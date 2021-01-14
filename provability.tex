@@ -3,16 +3,16 @@
 \newcommand{\later}{\mathord{\blacktriangleright}}
 \newcommand{\laterp}{\mathord{\vartriangleright}}
 
-\title{Provability via Guarded Recursion with Intensionality} 
+\title{Provability via Realisability with Guarded Recursion} 
 \author{Liang-Ting Chen}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://l-tchen.github.io}}%
   {liang.ting.chen.tw@gmail.com}%
   {https://orcid.org/0000-0002-3250-1331}{}
-\author{Hsiang-Shang `Josh' Ko}%
+\author{Hsiang-Shang Ko}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://josh-hs-ko.github.io}}%
   {joshko@iis.sinica.edu.tw}%
   {https://orcid.org/0000-0002-2439-1048}{}
-\authorrunning{L.-T.~Chen and Josh Ko} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
+\authorrunning{L.-T.~Chen and H.-S.~Ko}
 
 \Copyright{Liang-Ting Chen and Hsiang-Shang Ko}
 \ccsdesc{Theory of computation~Type theory}
@@ -55,18 +55,13 @@
 
 %TODO: Polish abstract
 \begin{abstract}
-  In this paper we give a positive answer to an open problem posed by Kavvos~\cite{Kavvos2020}: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
-  We give a realizability interpretation of such in the category of assemblies in two (variants of) guarded type theories.
-  One is the ticked cubical type theory---an extension of cubical type theory with guarded recursion~\cite{Mogelberg2019a};
-  the other is the internal language~\cite{Birkedal2012,Clouston2016} of topos of trees~$\Tree$ extended with a later modality on the level of types and on the level of propositions respectively. 
-
-  Of the utmost significance of our interpretation is the combination of
-  \begin{enumerate}[(a)]
-    \item intensional descriptions, e.g., formal derivations of proofs or code of programs and
-    \item extensions, i.e.\ denotations and availability through computational steps.
-  \end{enumerate}
-  Putting these altogether, we construct a categorical model satisfying Gödel-Löb axiom but refuting its stronger version.
-  By viewing provability $\Box A$ as a type of typed code for $A$ \`a la Davies and Pfenning~\cite{Davies2001b}, our work can be viewed as a step towards the meta-level (guarded) recursion but maintaining consistency.
+  In this paper we give a positive answer to an open problem posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$(\mathsf{GL})\colon \Box (\Box A \to A) \to \Box A$ but refuting~$(\mathsf{r}) \colon A \to \Box A$?
+  We construct an endofunctor of the category of assemblies internal to guarded type theory as the interpretation of $\Box$.
+  Of the utmost significance of our interpretation is the insight that its denotation should involve not only intensions, e.g., derivations of a proof, code of programs, or realisers, inspired by its provability reading but also their extensions.
+  In fact, we give our construction in two very different variants of guarded type theory:
+  one is the ticked cubical type theory---an extension of cubical type theory with guarded recursion;
+  the other is the internal language of topos of trees extended with a later modality on the level of types and on the level of propositions respectively. 
+  By viewing~$\Box A$ as a type of typed code for $A$ \`a la Davies and Pfenning, our work can be viewed as a step towards type-disciplined metaprogramming with non-structural but guarded recursion.
 \end{abstract}
 
 \section{Introduction}
@@ -81,7 +76,7 @@
 \cite{Kavvos2017,Kavvos2020}
 \cite{Shamkanov2014,Shamkanov2016a}
 
-\section{Preliminaries: interpreting intensionality via assemblies}
+\section{Preliminaries}
 \subsection{Realisability}
 \begin{definition}[Partial map classifer]
   
@@ -92,14 +87,10 @@
   
 \end{definition}
 
-\subsection{Intensionality}
-\begin{remark}[$\mathscr{P}$-category and exposure]
-  
-\end{remark}
-
 \subsection{Guarded recursion}
 
 \section{Realising provability using topos of trees}
+\section{Semantics of intensionality}
 \subsection{Topos of trees and its internal logic}
 \cite{Birkedal2012,Clouston2016}
 
@@ -112,7 +103,7 @@
 \section{Conclusion}
 \paragraph*{Comparison}
 \paragraph*{Future work}
-
+\cite{Davies2001b}
 %%
 %% Bibliography
 %%
