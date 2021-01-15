@@ -5,7 +5,7 @@ module Algebra.PCA.Base where
 open import Prelude
 open import Cubical.Foundations.Structure
 
-open import Function.Partial
+open import Function.Partial              public
 
 record PasStr (A : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor passtr

@@ -10,6 +10,8 @@ open import Agda.Primitive public
           ; Setω to 𝓤ω
           ; Set to Type
           )
+open import Cubical.Foundations.Everything public
+open import Cubical.Data.Sigma             public
 
 variable
   𝓤 𝓥 𝓦 𝓣 𝓤' 𝓥' 𝓦' 𝓣' : Universe
@@ -33,6 +35,3 @@ variable
 
 Π : {X : 𝓤 ̇ } (Y : X → 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
 Π {X = X} Y = (x : X) → Y x
-
-open import Cubical.Foundations.Everything public
-open import Cubical.Data.Sigma             public
