@@ -1,6 +1,8 @@
 {-# OPTIONS --without-K --cubical #-}
 
-module Prelude where
+{- Stolen from https://github.com/martinescardo/TypeTopology/ -}
+
+module Universes where
 
 open import Agda.Primitive public
   using (_⊔_)
@@ -12,9 +14,9 @@ open import Agda.Primitive public
           )
 
 variable
-  𝓤 𝓥 𝓦 𝓣 𝓤' 𝓥' 𝓦' 𝓣' : Universe
+ 𝓤 𝓥 𝓦 𝓣 𝓤' 𝓥' 𝓦' 𝓣' : Universe
 
-infix 1 _̇
+infix  1 _̇
 
 _̇ : (𝓤 : Universe) → _
 𝓤 ̇ = Type 𝓤
@@ -27,12 +29,3 @@ _⁺⁺ : Universe → Universe
 
 universe-of : (X : 𝓤 ̇ ) → Universe
 universe-of {𝓤} X = 𝓤
-
-variable
-  X Y Z : 𝓤 ̇
-
-Π : {X : 𝓤 ̇ } (Y : X → 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
-Π {X = X} Y = (x : X) → Y x
-
-open import Cubical.Foundations.Everything public
-open import Cubical.Data.Sigma             public

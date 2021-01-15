@@ -18,18 +18,18 @@
 \ccsdesc{Theory of computation~Type theory}
 \ccsdesc{Theory of computation~Logic}
 \ccsdesc{Theory of computation~Constructive mathematics}
-\keywords{Löb's theorem, guarded recursion, realizability, guarded cubical type theory, metaprogramming}
+\keywords{Löb's theorem, guarded recursion, realizability, cubical type theory, modal type theory, metaprogramming}
 
 \category{} %optional, e.g. invited paper
 
 \relatedversion{} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
 %\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
 
-\supplement{The results based on the ticked cubical type theory were formalised in Guarded Cubical Agda and the source code is available at \url{https://github.com/L-TChen/GLGR}.} %optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
+\supplement{The results based on the ticked cubical type theory were formalised in Guarded Cubical Agda with source code available at \url{https://github.com/L-TChen/provability}.}
 
 \funding{This work was supported by the Ministry of Science and Technology of Taiwan under grant MOST~109-2222-E-001-002-MY3.}
 
-%\acknowledgements{I want to thank \dots}%optional
+\acknowledgements{We want to thank Alex Kavvos and Martin Escard\'o.}
 
 \nolinenumbers %uncomment to disable line numbering
 
@@ -55,13 +55,13 @@
 
 %TODO: Polish abstract
 \begin{abstract}
-  In this paper we give a positive answer to an open problem posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$(\mathsf{GL})\colon \Box (\Box A \to A) \to \Box A$ but refuting~$(\mathsf{r}) \colon A \to \Box A$?
+  In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
   We construct an endofunctor of the category of assemblies internal to guarded type theory as the interpretation of $\Box$.
-  Of the utmost significance of our interpretation is the insight that its denotation should involve not only intensions, e.g., derivations of a proof, code of programs, or realisers, inspired by its provability reading but also their extensions.
-  In fact, we give our construction in two very different variants of guarded type theory:
-  one is the ticked cubical type theory---an extension of cubical type theory with guarded recursion;
-  the other is the internal language of topos of trees extended with a later modality on the level of types and on the level of propositions respectively. 
-  By viewing~$\Box A$ as a type of typed code for $A$ \`a la Davies and Pfenning, our work can be viewed as a step towards type-disciplined metaprogramming with non-structural but guarded recursion.
+  Of the utmost significance of our understanding for $\Box A$ is the insight that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or realisers, inspired by its provability reading.
+  Our results are established in two styles.
+  One is the `propositions-as-type' approach using ticked cubical type theory---an extension of cubical type theory with guarded recursion.
+  The other is `logic over a type theory' using the internal logic of topos extended with a later modality on the level of types and on the level of propositions respectively. 
+  By viewing~$\Box A$ as a type of typed code in the sense of Davies and Pfenning, our work can be viewed as a step towards typed metaprogramming with non-structural but guarded recursion.
 \end{abstract}
 
 \section{Introduction}
@@ -89,8 +89,9 @@
 
 \subsection{Guarded recursion}
 
+\subsection{Intensionality}
+
 \section{Realising provability using topos of trees}
-\section{Semantics of intensionality}
 \subsection{Topos of trees and its internal logic}
 \cite{Birkedal2012,Clouston2016}
 

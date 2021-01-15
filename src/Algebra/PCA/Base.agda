@@ -7,7 +7,7 @@ open import Cubical.Foundations.Structure
 
 open import Function.Partial
 
-record PasStr (A : Type ℓ) : Type (ℓ-suc ℓ) where
+record PasStr (A : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor passtr
   field
     _·_ : A → A → ℒ A
@@ -19,14 +19,14 @@ PAS ℓ = TypeWithStr ℓ PasStr
 PAS₀ : Type₁
 PAS₀ = PAS ℓ-zero
 
-record IsPCA {A : Type ℓ} (_·_ : A → A → ℒ A) : Type ℓ where
+record IsPCA {A : 𝓤 ̇} (_·_ : A → A → ℒ A) : 𝓤 ̇ where
   constructor ispca
   field
     k : {!!} -- ∃[ k ∈ A ] ∀ (x y : A) → (k · x · y) ↓ ∧ k · x · y = x
     s : {!!} -- ∃[ s ∈ A ] ∀ (x y z : A) → s · x · y ↓ ∧ s · x · y · z ≈ x · z · (y · z)
              -- where ≈ is the Kleene equality. Note that k and s are part of properties instead of structure. 
 
-record PcaStr (A : Type ℓ) : Type (ℓ-suc ℓ) where
+record PcaStr (A : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor pcastr
   field
     _·_   : A → A → ℒ A

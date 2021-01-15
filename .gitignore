@@ -1,3 +1,4 @@
 *.pdf
 *.vtc
 library_fixed.bib
+*.agda#
