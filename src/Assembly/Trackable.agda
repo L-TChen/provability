@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --allow-unsolved-metas #-}
 
 open import Prelude
 open import Algebra.PCA

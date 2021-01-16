@@ -15,6 +15,8 @@ open import Cubical.Foundations.Everything       public
 open import Cubical.Data.Sigma                   public
 open import Cubical.HITs.PropositionalTruncation public
 
+open import Later public
+
 
 variable
   𝓤 𝓥 𝓦 𝓣 𝓤' 𝓥' 𝓦' 𝓣' : Universe

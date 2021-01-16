@@ -3,6 +3,7 @@
 module Algebra.PCA.Base where
 
 open import Prelude
+open import Cubical.Data.Unit
 open import Cubical.Foundations.Structure
 
 open import Function.Partial              public
@@ -22,6 +23,7 @@ PAS₀ = PAS ℓ-zero
 record IsPCA {A : 𝓤 ̇} (_·_ : A → A → ℒ A) : 𝓤 ̇ where
   constructor ispca
   field
+    nonEmpty : ∃[ a ∈ A ] Unit*
     k : ∃[ k ∈ A ] ∀ (x y : A) → Σ[ p ∈ bindℒ (k · x) (_· y) ↓ ] value (bindℒ (k · x) (_· y)) p ≡ x
      -- ∃[ k ∈ A ] ∀ (x y : A) → (k · x · y) ↓ ∧ k · x · y = x
     s : ∃[ s ∈ A ] ∀ (x y z : A) → {!!}

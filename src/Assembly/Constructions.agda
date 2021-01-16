@@ -1,15 +1,16 @@
 {-# OPTIONS --without-K --cubical #-}
 
 open import Prelude
-open import Cubical.Data.Empty
-  renaming (⊥ to Empty)
-
 open import Algebra.PCA
 
 module Assembly.Constructions (A : PCA 𝓤₀) where
 
+open import Cubical.Data.Empty
+  renaming (⊥ to Empty)
+open import Cubical.Data.Unit
+
 open import Assembly.Base      A
---open import Assembly.Trackable A
+open import Assembly.Trackable A
 open PcaStr (str A)
 
 ⊥ : Asm₀
@@ -22,7 +23,7 @@ open PcaStr (str A)
     () isRealisable
 
 □_ : Asm 𝓤 → Asm 𝓤
-□ (|X| , asmstr _⊩_ _isRealisable-in-|X|) = |□X| , asmstr _⊩□x_ _isRealisable
+□ (|X| , asmstr _⊩_ _) = |□X| , asmstr _⊩□x_ _isRealisable
   where
     |□X| = Σ[ a ∈ ⟨ A ⟩ ] Σ[ x ∈ |X| ] (a ⊩ x)
 
@@ -31,3 +32,8 @@ open PcaStr (str A)
 
     _isRealisable  : (x : |□X|) → ∃[ a ∈ ⟨ A ⟩ ] (a ⊩□x x)
     (a , x , a⊩x) isRealisable = ∣ a , lift refl ∣
+
+∇₀_ : (X : 𝓤 ̇) → Asm 𝓤
+∇₀ X = X , asmstr (λ a x → Unit*) λ x → {! nonEmpty !}
+  where
+    open IsPCA isPCA
