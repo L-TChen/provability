@@ -9,8 +9,6 @@ open import Cubical.Data.Unit
 
 open import Cubical.Functions.Embedding
 
-infix 6 _↓
-
 module _ {X : 𝓤 ̇} {Y : 𝓥 ̇} (R : X → Y → 𝓤 ⊔ 𝓥 ̇) where
   isFunctional : 𝓤 ⊔ 𝓥 ̇
   isFunctional = (x : X) → isProp (Σ[ y ∈ Y ] R x y)
@@ -18,16 +16,28 @@ module _ {X : 𝓤 ̇} {Y : 𝓥 ̇} (R : X → Y → 𝓤 ⊔ 𝓥 ̇) where
 _⇀_ : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
 X ⇀ Y = Σ[ R ∈ _ ] Σ[ e ∈ (R → X) ] isEmbedding e × (R → Y) 
 
-ℒ_ : 𝓤 ̇ → 𝓤 ⁺ ̇ 
-ℒ Y = Σ[ P ∈ (universe-of Y) ̇ ] (isProp P × (P → Y))
+record ℒ_ (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
+  constructor partial
+  field
+    P       : 𝓤 ̇
+    PisProp : isProp P
+    value   : P → X
+open ℒ_ renaming (P to _↓; PisProp to _↓isProp) public
 
-_is-defined : ℒ X → (universe-of X) ̇
-(P , φ , x) is-defined = P
+_is-defined : ℒ X → (universeOf X) ̇
+_is-defined = ℒ_.P
 
-_↓ = _is-defined
+unitℒ : X → ℒ X
+unitℒ x = partial Unit* isPropUnit* λ _ → x
 
-value : (u : ℒ Y) → (u is-defined) → Y
-value (P , _ , f) = f
+bindℒ : {X Y : 𝓤 ̇}
+  → ℒ X → (X → ℒ Y) → ℒ Y
+bindℒ {Y = Y} x f = partial Q QisProp y
+  where
+    Q = Σ[ p ∈ x is-defined ] (f (value x p) ↓)
 
-η : X → ℒ X
-η x = Lift Unit , (λ { (lift tt) (lift tt) i → lift tt }) , (λ _ → x)
+    QisProp : isProp Q
+    QisProp = isPropΣ (x ↓isProp) λ p → f (value x p) ↓isProp
+
+    y : Q → Y
+    y (p , fx↓) = value (f (value x p)) fx↓

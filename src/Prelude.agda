@@ -11,6 +11,7 @@ open import Agda.Primitive public
           ; Set to Type
           )
 open import Cubical.Foundations.Everything       public
+  hiding (id)
 open import Cubical.Data.Sigma                   public
 open import Cubical.HITs.PropositionalTruncation public
 
@@ -29,8 +30,8 @@ _̇ : (𝓤 : Universe) → _
 _⁺⁺ : Universe → Universe
 𝓤 ⁺⁺ = 𝓤 ⁺ ⁺
 
-universe-of : (X : 𝓤 ̇ ) → Universe
-universe-of {𝓤} X = 𝓤
+universeOf : (X : 𝓤 ̇ ) → Universe
+universeOf {𝓤} X = 𝓤
 
 variable
   X Y Z : 𝓤 ̇

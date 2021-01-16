@@ -17,4 +17,3 @@ Asm 𝓤 = TypeWithStr 𝓤 AsmStr
 
 Asm₀ : 𝓤₁ ̇
 Asm₀ = Asm 𝓤₀
-

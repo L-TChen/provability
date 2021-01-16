@@ -7,20 +7,26 @@ module Assembly.Trackable (A : PCA 𝓤₀) where
 
 open import Assembly.Base A
 open PcaStr (str A)
+open IsPCA isPCA
 
-record IsTrackable (X : Asm 𝓤) (Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where 
-  constructor istrackable
-
+module _ (X Y : Asm 𝓤) where
   open AsmStr (str X) renaming (_⊩_ to _⊩x_)
   open AsmStr (str Y) renaming (_⊩_ to _⊩y_)
-  field
-    isTrackable : ∃[ r ∈ ⟨ A ⟩ ]
-        ∀ (a : ⟨ A ⟩) (x : ⟨ X ⟩)
-      → a ⊩x x
-      → Σ[ p ∈ r · a ↓ ] value (r · a) p ⊩y f x
+  
+  _tracks_ : ⟨ A ⟩ → (⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
+  _tracks_ r f = ∀ (a : ⟨ A ⟩) (x : ⟨ X ⟩)
+    → Σ[ p ∈ (r · a) ↓ ] (value (r · a) p ⊩y f x) 
 
-record Trackable (X : Asm 𝓤) (Y : Asm 𝓤) : 𝓤 ̇ where
-  constructor trackable
-  field
-    fun         : ⟨ X ⟩ → ⟨ Y ⟩
-    isTrackable : IsTrackable X Y fun
+  record IsTrackable (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where 
+    constructor istrackable
+    field
+      tracker : ∃[ r ∈ ⟨ A ⟩ ] r tracks f
+
+  record Trackable : 𝓤 ̇ where
+    constructor trackable
+    field
+      fun         : ⟨ X ⟩ → ⟨ Y ⟩
+      isTrackable : IsTrackable fun
+
+id : (X : Asm 𝓤) → Trackable X X
+id X = trackable (λ x → x) (istrackable {!!})

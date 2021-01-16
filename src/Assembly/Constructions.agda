@@ -9,7 +9,7 @@ open import Algebra.PCA
 module Assembly.Constructions (A : PCA 𝓤₀) where
 
 open import Assembly.Base      A
-open import Assembly.Trackable A
+--open import Assembly.Trackable A
 open PcaStr (str A)
 
 ⊥ : Asm₀
@@ -26,7 +26,7 @@ open PcaStr (str A)
   where
     |□X| = Σ[ a ∈ ⟨ A ⟩ ] Σ[ x ∈ |X| ] (a ⊩ x)
 
-    _⊩□x_   : ⟨ A ⟩ → |□X| → universe-of |X| ̇
+    _⊩□x_   : ⟨ A ⟩ → |□X| → universeOf |X| ̇
     a ⊩□x (a′ , x , a′⊩x) = Lift (a ≡ a′)
 
     _isRealisable  : (x : |□X|) → ∃[ a ∈ ⟨ A ⟩ ] (a ⊩□x x)

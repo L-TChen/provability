@@ -22,9 +22,13 @@ PAS₀ = PAS ℓ-zero
 record IsPCA {A : 𝓤 ̇} (_·_ : A → A → ℒ A) : 𝓤 ̇ where
   constructor ispca
   field
-    k : {!!} -- ∃[ k ∈ A ] ∀ (x y : A) → (k · x · y) ↓ ∧ k · x · y = x
-    s : {!!} -- ∃[ s ∈ A ] ∀ (x y z : A) → s · x · y ↓ ∧ s · x · y · z ≈ x · z · (y · z)
-             -- where ≈ is the Kleene equality. Note that k and s are part of properties instead of structure. 
+    k : ∃[ k ∈ A ] ∀ (x y : A) → Σ[ p ∈ bindℒ (k · x) (_· y) ↓ ] value (bindℒ (k · x) (_· y)) p ≡ x
+     -- ∃[ k ∈ A ] ∀ (x y : A) → (k · x · y) ↓ ∧ k · x · y = x
+    s : ∃[ s ∈ A ] ∀ (x y z : A) → {!!}
+     -- ∃[ s ∈ A ] ∀ (x y z : A) → s · x · y ↓ ∧ s · x · y · z ≈ x · z · (y · z)
+    -- where ≈ is the Kleene equality. Note that k and s are part of properties instead of structure. 
+  i : ∃[ i ∈ A ] ∀ (x : A) → Σ[ p ∈ (i · x) ↓ ] value (i · x) p ≡ x 
+  i = {!!}
 
 record PcaStr (A : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor pcastr
@@ -32,8 +36,6 @@ record PcaStr (A : 𝓤 ̇) : 𝓤 ⁺ ̇ where
     _·_   : A → A → ℒ A
     isPCA : IsPCA _·_
   infixl 7 _·_
-
-  open IsPCA isPCA
   
 PCA : (ℓ : Level) → Type (ℓ-suc ℓ)
 PCA ℓ = TypeWithStr ℓ PcaStr
