@@ -3,14 +3,14 @@
 open import Prelude
 open import Algebra.PCA
 
-module Assembly.Constructions (A : PCA 𝓤₀) where
+module Assembly.Constructions (A : PCA 𝓥 𝓤₀) where
 
 open import Cubical.Data.Empty
   renaming (⊥ to Empty)
 open import Cubical.Data.Unit
 
-open import Assembly.Base      A
-open import Assembly.Trackable A
+open import Assembly.Base      𝓥 A
+open import Assembly.Trackable 𝓥 A
 open PcaStr (str A)
 
 ⊥ : Asm₀

@@ -16,8 +16,8 @@ open import Later     public
 variable
   X Y Z : 𝓤 ̇
 
-∥_∥* : 𝓤 ̇ → 𝓤 ⊔ 𝓤₁ ̇
-∥_∥* X = Lift {j = 𝓤₁} ∥ X ∥
+∥_∥* : 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
+∥_∥* {𝓥 = 𝓥} X = Lift {j = 𝓥} ∥ X ∥
 
 pattern ∣_∣* x = lift (∣_∣ x)
 ------------------------------------------------------------------------
@@ -55,20 +55,20 @@ f ˢ g = λ x → f x (g x)
 
 -- Instances mainly for programming instead of reasoning (subject to change)
 
-Fun : 𝓤ω
-Fun = {𝓤 : Universe} → 𝓤 ̇ → 𝓤 ⊔ 𝓤₁ ̇
+Fun : Universe → 𝓤ω
+Fun 𝓥 = {𝓤 : Universe} → 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
 
-IxFun : 𝓤 ̇ → 𝓤ω
-IxFun Ix = {𝓤 : Universe} → Ix → Ix → 𝓤 ̇ → 𝓤 ⊔ 𝓤₁ ̇
+IxFun : Universe → 𝓤 ̇ → 𝓤ω
+IxFun 𝓥 Ix = {𝓤 : Universe} → Ix → Ix → 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
 
 private
   variable
-    F T M       : Fun
+    F T M       : Fun 𝓥
     Ix          : 𝓤 ̇
-    IxF IxT IxM : IxFun Ix
+    IxF IxT IxM : IxFun 𝓥 Ix
     i j k       : Ix
 
-record Functor (T : Fun) : 𝓤ω where
+record Functor (𝓥 : Universe) (T : Fun 𝓥) : 𝓤ω where
   infixl 6 _<$>_
   field
     _<$>_ : (X → Y) → T X → T Y
@@ -80,16 +80,16 @@ open Functor ⦃...⦄ public
 {-# DISPLAY Functor._<$>_ = _<$>_ #-}
 
 instance
-  truncFunc : Functor ∥_∥*
+  truncFunc : Functor 𝓥 (∥_∥* {𝓥 = 𝓥})
   _<$>_ ⦃ truncFunc ⦄ f x = lift (Cubical.HITs.PropositionalTruncation.map f (x .lower))
 
-record IxApplicative (F : IxFun Ix) : 𝓤ω where
+record IxApplicative (𝓥 : Universe) (F : IxFun 𝓥 Ix) : 𝓤ω where
   infixl 4 _<*>_ _*>_ _<*_
   field
     pure   : X → F i i X
     _<*>_  : F i j (X → Y) → F j k X → F i k Y
 
-  Applicative⇒Functor : Functor (F i j)
+  Applicative⇒Functor : Functor 𝓥 (F i j)
   _<$>_ ⦃ Applicative⇒Functor ⦄ f ma = pure f <*> ma
 
   _*>_ : F i j X → F j k Y → F i k Y
@@ -116,10 +116,10 @@ open IxApplicative ⦃...⦄ public
 {-# DISPLAY IxApplicative._*>_  = _*>_ #-}
 {-# DISPLAY IxApplicative.when  = when #-}
 
-Applicative : Fun → 𝓤ω
-Applicative F = IxApplicative {Ix = Unit} λ _ _ → F
+Applicative : (𝓥 : Universe) → Fun 𝓥 → 𝓤ω
+Applicative 𝓥 F = IxApplicative {Ix = Unit} 𝓥 λ _ _ → F
 
-record IxMonad (M : IxFun Ix) : 𝓤ω where
+record IxMonad (𝓥 : Universe) (M : IxFun 𝓥 Ix) : 𝓤ω where
   infixl 1 _>>=_ _>>_ _>=>_ _>>_
   infixr 1 _=<<_ _<=<_
   field
@@ -159,7 +159,7 @@ record IxMonad (M : IxFun Ix) : 𝓤ω where
     true  → mx
     false → my
 
-  IxMonad⇒IxApplicative : IxApplicative M
+  IxMonad⇒IxApplicative : IxApplicative 𝓥 M
   pure    ⦃ IxMonad⇒IxApplicative ⦄ = return
   _<*>_   ⦃ IxMonad⇒IxApplicative ⦄ = ap
 open IxMonad ⦃...⦄ public
@@ -169,14 +169,14 @@ open IxMonad ⦃...⦄ public
 {-# DISPLAY IxMonad.join   = join #-}
 {-# DISPLAY IxMonad.ifM_then_else_  = ifM_then_else_ #-}
 
-Monad : Fun → 𝓤ω
-Monad M = IxMonad {Ix = Unit} λ _ _ → M
+Monad : (𝓥 : Universe) → Fun 𝓥 → 𝓤ω
+Monad 𝓥 M = IxMonad {Ix = Unit} 𝓥 λ _ _ → M
 
-Monad⇒Applicative : {M : Fun} ⦃ _ : Monad M ⦄ → Applicative M
-Monad⇒Applicative {M} = IxMonad⇒IxApplicative {M = λ _ _ → M}
+Monad⇒Applicative : {M : Fun 𝓥} ⦃ _ : Monad 𝓥 M ⦄ → Applicative 𝓥 M
+Monad⇒Applicative {𝓥 = 𝓥} {M} = IxMonad⇒IxApplicative {M = λ _ _ → M}
 
 instance
-  Monad∥-∥ : Monad ∥_∥*
+  Monad∥-∥ : Monad 𝓥 (∥_∥* {𝓥 = 𝓥})
   return ⦃ Monad∥-∥ ⦄ x   = lift ∣ x ∣
   _>>=_  ⦃ Monad∥-∥ ⦄ x f =
     rec (λ {(lift x) (lift y) i → lift (squash x y i)}) f (lower x)

@@ -12,24 +12,24 @@ module _ {X : 𝓤 ̇} {Y : 𝓥 ̇} (R : X → Y → 𝓤 ⊔ 𝓥 ̇) where
   isFunctional = (x : X) → isProp (Σ[ y ∈ Y ] R x y)
 
 _⇀_ : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
-X ⇀ Y = Σ[ R ∈ _ ] Σ[ e ∈ (R → X) ] isEmbedding e × (R → Y) 
+X ⇀ Y = Σ[ R ∈ universeOf X ⊔ universeOf Y ̇ ] Σ[ e ∈ (R → X) ] isEmbedding e × (R → Y) 
 
-record ℒ_ (X : 𝓤 ̇) : 𝓤 ⊔ 𝓤₁ ̇ where
+record ℒ (𝓥 : Universe) (X : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor partial
   field
-    P       : 𝓤₀ ̇
+    P       : 𝓥 ̇
     PisProp : isProp P
     value   : P → X
-open ℒ_ renaming (P to _↓; PisProp to _↓isProp) public
+open ℒ renaming (P to _↓; PisProp to _↓isProp) public
 
-_is-defined : ℒ X → 𝓤₀ ̇
-_is-defined = ℒ_.P
+_is-defined : ℒ 𝓥 X → 𝓥 ̇
+_is-defined = ℒ.P
 
 instance
-  Functorℒ : Functor ℒ_
+  Functorℒ : Functor (𝓥 ⁺) (ℒ 𝓥)
   _<$>_ ⦃ Functorℒ ⦄ f (partial P PisProp x) = partial P PisProp (f ∘ x)
   
-  Monadℒ : Monad ℒ_
+  Monadℒ : Monad (𝓥 ⁺) (ℒ 𝓥)
   return ⦃ Monadℒ ⦄ x   = partial Unit* isPropUnit* λ _ → x
   _>>=_  ⦃ Monadℒ ⦄ x f = partial Q QisProp y
     where
@@ -41,5 +41,5 @@ instance
       y : Q → _
       y (p , fx↓) = value (f (value x p)) fx↓
 
-  Applicativeℒ : Applicative ℒ_
+  Applicativeℒ : Applicative (𝓥 ⁺) (ℒ 𝓥)
   Applicativeℒ = Monad⇒Applicative
