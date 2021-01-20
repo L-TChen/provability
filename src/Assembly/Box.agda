@@ -6,8 +6,9 @@ open import Algebra.PCA
 
 module Assembly.Box (A : PCA 𝓥 𝓤₀) where
 open PcaStr (str A)
+open IsPCA isPCA
 
-open import Assembly.Base      𝓥 A
+open import Assembly.Base 𝓥 A
 
 □_ : Asm 𝓤 → Asm 𝓤
 □ (|X| , asmstr _⊩_ _) = |□X| , asmstr _⊩□x_ _isRealisable
@@ -22,13 +23,6 @@ open import Assembly.Base      𝓥 A
 
 module _ where
   open Mor (□ ⊥) ⊥
-  f : (⟨ □ ⊥ ⟩ → Empty) → ▹ Empty → Empty
-  f eval⊥ ▹x = truncElim (λ _ → isProp⊥) bang nonEmpty
-    where
-      open IsPCA isPCA
-      bang : ⟨ A ⟩ → Empty
-      bang a = eval⊥ (a , ▹x , λ α → elim {𝓤₀} {A = (λ ())} (▹x α))
-
   -- Corollary.
   --   1. Evaluation □ ⊥ → ⊥ does not exist.
   --   2. There is no natural transformation □ → Id of exposures.
@@ -39,6 +33,5 @@ module _ where
       lem : (⟨ □ ⊥ ⟩ → Empty) → ▹ Empty → Empty
       lem eval⊥ ▹x = truncElim (λ _ → isProp⊥) bang nonEmpty
         where
-          open IsPCA isPCA
           bang : ⟨ A ⟩ → Empty
           bang a = eval⊥ (a , ▹x , λ α → elim {𝓤₀} {A = (λ ())} (▹x α))
