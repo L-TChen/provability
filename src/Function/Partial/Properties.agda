@@ -7,5 +7,6 @@ open import Cubical.Functions.Embedding
 
 open import Function.Partial.Base
 
-partial-map-classifer : (X ⇀ Y) ≃ (X → ℒ (universeOf X ⊔ universeOf Y) Y)
+partial-map-classifer : {X Y : 𝓤 ̇}
+  → (X ⇀ Y) ≃ (X → ℒ (universeOf X ⊔ universeOf Y) Y)
 partial-map-classifer = {!!}

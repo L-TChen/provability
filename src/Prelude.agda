@@ -9,18 +9,42 @@ open import Cubical.HITs.PropositionalTruncation public
   renaming (elim to truncElim)
 open import Cubical.Data.Sigma                   public
 open import Cubical.Data.Unit                    public
+open import Cubical.Data.Empty                   public
+  renaming (rec to ⊥rec)
 open import Cubical.Data.Bool                    public
 
 open import Universes public
 open import Later     public
 
-variable
-  X Y Z : 𝓤 ̇
+private
+  variable
+    X Y Z : 𝓤 ̇
 
 ∥_∥* : 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
 ∥_∥* {𝓥 = 𝓥} X = Lift {j = 𝓥} ∥ X ∥
 
 pattern ∣_∣* x = lift (∣_∣ x)
+
+------------------------------------------------------------------------
+-- Π x ꞉ A , Σ a ꞉ A , ∃ a ꞉ A notation in Type Theory
+
+infixr -1 Pi Sigma MereExists
+syntax Pi A (λ x → b)         = Π[ x ꞉ A ] b
+syntax Sigma A (λ x → b)      = Σ[ x ꞉ A ] b
+syntax MereExists A (λ x → b) = ∃[ x ꞉ A ] b
+
+Π : {X : 𝓤 ̇} (Y : X → 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
+Π {𝓤} {𝓥} {X} Y = (x : X) → Y x
+
+Pi : (X : 𝓤 ̇ ) (Y : X → 𝓥 ̇ ) → 𝓤 ⊔ 𝓥 ̇
+Pi X Y = Π Y
+
+Sigma : (X : 𝓤 ̇ ) (Y : X → 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
+Sigma X Y = Σ X Y
+
+MereExists : (X : 𝓤 ̇) (Y : X → 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
+MereExists X Y = ∥ Σ X Y ∥
+
 ------------------------------------------------------------------------
 -- Some simple functions
 
