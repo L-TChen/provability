@@ -6,31 +6,32 @@ module Later where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
+open import Universes 
 
 module Prims where
   primitive
-    primLockUniv : Set₁
+    primLockUniv : 𝓤₁ ̇
 open Prims renaming (primLockUniv to LockU) public
-
-private
-  variable
-    ℓ : Level
-    A : Set ℓ
-    B : A → Set ℓ
 
 infixr 2 ▹-syntax
 infixl 4 _⊛_
+infixl 0 ▹_
+
+private
+  variable
+    A : 𝓤 ̇
+    B : A → 𝓤 ̇
 
 postulate
   Tick : LockU
 
-▹_ : Set ℓ → Set ℓ
+▹_ : 𝓤 ̇ → 𝓤 ̇
 ▹ A = (@tick α : Tick) → A
 
-▸_ : ▹ Set ℓ → Set ℓ
+▸_ : ▹ 𝓤 ̇ → 𝓤 ̇
 ▸ A  = (@tick α : Tick) → A α
 
-▹-syntax : ▹ Set ℓ → Set ℓ
+▹-syntax : ▹ 𝓤 ̇ → 𝓤 ̇
 ▹-syntax A = (@tick α : Tick) → A α
 
 syntax ▹-syntax (λ α → e) = ▹[ α ] e
@@ -82,4 +83,3 @@ fix f = f (dfix f)
 
 fix-path : (f : ▹ A → A) → fix f ≡ f (next (fix f))
 fix-path f i = f (dfix-path f i)
-

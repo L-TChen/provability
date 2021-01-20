@@ -2,8 +2,9 @@
 \newcommand{\Tree}{\mathcal{S}}
 \newcommand{\later}{\mathord{\blacktriangleright}}
 \newcommand{\laterp}{\mathord{\vartriangleright}}
+\newcommand{\PER}{\mathbf{PER}}
 
-\title{A Realisability Semantics for Intensional Recursion} 
+\title{Realising Provability as Intensional Guarded Recursion} 
 \author{Liang-Ting Chen}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://l-tchen.github.io}}%
   {liang.ting.chen.tw@gmail.com}%
@@ -25,7 +26,7 @@
 \relatedversion{} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
 %\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
 
-\supplement{The results based on the ticked cubical type theory were formalised in Guarded Cubical Agda with source code available at \url{https://github.com/L-TChen/provability}.}
+\supplement{The results were formalised in Guarded Cubical Agda with source code available at \url{https://github.com/L-TChen/provability}.}
 
 \funding{This work was supported by the Ministry of Science and Technology of Taiwan under grant MOST~109-2222-E-001-002-MY3.}
 
@@ -56,11 +57,9 @@
 %TODO: Polish abstract
 \begin{abstract}
   In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
-  We construct an endofunctor of the category of assemblies internal to guarded type theory as the interpretation of $\Box$.
-  Of the utmost significance of our understanding for $\Box A$ is the insight that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or realisers, inspired by its provability reading.
-  Our results are established in two styles.
-  One is the `propositions-as-type' approach using ticked cubical type theory---an extension of cubical type theory with guarded recursion.
-  The other is `logic over a type theory' using the internal logic of topos extended with a later modality on the level of types and on the level of propositions respectively. 
+  We construct an endoexposure of the $\PER$-category of assemblies internal to guarded type theory as the interpretation of the provability modality~$\Box$.
+  Of the utmost significance of our understanding for $\Box A$ is that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or realisers, inspired by its provability reading.
+  Our results are established in the framework of ticked cubical type theory---an extension of cubical type theory with guarded recursion.
   By viewing~$\Box A$ as a type of typed code in the sense of Davies and Pfenning, our work can be viewed as a step towards typed metaprogramming with non-structural but guarded recursion.
 \end{abstract}
 
@@ -78,6 +77,7 @@
 
 \section{Preliminaries}
 \subsection{Realisability}
+\cite{Escardo2017a,Knapp2018}
 \begin{definition}[Partial map classifer]
   
 \end{definition}
@@ -90,10 +90,20 @@
 \subsection{Guarded recursion}
 
 \subsection{Intensionality}
+\begin{definition}[Partial equivalence relation]
+  
+\end{definition}
+\begin{definition}[Categories enriched over $\mathbf{PER}$]
+  
+\end{definition}
+\begin{definition}[Exposure]
+  also comonadic exposure
+\end{definition}
 
-\section{Realising provability using topos of trees}
-\subsection{Topos of trees and its internal logic}
-\cite{Birkedal2012,Clouston2016}
+%\section{Realising provability using topos of trees}
+%\subsection{Topos of trees and its internal logic}
+%\cite{Birkedal2012,Clouston2016}
+\section{Partial combinatory algebra with quotation}
 
 \section{Realising provability using guarded cubical type theory}
 
@@ -102,8 +112,13 @@
 \cite{Mogelberg2019a,Veltri2020}
 
 \section{Conclusion}
-\paragraph*{Comparison}
 \paragraph*{Future work}
+\begin{enumerate}
+  \item topos-theoretic arguments
+  \item Mix with \cite{Kavvos2017b}
+  \item Consistent version of \cite{Kavvos2017b}
+  \item Compare this with \cite{Shamkanov2014} and \cite{Shamkanov2016a}.
+\end{enumerate}
 \cite{Davies2001b}
 %%
 %% Bibliography

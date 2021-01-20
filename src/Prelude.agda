@@ -6,6 +6,7 @@ open import Cubical.Foundations.Everything       public
   hiding (id; ℓ-max)
 open import Cubical.HITs.PropositionalTruncation public
   hiding (map)
+  renaming (elim to truncElim)
 open import Cubical.Data.Sigma                   public
 open import Cubical.Data.Unit                    public
 open import Cubical.Data.Bool                    public

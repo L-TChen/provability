@@ -20,17 +20,15 @@ PAS 𝓥 𝓤 = TypeWithStr {𝓤 ⊔ 𝓥 ⁺} 𝓤 (PasStr 𝓥)
 PAS₀ : (𝓥 : Universe) → 𝓤₁ ⊔ 𝓥 ⁺ ̇
 PAS₀ 𝓥 = PAS 𝓥 𝓤₀
 
-record IsPCA (𝓥 : Universe) {A : 𝓤 ̇} (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ̇ where
+record IsPCA (𝓥 : Universe) {A : 𝓤 ̇} (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor ispca
   field
-    nonEmpty : ∃[ a ∈ A ] Unit
+    nonEmpty : ∥ A ∥
     -- k : {!!}
      -- ∃[ k ∈ A ] ∀ (x y : A) → (k · x · y) ↓ ∧ k · x · y = x
     -- s : {!!}
      -- ∃[ s ∈ A ] ∀ (x y z : A) → s · x · y ↓ ∧ s · x · y · z ≳ x · z · (y · z)
     -- where e ≳ e′ means that if e′ is defined then e is defined and e = e′
-  i : Σ[ i ∈ A ] ∀ (x : A) → Σ[ p ∈ (i · x) ↓ ] value (i · x) p ≡ x 
-  i = {!!}
   -- i = s · k · k
 
 record PcaStr (𝓥 : Universe) (A : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
