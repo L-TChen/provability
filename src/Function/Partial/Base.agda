@@ -26,6 +26,7 @@ record ℒ (𝓥 : Universe) (X : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
     P       : 𝓥 ̇
     PisProp : isProp P
     value   : P → X
+
 open ℒ using (value) public
 
 _↓ : {X : 𝓤 ̇} → ℒ 𝓥 X → 𝓥 ̇
@@ -43,6 +44,9 @@ undefined : ℒ 𝓥 X
 ℒ.PisProp undefined ()
 ℒ.value   undefined ()
  
+_≼_ : ℒ 𝓥 X → ℒ 𝓥 X → universeOf X ⊔ 𝓥 ̇
+x ≼ y = Σ[ x↓⇒y↓ ꞉ (x ↓ → y ↓) ] Π[ x↓ ꞉ x ↓ ] value x x↓ ≡ value y (x↓⇒y↓ x↓)   
+
 instance
   Functorℒ : Functor (𝓥 ⁺) (ℒ 𝓥)
   _<$>_ ⦃ Functorℒ ⦄ f (partial P PisProp x) = partial P PisProp (f ∘ x)

@@ -31,17 +31,14 @@ module Mor (X Y : Asm 𝓤) where
   open AsmStr (str X) renaming (_⊩_ to _⊩x_)
   open AsmStr (str Y) renaming (_⊩_ to _⊩y_)
   
-  record _Tracks_ (r : ⟨ A ⟩)(f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
-    constructor tracks
-    field
-      tracks : (a : ⟨ A ⟩) (x : ⟨ X ⟩)
-        → a ⊩x x
-        → Σ[ p ꞉ r · a ↓ ] value (r · a) p ⊩y f x
+  _tracks_ : (r : ⟨ A ⟩)(f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ⊔ 𝓥 ̇
+  r tracks f = Π[ a ꞉ ⟨ A ⟩ ] Π[ x ꞉ ⟨ X ⟩ ] Π[ _ ꞉ a ⊩x x ] Σ[ p ꞉ r · a ↓ ] value (r · a) p ⊩y (f x)
 
   record HasTracker (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ⊔ 𝓥 ⁺ ̇ where 
     constructor istrackable
     field
-      tracker : Σ[ r ꞉ ⟨ A ⟩ ] r Tracks f
+      tracker   : ⟨ A ⟩
+      isTracked : tracker tracks f
 
   IsTrackable : (⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ⊔ 𝓥 ⁺ ̇
   IsTrackable f = ∥ HasTracker f ∥

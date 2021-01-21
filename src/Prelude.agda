@@ -10,7 +10,7 @@ open import Cubical.HITs.PropositionalTruncation public
 open import Cubical.Data.Sigma                   public
 open import Cubical.Data.Unit                    public
 open import Cubical.Data.Empty                   public
-  renaming (rec to ⊥rec)
+  renaming (rec to ⊥rec; elim to ⊥-elim)
 open import Cubical.Data.Bool                    public
 
 open import Universes public

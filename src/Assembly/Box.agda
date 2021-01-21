@@ -13,6 +13,7 @@ open import Assembly.Base 𝓥 A
 □_ : Asm 𝓤 → Asm 𝓤
 □ (|X| , asmstr _⊩_ _) = |□X| , asmstr _⊩□x_ _isRealisable
   where
+    |□X| : universeOf |X| ̇
     |□X| = Σ[ a ꞉ ⟨ A ⟩ ] Σ[ x▹ ꞉ ▹ |X| ] ▹[ α ] a ⊩ x▹ α
 
     _⊩□x_   : ⟨ A ⟩ → |□X| → universeOf |X| ̇
@@ -26,7 +27,7 @@ module _ where
   -- Corollary.
   --   1. Evaluation □ ⊥ → ⊥ does not exist.
   --   2. There is no natural transformation □ → Id of exposures.
-  eval-does-not-exist : Π[ e ꞉ (⟨ □ ⊥ ⟩ → Empty) ] Π[ r ꞉ ⟨ A ⟩ ] ((r Tracks e) → Empty)
+  eval-does-not-exist : Π[ e ꞉ (⟨ □ ⊥ ⟩ → Empty) ] Π[ r ꞉ ⟨ A ⟩ ] (r tracks e → Empty)
   eval-does-not-exist e _ _ = fix (lem e)
     where
       -- Lemma. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
@@ -34,4 +35,4 @@ module _ where
       lem eval⊥ ▹x = truncElim (λ _ → isProp⊥) bang nonEmpty
         where
           bang : ⟨ A ⟩ → Empty
-          bang a = eval⊥ (a , ▹x , λ α → elim {𝓤₀} {A = (λ ())} (▹x α))
+          bang a = eval⊥ (a , ▹x , λ α → ⊥-elim {𝓤₀} {A = (λ ())} (▹x α))
