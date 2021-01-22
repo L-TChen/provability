@@ -4,6 +4,7 @@ module Function.Partial.Base where
 
 open import Cubical.Relation.Binary
 open import Cubical.Functions.Embedding
+open import Cubical.Data.Nat
 
 open import Prelude
 
@@ -44,8 +45,20 @@ undefined : ℒ 𝓥 X
 ℒ.PisProp undefined ()
 ℒ.value   undefined ()
  
-_≼_ : ℒ 𝓥 X → ℒ 𝓥 X → universeOf X ⊔ 𝓥 ̇
-x ≼ y = Σ[ x↓⇒y↓ ꞉ (x ↓ → y ↓) ] Π[ x↓ ꞉ x ↓ ] value x x↓ ≡ value y (x↓⇒y↓ x↓)   
+--⟪_⟫ : (ℕ → Bool) → 𝓤₀ ̇
+--⟪ α ⟫ = Σ[ n ꞉ ℕ ] α n ≡ true
+--
+--_isRosolini : 𝓤 ̇ → 𝓤 ⁺ ̇
+--A isRosolini = ∃[ α ꞉ (ℕ → Bool) ] isProp ⟪ α ⟫ × (A ≡ Lift ⟪ α ⟫)
+
+record Dominance : 𝓤 ⁺ ̇ where
+  constructor dominance
+  field
+    d              : 𝓤 ̇ → 𝓤 ̇
+    d-is-prop      : Π[ X ꞉ 𝓤 ̇ ] isProp (d X)
+    dx-is-prop     : Π[ X ꞉ 𝓤 ̇ ] (d X → isProp X)
+    d1-is-dominant : d Unit*
+    Σ-dominat-type : Π[ P ꞉ 𝓤 ̇ ] Π[ Q ꞉ (P → 𝓤 ̇) ] (d P → Π[ p ꞉ P ] d (Q p) → d (Σ[ p ꞉ P ] Q p))
 
 instance
   Functorℒ : Functor (𝓥 ⁺) (ℒ 𝓥)
@@ -55,7 +68,7 @@ instance
   return ⦃ Monadℒ ⦄ x   = partial Unit* isPropUnit* (λ _ → x)
   _>>=_  ⦃ Monadℒ ⦄ x f = partial Q QisProp y
     where
-      Q = Σ[ p ꞉ x is-defined ] f (value x p) ↓
+      Q = Σ[ p ꞉ x ↓ ] f (value x p) ↓
 
       QisProp : isProp Q
       QisProp = isPropΣ (x ↓isProp) λ x↓ → f (value x x↓) ↓isProp

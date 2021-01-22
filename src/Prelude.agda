@@ -178,6 +178,9 @@ record IxMonad (𝓥 : Universe) (M : IxFun 𝓥 Ix) : 𝓤ω where
   bind : M i j X → (X → M j k Y) → M i k Y
   bind = _>>=_
 
+  bind2 : {l : Ix} → M i j X → M j k X → (X → X → M k l Y) → M i l Y
+  bind2 mx₁ mx₂ _·_ = mx₁ >>= λ x₁ → mx₂ >>= λ x₂ → x₁ · x₂
+
   -- short-circut conditional
   ifM_then_else_ : M i j Bool → M j k X → M j k X → M i k X
   ifM mb then mx else my = caseM mb of λ where
