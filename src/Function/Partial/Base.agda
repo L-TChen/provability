@@ -19,7 +19,7 @@ module _ {X : 𝓤 ̇} {Y : 𝓥 ̇} (R : X → Y → 𝓤 ⊔ 𝓥 ̇) where
   isFunctional = (x : X) → isProp (Σ[ y ꞉ Y ] R x y)
 
 _⇀_ : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
-X ⇀ Y = Σ[ R ꞉ universeOf X ⊔ universeOf Y ̇ ] Σ[ e ꞉ (R → X) ] isEmbedding e × (R → Y) 
+X ⇀ Y = Σ[ R ꞉ universeOf X ⊔ universeOf Y ̇ ] Σ[ e ꞉ (R → X) ] isEmbedding e × (R → Y)
 
 record ℒ (𝓥 : Universe) (X : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor partial
