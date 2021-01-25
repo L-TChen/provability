@@ -25,15 +25,7 @@ _∷_ : A → (Fin n → A) → Fin (suc n) → A
 (a ∷ as) (zero  , 0<n)   = a
 (a ∷ as) (suc i , 1+i<n) = as (i , ℕₚ.pred-≤-pred 1+i<n)
 
-0ᶠ = fzero
-1ᶠ : Fin (2 + n)
-1ᶠ = fsuc 0ᶠ
-2ᶠ : Fin (3 + n)
-2ᶠ = fsuc 1ᶠ
-3ᶠ : Fin (4 + n)
-3ᶠ = fsuc 2ᶠ
-
-record IsPPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
+record IsOPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor ispas
   -- ≼ᴾ is the lifted preorder on ℒ A 
   infix 4 _≼ᵖ_
@@ -71,55 +63,57 @@ record IsPPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A �
   ⟦ i ́    ⟧ σ = pure (σ i)
   ⟦ t ⊙ s ⟧ σ = ⟦ t ⟧ σ • ⟦ s ⟧ σ
 
-record PPasStr 𝓥 (A : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
+record OPasStr 𝓥 (A : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor passtr
   field
     _·_    : A → A → ℒ 𝓥 A
     _≼_    : Order A 𝓥
-    isPPAS : IsPPAS 𝓥 _≼_ _·_
+    isOPAS : IsOPAS 𝓥 _≼_ _·_
 
   infix  4 _≼_
   infixl 7 _·_
-  open IsPPAS isPPAS public
+  open IsOPAS isOPAS public
 
--- PPAS stands for Preordered Partial Applicative Structure
-PPAS : (𝓥 𝓤 : Universe) → 𝓤 ⁺ ⊔ 𝓥 ⁺ ̇
-PPAS 𝓥 𝓤 = TypeWithStr 𝓤 (PPasStr 𝓥) 
+-- OPAS stands for Preordered Partial Applicative Structure
+OPAS : (𝓥 𝓤 : Universe) → 𝓤 ⁺ ⊔ 𝓥 ⁺ ̇
+OPAS 𝓥 𝓤 = TypeWithStr 𝓤 (OPasStr 𝓥) 
 
-PPAS₀ : (𝓥 : Universe) → 𝓤₁ ⊔ 𝓥 ⁺ ̇
-PPAS₀ 𝓥 = PPAS 𝓥 𝓤₀
+OPAS₀ : (𝓥 : Universe) → 𝓤₁ ⊔ 𝓥 ⁺ ̇
+OPAS₀ 𝓥 = OPAS 𝓥 𝓤₀
 
-record IsPPCA 𝓥 {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
+record IsOPCA 𝓥 {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   field
-    isPPAS : IsPPAS 𝓥 _≼_ _·_
-  open IsPPAS isPPAS public
+    isOPAS : IsOPAS 𝓥 _≼_ _·_
+  open IsOPAS isOPAS public
   
   field
-    ƛ_ : Term (suc n) → Term n
-    completeness : Π[ t ꞉ Term (suc n) ] Π[ σ ꞉ (Fin n → A) ] Π[ a ꞉ A ]
-      ⟦ ƛ t ⟧ σ • (pure a) ≼ᵖ ⟦ t ⟧ (a ∷ σ)
+    ƛ_           : Term (suc n) ➝ Term n
+    completeness : Π[ t ꞉ Term (suc n) ] Π[ a ꞉ A ] Π[ as ꞉ Fin n ➝ A ] 
+      ⟦ ƛ t ⟧ as • (pure a) ≼ᵖ ⟦ t ⟧ (a ∷ as)
   infix  5 ƛ_
 
   iᵗ : Term n
-  iᵗ = ƛ 0ᶠ ́
-  
-  kᵗ : Term n
-  kᵗ = ƛ ƛ 0ᶠ ́
+  iᵗ = ƛ 0 ́
 
-  sᵗ : Term n
-  sᵗ = ƛ ƛ ƛ ƛ 0ᶠ ́ ⊙ 2ᶠ ́ ⊙ (1ᶠ ́ ⊙ 2ᶠ ́)
-  
   iᵗ↓ : ⟦ iᵗ ⟧ [] ↓
   iᵗ↓ = {!!}
-
-  k↓ : ⟦ kᵗ ⟧ [] ↓ 
+  
+  kᵗ : Term n
+  kᵗ = ƛ ƛ 0 ́
+  k  = ⟦ kᵗ ⟧ []
+  
+  k↓ : k ↓ 
   k↓ = {!!}
 
+  sᵗ : Term n
+  sᵗ = ƛ ƛ ƛ ƛ 0 ́ ⊙ 2 ́ ⊙ (1 ́ ⊙ 2 ́)
+  s  = ⟦ sᵗ ⟧ []
+
   kab≼a : (a b : A)
-    → ⟦ kᵗ ⊙ 0ᶠ ́ ⊙ 1ᶠ ́ ⟧ (a ∷ b ∷ [])  ≼ᵖ ⟦ 0ᶠ ́ ⟧ (a ∷ [])
+    → k • (pure a) • (pure b)  ≼ᵖ (pure a)
   kab≼a a b tt* = {!a!}
 
-  sabc≼acbc : (σ : Fin 3 → A) → ⟦ sᵗ ⊙ 0ᶠ ́ ⊙ 1ᶠ ́ ⊙ 2ᶠ ́ ⟧ σ ≼ᵖ ⟦ 0ᶠ ́ ⊙ 2ᶠ ́ ⊙ (1ᶠ ́ ⊙ 2ᶠ ́) ⟧ σ
+  sabc≼acbc : (σ : Fin 3 → A) → ⟦ sᵗ ⊙ 0 ́ ⊙ 1 ́ ⊙ 2 ́ ⟧ σ ≼ᵖ ⟦ 0 ́ ⊙ 2 ́ ⊙ (1 ́ ⊙ 2 ́) ⟧ σ
   sabc≼acbc σ p = {!!} , {!!}
 
 -- record IsPCA (𝓥 : Universe) {A : 𝓤 ̇} (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
@@ -138,11 +132,11 @@ record IsPPCA 𝓥 {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 
 record PpcaStr (𝓥 : Universe) (A : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor ppcastr
   field
-    _≼_   : Order A 𝓥
-    _·_   : A → A → ℒ 𝓥 A
-    isPCA : IsPPCA 𝓥 _≼_ _·_ 
+    _≼_    : Order A 𝓥
+    _·_    : A → A → ℒ 𝓥 A
+    isOPCA : IsOPCA 𝓥 _≼_ _·_ 
   infixl 7 _·_
-  open IsPPCA isPCA
+  open IsOPCA isOPCA
   
 PPCA : (𝓥 𝓤 : Universe) → 𝓤 ⁺ ⊔ 𝓥 ⁺ ̇
 PPCA 𝓥 𝓤 = TypeWithStr 𝓤 (PpcaStr 𝓥)

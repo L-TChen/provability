@@ -2,6 +2,9 @@
 
 module Prelude where
 
+open import Agda.Builtin.FromNat                 public
+  renaming (Number to HasFromNat)
+
 open import Cubical.Foundations.Everything       public
   hiding (id; ℓ-max)
 open import Cubical.HITs.PropositionalTruncation public
@@ -12,6 +15,11 @@ open import Cubical.Data.Unit                    public
 open import Cubical.Data.Empty                   public
   renaming (rec to ⊥rec; elim to ⊥-elim)
 open import Cubical.Data.Bool                    public
+  hiding (_≟_)
+open import Cubical.Data.Nat                     public
+  using (ℕ; zero; suc)
+open import Cubical.Data.Fin                     public
+  using (Fin; fzero; fsuc; fromFin)
 
 open import Universes public
 open import Later     public
@@ -28,7 +36,7 @@ pattern ∣_∣* x = lift (∣_∣ x)
 ------------------------------------------------------------------------
 -- Π x ꞉ A , Σ a ꞉ A , ∃ a ꞉ A notation in Type Theory
 
-infixr -1 Π Σ′ ∃′
+infixr -1 Π Σ′ ∃′ _➝_
 syntax Π  {A = A} (λ x → b) = Π[ x ꞉ A ] b
 syntax Σ′ {A = A} (λ x → b) = Σ[ x ꞉ A ] b
 syntax ∃′ {A = A} (λ x → b) = ∃[ x ꞉ A ] b
@@ -42,6 +50,8 @@ syntax ∃′ {A = A} (λ x → b) = ∃[ x ꞉ A ] b
 ∃′ : {A : 𝓤 ̇} (B : A → 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
 ∃′ {A = A} B = ∥ Σ A B ∥
 
+_➝_ : 𝓤 ̇ → 𝓥 ̇ → 𝓤 ⊔ 𝓥 ̇
+A ➝ B = A → B
 ------------------------------------------------------------------------
 -- Some simple functions
 
