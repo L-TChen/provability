@@ -17,9 +17,9 @@ open import Cubical.Data.Empty                   public
 open import Cubical.Data.Bool                    public
   hiding (_≟_)
 open import Cubical.Data.Nat                     public
-  using (ℕ; zero; suc)
+  using (ℕ; zero; suc; fromNatℕ)
 open import Cubical.Data.Fin                     public
-  using (Fin; fzero; fsuc; fromFin)
+  using (Fin; fzero; fsuc; fromNatFin)
 
 open import Universes public
 open import Later     public

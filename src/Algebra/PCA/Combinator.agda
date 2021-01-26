@@ -1,15 +1,12 @@
 {-# OPTIONS --without-K --cubical #-}
 
-open import Cubical.Data.Nat as ℕ
-  using (ℕ; zero; suc)
-
 open import Prelude
-  hiding (_∎)
 open import Algebra.PCA.Base
 
 module Algebra.PCA.Combinator (𝓐 : OPCA 𝓥 𝓤) where
 open OpcaStr (str 𝓐)
   renaming (⟦_⟧_ to ⟦_⟧ᵗ_)
+open Term-Reasoning 𝓐
 
 𝐼ᵗ : Term 0
 𝐼ᵗ = ƛ ` 0
@@ -30,8 +27,8 @@ open OpcaStr (str 𝓐)
     ≼⟨ •ₗ-respect-ℒ≼ (⟦ (ƛ ƛ ` 1) ⊙ ᵒ a ⟧₀) (⟦ ƛ ` 1 ⟧ᵗ (a ∷ [])) (pure b) completeness ⟩
   ⟦ (ƛ ` 1) ⊙ ᵒ b ⟧ a ∷ []
     ≼⟨ completeness  ⟩
-  ⟦ ` 1 ⟧ b ∷ a ∷ [] ∎ 
-  where open Term-Reasoning 𝓐
+  ⟦ ` 1 ⟧ b ∷ a ∷ []
+    ∎ 
 
 𝐾↓ : ⟦ 𝐾ᵗ ⟧₀ ↓ 
 𝐾↓ = truncElim (λ _ → ⟦ 𝐾ᵗ ⟧₀ ↓isProp) (λ a → 𝐾ab≼a a a _ .fst .fst .fst) nonEmpty
@@ -47,6 +44,5 @@ open OpcaStr (str 𝓐)
      ⟩
   ⟦ (ƛ ` 2 ⊙ ` 0 ⊙ (` 1 ⊙ ` 0)) ⊙ ᵒ c ⟧ b ∷ a ∷ []
     ≼⟨ completeness ⟩
-  ⟦ ` 2 ⊙ ` 0 ⊙ (` 1 ⊙ ` 0) ⟧ c ∷ b ∷ a ∷ [] ∎
-  where
-    open Term-Reasoning 𝓐
+  ⟦ ` 2 ⊙ ` 0 ⊙ (` 1 ⊙ ` 0) ⟧ c ∷ b ∷ a ∷ []
+    ∎
