@@ -8,43 +8,60 @@ open import Cubical.Data.Nat
 
 open import Prelude
 
-infix 2 _↓ _↓isProp _is-defined
+infix 2 _↓ _↓isProp
 
 private
   variable
-    X : 𝓤 ̇
+    A B : 𝓤 ̇
 
-module _ {X : 𝓤 ̇} {Y : 𝓥 ̇} (R : X → Y → 𝓤 ⊔ 𝓥 ̇) where
+module _ {A : 𝓤 ̇} {B : 𝓥 ̇} (R : A → B → 𝓤 ⊔ 𝓥 ̇) where
   isFunctional : 𝓤 ⊔ 𝓥 ̇
-  isFunctional = (x : X) → isProp (Σ[ y ꞉ Y ] R x y)
+  isFunctional = (a : A) → isProp (Σ[ b ꞉ B ] R a b)
 
 _⇀_ : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
-X ⇀ Y = Σ[ R ꞉ universeOf X ⊔ universeOf Y ̇ ] Σ[ e ꞉ (R → X) ] isEmbedding e × (R → Y)
+A ⇀ B = Σ[ R ꞉ universeOf A ⊔ universeOf B ̇ ] Σ[ e ꞉ (R → A) ] isEmbedding e × (R → B)
 
-record ℒ (𝓥 : Universe) (X : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
+record ℒ (𝓥 : Universe) (A : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor partial
   field
-    P       : 𝓥 ̇
-    PisProp : isProp P
-    value   : P → X
+    _is-defined            : 𝓥 ̇
+    definedness-of_is-Prop : isProp (_is-defined)
+    value       : _is-defined → A
+open ℒ public
 
-open ℒ using (value) public
+_↓ : {A : 𝓤 ̇} → ℒ 𝓥 A → 𝓥 ̇
+x ↓ = x ℒ.is-defined
 
-_↓ : {X : 𝓤 ̇} → ℒ 𝓥 X → 𝓥 ̇
-x ↓ = ℒ.P x
+_↓isProp : {A : 𝓤 ̇}
+  → (x : ℒ 𝓥 A) → isProp (x ↓)
+x ↓isProp = ℒ.definedness-of x is-Prop 
 
-_↓isProp : {X : 𝓤 ̇}
-  → (x : ℒ 𝓥 X) → isProp (x ↓)
-x ↓isProp = ℒ.PisProp x
-
-_is-defined : {X : 𝓤 ̇} → ℒ 𝓥 X → 𝓥 ̇
-_is-defined = ℒ.P
-
-undefined : ℒ 𝓥 X
-ℒ.P       undefined = ⊥*
-ℒ.PisProp undefined ()
-ℒ.value   undefined ()
+undefined : ℒ 𝓥 A
+_is-defined            undefined = ⊥*
+definedness-of_is-Prop undefined ()
  
+instance
+  Functorℒ : Functor (𝓥 ⁺) (ℒ 𝓥)
+  _<$>_ ⦃ Functorℒ ⦄ f (partial P PisProp x) = partial P PisProp (f ∘ x) 
+  
+  Monadℒ : Monad (𝓥 ⁺) (ℒ 𝓥)
+  return ⦃ Monadℒ ⦄ x   = partial Unit* isPropUnit* (λ _ → x)
+  _>>=_  ⦃ Monadℒ ⦄ {X = A} {Y = B} x f = partial Q QisProp y
+    where
+      Q = Σ[ p ꞉ x ↓ ] f (value x p) ↓
+
+      QisProp : isProp Q
+      QisProp = isPropΣ (x ↓isProp) λ x↓ → f (value x x↓) ↓isProp
+
+      y : Q → B
+      y (x↓ , fx↓) = value (f (value x x↓)) fx↓
+
+  Applicativeℒ : Applicative (𝓥 ⁺) (ℒ 𝓥)
+  Applicativeℒ = Monad⇒Applicative
+ 
+pure-is-defined : {A : 𝓤 ̇} (a : A) → _↓ {𝓤} {𝓥} (pure a)
+pure-is-defined a = tt*
+
 --⟪_⟫ : (ℕ → Bool) → 𝓤₀ ̇
 --⟪ α ⟫ = Σ[ n ꞉ ℕ ] α n ≡ true
 --
@@ -55,27 +72,7 @@ record Dominance : 𝓤 ⁺ ̇ where
   constructor dominance
   field
     d              : 𝓤 ̇ → 𝓤 ̇
-    d-is-prop      : Π[ X ꞉ 𝓤 ̇ ] isProp (d X)
-    dx-is-prop     : Π[ X ꞉ 𝓤 ̇ ] (d X → isProp X)
+    d-is-prop      : Π[ A ꞉ 𝓤 ̇ ] isProp (d A)
+    dx-is-prop     : Π[ A ꞉ 𝓤 ̇ ] (d A → isProp A)
     d1-is-dominant : d Unit*
     Σ-dominat-type : Π[ P ꞉ 𝓤 ̇ ] Π[ Q ꞉ (P → 𝓤 ̇) ] (d P → Π[ p ꞉ P ] d (Q p) → d (Σ[ p ꞉ P ] Q p))
-
-instance
-  Functorℒ : Functor (𝓥 ⁺) (ℒ 𝓥)
-  _<$>_ ⦃ Functorℒ ⦄ f (partial P PisProp x) = partial P PisProp (f ∘ x)
-  
-  Monadℒ : Monad (𝓥 ⁺) (ℒ 𝓥)
-  return ⦃ Monadℒ ⦄ x   = partial Unit* isPropUnit* (λ _ → x)
-  _>>=_  ⦃ Monadℒ ⦄ x f = partial Q QisProp y
-    where
-      Q = Σ[ p ꞉ x ↓ ] f (value x p) ↓
-
-      QisProp : isProp Q
-      QisProp = isPropΣ (x ↓isProp) λ x↓ → f (value x x↓) ↓isProp
-
-      y : Q → _
-      y (p , fx↓) = value (f (value x p)) fx↓
-
-  Applicativeℒ : Applicative (𝓥 ⁺) (ℒ 𝓥)
-  Applicativeℒ = Monad⇒Applicative
- 

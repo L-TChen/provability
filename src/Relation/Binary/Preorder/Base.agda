@@ -13,28 +13,53 @@ Order A 𝓥 = Rel A A 𝓥
 private
   variable
     A   : 𝓤 ̇
-    _≼_ : Order A 𝓥
 
-record IsPreordered {A : 𝓤 ̇} (_≼_ : Order A 𝓥) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
-  constructor ispreordered
+record IsPreorder {A : 𝓤 ̇} (_≼_ : Order A 𝓥) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
+  constructor ispreorder
   field
     isReflexive  : isRefl _≼_
     isTransitive : isTrans _≼_
     ≼-isProp     : {x y : A} → isProp (x ≼ y)
 
-ℒᵖ : (_≼_ : Order A 𝓥) → Order (ℒ 𝓥 A) 𝓥
-ℒᵖ _≼_ x y = (y↓ : y ↓) → Σ[ x↓ ꞉ x ↓ ] (value x x↓ ≼ value y y↓)
+record HasPreorder (𝓥 : Universe) (A : 𝓤 ̇) : (𝓤 ⊔ 𝓥) ⁺  ̇ where
+  constructor _,_
+  field
+    _≼_          : Order A 𝓥
+    ≼-isPreorder : IsPreorder _≼_
+  open IsPreorder ≼-isPreorder public
 
-module _ where
-  open IsPreordered 
+Preordered : (𝓥 𝓤 : Universe) → (𝓤 ⊔ 𝓥) ⁺ ̇
+Preordered 𝓥 𝓤 = TypeWithStr 𝓤 (HasPreorder 𝓥)
 
-  ℒ-Order-isPreorder : IsPreordered _≼_ → IsPreordered (ℒᵖ _≼_)
-  isReflexive  (ℒ-Order-isPreorder ≼-isOrdered) x x↓ = x↓ , isReflexive ≼-isOrdered (value x x↓)
-  isTransitive (ℒ-Order-isPreorder ≼-isOrdered) x y z x≼y y≼z z↓ =
-    let y↓  = y≼z z↓ .fst
-        y≤z = y≼z z↓ .snd
-        x↓  = x≼y y↓ .fst
-        x≤y = x≼y y↓ .snd
-    in x↓ , isTransitive ≼-isOrdered (value x x↓) (value y y↓) (value z z↓) x≤y y≤z
-  ≼-isProp     (ℒ-Order-isPreorder ≼-isPreordered) {x} {y} =
-    isPropΠ (λ y↓ → isPropΣ (x ↓isProp) λ x↓ → ≼-isProp ≼-isPreordered)
+Preordered₀ : (𝓥 : Universe) → 𝓤₁ ⊔ 𝓥 ⁺ ̇
+Preordered₀ 𝓥 = TypeWithStr 𝓤₀ (HasPreorder 𝓥)
+
+ℒᵖ : Preordered 𝓥 𝓤 → Preordered 𝓥 (𝓤 ⊔ 𝓥 ⁺)
+ℒᵖ (A , _≼_ , ≼-isPreorder) = ℒ _ A , ℒᵖ-Order _≼_ , ℒ-Order-isPreorder ≼-isPreorder
+  where
+    open IsPreorder
+
+    ℒᵖ-Order : (_≼_ : Order A 𝓥) → Order (ℒ 𝓥 A) 𝓥
+    ℒᵖ-Order _≼_ x y = (y↓ : y ↓) → Σ[ x↓ ꞉ x ↓ ] (value x x↓ ≼ value y y↓)
+
+    ℒ-Order-isPreorder : {_≼_ : Order A 𝓥} → IsPreorder _≼_ → IsPreorder (ℒᵖ-Order _≼_)
+    isReflexive  (ℒ-Order-isPreorder ≼-isOrdered) x x↓ = x↓ , isReflexive ≼-isOrdered (value x x↓)
+    isTransitive (ℒ-Order-isPreorder ≼-isOrdered) x y z x≼y y≼z z↓ =
+      let y↓  = y≼z z↓ .fst
+          y≤z = y≼z z↓ .snd
+          x↓  = x≼y y↓ .fst
+          x≤y = x≼y y↓ .snd
+      in x↓ , isTransitive ≼-isOrdered (value x x↓) (value y y↓) (value z z↓) x≤y y≤z
+    ≼-isProp     (ℒ-Order-isPreorder ≼-isOrdered) {x} {y} = isPropΠ λ y↓ →
+      isPropΣ (x ↓isProp) λ x↓ → ≼-isProp ≼-isOrdered
+
+module ≼-Reasoning {A : 𝓤 ̇} {_≼_ : Order A 𝓥} (≼-isPreorder : IsPreorder _≼_) where 
+  open IsPreorder ≼-isPreorder
+  
+  _≼⟨_⟩_ : {b c : A} (a : A) → a ≼ b → b ≼ c → a ≼ c
+  a ≼⟨ a≼b ⟩ b≼c = isTransitive a _ _ a≼b b≼c
+
+  _∎≼ : ∀ a → a ≼ a
+  a ∎≼ = isReflexive a
+
+  infixr 2 _≼⟨_⟩_
