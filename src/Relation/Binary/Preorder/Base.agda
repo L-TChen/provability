@@ -52,14 +52,3 @@ Preordered₀ 𝓥 = TypeWithStr 𝓤₀ (HasPreorder 𝓥)
       in x↓ , isTransitive ≼-isOrdered (value x x↓) (value y y↓) (value z z↓) x≤y y≤z
     ≼-isProp     (ℒ-Order-isPreorder ≼-isOrdered) {x} {y} = isPropΠ λ y↓ →
       isPropΣ (x ↓isProp) λ x↓ → ≼-isProp ≼-isOrdered
-
-module ≼-Reasoning {A : 𝓤 ̇} {_≼_ : Order A 𝓥} (≼-isPreorder : IsPreorder _≼_) where 
-  open IsPreorder ≼-isPreorder
-  
-  _≼⟨_⟩_ : {b c : A} (a : A) → a ≼ b → b ≼ c → a ≼ c
-  a ≼⟨ a≼b ⟩ b≼c = isTransitive a _ _ a≼b b≼c
-
-  _∎≼ : ∀ a → a ≼ a
-  a ∎≼ = isReflexive a
-
-  infixr 2 _≼⟨_⟩_

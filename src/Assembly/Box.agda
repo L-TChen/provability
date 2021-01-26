@@ -4,9 +4,8 @@ open import Prelude
   renaming (⊥ to Empty)
 open import Algebra.PCA
 
-module Assembly.Box (A : PCA 𝓥 𝓤₀) where
-open PcaStr (str A)
-open IsPCA isPCA
+module Assembly.Box (A : OPCA 𝓥 𝓤₀) where
+open OpcaStr (str A)
 
 open import Assembly.Base 𝓥 A
 
