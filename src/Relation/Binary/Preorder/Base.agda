@@ -40,7 +40,7 @@ Preordered₀ 𝓥 = TypeWithStr 𝓤₀ (HasPreorder 𝓥)
     open IsPreorder
 
     ℒᵖ-Order : (_≼_ : Order A 𝓥) → Order (ℒ 𝓥 A) 𝓥
-    ℒᵖ-Order _≼_ x y = (y↓ : y ↓) → Σ[ x↓ ꞉ x ↓ ] (value x x↓ ≼ value y y↓)
+    ℒᵖ-Order _≼_ x y = (y↓ : ⟨ y ↓ ⟩) → Σ[ x↓ ꞉ ⟨ x ↓ ⟩ ] (value x x↓ ≼ value y y↓)
 
     ℒ-Order-isPreorder : {_≼_ : Order A 𝓥} → IsPreorder _≼_ → IsPreorder (ℒᵖ-Order _≼_)
     isReflexive  (ℒ-Order-isPreorder ≼-isOrdered) x x↓ = x↓ , isReflexive ≼-isOrdered (value x x↓)
@@ -51,4 +51,4 @@ Preordered₀ 𝓥 = TypeWithStr 𝓤₀ (HasPreorder 𝓥)
           x≤y = x≼y y↓ .snd
       in x↓ , isTransitive ≼-isOrdered (value x x↓) (value y y↓) (value z z↓) x≤y y≤z
     ≼-isProp     (ℒ-Order-isPreorder ≼-isOrdered) {x} {y} = isPropΠ λ y↓ →
-      isPropΣ (x ↓isProp) λ x↓ → ≼-isProp ≼-isOrdered
+      isPropΣ ((x ↓) .snd) λ x↓ → ≼-isProp ≼-isOrdered

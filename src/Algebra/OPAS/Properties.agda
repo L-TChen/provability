@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --allow-unsolved-metas #-}
 module Algebra.OPAS.Properties where
 
 open import Prelude
@@ -34,3 +34,15 @@ module Structure (𝔄 : OPAS 𝓥 𝓤) where
       x₀≼x₁ = x₀≼ᵖx₁ x₁↓ .snd
       y₀↓   = y₀≼ᵖy₁ y₁↓ .fst
       y₀≼y₁ = y₀≼ᵖy₁ y₁↓ .snd
+
+  lem : (t : Term 0) → (t↓ : ⟨ ⟦ t ⟧₀ ↓ ⟩) → ⟦ ᶜ value ⟦ t ⟧₀ t↓ ⟧₀ ≡ ⟦ t ⟧₀
+  lem t t↓ = 
+    ⟦ ᶜ value ⟦ t ⟧₀ t↓ ⟧₀
+      ≡⟨ refl ⟩
+    pure (value ⟦ t ⟧₀ t↓ )
+      ≡⟨ refl ⟩
+    (Unit* , isPropUnit*) , (λ _ → value ⟦ t ⟧₀ t↓)
+      ≡⟨ {!!} ⟩
+    ⟦ t ⟧₀
+      ∎
+

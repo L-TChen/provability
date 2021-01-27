@@ -1,14 +1,13 @@
-{-# OPTIONS --without-K --cubical #-} 
+{-# OPTIONS --without-K --cubical  --allow-unsolved-metas #-} 
 
 module Function.Partial.Base where
 
-open import Cubical.Relation.Binary
 open import Cubical.Functions.Embedding
-open import Cubical.Data.Nat
+import Cubical.Functions.Logic as L
 
 open import Prelude
 
-infix 2 _↓ _↓isProp
+infix 2 _↓ 
 
 private
   variable
@@ -22,36 +21,30 @@ _⇀_ : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
 A ⇀ B = Σ[ R ꞉ universeOf A ⊔ universeOf B ̇ ] Σ[ e ꞉ (R → A) ] isEmbedding e × (R → B)
 
 record ℒ (𝓥 : Universe) (A : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
-  constructor partial
+  constructor _,_
   field
-    _is-defined            : 𝓥 ̇
-    definedness-of_is-Prop : isProp (_is-defined)
-    value       : _is-defined → A
+    _is-defined : hProp 𝓥
+    value       : ⟨ _is-defined ⟩ → A
 open ℒ public
 
-_↓ : {A : 𝓤 ̇} → ℒ 𝓥 A → 𝓥 ̇
-x ↓ = x ℒ.is-defined
-
-_↓isProp : {A : 𝓤 ̇}
-  → (x : ℒ 𝓥 A) → isProp (x ↓)
-x ↓isProp = ℒ.definedness-of x is-Prop 
+_↓ : ℒ 𝓥 A → hProp 𝓥
+x ↓ = (x ℒ.is-defined)
 
 undefined : ℒ 𝓥 A
-_is-defined            undefined = ⊥*
-definedness-of_is-Prop undefined ()
+_is-defined undefined = ⊥* , λ ()
  
 instance
   Functorℒ : Functor (𝓥 ⁺) (ℒ 𝓥)
-  _<$>_ ⦃ Functorℒ ⦄ f (partial P PisProp x) = partial P PisProp (f ∘ x) 
+  _<$>_ ⦃ Functorℒ ⦄ f (P , x) = P , (f ∘ x) 
   
   Monadℒ : Monad (𝓥 ⁺) (ℒ 𝓥)
-  return ⦃ Monadℒ ⦄ x   = partial Unit* isPropUnit* (λ _ → x)
-  _>>=_  ⦃ Monadℒ ⦄ {X = A} {Y = B} x f = partial Q QisProp y
+  return ⦃ Monadℒ ⦄ x   = L.⊤* , (λ _ → x)
+  _>>=_  ⦃ Monadℒ ⦄ {X = A} {Y = B} x f = (Q , QisProp) , y
     where
-      Q = Σ[ p ꞉ x ↓ ] f (value x p) ↓
+      Q = Σ[ p ꞉ ⟨ x ↓ ⟩ ] ⟨ f (value x p) ↓ ⟩
 
       QisProp : isProp Q
-      QisProp = isPropΣ (x ↓isProp) λ x↓ → f (value x x↓) ↓isProp
+      QisProp = isPropΣ (L.isProp⟨⟩ (x ↓)) λ x↓ → L.isProp⟨⟩ (f (value x x↓) ↓)
 
       y : Q → B
       y (x↓ , fx↓) = value (f (value x x↓)) fx↓
@@ -59,8 +52,26 @@ instance
   Applicativeℒ : Applicative (𝓥 ⁺) (ℒ 𝓥)
   Applicativeℒ = Monad⇒Applicative
  
-pure-is-defined : {A : 𝓤 ̇} (a : A) → _↓ {𝓤} {𝓥} (pure a)
+pure-is-defined : {A : 𝓤 ̇}
+  → (a : A) → ⟨ _↓ {𝓥} {𝓤} (pure a) ⟩
 pure-is-defined a = tt*
+
+defined-is-pure : {A : 𝓤 ̇}
+  → (v : ℒ 𝓥 A) → (v↓ : ⟨ v ↓ ⟩)
+  → Σ[ a ꞉ A ] v ≡ pure a
+defined-is-pure {𝓥 = 𝓥} {A = A} v v↓ = value v v↓ , (
+  v is-defined , value v
+    ≡[ i ]⟨ v↓≡⊤ i , single-value i ⟩
+  ⊤* , (λ _ → value v v↓)
+    ∎)
+  where
+    open L
+    v↓≡⊤ : v is-defined ≡ ⊤*
+    v↓≡⊤ = ⇒∶ (λ _ → tt*)
+           ⇐∶ (λ _ → v↓)
+
+    single-value : PathP (λ i → ⟨ v↓≡⊤ i ⟩ → A) (value v) (λ _ → value v v↓)
+    single-value = {!!}
 
 --⟪_⟫ : (ℕ → Bool) → 𝓤₀ ̇
 --⟪ α ⟫ = Σ[ n ꞉ ℕ ] α n ≡ true

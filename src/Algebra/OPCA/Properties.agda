@@ -69,11 +69,11 @@ module Combinators (𝔄 : OPCA 𝓥 𝓤) where
           ∎
         where open ≼-Reasoning (OPCA→OPAS 𝔄)
 
-      𝐼↓ : ⟦ ƛ 𝐼 ⟧₀ ↓
-      𝐼↓ = truncElim (λ _ → ⟦ ƛ 𝐼 ⟧₀ ↓isProp) (λ a → 𝐼a≼a a tt* .fst .fst ) nonEmpty 
+      𝐼↓ : ⟨ ⟦ ƛ 𝐼 ⟧₀ ↓ ⟩
+      𝐼↓ = truncElim (λ _ → (⟦ ƛ 𝐼 ⟧₀ ↓) .snd) (λ a → 𝐼a≼a a tt* .fst .fst ) nonEmpty 
 
-      𝐾↓ : ⟦ ƛ ƛ 𝐾 ⟧₀ ↓ 
-      𝐾↓ = truncElim (λ _ → ⟦ ƛ ƛ 𝐾 ⟧₀ ↓isProp) (λ a → 𝐾ab≼a a a _ .fst .fst .fst) nonEmpty
+      𝐾↓ : ⟨ ⟦ ƛ ƛ 𝐾 ⟧₀ ↓ ⟩
+      𝐾↓ = truncElim (λ _ → (⟦ ƛ ƛ 𝐾 ⟧₀ ↓) .snd) (λ a → 𝐾ab≼a a a _ .fst .fst .fst) nonEmpty
 
   𝑖 : A
   𝑖 = value ⟦ ƛ 𝐼 ⟧₀ 𝐼↓ 
@@ -95,12 +95,12 @@ module Combinators (𝔄 : OPCA 𝓥 𝓤) where
     --  where
     --    open ≼-Reasoning (OPCA→OPAS 𝔄)
 
-  𝑆↓ : ⟦ ƛ ƛ ƛ 𝑆 ⟧₀ ↓
-  𝑆↓ = truncElim (λ _ → ⟦ ƛ ƛ ƛ 𝑆 ⟧₀ ↓isProp) (λ a → lem a _ .fst .fst .fst .fst) nonEmpty
+  𝑆↓ : ⟨ ⟦ ƛ ƛ ƛ 𝑆 ⟧₀ ↓ ⟩
+  𝑆↓ = truncElim (λ _ → (⟦ ƛ ƛ ƛ 𝑆 ⟧₀ ↓) .snd) (λ a → lemma a tt* .fst .fst .fst .fst) nonEmpty
     where
       open ≼-Reasoning (OPCA→OPAS 𝔄)
-      lem : (a : A) → ⟦ (ƛ ƛ ƛ 𝑆) ⊙ ᶜ 𝑘 ⊙ ᶜ 𝑘 ⊙ ᶜ a ⟧₀ ℒ≼ ⟦ ᶜ a ⟧₀
-      lem a = begin
+      lemma : (a : A) → ⟦ (ƛ ƛ ƛ 𝑆) ⊙ ᶜ 𝑘 ⊙ ᶜ 𝑘 ⊙ ᶜ a ⟧₀ ℒ≼ ⟦ ᶜ a ⟧₀
+      lemma a = begin
         ⟦ (ƛ ƛ ƛ 𝑆) ⊙ ᶜ 𝑘 ⊙ ᶜ 𝑘 ⊙ ᶜ a ⟧ []
           ≼⟨ 𝑆abc≼acbc _ _ _ ⟩
         ⟦ ᶜ 𝑘 ⊙ ᶜ a ⊙ (ᶜ 𝑘 ⊙ ᶜ a) ⟧ []
