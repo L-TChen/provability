@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical  --allow-unsolved-metas #-} 
+{-# OPTIONS --without-K --cubical #-} 
 
 module Function.Partial.Base where
 
@@ -51,27 +51,6 @@ instance
 
   Applicativeℒ : Applicative (𝓥 ⁺) (ℒ 𝓥)
   Applicativeℒ = Monad⇒Applicative
- 
-pure-is-defined : {A : 𝓤 ̇}
-  → (a : A) → ⟨ _↓ {𝓥} {𝓤} (pure a) ⟩
-pure-is-defined a = tt*
-
-defined-is-pure : {A : 𝓤 ̇}
-  → (v : ℒ 𝓥 A) → (v↓ : ⟨ v ↓ ⟩)
-  → Σ[ a ꞉ A ] v ≡ pure a
-defined-is-pure {𝓥 = 𝓥} {A = A} v v↓ = value v v↓ , (
-  v is-defined , value v
-    ≡[ i ]⟨ v↓≡⊤ i , single-value i ⟩
-  ⊤* , (λ _ → value v v↓)
-    ∎)
-  where
-    open L
-    v↓≡⊤ : v is-defined ≡ ⊤*
-    v↓≡⊤ = ⇒∶ (λ _ → tt*)
-           ⇐∶ (λ _ → v↓)
-
-    single-value : PathP (λ i → ⟨ v↓≡⊤ i ⟩ → A) (value v) (λ _ → value v v↓)
-    single-value = {!!}
 
 --⟪_⟫ : (ℕ → Bool) → 𝓤₀ ̇
 --⟪ α ⟫ = Σ[ n ꞉ ℕ ] α n ≡ true
