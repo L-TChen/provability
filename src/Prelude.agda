@@ -17,9 +17,10 @@ open import Cubical.Data.Empty                   public
 open import Cubical.Data.Bool                    public
   hiding (_≟_)
 open import Cubical.Data.Nat                     public
-  using (ℕ; zero; suc; fromNatℕ)
+  using (ℕ; zero; suc; _+_; fromNatℕ)
+import  Cubical.Data.Nat.Order as ℕₚ
 open import Cubical.Data.Fin                     public
-  using (Fin; fzero; fsuc; fromNatFin)
+  using (Fin; fzero; fsuc; ¬Fin0; fromNatFin)
 
 open import Universes public
 open import Later     public
@@ -27,6 +28,14 @@ open import Later     public
 private
   variable
     X Y Z : 𝓤 ̇
+    n m l : ℕ
+
+infixl 8 _ˢ_
+infixr 5 _∷_
+infixr -1 _$_
+
+infixr -1 Π Σ′ ∃′ _➝_
+
 
 ∥_∥* : 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
 ∥_∥* {𝓥 = 𝓥} X = Lift {j = 𝓥} ∥ X ∥
@@ -36,7 +45,6 @@ pattern ∣_∣* x = lift (∣_∣ x)
 ------------------------------------------------------------------------
 -- Π x ꞉ A , Σ a ꞉ A , ∃ a ꞉ A notation in Type Theory
 
-infixr -1 Π Σ′ ∃′ _➝_
 syntax Π  {A = A} (λ x → b) = Π[ x ꞉ A ] b
 syntax Σ′ {A = A} (λ x → b) = Σ[ x ꞉ A ] b
 syntax ∃′ {A = A} (λ x → b) = ∃[ x ꞉ A ] b
@@ -61,11 +69,6 @@ id x = x
 ------------------------------------------------------------------------
 -- Operations on dependent functions
 
--- These are functions whose output has a type that depends on the
--- value of the input to the function.
-
-infixl 8 _ˢ_
-infixr -1 _$_
 
 -- Application - note that _$_ is right associative, as in Haskell.
 -- If you want a left associative infix application operator, use
@@ -86,6 +89,20 @@ _ˢ_ : {A : 𝓤 ̇} {B : A → 𝓥 ̇} {C : (x : A) → B x → 𝓦 ̇} →
 f ˢ g = λ x → f x (g x)
 
 -- Instances mainly for programming instead of reasoning (subject to change)
+
+    
+-- ListLike structures
+-- TODO: Use instances? 
+abstract -- don't reduce []
+  [] : {A : 𝓤 ̇} → Fin 0 → A
+  [] {A = A} i = ⊥-elim {A = λ _ → A} (¬Fin0 i)
+
+_∷_ : {A : 𝓤 ̇} → A → (Fin n → A) → Fin (suc n) → A
+(a ∷ as) (zero  , _)     = a
+(a ∷ as) (suc i , 1+i<n) = as (i , ℕₚ.pred-≤-pred 1+i<n)
+
+[_] : {A : 𝓤 ̇} → A → Fin 1 → A
+[ a ] = a ∷ []
 
 Fun : Universe → 𝓤ω
 Fun 𝓥 = {𝓤 : Universe} → 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
