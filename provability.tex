@@ -1,10 +1,14 @@
 \documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
+\usepackage[draft,inline,nomargin]{fixme}
+\FXRegisterAuthor{lt}{alt}{LT}
+\FXRegisterAuthor{hs}{ahs}{Josh}
+
 \newcommand{\Tree}{\mathcal{S}}
 \newcommand{\later}{\mathord{\blacktriangleright}}
 \newcommand{\laterp}{\mathord{\vartriangleright}}
 \newcommand{\PER}{\mathbf{PER}}
 
-\title{Realising Löb's Axiom as Intensional Guarded Recursion in Homotopy Type Theory} 
+\title{Realising Löb's Axiom as Intensional (Guarded) Recursion in Homotopy Type Theory} 
 \author{Liang-Ting Chen}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://l-tchen.github.io}}%
   {liang.ting.chen.tw@gmail.com}%
@@ -59,9 +63,11 @@
   In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
   We construct an endoexposure of the $\PER$-category of assemblies internal to guarded type theory as the interpretation of the provability modality~$\Box$.
   Of the utmost significance of our understanding for $\Box A$ is that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or realisers, inspired by its provability reading.
-  Our results are established in the framework of ticked cubical type theory---an extension of cubical type theory with guarded recursion.
-  By viewing~$\Box A$ as a type of typed code in the sense of Davies and Pfenning, our work can be viewed as a step towards typed metaprogramming with non-structural but guarded recursion.
+  Our results are established in the framework of ticked cubical type theory---an extension of cubical type theory with guarded recursion and formalised in Guarded Cubical Agda.
+  By viewing~$\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
 \end{abstract}
+
+\ltnote{Shall we include Chiang as a coauthor?}
 
 \section{Introduction}
 \cite{Litak2014}
@@ -76,16 +82,6 @@
 \cite{Shamkanov2014,Shamkanov2016a}
 
 \section{Preliminaries}
-\subsection{Realisability}
-\cite{Escardo2017a,Knapp2018}
-\begin{definition}[Partial map classifer]
-  
-\end{definition}
-\begin{definition}[Preordered partial combinatory algebra]
-\end{definition}
-\begin{definition}[Assembly and trackable map]
-  
-\end{definition}
 
 \subsection{Guarded recursion}
 
@@ -100,10 +96,24 @@
   also comonadic exposure
 \end{definition}
 
+
+\subsection{Realisability}
+\cite{Escardo2017a,Knapp2018}
+\begin{definition}[Partial map classifer]
+  
+\end{definition}
+\begin{definition}[Ordered partial combinatory algebra]
+\end{definition}
+\begin{definition}[Assembly and trackable map]
+  
+\end{definition}
+
+
+
 %\section{Realising provability using topos of trees}
 %\subsection{Topos of trees and its internal logic}
 %\cite{Birkedal2012,Clouston2016}
-\section{Partial combinatory algebra with quotation}
+\section{Ordered partial combinatory algebra with numbering}
 
 \section{Realising provability using guarded cubical type theory}
 
