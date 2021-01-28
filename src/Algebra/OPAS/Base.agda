@@ -4,7 +4,7 @@ module Algebra.OPAS.Base where
 
 open import Prelude
 open import Relation.Binary.Preorder
-open import Function.Partial               public
+open import Function.Partial
     
 record IsOPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor isopas
@@ -72,36 +72,6 @@ OPAS 𝓥 𝓤 = TypeWithStr 𝓤 (OpasStr 𝓥)
 OPAS₀ : (𝓥 : Universe) → 𝓤₁ ⊔ 𝓥 ⁺ ̇
 OPAS₀ 𝓥 = OPAS 𝓥 𝓤₀
 
--- Ugly and tedious ...
-record hasSKI (𝔄 : OPAS 𝓥 𝓤) : 𝓤 ⊔ 𝓥 ̇ where
-  constructor hasski
-  open OpasStr (str 𝔄)
-  private
-    A = ⟨ 𝔄 ⟩
-
-  field 
-    𝑖    : A 
-    𝑘    : A
-    𝑠    : A
-    𝑖¹↓  : {a : A} → ⟨ 𝑖 · a ↓ ⟩
-    𝑘¹↓  : {a : A} → ⟨ 𝑘 · a ↓ ⟩
-    𝑠¹↓  : {a : A} → ⟨ 𝑠 · a ↓ ⟩
-    
-  𝑖¹ = λ (a : A) → value (𝑖 · a) 𝑖¹↓
-  𝑘¹ = λ (a : A) → value (𝑘 · a) 𝑘¹↓
-  𝑠¹ = λ (a : A) → value (𝑠 · a) 𝑠¹↓
-
-  field
-    𝑖a≼a : {a : A}  → 𝑖¹ a ≼ a
-    𝑘²↓ : {a b : A} → ⟨ (𝑘¹ a) · b ↓ ⟩
-    𝑠²↓ : {a b : A} → ⟨ (𝑠¹ a) · b ↓ ⟩ 
-    
-  𝑘² = λ (a b : A) → value (𝑘¹ a · b) 𝑘²↓
-  𝑠² = λ (a b : A) → value (𝑠¹ a · b) 𝑠²↓
-
-  field
-    𝑘ab≼a     : {a b : A} → 𝑘² a b ≼ a 
-    𝑠abc≼acbc : {a b c : A} → (𝑠² a b · c) ℒ≼ a · c • (b · c)
 
 module ≼-Reasoning (𝔄 : OPAS 𝓥 𝓤) where
   open OpasStr (str 𝔄)
@@ -144,3 +114,34 @@ module ≼-Reasoning (𝔄 : OPAS 𝓥 𝓤) where
 
   ⟦_⟧_∎    : (t : Term n)(σ : Fin n → A) → t under σ IsRelatedTo t under σ
   ⟦ t ⟧ σ ∎ = equals refl
+
+-- Ugly and tedious ...
+record hasSKI (𝔄 : OPAS 𝓥 𝓤) : 𝓤 ⊔ 𝓥 ̇ where
+  constructor hasski
+  open OpasStr (str 𝔄)
+  private
+    A = ⟨ 𝔄 ⟩
+
+  field 
+    𝑖    : A 
+    𝑘    : A
+    𝑠    : A
+    𝑖¹↓  : {a : A} → 𝑖 · a ↓
+    𝑘¹↓  : {a : A} → 𝑘 · a ↓
+    𝑠¹↓  : {a : A} → 𝑠 · a ↓
+    
+  𝑖¹ = λ (a : A) → value (𝑖 · a) 𝑖¹↓
+  𝑘¹ = λ (a : A) → value (𝑘 · a) 𝑘¹↓
+  𝑠¹ = λ (a : A) → value (𝑠 · a) 𝑠¹↓
+
+  field
+    𝑖a≼a : {a : A}  → 𝑖¹ a ≼ a
+    𝑘²↓ : {a b : A} → 𝑘¹ a · b ↓
+    𝑠²↓ : {a b : A} → 𝑠¹ a · b ↓
+    
+  𝑘² = λ (a b : A) → value (𝑘¹ a · b) 𝑘²↓
+  𝑠² = λ (a b : A) → value (𝑠¹ a · b) 𝑠²↓
+
+  field
+    𝑘ab≼a     : {a b : A} → 𝑘² a b ≼ a 
+    𝑠abc≼acbc : {a b c : A} → (𝑠² a b · c) ℒ≼ a · c • (b · c)

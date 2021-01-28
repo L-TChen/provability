@@ -2,5 +2,5 @@
 
 module Algebra.OPCA where
 
-open import Algebra.PCA.Base       public
-open import Algebra.PCA.Properties public
+open import Algebra.OPCA.Base       public
+open import Algebra.OPCA.Properties public

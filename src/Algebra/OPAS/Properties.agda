@@ -1,8 +1,11 @@
-{-# OPTIONS --without-K --cubical --allow-unsolved-metas #-}
+{-# OPTIONS --without-K --cubical #-}
 module Algebra.OPAS.Properties where
+
+open import Cubical.Functions.Logic  as L
 
 open import Prelude
 open import Algebra.OPAS.Base
+open import Function.Partial
 
 module Structure (𝔄 : OPAS 𝓥 𝓤) where
   open OpasStr (str 𝔄)
@@ -35,15 +38,19 @@ module Structure (𝔄 : OPAS 𝓥 𝓤) where
       y₀↓   = y₀≼ᵖy₁ y₁↓ .fst
       y₀≼y₁ = y₀≼ᵖy₁ y₁↓ .snd
 
-  ⟦⟦t⟧⟧=⟦t⟧ : (t : Term 0) → (t↓ : ⟨ ⟦ t ⟧₀ ↓ ⟩) → ⟦ ᶜ value ⟦ t ⟧₀ t↓ ⟧₀ ≡ ⟦ t ⟧₀
-  ⟦⟦t⟧⟧=⟦t⟧ t t↓ = 
-    ⟦ ᶜ value ⟦ t ⟧₀ t↓ ⟧₀
-      ≡⟨ refl ⟩
-    pure (value ⟦ t ⟧₀ t↓ )
-      ≡⟨ refl ⟩
-    (Unit* , isPropUnit*) , (λ _ → value ⟦ t ⟧₀ t↓)
-      ≡⟨ {!!} ⟩ 
-    (⟦ t ⟧₀ ↓) , value ⟦ t ⟧₀
-      ≡⟨ refl ⟩
-    ⟦ t ⟧₀
-      ∎
+  abstract
+    ⟦⟦t⟧⟧=⟦t⟧ : (t : Term 0) → (t↓ : ⟦ t ⟧₀ ↓) → ⟦ ᶜ value ⟦ t ⟧₀ t↓ ⟧₀ ≡ ⟦ t ⟧₀
+    ⟦⟦t⟧⟧=⟦t⟧ t t↓ = 
+      pure (value ⟦ t ⟧₀ t↓ )
+        ≡⟨ refl ⟩
+      ⊤* , (λ (_ : Unit*) → value ⟦ t ⟧₀ t↓)
+        ≡⟨ ΣPathP (⊤=p↓ , λ i _ → value ⟦ t ⟧₀ t↓) ⟩
+      ⟦ t ⟧₀ is-defined , (λ _ → value ⟦ t ⟧₀ t↓)
+        ≡⟨ cong (⟦ t ⟧₀ is-defined ,_) (funExt (λ x i → value ⟦ t ⟧₀ ((⟦ t ⟧₀ ↓-isProp) t↓ x i))) ⟩
+      ⟦ t ⟧₀ is-defined , value ⟦ t ⟧₀
+        ≡⟨ refl ⟩
+      ⟦ t ⟧₀
+        ∎
+      where
+        ⊤=p↓ : ⊤* ≡ (⟦ t ⟧₀ is-defined)
+        ⊤=p↓ = ⇔toPath (λ _ → t↓) λ _ → tt*

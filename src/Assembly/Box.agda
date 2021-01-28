@@ -2,7 +2,7 @@
 
 open import Prelude
   renaming (⊥ to Empty)
-open import Algebra.PCA
+open import Algebra.OPCA
 
 module Assembly.Box (A : OPCA 𝓥 𝓤₀) where
 open OpcaStr (str A)

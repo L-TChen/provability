@@ -2,7 +2,7 @@
 
 open import Prelude
   hiding (⊥)
-open import Algebra.PCA
+open import Algebra.OPCA
 {- The notion of assembly is defined over a fixed partial combinatory algebra -}
 
 module Assembly.Base (𝓥 : Universe) (A : OPCA 𝓥 𝓤₀) where
