@@ -28,6 +28,7 @@ open import Later     public
 private
   variable
     X Y Z : 𝓤 ̇
+    A B C : 𝓤 ̇
     n m l : ℕ
 
 infixl 8 _ˢ_
@@ -104,6 +105,17 @@ _∷_ : {A : 𝓤 ̇} → A → (Fin n → A) → Fin (suc n) → A
 
 [_] : {A : 𝓤 ̇} → A → Fin 1 → A
 [ a ] = a ∷ []
+
+tail : (Fin (suc n) → A) → Fin n → A
+tail as n = as (fsuc n)
+
+foldl : (B → A → B) → B → (Fin n → A) → B
+foldl {n = zero}  _·_ e xs = e
+foldl {n = suc n} _·_ e xs = foldl _·_ e (tail xs) · xs 0
+
+foldl1 : (A → A → A) → (Fin (suc n) → A) → A
+foldl1 {n = zero}  _·_ xs = xs 0
+foldl1 {n = suc n} _·_ xs = foldl1 _·_ (tail xs) · xs 0
 
 Fun : Universe → 𝓤ω
 Fun 𝓥 = {𝓤 : Universe} → 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
