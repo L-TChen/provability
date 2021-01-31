@@ -18,7 +18,7 @@ record IsOPCA 𝓥 {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 
   open IsOPAS isOPAS  public
   field
     -- TODO: Clarify if ƛ_ should give `Term n` or `∥ Term n ∥`
-    ƛ_           : Term (suc n) ➝ Term n
+    ƛ_     : Term (suc n) → Term n
     completeness : {t : Term (suc n)} {a : A} {as : Fin n → A}
       → ⟦ (ƛ t) ⊙ ᶜ a ⟧ as ℒ≼ ⟦ t ⟧ (a ∷ as)
   infixr  5 ƛ_
