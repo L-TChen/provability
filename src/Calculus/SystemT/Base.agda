@@ -51,10 +51,10 @@ data _⊢_ Γ where
     : Γ ⊢ A 
     → Γ ⊢ B
     → Γ ⊢ A ×̇ B
-  proj₁
+  projₗ
     : Γ ⊢ A ×̇ B
     → Γ ⊢ A
-  proj₂
+  projᵣ
     : Γ ⊢ A ×̇ B
     → Γ ⊢ B
   zero
@@ -85,8 +85,8 @@ rename ρ (ƛ M)        = ƛ rename (ext ρ) M
 rename ρ (M · N)      = rename ρ M · rename ρ N
 rename ρ ⟨⟩           = ⟨⟩
 rename ρ ⟨ M , N ⟩    = ⟨ rename ρ M , rename ρ N ⟩
-rename ρ (proj₁ M)    = proj₁ (rename ρ M)
-rename ρ (proj₂ N)    = proj₂ (rename ρ N)
+rename ρ (projₗ M)    = projₗ (rename ρ M)
+rename ρ (projᵣ N)    = projᵣ (rename ρ N)
 rename ρ zero         = zero
 rename ρ (suc M)      = suc (rename ρ M)
 rename ρ (prec M N L) = prec (rename ρ M) (rename (ext (ext ρ)) N) (rename ρ L)
@@ -115,8 +115,8 @@ _⟪_⟫
 (M · N)   ⟪ σ ⟫  = M ⟪ σ ⟫ · N ⟪ σ ⟫
 ⟨⟩        ⟪ σ ⟫  = ⟨⟩
 ⟨ M , N ⟩ ⟪ σ ⟫  = ⟨ M ⟪ σ ⟫ , N ⟪ σ ⟫ ⟩
-(proj₁ M) ⟪ σ ⟫  = proj₁ (M ⟪ σ ⟫)
-(proj₂ M) ⟪ σ ⟫  = proj₂ (M ⟪ σ ⟫)
+(projₗ M) ⟪ σ ⟫  = projₗ (M ⟪ σ ⟫)
+(projᵣ M) ⟪ σ ⟫  = projᵣ (M ⟪ σ ⟫)
 zero      ⟪ σ ⟫  = zero
 suc M     ⟪ σ ⟫  = suc (M ⟪ σ ⟫)
 prec M N L ⟪ σ ⟫ = prec (M ⟪ σ ⟫) (N ⟪ exts (exts σ) ⟫) (L ⟪ σ ⟫)
@@ -154,11 +154,11 @@ data _⊢_-→_ (Γ : Cxt) : (M N : Γ ⊢ A) → Set where
   β-ƛ·
     : Γ ⊢ (ƛ M) · N -→ M [ N ]
 
-  β-⟨,⟩proj₁
-    : Γ ⊢ proj₁ ⟨ M , N ⟩ -→ M
+  β-⟨,⟩projₗ
+    : Γ ⊢ projₗ ⟨ M , N ⟩ -→ M
 
-  β-⟨,⟩proj₂
-    : Γ ⊢ proj₂ ⟨ M , N ⟩ -→ N
+  β-⟨,⟩projᵣ
+    : Γ ⊢ projᵣ ⟨ M , N ⟩ -→ N
 
   β-rec-zero
     : Γ ⊢ prec M N zero -→ M
@@ -170,33 +170,33 @@ data _⊢_-→_ (Γ : Cxt) : (M N : Γ ⊢ A) → Set where
     : Γ , A ⊢ M -→ M′
     → Γ     ⊢ ƛ M -→ ƛ M′
 
-  ξ-·₁
+  ξ-·ₗ
     : Γ ⊢ L -→ L′
       ---------------
     → Γ ⊢ L · M -→ L′ · M
 
-  ξ-·₂
+  ξ-·ᵣ
     : Γ ⊢ M -→ M′
       ---------------
     → Γ ⊢ L · M -→ L · M′
 
-  ξ-⟨,⟩₁
+  ξ-⟨,⟩ₗ
     : Γ ⊢ M -→ M′ 
       ---------------
     → Γ ⊢ ⟨ M , N ⟩ -→ ⟨ M′ , N ⟩
 
-  ξ-⟨,⟩₂
+  ξ-⟨,⟩ᵣ
     : Γ ⊢ N -→ N′ 
       ---------------
     → Γ ⊢ ⟨ M , N ⟩ -→ ⟨ M , N′ ⟩
 
-  ξ-proj₁
+  ξ-projₗ
     : Γ ⊢ L -→ L′
-    → Γ ⊢ proj₁ L -→ proj₁ L′
+    → Γ ⊢ projₗ L -→ projₗ L′
 
-  ξ-proj₂
+  ξ-projᵣ
     : Γ ⊢ L -→ L′
-    → Γ ⊢ proj₂ L -→ proj₂ L′
+    → Γ ⊢ projᵣ L -→ projᵣ L′
 
   ξ-suc
     : Γ ⊢ M -→ N
@@ -266,8 +266,8 @@ module -↠-Reasoning where
       ----------
     → Γ ⊢ L -↠ N
   -↠-trans L-↠M M-↠N = _ -↠⟨ L-↠M ⟩ M-↠N
-
 open -↠-Reasoning using (_⊢_-↠_; -↠-refl; -↠-reflexive; -↠-trans) public
+
 
 data Value : (M : ∅ ⊢ A) → Set where
   ƛ_
@@ -306,17 +306,17 @@ data Progress (M : ∅ ⊢ A) : Set where
 progress : (M : ∅ ⊢ A) → Progress M
 progress (ƛ M)       = done (ƛ M)
 progress (M · N)    with progress M | progress N
-... | step M→M′   | _         = step (ξ-·₁ M→M′)
-... | _           | step N→N′ = step (ξ-·₂ N→N′)
+... | step M→M′   | _         = step (ξ-·ₗ M→M′)
+... | _           | step N→N′ = step (ξ-·ᵣ N→N′)
 ... | done (ƛ M′) | done vN   = step β-ƛ·
 progress ⟨⟩          = done ⟨⟩
 progress ⟨ M , N ⟩   = done ⟨ M , N ⟩
-progress (proj₁ MN) with progress MN
-... | step M-→N      = step (ξ-proj₁ M-→N)
-... | done ⟨ _ , _ ⟩ = step β-⟨,⟩proj₁
-progress (proj₂ MN) with progress MN
-... | step M-→N      = step (ξ-proj₂ M-→N)
-... | done ⟨ M , N ⟩ = step β-⟨,⟩proj₂
+progress (projₗ MN) with progress MN
+... | step M-→N      = step (ξ-projₗ M-→N)
+... | done ⟨ _ , _ ⟩ = step β-⟨,⟩projₗ
+progress (projᵣ MN) with progress MN
+... | step M-→N      = step (ξ-projᵣ M-→N)
+... | done ⟨ M , N ⟩ = step β-⟨,⟩projᵣ
 progress zero        = done zero
 progress (suc M)     = done (suc M)
 progress (prec M N L) with progress L
@@ -324,28 +324,77 @@ progress (prec M N L) with progress L
 ... | done zero      = step β-rec-zero
 ... | done (suc L′)  = step β-rec-suc
 
--- ------------------------------------------------------------------------------
--- -- Properties of subst, rename
 
--- postulate
---   rename-cong : {ρ ρ′ : Rename Γ Γ′} → (∀ {A} → ρ {A} ≗ ρ′ {A}) → (M : Γ ⊢ A) → rename ρ M ≡ rename ρ′ M
---   subst-` : (M : ∅ ⊢ A) → M ⟪ `_ ⟫ ≡ M
---   subst-cong : {σ σ′ : Subst Γ Γ′} → (∀ {A} → σ {A} ≗ σ′ {A}) → (M : Γ ⊢ A) → M ⟪ σ ⟫ ≡ M ⟪ σ′ ⟫
---   subst-rename : (ρ : Rename Γ Γ′) (σ : Subst Γ′ Γ′′) (M : Γ ⊢ A) → rename ρ M ⟪ σ ⟫ ≡ M ⟪ σ ∘ ρ ⟫
---   subst-subst : (σ : Subst Γ Γ′) (σ′ : Subst Γ′ Γ′′) (M : Γ ⊢ A) → M ⟪ σ ⟫ ⟪ σ′ ⟫ ≡ M ⟪ _⟪ σ′ ⟫ ∘ σ ⟫
+module _ where
+  open -↠-Reasoning
 
--- subst-rename-∅ : (ρ : Rename ∅ Γ) (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → rename ρ M ⟪ σ ⟫ ≡ M
--- subst-rename-∅ ρ σ M =
---   begin
---     rename ρ M ⟪ σ ⟫
---   ≡⟨ subst-rename ρ σ M ⟩
---     M ⟪ σ ∘ ρ ⟫
---   ≡⟨ subst-cong (λ ()) M ⟩
---     M ⟪ `_ ⟫
---   ≡⟨ subst-` M ⟩
---     M
---   ∎
---   where open P.≡-Reasoning
+  ƛ-↠
+    : _ ⊢ M -↠ M′
+    → _ ⊢ ƛ M -↠ ƛ M′
+  ƛ-↠ (M ∎)                 = ƛ M ∎
+  ƛ-↠ (M -→⟨ M→M₁ ⟩ M₁-↠M₂) =
+    ƛ M -→⟨ ξ-ƛ M→M₁ ⟩ ƛ-↠ M₁-↠M₂
 
--- subst-↑ : (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → ↑ M ⟪ σ ⟫ ≡ M
--- subst-↑ = subst-rename-∅ (λ ())
+  ·ₗ-↠
+    : _ ⊢ M -↠ M′
+    → _ ⊢ M · N -↠ M′ · N
+  ·ₗ-↠ (M ∎)                 = M · _ ∎
+  ·ₗ-↠ (M -→⟨ M→Mₗ ⟩ Mₗ-↠M₂) =
+    M · _ -→⟨ ξ-·ₗ M→Mₗ ⟩ ·ₗ-↠ Mₗ-↠M₂
+
+  ·ᵣ-↠
+    : _ ⊢ N -↠ N′
+    → _ ⊢ M · N -↠ M · N′
+  ·ᵣ-↠ (N ∎)                 = _ · N ∎
+  ·ᵣ-↠ (N -→⟨ N→N₁ ⟩ N₁-↠N₂) =
+    _ · N -→⟨ ξ-·ᵣ N→N₁ ⟩ ·ᵣ-↠ N₁-↠N₂
+
+  ·-↠
+    : _ ⊢ M -↠ M′
+    → _ ⊢ N -↠ N′
+    → _ ⊢ M · N -↠ M′ · N′
+  ·-↠ M-↠M′ N-↠N′ = begin
+    _ · _
+      -↠⟨ ·ₗ-↠ M-↠M′ ⟩
+    _ · _
+      -↠⟨ ·ᵣ-↠ N-↠N′ ⟩
+    _ · _ ∎ 
+
+  projₗ-↠
+    : _ ⊢ L -↠ L′ → _ ⊢ projₗ L -↠ projₗ L′
+  projₗ-↠ (L ∎)                 = projₗ L ∎
+  projₗ-↠ (L -→⟨ L→L₁ ⟩ L₁-↠L₂) =
+    projₗ L -→⟨ ξ-projₗ L→L₁ ⟩ projₗ-↠ L₁-↠L₂
+
+  projᵣ-↠
+    : _ ⊢ L -↠ L′
+    → _ ⊢ projᵣ L -↠ projᵣ L′
+  projᵣ-↠ (L ∎)                 = projᵣ L ∎
+  projᵣ-↠ (L -→⟨ L→L₂ ⟩ L₂-↠L₂) =
+    projᵣ L -→⟨ ξ-projᵣ L→L₂ ⟩ projᵣ-↠ L₂-↠L₂
+
+  ⟨,⟩ₗ-↠
+    : _ ⊢ M -↠ M′
+    → _ ⊢ ⟨ M , N ⟩ -↠ ⟨ M′ , N ⟩
+  ⟨,⟩ₗ-↠ (M ∎)                 = ⟨ M , _ ⟩ ∎
+  ⟨,⟩ₗ-↠ (M -→⟨ M→M₁ ⟩ M₁-↠M₂) =
+    ⟨ M , _ ⟩ -→⟨ ξ-⟨,⟩ₗ M→M₁ ⟩ ⟨,⟩ₗ-↠ M₁-↠M₂
+
+  ⟨,⟩ᵣ-↠
+    : _ ⊢ N -↠ N′
+    → _ ⊢ ⟨ M , N ⟩ -↠ ⟨ M , N′ ⟩
+  ⟨,⟩ᵣ-↠ (N ∎)                 = ⟨ _ , N ⟩ ∎
+  ⟨,⟩ᵣ-↠ (N -→⟨ N→N₁ ⟩ N₁-↠N₂) =
+    ⟨ _ , N ⟩ -→⟨ ξ-⟨,⟩ᵣ N→N₁ ⟩ ⟨,⟩ᵣ-↠ N₁-↠N₂
+
+  ⟨,⟩-↠
+    : _ ⊢ M -↠ M′
+    → _ ⊢ N -↠ N′
+    → _ ⊢ ⟨ M , N ⟩ -↠ ⟨ M′ , N′ ⟩
+  ⟨,⟩-↠ M↠M′ N↠N′ = begin
+    ⟨ _ , _ ⟩
+      -↠⟨ ⟨,⟩ₗ-↠ M↠M′ ⟩
+    ⟨ _ , _ ⟩
+      -↠⟨ ⟨,⟩ᵣ-↠ N↠N′ ⟩
+    ⟨ _ , _ ⟩
+      ∎

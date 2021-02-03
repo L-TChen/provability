@@ -3,8 +3,10 @@
 module Calculus.SystemT.Quoting where
 
 open import Prelude 
+  hiding (_≡⟨_⟩_; _∎)
 
 open import Calculus.SystemT.Base
+open import Calculus.SystemT.Substitution
 
 private
   variable
@@ -30,20 +32,20 @@ record Quoting : 𝓤₀ ̇ where
   diag : ∅ ⊢ ℕ̇ →̇ ℕ̇
   diag = ƛ (↑ Ap) · # 0 · (↑ Num · # 0)
 
-  -- diag-⌜⌝ : ∅ ⊢ diag · ⌜ a ⌝ -↠ ⌜ a · ⌜ a ⌝ ⌝
-  -- diag-⌜⌝ {a = a} =
-  --   begin
-  --     diag · ⌜ a ⌝
-  --   -→⟨ β-ƛ· ⟩
-  --     ↑ app ⟪ subst-zero ⌜ a ⌝ ⟫ · ⌜ a ⌝ · (↑ ignum ⟪ subst-zero ⌜ a ⌝ ⟫ · ⌜ a ⌝)
-  --   ≡⟨ P.cong₂ (λ M N → M · ⌜ a ⌝ · (N · ⌜ a ⌝)) (subst-↑ _ app) (subst-↑ _ ignum) ⟩
-  --     app · ⌜ a ⌝ · (ignum · ⌜ a ⌝)
-  --   -↠⟨ ·₂-↠ ignum-⌜⌝ ⟩
-  --     app · ⌜ a ⌝ · ⌜ ⌜ a ⌝ ⌝
-  --   -↠⟨ app-⌜⌝-⌜⌝ ⟩
-  --     ⌜ a · ⌜ a ⌝ ⌝
-  --   ∎
-  --   where open -↠-Reasoning
+  diag-⌜⌝ : ∅ ⊢ diag · ⌜ a ⌝ -↠ ⌜ a · ⌜ a ⌝ ⌝
+  diag-⌜⌝ {a = a} =
+    begin
+      diag · ⌜ a ⌝
+    -→⟨ β-ƛ· ⟩
+      ↑ Ap [ ⌜ a ⌝ ] · ⌜ a ⌝ · (↑ Num [ ⌜ a ⌝ ] · ⌜ a ⌝)
+    ≡⟨ {!!} ⟩ -- ≡⟨ cong₂ (λ M N → M · ⌜ a ⌝ · (N · ⌜ a ⌝)) ? ⟩ -- (subst-↑ _ app) (subst-↑ _ ignum) ⟩
+      Ap · ⌜ a ⌝ · (Num · ⌜ a ⌝)
+    -↠⟨ {!·!} ⟩ -- ·₂-↠ ignum-⌜⌝ ⟩
+      Ap · ⌜ a ⌝ · ⌜ ⌜ a ⌝ ⌝
+    -↠⟨ Ap-↠ ⟩
+      ⌜ a · ⌜ a ⌝ ⌝
+    ∎
+    where open -↠-Reasoning
 
   -- -- ⊢ □ A →̇ A   ⇒   ⊢ A
   -- gfix : ∅ ⊢ ℕ̇ →̇ A → ∅ ⊢ A
