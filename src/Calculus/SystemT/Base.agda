@@ -68,6 +68,9 @@ data _⊢_ Γ where
     → Γ ⊢ ℕ̇
     → Γ ⊢ A
 
+Prog : 𝕋 → 𝓤₀ ̇
+Prog A = ∅ ⊢ A
+
 #_ : (n : ℕ)
   → {n∈Γ : True (suc n ≤? length Γ)}
     --------------------------------
@@ -91,6 +94,8 @@ rename ρ zero         = zero
 rename ρ (suc M)      = suc (rename ρ M)
 rename ρ (prec M N L) = prec (rename ρ M) (rename (ext (ext ρ)) N) (rename ρ L)
 
+↑₁_ : Γ ⊢ A → Γ , B ⊢ A
+↑₁_ = rename S_
 ↑_ : ∅ ⊢ A → Γ ⊢ A
 ↑_ = rename (λ ())
 

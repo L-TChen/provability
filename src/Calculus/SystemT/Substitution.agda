@@ -16,15 +16,15 @@ open import Calculus.SystemT.Base   public
 
 private
   variable
-    Γ Δ : Cxt
+    Γ Δ Ξ : Cxt
     A B : 𝕋
 
---postulate
+postulate
 --  rename-cong : {ρ ρ′ : Rename Γ Δ} → (∀ {A} → ρ {A} ≗ ρ′ {A}) → (M : Γ ⊢ A) → rename ρ M ≡ rename ρ′ M
 --  subst-` : (M : ∅ ⊢ A) → M ⟪ `_ ⟫ ≡ M
 --  subst-cong : {σ σ′ : Subst Γ Δ} → (∀ {A} → σ {A} ≗ σ′ {A}) → (M : Γ ⊢ A) → M ⟪ σ ⟫ ≡ M ⟪ σ′ ⟫
 --  subst-rename : (ρ : Rename Γ Δ) (σ : Subst Δ Δ′) (M : Γ ⊢ A) → rename ρ M ⟪ σ ⟫ ≡ M ⟪ σ ∘ ρ ⟫
---  subst-subst : (σ : Subst Γ Δ) (σ′ : Subst Δ Δ′) (M : Γ ⊢ A) → M ⟪ σ ⟫ ⟪ σ′ ⟫ ≡ M ⟪ _⟪ σ′ ⟫ ∘ σ ⟫
+  subst-subst : (σ : Subst Γ Δ) (σ′ : Subst Δ Ξ) (M : Γ ⊢ A) → M ⟪ σ ⟫ ⟪ σ′ ⟫ ≡ M ⟪ _⟪ σ′ ⟫ ∘ σ ⟫
 
 postulate
   subst-rename-∅ : (ρ : Rename ∅ Γ) (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → rename ρ M ⟪ σ ⟫ ≡ M

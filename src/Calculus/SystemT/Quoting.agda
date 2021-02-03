@@ -3,7 +3,7 @@
 module Calculus.SystemT.Quoting where
 
 open import Prelude 
-  hiding (_≡⟨_⟩_; _∎)
+  hiding (_≡⟨_⟩_; _∎; ⟪_⟫)
 
 open import Calculus.SystemT.Base
 open import Calculus.SystemT.Substitution
@@ -12,92 +12,82 @@ private
   variable
     Γ : Cxt
     A B C : 𝕋
-    a b c : ∅ ⊢ A
+    M N L : ∅ ⊢ A
     m n   : ∅ ⊢ ℕ̇
 
 record Quoting : 𝓤₀ ̇ where
   field
-    ⌜_⌝          : ∅ ⊢ A → ∅ ⊢ ℕ̇
-    ⌜⌝-injective : ⌜ a ⌝ ≡ ⌜ b ⌝ → a ≡ b
+    ⌜_⌝          : Prog A → Prog ℕ̇
+    ⌜⌝-injective : ⌜ M ⌝ ≡ ⌜ M ⌝ → M ≡ N
 
     -- ⊢ □ (A → B) →̇ □ A →̇ □ B
-    Ap   : ∅ ⊢ ℕ̇ →̇ ℕ̇ →̇ ℕ̇
-    Ap-↠ : ∅ ⊢ Ap · ⌜ a ⌝ · ⌜ b ⌝ -↠ ⌜ a · b ⌝
+    Ap   : Prog (ℕ̇ →̇ ℕ̇ →̇ ℕ̇)
+    Ap-↠ : ∅ ⊢ Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M · N ⌝
 
     -- ⊢ □ A →̇ □ (□ A)
-    Num   : ∅ ⊢ ℕ̇ →̇ ℕ̇
-    Num-↠ : ∅ ⊢ Num · ⌜ a ⌝ -↠ ⌜ ⌜ a ⌝ ⌝
+    Num   : Prog (ℕ̇ →̇ ℕ̇)
+    Num-↠ : ∅ ⊢ Num · ⌜ M ⌝ -↠ ⌜ ⌜ M ⌝ ⌝
 
+  open -↠-Reasoning
   -- ⊢ □ (ℕ →̇ A) →̇ □ A
-  -- this is exactly the S Ap Num
-  diag : ∅ ⊢ ℕ̇ →̇ ℕ̇
+  diag : Prog (ℕ̇ →̇ ℕ̇)
   diag = ƛ (↑ Ap) · # 0 · (↑ Num · # 0)
 
-  diag-⌜⌝ : ∅ ⊢ diag · ⌜ a ⌝ -↠ ⌜ a · ⌜ a ⌝ ⌝
-  diag-⌜⌝ {a = a} =
-    begin
-      diag · ⌜ a ⌝
+  diag-⌜⌝ : ∅ ⊢ diag · ⌜ M ⌝ -↠ ⌜ M · ⌜ M ⌝ ⌝
+  diag-⌜⌝ {M = M} = begin
+      diag · ⌜ M ⌝
     -→⟨ β-ƛ· ⟩
-      ↑ Ap [ ⌜ a ⌝ ] · ⌜ a ⌝ · (↑ Num [ ⌜ a ⌝ ] · ⌜ a ⌝)
-    ≡⟨ cong₂ (λ M N → M · ⌜ a ⌝ · (N · ⌜ a ⌝)) (subst-↑ _ Ap) (subst-↑ _ Num) ⟩
-      Ap · ⌜ a ⌝ · (Num · ⌜ a ⌝)
+      ↑ Ap [ ⌜ M ⌝ ] · ⌜ M ⌝ · (↑ Num [ ⌜ M ⌝ ] · ⌜ M ⌝)
+    ≡⟨ cong₂ (λ N L → N · ⌜ M ⌝ · (L · ⌜ M ⌝)) (subst-↑ _ Ap) (subst-↑ _ Num) ⟩
+      Ap · ⌜ M ⌝ · (Num · ⌜ M ⌝)
     -↠⟨ ·ᵣ-↠ Num-↠ ⟩
-      Ap · ⌜ a ⌝ · ⌜ ⌜ a ⌝ ⌝
+      Ap · ⌜ M ⌝ · ⌜ ⌜ M ⌝ ⌝
     -↠⟨ Ap-↠ ⟩
-      ⌜ a · ⌜ a ⌝ ⌝
+      ⌜ M · ⌜ M ⌝ ⌝
     ∎
-    where open -↠-Reasoning
 
-  -- -- ⊢ □ A →̇ A   ⇒   ⊢ A
-  -- gfix : ∅ ⊢ ℕ̇ →̇ A → ∅ ⊢ A
-  -- gfix {A} a = g · ⌜ g ⌝ where
-  --   -- the β-redex is for (∅ ⊢ igfix A · ⌜ a ⌝ -↠ ⌜ gfix a ⌝) to be true
-  --   g : ∅ ⊢ ℕ̇ →̇ A
-  --   g = (ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0))) · a
+  -- the β-redex is for (∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝) to be true
+  G : Prog (ℕ̇ →̇ A) → Prog (ℕ̇ →̇ A)
+  G M = (ƛ ƛ # 1 · (↑ diag · # 0)) · M
+  
+  -- ⊢ □ A →̇ A   ⇒   ⊢ A
+  gfix : Prog (ℕ̇ →̇ A) → Prog A
+  gfix {A} M = G M · ⌜ G M ⌝
 
-  -- gfix-spec : ∅ ⊢ gfix a -↠ a · ⌜ gfix a ⌝
-  -- gfix-spec {A = A} {a = a} =
-  --   begin
-  --     g · ⌜ g ⌝
-  --   -→⟨ ξ-·₁ β-ƛ· ⟩
-  --     ƛ_ {B = A} (rename S_ a · (↑ diag ⟪ _ ⟫ · # 0)) · ⌜ g ⌝
-  --   -→⟨ β-ƛ· ⟩
-  --     rename S_ a ⟪ _ ⟫ · (↑ diag ⟪ _ ⟫ ⟪ _ ⟫ · ⌜ g ⌝)
-  --   ≡⟨ P.cong₂ (λ M N → M · (N · ⌜ g ⌝)) (subst-rename-∅ S_ _ a) (subst-subst _ _ (↑ diag)) ⟩
-  --     a · (↑ diag ⟪ _ ⟫ · ⌜ g ⌝)
-  --   ≡⟨ P.cong (λ M → a · (M · ⌜ g ⌝)) (subst-↑ _ diag) ⟩
-  --     a · (diag · ⌜ g ⌝)
-  --   -↠⟨ ·₂-↠ diag-⌜⌝ ⟩
-  --     a · ⌜ g · ⌜ g ⌝ ⌝
-  --   ∎
-  --   where
-  --     open -↠-Reasoning
-  --     g : ∅ ⊢ ℕ̇ →̇ A
-  --     g = (ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0))) · a
+  gfix-spec : ∅ ⊢ gfix M -↠ M · ⌜ gfix M ⌝
+  gfix-spec {A = A} {M = M} = begin
+      G M · ⌜ G M ⌝
+    -→⟨ ξ-·ₗ β-ƛ· ⟩
+      (ƛ ↑₁ M · (↑ diag ⟪ _ ⟫ · # 0)) · ⌜ G M ⌝
+    -→⟨ β-ƛ· ⟩
+      rename S_ M ⟪ _ ⟫ · (↑ diag ⟪ _ ⟫ ⟪ _ ⟫ · ⌜ G M ⌝)
+    ≡⟨ cong₂ (λ N L → N · (L · ⌜ G M ⌝)) (subst-rename-∅ S_ _ M) (subst-subst _ _ (↑ diag)) ⟩ 
+      M · (↑ diag ⟪ _ ⟫ · ⌜ G M ⌝)
+    ≡⟨ cong (λ N → M · (N · ⌜ G M ⌝)) (subst-↑ _ diag) ⟩
+      M · (diag · ⌜ G M ⌝)
+    -↠⟨ ·ᵣ-↠ diag-⌜⌝ ⟩
+      M · ⌜ G M · ⌜ G M ⌝ ⌝
+    ∎
 
-  -- -- ⊢ □ (□ A →̇ A) →̇ □ A
-  -- igfix : (A : Type) → ∅ ⊢ ℕ̇ →̇ ℕ̇
-  -- igfix A = ƛ ↑ diag · (↑ app · ↑ ⌜ ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0)) ⌝ · # 0)
+  -- ⊢ □ (□ A →̇ A) →̇ □ A
+  igfix : (A : 𝕋) → Prog (ℕ̇ →̇ ℕ̇)
+  igfix A = ƛ ↑ diag · (↑ Ap · ↑ ⌜ ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0)) ⌝ · # 0)
 
-  -- igfix-⌜⌝ : {a : ∅ ⊢ ℕ̇ →̇ A} → ∅ ⊢ igfix A · ⌜ a ⌝ -↠ ⌜ gfix a ⌝
-  -- igfix-⌜⌝ {A = A} {a = a} =
-  --   begin
-  --     igfix A · ⌜ a ⌝
-  --   -→⟨ β-ƛ· ⟩
-  --     (↑ diag) ⟪ _ ⟫ · (↑ app ⟪ _ ⟫ · ↑ ⌜ ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0)) ⌝  ⟪ _ ⟫ · ⌜ a ⌝)
-  --   ≡⟨ cong₃ (λ L M N → L · (M · N · ⌜ a ⌝)) (subst-↑ _ diag) (subst-↑ _ app) (subst-↑ _ _) ⟩
-  --     diag · (app · ⌜ ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0)) ⌝ · ⌜ a ⌝)
-  --   -↠⟨ ·₂-↠ app-⌜⌝-⌜⌝ ⟩
-  --     diag · ⌜ g ⌝
-  --   -↠⟨ diag-§⌜⌝ ⟩
-  --     ⌜ g · ⌜ g ⌝ ⌝
-  --   ∎
-  --   where
-  --     open -↠-Reasoning
-  --     g : ∅ ⊢ ℕ̇ →̇ A
-  --     g = (ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0))) · a
-  --     cong₃ : ∀ f {x y u v s t} → x ≡ y → u ≡ v → s ≡ t → f x u s ≡ f y v t
-  --     cong₃ f P.refl P.refl P.refl = P.refl
+  igfix-⌜⌝ : {M : ∅ ⊢ ℕ̇ →̇ A} → ∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝
+  igfix-⌜⌝ {A = A} {M = M} = begin
+      igfix A · ⌜ M ⌝
+    -→⟨ β-ƛ· ⟩
+      (↑ diag) ⟪ _ ⟫ · (↑ Ap ⟪ _ ⟫ · ↑ ⌜ ƛ ƛ (# 1 · (↑ diag · # 0)) ⌝  ⟪ _ ⟫ · ⌜ M ⌝)
+    ≡⟨ {!!} ⟩ -- ≡⟨ (λ i → (subst-↑ _ diag i) · (subst-↑ _ Ap i · subst-↑ _ _ i · ⌜ M ⌝)) ⟩
+      diag · (Ap · ⌜ ƛ ƛ_ {B = A} (# 1 · (↑ diag · # 0)) ⌝ · ⌜ M ⌝)
+    -↠⟨ ·ᵣ-↠ Ap-↠ ⟩
+      diag · ⌜ g ⌝
+    -↠⟨ diag-⌜⌝ ⟩
+      ⌜ g · ⌜ g ⌝ ⌝
+    ∎
+    where
+      g : ∅ ⊢ ℕ̇ →̇ A
+      g = G M
 
   -- -- ⊢ □ A →̇ A   ⇒   ⊢ A →̇ A   ⇒   ⊢ A
   -- selfEval⇒fixpoint
