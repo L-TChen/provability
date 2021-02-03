@@ -80,22 +80,22 @@ instance
   _≟_ ⦃ DecEq𝕋 ⦄ = _≟Tp_
 
 dom≡ : A →̇ B ≡ A′ →̇ B′ → A ≡ A′
-dom≡ eq = decode (encode eq .fst)
+dom≡ p = decode (encode p .fst)
 
-rng≡ : A →̇ B ≡ A′ →̇ B′ → B ≡ B′
-rng≡ eq = decode (encode eq .snd)
+-- rng≡ : A →̇ B ≡ A′ →̇ B′ → B ≡ B′
+-- rng≡ eq = decode (encode eq .snd)
 
-×ₗ≡ : A ×̇ B ≡ A′ ×̇ B′ → A ≡ A′ 
-×ₗ≡ eq = decode (encode eq .fst)
+-- ×ₗ≡ : A ×̇ B ≡ A′ ×̇ B′ → A ≡ A′ 
+-- ×ₗ≡ eq = decode (encode eq .fst)
 
-×ᵣ≡ : A ×̇ B ≡ A′ ×̇ B′ → B ≡ B′ 
-×ᵣ≡ eq = decode (encode eq .snd)
+-- ×ᵣ≡ : A ×̇ B ≡ A′ ×̇ B′ → B ≡ B′ 
+-- ×ᵣ≡ eq = decode (encode eq .snd)
 
-ℕ≢→ : ¬ ℕ̇ ≡ A →̇ B
-ℕ≢→ = encode
+-- ℕ≢→ : ¬ ℕ̇ ≡ A →̇ B
+-- ℕ≢→ = encode
 
-ℕ≢× : ¬ ℕ̇ ≡ A ×̇ B
-ℕ≢× = encode
+-- ℕ≢× : ¬ ℕ̇ ≡ A ×̇ B
+-- ℕ≢× = encode
 
-×≢→ : ¬ A ×̇ B ≡ C →̇ D
-×≢→ = encode
+-- ×≢→ : ¬ A ×̇ B ≡ C →̇ D
+-- ×≢→ = encode

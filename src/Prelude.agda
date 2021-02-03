@@ -13,16 +13,16 @@ open import Cubical.HITs.PropositionalTruncation public
   hiding (map)
   renaming (elim to truncElim)
 
-open import Cubical.Data.Sigma                   public
-open import Cubical.Data.Unit                    public
-open import Cubical.Data.Empty                   public
+open import Cubical.Data.Sigma                     public
+open import Cubical.Data.Unit                      public
+open import Cubical.Data.Empty                     public
   renaming (rec to ⊥rec; elim to ⊥-elim)
-open import Cubical.Data.Bool                    public
+open import Cubical.Data.Bool                      public
   hiding (_≟_)
-open import Cubical.Data.Nat                     public
+open import Cubical.Data.Nat                       public
   using (ℕ; zero; suc; _+_; _∸_; fromNatℕ)
-import Cubical.Data.Nat.Properties as ℕₚ
-import Cubical.Data.Nat.Order      as ℕₚ
+open import Cubical.Data.Nat.Order.Recursive as ℕₚ public
+  using (_≤_; _<_)
 
 open import Universes public
 open import Later     public
@@ -63,6 +63,11 @@ A ➝ B = A → B
 
 id : A → A
 id x = x
+
+_≤?_ : (m n : ℕ) → Dec (m ≤ n)
+zero  ≤? _     = yes tt
+suc m ≤? zero  = no λ ()
+suc m ≤? suc n = m ≤? n
 
 record DecEq (A : 𝓤 ̇) : 𝓤  ̇ where
   field

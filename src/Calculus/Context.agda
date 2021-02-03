@@ -2,6 +2,8 @@
 
 module Calculus.Context where
 
+open import Cubical.Data.Nat.Order.Recursive
+
 open import Prelude
 open import Calculus.Type
 
@@ -25,11 +27,17 @@ data _∋_ {Ty : 𝓤 ̇} : Context Ty → Ty → 𝓤 ̇ where
   Z  : Γ , A ∋ A
   S_ : Γ     ∋ A → Γ , B ∋ A
 
-lookup : Context Ty → ℕ → Ty
-lookup Γ n = {!!}
+length : Context Ty → ℕ
+length ∅       = 0
+length (Γ , A) = suc (length Γ)
 
-count : (n : ℕ) → Γ ∋ lookup Γ n
-count n = {!!}
+lookup : (Γ : Context Ty) → {n : ℕ} → (p : n < length Γ) → Ty
+lookup (Γ , A) {zero} tt = A
+lookup (Γ , A) {suc n} p = lookup Γ p
+
+count : (Γ : Context Ty) → {n : ℕ} → (p : n < length Γ) → Γ ∋ lookup Γ p
+count (_ , _) {zero}    tt = Z
+count (Γ , _) {(suc n)} p  = S count Γ p
 
 ext
   : (∀ {A : Ty} →       Γ ∋ A →     Δ ∋ A)

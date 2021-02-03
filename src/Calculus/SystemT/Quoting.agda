@@ -1,7 +1,6 @@
 {-# OPTIONS --without-K --cubical #-}
 
-module Calculus.SystemT.GodelNumbering where
-
+module Calculus.SystemT.Quoting where
 
 open import Prelude 
 
@@ -20,16 +19,16 @@ record Quoting : 𝓤₀ ̇ where
     ⌜⌝-injective : ⌜ a ⌝ ≡ ⌜ b ⌝ → a ≡ b
 
     -- ⊢ □ (A → B) →̇ □ A →̇ □ B
-    app   : ∅ ⊢ ℕ̇ →̇ ℕ̇ →̇ ℕ̇
-    app-↠ : ∅ ⊢ app · ⌜ a ⌝ · ⌜ b ⌝ -↠ ⌜ a · b ⌝
+    Ap   : ∅ ⊢ ℕ̇ →̇ ℕ̇ →̇ ℕ̇
+    Ap-↠ : ∅ ⊢ Ap · ⌜ a ⌝ · ⌜ b ⌝ -↠ ⌜ a · b ⌝
 
     -- ⊢ □ A →̇ □ (□ A)
-    ignum   : ∅ ⊢ ℕ̇ →̇ ℕ̇
-    ignum-↠ : ∅ ⊢ ignum · ⌜ a ⌝ -↠ ⌜ ⌜ a ⌝ ⌝
+    Num   : ∅ ⊢ ℕ̇ →̇ ℕ̇
+    Num-↠ : ∅ ⊢ Num · ⌜ a ⌝ -↠ ⌜ ⌜ a ⌝ ⌝
 
   -- ⊢ □ (ℕ →̇ A) →̇ □ A
   diag : ∅ ⊢ ℕ̇ →̇ ℕ̇
-  diag = ? -- ƛ ↑ app · # 0 · (↑ ignum · # 0)
+  diag = ƛ (↑ Ap) · # 0 · (↑ Num · # 0)
 
   -- diag-⌜⌝ : ∅ ⊢ diag · ⌜ a ⌝ -↠ ⌜ a · ⌜ a ⌝ ⌝
   -- diag-⌜⌝ {a = a} =
