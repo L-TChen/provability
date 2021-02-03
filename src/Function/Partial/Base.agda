@@ -47,7 +47,7 @@ undefined : ℒ 𝓥 A
 fst undefined = ⊥* , λ ()
  
 η : (𝓥 : Universe) → A → ℒ 𝓥 A
-η 𝓥 a = L.⊤* , λ _ → a
+η 𝓥 a = (Unit* , isPropUnit*) , λ _ → a
 
 instance
   Functorℒ : Functor (𝓥 ⁺) (ℒ 𝓥)

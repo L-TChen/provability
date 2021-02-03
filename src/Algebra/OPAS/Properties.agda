@@ -39,11 +39,11 @@ module Structure (𝔄 : OPAS 𝓥 𝓤) where
       y₀≼y₁ = y₀≼ᵖy₁ y₁↓ .snd
 
   abstract
-    ⟦⟦t⟧⟧=⟦t⟧ : (t : Term 0) → (t↓ : ⟦ t ⟧₀ ↓) → ⟦ ᶜ value ⟦ t ⟧₀ t↓ ⟧₀ ≡ ⟦ t ⟧₀
+    ⟦⟦t⟧⟧=⟦t⟧ : (t : Term A 0) → (t↓ : ⟦ t ⟧₀ ↓) → ⟦ ᶜ value ⟦ t ⟧₀ t↓ ⟧₀ ≡ ⟦ t ⟧₀
     ⟦⟦t⟧⟧=⟦t⟧ t t↓ = 
       pure (value ⟦ t ⟧₀ t↓ )
         ≡⟨ refl ⟩
-      ⊤* , (λ (_ : Unit*) → value ⟦ t ⟧₀ t↓)
+      (Unit* , isPropUnit*) , (λ (_ : Unit*) → value ⟦ t ⟧₀ t↓)
         ≡⟨ ΣPathP (⊤=p↓ , λ i _ → value ⟦ t ⟧₀ t↓) ⟩
       ⟦ t ⟧₀ is-defined , (λ _ → value ⟦ t ⟧₀ t↓)
         ≡⟨ cong (⟦ t ⟧₀ is-defined ,_) (funExt (λ x i → value ⟦ t ⟧₀ ((⟦ t ⟧₀ ↓-isProp) t↓ x i))) ⟩
@@ -52,5 +52,5 @@ module Structure (𝔄 : OPAS 𝓥 𝓤) where
       ⟦ t ⟧₀
         ∎
       where
-        ⊤=p↓ : ⊤* ≡ (⟦ t ⟧₀ is-defined)
+        ⊤=p↓ : (Unit* , isPropUnit*) ≡ (⟦ t ⟧₀ is-defined)
         ⊤=p↓ = ⇔toPath (λ _ → t↓) λ _ → tt*

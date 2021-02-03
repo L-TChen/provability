@@ -3,4 +3,4 @@
 module Algebra.OPCA where
 
 open import Algebra.OPCA.Base       public
-open import Algebra.OPCA.Properties public
+open import Algebra.OPCA.Properties

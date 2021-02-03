@@ -3,7 +3,7 @@
 module Function.Partial.Properties where
 
 open import Cubical.Functions.Logic
-  using (⊤*; ⇒∶_⇐∶_; ⇐∶_⇒∶_)
+  using (⇒∶_⇐∶_; ⇐∶_⇒∶_)
 open import Cubical.Functions.Embedding
 
 open import Prelude
@@ -50,9 +50,9 @@ defined-is-pure {A = A} p p↓ =
   transport (λ i → ⟨ p↓=⊤ i ⟩ → A) (value p) tt* ,
     (p is-defined , value p
       ≡[ i ]⟨ p↓=⊤ i , transport-filler (λ i → ⟨ p↓=⊤ i ⟩ → A) (value p) i ⟩
-    ⊤* , (λ { tt* → transport (λ i → ⟨ p↓=⊤ i ⟩ → A) (value p) tt*})
+    (Unit* , isPropUnit*) , (λ { tt* → transport (λ i → ⟨ p↓=⊤ i ⟩ → A) (value p) tt*})
       ∎) 
   where
-    p↓=⊤ : p is-defined ≡ ⊤*
+    p↓=⊤ : p is-defined ≡ (Unit* , isPropUnit*)
     p↓=⊤ = ⇒∶ (λ _ → tt*)
            ⇐∶ (λ _ → p↓)

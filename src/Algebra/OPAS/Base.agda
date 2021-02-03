@@ -2,20 +2,34 @@
 
 module Algebra.OPAS.Base where
 
+import Cubical.Data.Nat.Order as ℕₚ
+
 open import Prelude
+  hiding ([_])
 open import Relation.Binary.Preorder
 open import Function.Partial
-
 
 private
   variable
     n m : ℕ
 
+infixl 7 _⊙_
+infix  9 `_ ᶜ_
+
+data Term (A : 𝓤 ̇) (n : ℕ) : 𝓤 ̇ where
+  ᶜ_  : A        → Term A n
+  `_  : Fin n    → Term A n
+  _⊙_ : Term A n → Term A n → Term A n
+
+_[_] : {A : 𝓤 ̇} → Term A (suc n) → Term A n → Term A n
+(ᶜ a)     [ s ] = ᶜ a
+(` zero)  [ s ] = s
+(` suc i) [ s ] = ` i
+(t ⊙ u)   [ s ] = (t [ s ]) ⊙ (u [ s ])
+
 record IsOPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 𝓥 A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor isopas
   infixl 7 _•_
-  infix  9 `_ ᶜ_
-  infixl 7 _⊙_
 
   infix  4 _ℒ≼_
   
@@ -31,6 +45,8 @@ record IsOPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A �
 
   field
     ·-respect-≼  : {x₁ y₁ x₀ y₀ : A} → x₀ ≼ x₁ → y₀ ≼ y₁ → x₀ · y₀ ℒ≼ x₁ · y₁
+                                     -- if x₀ ≼ x₁ and y₀ ≼ y₁, then again if x₁ · y₁ ↓ then x₀ · y₀ ↓ and
+                                     -- x₀ · y₀ ≼ x₁ · y₁
 
   _•_ : ℒ 𝓥 A → ℒ 𝓥 A → ℒ 𝓥 A
   ma₁ • ma₂ = do
@@ -38,17 +54,12 @@ record IsOPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A �
     a₂ ← ma₂
     a₁ · a₂
 
-  data Term (n : ℕ) : 𝓤 ̇ where
-    ᶜ_  : A      → Term n
-    `_  : Fin n  → Term n
-    _⊙_ : Term n → Term n → Term n
-
-  ⟦_⟧_ : {n : ℕ} → Term n → (Fin n → A) → ℒ 𝓥 A
+  ⟦_⟧_ : Term A n → (Finite A n) → ℒ 𝓥 A
   ⟦ ᶜ a   ⟧ σ = pure a
-  ⟦ ` i   ⟧ σ = pure (σ i)
+  ⟦ ` x   ⟧ σ = pure (σ x)
   ⟦ t ⊙ s ⟧ σ = ⟦ t ⟧ σ • ⟦ s ⟧ σ
 
-  ⟦_⟧₀ : Term 0 → ℒ 𝓥 A
+  ⟦_⟧₀ : Term A 0 → ℒ 𝓥 A
   ⟦ t ⟧₀ = ⟦ t ⟧ []
 
   open IsPreorder ≼-isPreorder public
@@ -59,7 +70,9 @@ record IsOPAS (𝓥 : Universe) {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A �
     renaming
       ( ≼-isProp     to ℒ≼-isProp
       ; isReflexive  to ℒ≼-isReflexive
-      ; isTransitive to ℒ≼-isTransitive)
+      ; isTransitive to ℒ≼-isTransitive
+      ; ≡-respˡ-≼    to ≡-respˡ-ℒ≼
+      ; ≡-respʳ-≼    to ≡-respʳ-ℒ≼)
 
 record OpasStr 𝓥 (A : 𝓤 ̇) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
   constructor passtr
@@ -86,7 +99,7 @@ module ≼-Reasoning (𝔄 : OPAS 𝓥 𝓤) where
   private
     A = ⟨ 𝔄 ⟩
     variable
-      s t u v : Term n
+      s t u v : Term A n
       ρ σ τ : Fin n → A
 
   infix 4 _under_IsRelatedTo_under_
@@ -97,7 +110,7 @@ module ≼-Reasoning (𝔄 : OPAS 𝓥 𝓤) where
   syntax step-≼ s ρ t≼u s≼t = ⟦ s ⟧ ρ ≼⟨ s≼t ⟩ t≼u
   syntax step-≡ s ρ t≼u s≼t = ⟦ s ⟧ ρ ≡⟨ s≼t ⟩ t≼u
 
-  data _under_IsRelatedTo_under_ (t : Term n)(σ : Fin n → A)(s : Term m)(τ : Fin m → A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
+  data _under_IsRelatedTo_under_ (t : Term A n)(σ : Fin n → A)(s : Term A m)(τ : Fin m → A) : 𝓤 ⊔ 𝓥 ⁺ ̇ where
     nonstrict : (t≼s : ⟦ t ⟧ᵗ σ ℒ≼ ⟦ s ⟧ᵗ τ) → t under σ IsRelatedTo s under τ
     equals    : (t≡s : ⟦ t ⟧ᵗ σ ≡  ⟦ s ⟧ᵗ τ) → t under σ IsRelatedTo s under τ
 
@@ -107,37 +120,28 @@ module ≼-Reasoning (𝔄 : OPAS 𝓥 𝓤) where
     where
       LHS = ⟦ t ⟧ᵗ σ
 
-  step-≡ : (s : Term n) (ρ : Fin n → A)
+  step-≡ : (s : Term A n) (ρ : Fin n → A)
     → t under σ IsRelatedTo u under τ → ⟦ s ⟧ᵗ ρ ≡ ⟦ t ⟧ᵗ σ
     → s under ρ IsRelatedTo u under τ
-  step-≡ {u = u} {τ = τ} s ρ (nonstrict y≼z) x≡y = nonstrict (transport (cong (λ a → a ℒ≼ (⟦ u ⟧ᵗ τ)) (sym x≡y)) y≼z)
-  step-≡                 s ρ (equals    y≡z) x≡y = equals (x≡y ∙ y≡z) 
+  step-≡ {u = u} {τ = τ} s ρ (nonstrict y≼z) x=y = nonstrict (≡-respˡ-ℒ≼ (⟦ u ⟧ᵗ τ) (sym x=y) y≼z)
+  step-≡                 s ρ (equals    y=z) x=y = equals (x=y ∙ y=z) 
 
-  step-≼ : (s : Term n) (ρ : Fin n → A)
+  step-≼ : (s : Term A n) (ρ : Fin n → A)
     → t under σ IsRelatedTo u under τ → ⟦ s ⟧ᵗ ρ ℒ≼ ⟦ t ⟧ᵗ σ
     → s under ρ IsRelatedTo u under τ
   step-≼ {t = t} {σ} {u = u} {τ} s ρ (nonstrict y≼z) x≼y = nonstrict (ℒ≼-isTransitive (⟦ s ⟧ᵗ ρ) (⟦ t ⟧ᵗ σ) (⟦ u ⟧ᵗ τ) x≼y y≼z)
-  step-≼ {t = t} {σ} {u = u} {τ} s ρ (equals    y≡z) x≼y = nonstrict (transport (cong (λ a → LHS ℒ≼ a) y≡z) x≼y)
-    where
-      LHS = ⟦ s ⟧ᵗ ρ
+  step-≼ {t = t} {σ} {u = u} {τ} s ρ (equals    y=z) x≼y = nonstrict (≡-respʳ-ℒ≼ (⟦ s ⟧ᵗ ρ) y=z x≼y)
 
-  ⟦_⟧_∎    : (t : Term n)(σ : Fin n → A) → t under σ IsRelatedTo t under σ
+  ⟦_⟧_∎    : (t : Term A n)(σ : Fin n → A) → t under σ IsRelatedTo t under σ
   ⟦ t ⟧ σ ∎ = equals refl
 
 record hasSK (𝔄 : OPAS 𝓥 𝓤) : 𝓤 ⊔ 𝓥  ̇ where
   constructor hasski
   open OpasStr (str 𝔄)
-  
+  -- 𝔄 = (|𝔄| , ≼ , _·_)
   field 
-    𝑘         : ⟨ 𝔄 ⟩ 
-    𝑠         : ⟨ 𝔄 ⟩
-    
-  𝐾 : Term n
-  𝐾 = ᶜ 𝑘
-  𝑆 : Term n
-  𝑆 = ᶜ 𝑠
-
-  field
-    𝑘ab≼a     : ∀ {a b}   → ⟦ 𝐾 ⊙ ᶜ a ⊙ ᶜ b ⟧₀ ℒ≼ (pure a)
+    𝐾         : Term ⟨ 𝔄 ⟩ n
+    𝑆         : Term ⟨ 𝔄 ⟩ n
+    𝐾ab≼a     : ∀ {a b}   → ⟦ 𝐾 ⊙ ᶜ a ⊙ ᶜ b ⟧₀ ℒ≼ (pure a)
     𝑠²↓       : ∀ {a b}   → ⟦ 𝑆 ⊙ ᶜ a ⊙ ᶜ b ⟧₀ ↓
     𝑠abc≼acbc : ∀ {a b c} → ⟦ 𝑆 ⊙ ᶜ a ⊙ ᶜ b ⊙ ᶜ c ⟧₀ ℒ≼ ⟦ ᶜ a ⊙ ᶜ c ⊙ (ᶜ b ⊙ ᶜ c) ⟧₀

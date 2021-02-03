@@ -21,6 +21,14 @@ record IsPreorder {A : 𝓤 ̇} (_≼_ : Order A 𝓥) : 𝓤 ⊔ 𝓥 ⁺ ̇ wh
     isTransitive : isTrans _≼_
     ≼-isProp     : {x y : A} → isProp (x ≼ y)
 
+  ≡-respˡ-≼ : {x y : A} (z : A)
+    → y ≡ x → y ≼ z → x ≼ z
+  ≡-respˡ-≼ z y=x y≼z = transport (cong (λ a → a ≼ z) y=x) y≼z
+
+  ≡-respʳ-≼ : (x {y z} : A)
+    → y ≡ z → x ≼ y → x ≼ z
+  ≡-respʳ-≼ x y=z x≼y = transport (cong (λ a → x ≼ a) y=z) x≼y
+
 record HasPreorder (𝓥 : Universe) (A : 𝓤 ̇) : (𝓤 ⊔ 𝓥) ⁺  ̇ where
   constructor _,_
   field

@@ -5,11 +5,14 @@ module Prelude where
 open import Agda.Builtin.FromNat                 public
   renaming (Number to HasFromNat)
 
+--open import Cubical.Relation.Nullary.Base        public
+
 open import Cubical.Foundations.Everything       public
   hiding (id; ℓ-max)
 open import Cubical.HITs.PropositionalTruncation public
   hiding (map)
   renaming (elim to truncElim)
+
 open import Cubical.Data.Sigma                   public
 open import Cubical.Data.Unit                    public
 open import Cubical.Data.Empty                   public
@@ -17,10 +20,12 @@ open import Cubical.Data.Empty                   public
 open import Cubical.Data.Bool                    public
   hiding (_≟_)
 open import Cubical.Data.Nat                     public
-  using (ℕ; zero; suc; _+_; fromNatℕ)
-import  Cubical.Data.Nat.Order as ℕₚ
-open import Cubical.Data.Fin                     public
-  using (Fin; fzero; fsuc; ¬Fin0; fromNatFin)
+  using (ℕ; zero; suc; _+_; _∸_; fromNatℕ)
+import Cubical.Data.Nat.Properties as ℕₚ
+import Cubical.Data.Nat.Order      as ℕₚ
+--open import Cubical.Data.Fin                     public
+open import Cubical.Data.FinData                   public
+  using (Fin; zero; suc; ¬Fin0; fromNatFin)
 
 open import Universes public
 open import Later     public
@@ -32,7 +37,6 @@ private
     n m l : ℕ
 
 infixl 8 _ˢ_
-infixr 5 _∷_
 infixr -1 _$_
 
 infixr -1 Π Σ′ ∃′ _➝_
@@ -92,30 +96,56 @@ f ˢ g = λ x → f x (g x)
 
 -- Instances mainly for programming instead of reasoning (subject to change)
 
-    
--- ListLike structures
--- TODO: Use instances? 
-abstract -- don't reduce []
-  [] : {A : 𝓤 ̇} → Fin 0 → A
-  [] {A = A} i = ⊥-elim {A = λ _ → A} (¬Fin0 i)
+Finite : 𝓤 ̇ → (n : ℕ) → 𝓤 ̇
+Finite A n = Fin n → A
+private
+  module F where
 
-_∷_ : {A : 𝓤 ̇} → A → (Fin n → A) → Fin (suc n) → A
-(a ∷ as) (zero  , _)     = a
-(a ∷ as) (suc i , 1+i<n) = as (i , ℕₚ.pred-≤-pred 1+i<n)
+    abstract -- don't reduce []
+      [] : Finite A 0
+      [] ()
 
-[_] : {A : 𝓤 ̇} → A → Fin 1 → A
-[ a ] = a ∷ []
+    _∷_ : A → Finite A n → Finite A (suc n)
+    (a ∷ as) zero    = a
+    (a ∷ as) (suc i) = as i
 
-tail : (Fin (suc n) → A) → Fin n → A
-tail as n = as (fsuc n)
+    [_] : A → Finite A 1
+    [ a ] = a ∷ []
 
-foldl : (B → A → B) → B → (Fin n → A) → B
-foldl {n = zero}  _·_ e xs = e
-foldl {n = suc n} _·_ e xs = foldl _·_ e (tail xs) · xs 0
+    tail : Finite A (suc n) → Finite A n
+    tail as n = as (suc n)
 
-foldl1 : (A → A → A) → (Fin (suc n) → A) → A
-foldl1 {n = zero}  _·_ xs = xs 0
-foldl1 {n = suc n} _·_ xs = foldl1 _·_ (tail xs) · xs 0
+    foldl : (B → A → B) → B → (Finite A n) → B
+    foldl {n = zero}  _·_ e xs = e
+    foldl {n = suc n} _·_ e xs = foldl _·_ e (tail xs) · xs 0
+
+    foldl1 : (A → A → A) → Finite A (suc n) → A
+    foldl1 {n = zero}  _·_ xs = xs 0
+    foldl1 {n = suc n} _·_ xs = foldl1 _·_ (tail xs) · xs 0
+
+record Sequence (Seq : ℕ → 𝓤 ̇) : 𝓤 ⁺ ̇ where
+  infixr 5 _∷_
+  field
+    carrier  : 𝓤 ̇
+    []       : Seq 0
+    [_]      : carrier → Seq 1
+    _∷_      : carrier → Seq n → Seq (suc n)
+    tail     : Seq (suc n) → Seq n
+    length   : Seq n   → ℕ
+--    fromList : List carrier → Σ I Seq
+--    toList   : Σ I Seq → List carrier
+open Sequence ⦃...⦄ public
+
+instance
+  SequenceFinite : Sequence (Finite A)
+  SequenceFinite {A = A} = record
+    { carrier = A
+    ; []      = F.[]
+    ; [_]     = F.[_]
+    ; _∷_     = F._∷_
+    ; tail    = F.tail
+    ; length  = λ {n} _ → n
+    }
 
 Fun : Universe → 𝓤ω
 Fun 𝓥 = {𝓤 : Universe} → 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇

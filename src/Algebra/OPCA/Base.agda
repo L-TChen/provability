@@ -3,6 +3,7 @@
 module Algebra.OPCA.Base where
 
 open import Prelude
+  hiding ([_])
 open import Relation.Binary.Preorder
 open import Function.Partial               public
 
@@ -17,9 +18,8 @@ record IsOPCA 𝓥 {A : 𝓤 ̇} (_≼_ : Order A 𝓥) (_·_ : A → A → ℒ 
     isOPAS : IsOPAS 𝓥 _≼_ _·_
   open IsOPAS isOPAS  public
   field
-    -- TODO: Clarify if ƛ_ should give `Term n` or `∥ Term n ∥`
-    ƛ_     : Term (suc n) → Term n
-    completeness : {t : Term (suc n)} {a : A} {as : Fin n → A}
+    ƛ_     : Term A (suc n) → Term A n
+    completeness : {t : Term A (suc n)} {a : A} {as : Finite A n}
       → ⟦ (ƛ t) ⊙ ᶜ a ⟧ as ℒ≼ ⟦ t ⟧ (a ∷ as)
   infixr  5 ƛ_
 
