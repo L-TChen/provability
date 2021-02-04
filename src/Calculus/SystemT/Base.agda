@@ -22,9 +22,11 @@ Cxt = Context 𝕋
 
 data _⊢_ (Γ : Cxt) : 𝕋 → 𝓤₀ ̇
 
+variable
+  Γ Δ Ξ  : Cxt
+  
 private
   variable
-    Γ Δ            : Cxt
     A B C          : 𝕋
     M N L M′ N′ L′ : Γ ⊢ A
 
@@ -280,6 +282,9 @@ module -↠-Reasoning where
   -↠-trans L-↠M M-↠N = _ -↠⟨ L-↠M ⟩ M-↠N
 open -↠-Reasoning using (_-↠_; -↠-refl; -↠-reflexive; -↠-trans) public
 
+Normal : (M : Γ ⊢ A) → 𝓤₀ ̇
+Normal M = ¬ (Σ[ N ꞉ _ ] M -→ N)
+
 data Value : (M : ∅ ⊢ A) → Set where
   ƛ_
     : (N : ∅ , A ⊢ B)
@@ -338,7 +343,6 @@ progress (prec M N L) with progress L
 
 module _ where
   open -↠-Reasoning
-
   ƛ-↠
     : M -↠ M′
     → ƛ M -↠ ƛ M′
@@ -410,3 +414,41 @@ module _ where
       -↠⟨ ⟨,⟩ᵣ-↠ N↠N′ ⟩
     ⟨ _ , _ ⟩
       ∎
+
+-- ------------------------------------------------------------------------------
+-- -- Decidable equality between α-equivalent terms
+
+-- code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
+-- code {Γ} {A} {Δ} {B} (` x) (` y)     =
+--   (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i → Γ=Δ i ∋ A=B i) x y
+-- code (ƛ M)          (ƛ N)            = code M N -- code M N
+-- code (M₁ · N₁)      (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
+-- code ⟨⟩             ⟨⟩               = Unit
+-- code ⟨ M₁ , N₁ ⟩    ⟨ M₂ , N₂ ⟩      = code M₁ M₂ × code N₁ N₂
+-- code (projₗ M)      (projₗ N)        = code M N
+-- code (projᵣ M)      (projᵣ N)        = code M N
+-- code zero           zero             = Unit
+-- code (suc M)        (suc N)          = code M N
+-- code (prec M₁ N₁ L₁) (prec M₂ N₂ L₂) = code M₁ M₂ × code N₁ N₂ × code L₁ L₂ 
+-- code (` x)          _                = ⊥
+-- code (ƛ M)          _                = ⊥
+-- code (_ · _)        _                = ⊥
+-- code ⟨⟩             _                = ⊥
+-- code ⟨ _ , _ ⟩      _                = ⊥
+-- code (projₗ M)      _                = ⊥
+-- code (projᵣ M)      _                = ⊥
+-- code zero           _                = ⊥
+-- code (suc M)        _                = ⊥
+-- code (prec M M₁ M₂) _                = ⊥
+
+-- r : (M : Γ ⊢ A) → code M M
+-- r (` x)   A=B Γ=Δ = {!!}
+-- r (ƛ M)          = r M
+-- r (M · N)        = r M Prelude., r N
+-- r ⟨⟩             = tt
+-- r ⟨ M , N ⟩      = r M Prelude., r N
+-- r (projₗ M)      = r M
+-- r (projᵣ M)      = r M
+-- r zero           = tt
+-- r (suc M)        = r M
+-- r (prec M M₁ M₂) = r M Prelude., r M₁ Prelude., r M₂

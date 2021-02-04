@@ -8,19 +8,26 @@ open import Prelude
 open import Calculus.SystemT.Base
 open import Calculus.SystemT.Substitution
 open import Calculus.SystemT.Confluence
-
+ 
 private
   variable
-    Γ : Cxt
     A B C : 𝕋
     M N F : ∅ ⊢ A
-    m n   : ∅ ⊢ nat
+    m̅ n̅ l̅ : ∅ ⊢ nat
+
+𝐼 : (A : 𝕋) → Γ ⊢ A →̇ A
+𝐼 A = ƛ # 0
+
+postulate
+  𝐼·M≢M : {M : Γ ⊢ A} → 𝐼 A · M ≢ M
 
 record Quoting : 𝓤₀ ̇ where
   field
     ⌜_⌝          : Prog A → Prog nat
-    -- 
-    ⌜⌝-injective : ⌜ M ⌝ ≡ ⌜ M ⌝ → M ≡ N
+
+    -- ⌜-⌝ reflects equality
+    ⌜⌝-injective : ⌜ M ⌝ ≡ ⌜ N ⌝ → M ≡ N
+    ⌜⌝-normal    : (M : Prog A) → Normal ⌜ M ⌝
 
     -- ⊢ □ (A → B) →̇ □ A →̇ □ B
     Ap   : Prog (nat →̇ nat →̇ nat)
@@ -31,8 +38,20 @@ record Quoting : 𝓤₀ ̇ where
     Num-↠ : Num · ⌜ M ⌝ -↠ ⌜ ⌜ M ⌝ ⌝
 
   open -↠-Reasoning
-  quoting-not-definable : ¬ (Σ[ Q ꞉ Prog (A →̇ nat) ] Q · M -↠ ⌜ M ⌝)
-  quoting-not-definable = {!!}
+
+  quoting-not-definable : ¬ (Σ[ Q ꞉ Prog (nat →̇ nat) ] Π[ M ꞉ Prog nat ] Q · M -↠ ⌜ M ⌝)
+  quoting-not-definable (Q , QM=⌜M⌝) = 𝐼·M≢M (⌜⌝-injective ⌜I·M⌝=⌜M⌝)
+    where
+      QI0-↠⌜0⌝ : Q · (𝐼 nat · zero) -↠ ⌜ zero ⌝
+      QI0-↠⌜0⌝ = begin
+        Q · (𝐼 nat · zero)
+          -→⟨ ξ-·ᵣ β-ƛ· ⟩
+        Q · zero
+          -↠⟨ QM=⌜M⌝ zero ⟩
+        ⌜ zero ⌝ ∎
+
+      ⌜I·M⌝=⌜M⌝ : ⌜ 𝐼 nat · zero ⌝ ≡ ⌜ zero ⌝
+      ⌜I·M⌝=⌜M⌝ = Normal⇒Path (⌜⌝-normal (𝐼 nat · zero)) (⌜⌝-normal zero) (QM=⌜M⌝ (𝐼 nat · zero)) QI0-↠⌜0⌝
 
   -- ⊢ □ (ℕ →̇ A) →̇ □ A
   Diag : Γ ⊢ nat →̇ nat

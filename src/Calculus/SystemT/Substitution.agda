@@ -7,16 +7,15 @@ module Calculus.SystemT.Substitution where
 open import Prelude
   hiding (_,_; ⟨_⟩; ⟪_⟫)
 
-open import Calculus.Type           public
-open import Calculus.Context        public
-open import Calculus.SystemT.Base   public
+open import Calculus.Type           
+open import Calculus.Context        
+open import Calculus.SystemT.Base
 
 ------------------------------------------------------------------------------
 -- Properties of subst, rename
 
 private
   variable
-    Γ Δ Ξ : Cxt
     A B   : 𝕋
 
 postulate

@@ -17,6 +17,7 @@ private
   variable
     A B C D A′ B′ C′ : 𝕋
 
+module EncodeDecode where
   code : (A B : 𝕋) → 𝓤₀ ̇
   code ⊤̇       ⊤̇       = Unit
   code nat     nat       = Unit
@@ -34,7 +35,6 @@ private
   code ⊤̇       (A →̇ B) = ⊥
   code (A ×̇ B) ⊤̇       = ⊥
   code (A →̇ B) ⊤̇       = ⊥
-
 
   r : (A : 𝕋) → code A A
   r nat     = tt
@@ -74,6 +74,7 @@ private
   ⊤̇       ≟Tp (A →̇ B) = no encode
   (A ×̇ B) ≟Tp ⊤̇       = no encode
   (A →̇ B) ≟Tp ⊤̇       = no encode
+open EncodeDecode
 
 instance
   DecEq𝕋 : DecEq 𝕋 
@@ -82,20 +83,20 @@ instance
 dom≡ : A →̇ B ≡ A′ →̇ B′ → A ≡ A′
 dom≡ p = decode (encode p .fst)
 
--- rng≡ : A →̇ B ≡ A′ →̇ B′ → B ≡ B′
--- rng≡ eq = decode (encode eq .snd)
+rng≡ : A →̇ B ≡ A′ →̇ B′ → B ≡ B′
+rng≡ p = decode (encode p .snd)
 
--- ×ₗ≡ : A ×̇ B ≡ A′ ×̇ B′ → A ≡ A′ 
--- ×ₗ≡ eq = decode (encode eq .fst)
+×ₗ≡ : A ×̇ B ≡ A′ ×̇ B′ → A ≡ A′ 
+×ₗ≡ p = decode (encode p .fst)
 
--- ×ᵣ≡ : A ×̇ B ≡ A′ ×̇ B′ → B ≡ B′ 
--- ×ᵣ≡ eq = decode (encode eq .snd)
+×ᵣ≡ : A ×̇ B ≡ A′ ×̇ B′ → B ≡ B′ 
+×ᵣ≡ p = decode (encode p .snd)
 
--- ℕ≢→ : ¬ nat ≡ A →̇ B
--- ℕ≢→ = encode
+ℕ≢→ : ¬ nat ≡ A →̇ B
+ℕ≢→ = encode
 
--- ℕ≢× : ¬ nat ≡ A ×̇ B
--- ℕ≢× = encode
+ℕ≢× : ¬ nat ≡ A ×̇ B
+ℕ≢× = encode
 
--- ×≢→ : ¬ A ×̇ B ≡ C →̇ D
--- ×≢→ = encode
+×≢→ : ¬ A ×̇ B ≡ C →̇ D
+×≢→ = encode
