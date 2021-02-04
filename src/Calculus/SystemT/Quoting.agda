@@ -7,6 +7,7 @@ open import Prelude
 
 open import Calculus.SystemT.Base
 open import Calculus.SystemT.Substitution
+open import Calculus.SystemT.Confluence
 
 private
   variable

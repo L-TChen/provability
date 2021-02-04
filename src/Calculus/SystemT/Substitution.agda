@@ -17,7 +17,7 @@ open import Calculus.SystemT.Base   public
 private
   variable
     Γ Δ Ξ : Cxt
-    A B : 𝕋
+    A B   : 𝕋
 
 postulate
 --  rename-cong : {ρ ρ′ : Rename Γ Δ} → (∀ {A} → ρ {A} ≗ ρ′ {A}) → (M : Γ ⊢ A) → rename ρ M ≡ rename ρ′ M
