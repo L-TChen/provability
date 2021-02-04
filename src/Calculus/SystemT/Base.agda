@@ -465,6 +465,5 @@ postulate
 encode : M ≡ N → code M N
 encode {M = M} M=N = transport (cong (code M) M=N) (r M)
 
-postulate
-  𝐼·M≢M : {M : Γ ⊢ A} → 𝐼 A · M ≢ M
--- Its proof should just be `encode : A ≡ B → code A B` 
+𝐼·zero≢zero : 𝐼 {Γ = ∅} nat · zero ≢ zero
+𝐼·zero≢zero = encode

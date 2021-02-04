@@ -34,7 +34,7 @@ record Quoting : 𝓤₀ ̇ where
   open -↠-Reasoning
 
   quoting-not-definable : ¬ (Σ[ Q ꞉ Prog (nat →̇ nat) ] Π[ M ꞉ Prog nat ] Q · M -↠ ⌜ M ⌝)
-  quoting-not-definable (Q , QM=⌜M⌝) = 𝐼·M≢M (⌜⌝-injective ⌜I·M⌝=⌜M⌝)
+  quoting-not-definable (Q , QM=⌜M⌝) = 𝐼·zero≢zero (⌜⌝-injective ⌜I·M⌝=⌜M⌝)
     where
       QI0-↠⌜0⌝ : Q · (𝐼 nat · zero) -↠ ⌜ zero ⌝
       QI0-↠⌜0⌝ = begin
