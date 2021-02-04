@@ -15,12 +15,6 @@ private
     M N F : ∅ ⊢ A
     m̅ n̅ l̅ : ∅ ⊢ nat
 
-𝐼 : (A : 𝕋) → Γ ⊢ A →̇ A
-𝐼 A = ƛ # 0
-
-postulate
-  𝐼·M≢M : {M : Γ ⊢ A} → 𝐼 A · M ≢ M
-
 record Quoting : 𝓤₀ ̇ where
   field
     ⌜_⌝          : Prog A → Prog nat

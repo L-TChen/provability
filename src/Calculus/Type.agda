@@ -20,7 +20,7 @@ private
 module EncodeDecode where
   code : (A B : 𝕋) → 𝓤₀ ̇
   code ⊤̇       ⊤̇       = Unit
-  code nat     nat       = Unit
+  code nat     nat     = Unit
   code (A ×̇ B) (C ×̇ D) = code A C × code B D
   code (A →̇ B) (C →̇ D) = code A C × code B D
   code nat     (_ ×̇ _) = ⊥

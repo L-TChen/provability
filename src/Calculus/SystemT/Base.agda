@@ -81,6 +81,13 @@ Prog A = ∅ ⊢ A
   → Γ ⊢ lookup Γ (toWitness n∈Γ)
 #_ {Γ = Γ} n {n∈Γ}  =  ` count Γ (toWitness n∈Γ)
 
+
+------------------------------------------------------------------------------
+-- Some combinators
+
+𝐼 : (A : 𝕋) → Γ ⊢ A →̇ A
+𝐼 A = ƛ # 0
+
 ------------------------------------------------------------------------------
 -- Variable renaming
 
@@ -415,32 +422,34 @@ module _ where
     ⟨ _ , _ ⟩
       ∎
 
--- ------------------------------------------------------------------------------
--- -- Decidable equality between α-equivalent terms
+------------------------------------------------------------------------------
+-- Decidable equality between α-equivalent terms
 
--- code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
--- code {Γ} {A} {Δ} {B} (` x) (` y)     =
---   (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i → Γ=Δ i ∋ A=B i) x y
--- code (ƛ M)          (ƛ N)            = code M N -- code M N
--- code (M₁ · N₁)      (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
--- code ⟨⟩             ⟨⟩               = Unit
--- code ⟨ M₁ , N₁ ⟩    ⟨ M₂ , N₂ ⟩      = code M₁ M₂ × code N₁ N₂
--- code (projₗ M)      (projₗ N)        = code M N
--- code (projᵣ M)      (projᵣ N)        = code M N
--- code zero           zero             = Unit
--- code (suc M)        (suc N)          = code M N
--- code (prec M₁ N₁ L₁) (prec M₂ N₂ L₂) = code M₁ M₂ × code N₁ N₂ × code L₁ L₂ 
--- code (` x)          _                = ⊥
--- code (ƛ M)          _                = ⊥
--- code (_ · _)        _                = ⊥
--- code ⟨⟩             _                = ⊥
--- code ⟨ _ , _ ⟩      _                = ⊥
--- code (projₗ M)      _                = ⊥
--- code (projᵣ M)      _                = ⊥
--- code zero           _                = ⊥
--- code (suc M)        _                = ⊥
--- code (prec M M₁ M₂) _                = ⊥
+code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
+code {Γ} {A} {Δ} {B} (` x) (` y)     =
+  (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i → Γ=Δ i ∋ A=B i) x y
+code (ƛ M)          (ƛ N)            = code M N -- code M N
+code (M₁ · N₁)      (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
+code ⟨⟩             ⟨⟩               = Unit
+code ⟨ M₁ , N₁ ⟩    ⟨ M₂ , N₂ ⟩      = code M₁ M₂ × code N₁ N₂
+code (projₗ M)      (projₗ N)        = code M N
+code (projᵣ M)      (projᵣ N)        = code M N
+code zero           zero             = Unit
+code (suc M)        (suc N)          = code M N
+code (prec M₁ N₁ L₁) (prec M₂ N₂ L₂) = code M₁ M₂ × code N₁ N₂ × code L₁ L₂ 
+code (ƛ M)          N                = ⊥
+code (` x)          _                = ⊥
+code (_ · _)        _                = ⊥
+code ⟨⟩             _                = ⊥
+code ⟨ _ , _ ⟩      _                = ⊥
+code (projₗ M)      _                = ⊥
+code (projᵣ M)      _                = ⊥
+code zero           _                = ⊥
+code (suc M)        _                = ⊥
+code (prec M M₁ M₂) _                = ⊥
 
+postulate
+  r : (M : Γ ⊢ A) → code M M
 -- r : (M : Γ ⊢ A) → code M M
 -- r (` x)   A=B Γ=Δ = {!!}
 -- r (ƛ M)          = r M
@@ -452,3 +461,10 @@ module _ where
 -- r zero           = tt
 -- r (suc M)        = r M
 -- r (prec M M₁ M₂) = r M Prelude., r M₁ Prelude., r M₂
+
+encode : M ≡ N → code M N
+encode {M = M} M=N = transport (cong (code M) M=N) (r M)
+
+postulate
+  𝐼·M≢M : {M : Γ ⊢ A} → 𝐼 A · M ≢ M
+-- Its proof should just be `encode : A ≡ B → code A B` 
