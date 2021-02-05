@@ -5,7 +5,7 @@
 module Calculus.SystemT.Confluence where
 
 open import Prelude
-  hiding ( ⟨_⟩; ⟪_⟫; _∎; _≡⟨_⟩_; ≡⟨⟩-syntax)
+  hiding (⟨_⟩; ⟪_⟫; _∎; _≡⟨_⟩_; ≡⟨⟩-syntax)
 
 open import Calculus.SystemT.Base
   hiding (_,_)

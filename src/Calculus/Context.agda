@@ -14,14 +14,49 @@ data Context (Ty : 𝓤 ̇) : 𝓤 ̇ where
 private
   variable
     Ty    : 𝓤 ̇
-    Γ Δ Θ : Context Ty
-    A B C : Ty
+    Γ Δ   : Context Ty
+    A B   : Ty
+    
+module CxtEncodeDecode {Ty : 𝓤 ̇} where
+  code : (Γ Δ : Context Ty) → 𝓤 ̇
+  code ∅       ∅       = Unit*
+  code (Γ , A) (Δ , B) = code Γ Δ × (A ≡ B)
+  code ∅       (_ , _) = ⊥*
+  code (_ , _) ∅       = ⊥*
+
+  r : (Γ : Context Ty) → code Γ Γ
+  r ∅       = tt*
+  r (Γ , A) = r Γ , refl
+
+  encode : A ≡ B → code A B
+  encode {A = A} A=B = transport (cong (code A) A=B) (r A)
+  
+  decode : {Γ Δ : Context Ty} → code Γ Δ → Γ ≡ Δ
+  decode {Γ = ∅}     {∅}     tt*  = refl
+  decode {Γ = Γ , A} {Δ , B} (Γ=Δ , A=B) i = decode Γ=Δ i , A=B i
+  decode {Γ = ∅}     {_ , _} ()
+  decode {Γ = _ , _} {∅}     ()
+
+  module _ ⦃ _ : DecEq Ty ⦄ where
+    _≟Cxt_ : (Γ Δ : Context Ty) → Dec (Γ ≡ Δ)
+    ∅       ≟Cxt ∅       = yes (decode tt*)
+    (Γ , A) ≟Cxt (Δ , B) with Γ ≟Cxt Δ | A ≟ B
+    ... | yes p | yes q = yes (cong₂ _,_ p q)
+    ... | yes p | no ¬q = no λ p → ¬q (encode p .snd)
+    ... | no ¬p | q     = no λ p → ¬p (decode (encode p .fst))
+    ∅       ≟Cxt (Δ , B) = no λ p → ⊥*-elim (encode p)
+    (Γ , A) ≟Cxt ∅       = no λ p → ⊥*-elim (encode p)
+
+    instance
+      DecEqCxt : DecEq (Context Ty)
+      _≟_ ⦃ DecEqCxt ⦄ = _≟Cxt_
+open CxtEncodeDecode using (DecEqCxt) public
 
 ------------------------------------------------------------------------------
 -- Membership
 
 data _∋_ {Ty : 𝓤 ̇} : Context Ty → Ty → 𝓤 ̇ where
-  Z  : Γ , A ∋ A
+  Z  :             Γ , A ∋ A
   S_ : Γ     ∋ A → Γ , B ∋ A
 
 length : Context Ty → ℕ
@@ -46,48 +81,22 @@ ext ρ (S x)  =  S (ρ x)
 Rename : {Ty : 𝓤 ̇} → Context Ty → Context Ty → 𝓤 ̇
 Rename Γ Γ′ = ∀ {A} → Γ ∋ A → Γ′ ∋ A
 
-module DecidableEquality
-  {𝕋       : 𝓤 ̇}
-  (code𝕋   : 𝕋 → 𝕋 → 𝓤₀ ̇)
-  (decode𝕋 : {A B : 𝕋} → code𝕋 A B → A ≡ B)
-  (r𝕋      : (A : 𝕋) → code𝕋 A A)
-  (encode𝕋 : {A B : 𝕋} → A ≡ B → code𝕋 A B)
-  (_≟𝕋_    : (A B : 𝕋) → Dec (A ≡ B))
-  where 
+module ∋EncodeDecode {Ty : 𝓤 ̇} where
+  code : (x y : Γ ∋ A) → 𝓤 ̇
+  code Z = codeZ
+    where
+      codeZ : (y : Γ ∋ A) → 𝓤 ̇
+      codeZ Z     = Unit*
+      codeZ (S y) = ⊥*
+  code (S x) Z     = ⊥*
+  code (S x) (S y) = code x y
 
-  private
-    Cxt = Context 𝕋
+  r : (x : Γ ∋ A) → code x x
+  r Z     = tt*
+  r (S x) = r x
 
-  code : (Γ Δ : Cxt) → 𝓤₀ ̇
-  code ∅       ∅       = Unit
-  code (Γ , A) (Δ , B) = code Γ Δ × code𝕋 A B
-  code ∅       (_ , _) = ⊥
-  code (_ , _) ∅       = ⊥
+  encode : {x y : Γ ∋ A} → x ≡ y → code x y
+  encode {x = x} x=y = transport (cong (code x) x=y) (r x)
 
-  r : (Γ : Cxt) → code Γ Γ
-  r ∅       = tt
-  r (Γ , A) = r Γ , r𝕋 A 
-
-  encode : A ≡ B → code A B
-  encode {A = A} A=B = transport (cong (code A) A=B) (r A)
-  
-  decode : {Γ Δ : Cxt} → code Γ Δ → Γ ≡ Δ
-  decode {∅}     {∅}     tt   = refl
-  decode {Γ , A} {Δ , B} p  i = decode (fst p) i , decode𝕋 (snd p) i
-  decode {∅}     {_ , _} ()
-  decode {_ , _} {∅}     ()
-
-  _≟Cxt_ : (Γ Δ : Cxt) → Dec (Γ ≡ Δ)
-  ∅       ≟Cxt ∅       = yes (decode tt)
-  (Γ , A) ≟Cxt (Δ , B) with Γ ≟Cxt Δ | A ≟𝕋 B
-  ... | yes p | yes q = yes (cong₂ _,_ p q)
-  ... | yes p | no ¬q = no λ Γ=Δ → ¬q (decode𝕋 (encode Γ=Δ .snd))
-  ... | no ¬p | q     = no λ Γ=Δ → ¬p (decode (encode Γ=Δ .fst))
-  ∅       ≟Cxt (Δ , B) = no encode
-  (Γ , T) ≟Cxt ∅       = no encode
-
-  instance
-    DecEqCxt : DecEq Cxt
-    _≟_ ⦃ DecEqCxt ⦄ = _≟Cxt_
-open DecidableEquality using (DecEqCxt)
- 
+  postulate
+    decode : {x y : _∋_ {𝓤} {Ty} Γ A} → code x y → x ≡ y

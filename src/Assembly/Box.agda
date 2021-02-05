@@ -1,37 +1,38 @@
 {-# OPTIONS --without-K --cubical #-}
 
 open import Prelude
-  renaming (⊥ to Empty)
-open import Algebra.OPCA
 
-module Assembly.Box (A : OPCA 𝓥 𝓤₀) where
-open OpcaStr (str A)
+module Assembly.Box where
 
-open import Assembly.Base 𝓥 A
+open import Calculus.SystemT
+  hiding (⟨_,_⟩; _,_)
+open import Assembly.Base
 
-□_ : Asm 𝓤 → Asm 𝓤
-□ (|X| , asmstr _⊩_ _) = |□X| , asmstr _⊩□x_ _isRealisable
-  where
-    |□X| : universeOf |X| ̇
-    |□X| = Σ[ a ꞉ ⟨ A ⟩ ] Σ[ x▹ ꞉ ▹ |X| ] ▹[ α ] a ⊩ x▹ α
+module _ (q : Quoting) where
+  open Quoting q
 
-    _⊩□x_   : ⟨ A ⟩ → |□X| → universeOf |X| ̇
-    a ⊩□x (a′ , x , a′⊩x) = Lift (a ≡ a′)
+  □_ : Asm 𝓤₀ → Asm 𝓤₀
+  □ (|X| , asmstr A _⊩_ _isRealisableₓ) = |□X| , asmstr nat _⊩□x_ _isRealisable
+    where
+      |□X| : (universe-of |X|) ̇
+      |□X| = Σ[ a ꞉ Prog nat ] Σ[ ▹x ꞉ ▹ |X| ] Σ[ M ꞉ Prog A ] (⌜ M ⌝ ≡ a) × (▹[ α ] M ⊩ ▹x α) 
 
-    _isRealisable  : Π[ x ꞉ |□X| ] ∃[ a ꞉ ⟨ A ⟩ ] a ⊩□x x
-    (a , x , a⊩x) isRealisable = ∣ a , lift refl ∣
+      _⊩□x_   : Prog nat → |□X| → _
+      b ⊩□x (a , x , a⊩x) = Lift (a ≡ b)
 
-module _ where
-  open Mor (□ ⊥) ⊥
+      _isRealisable  : Π[ x ꞉ |□X| ] ∃[ a ꞉ Prog nat ] a ⊩□x x
+      (a , x , a⊩x) isRealisable = ∣ a , lift refl ∣
+
+  open Mor (□ ⊥ₐ) ⊥ₐ
   -- Corollary.
   --   1. Evaluation □ ⊥ → ⊥ does not exist.
   --   2. There is no natural transformation □ → Id of exposures.
-  eval-does-not-exist : Π[ e ꞉ (⟨ □ ⊥ ⟩ → Empty) ] Π[ r ꞉ ⟨ A ⟩ ] (r tracks e → Empty)
+  eval-does-not-exist : {A : 𝕋} → Π[ e ꞉ (⟨ □ ⊥ₐ ⟩ → ⊥) ] Π[ r ꞉ Prog (nat →̇ ⊤̇) ] (r tracks e → ⊥)
   eval-does-not-exist e _ _ = fix (lem e)
     where
       -- Lemma. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
-      lem : (⟨ □ ⊥ ⟩ → Empty) → ▹ Empty → Empty
-      lem eval⊥ ▹x = truncElim (λ _ → isProp⊥) bang nonEmpty
+      lem : (⟨ □ ⊥ₐ ⟩ → ⊥) → ▹ ⊥ → ⊥
+      lem eval⊥ ▹x = bang
         where
-          bang : ⟨ A ⟩ → Empty
-          bang a = eval⊥ (a , ▹x , λ α → ⊥-elim {𝓤₀} {A = (λ ())} (▹x α))
+          bang : ⊥
+          bang = eval⊥ (⌜ ⟨⟩ ⌝ , ▹x , ⟨⟩ , refl , λ α → ⊥-elim {𝓤₀} {A = λ ()} (▹x α)) 

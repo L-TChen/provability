@@ -7,8 +7,11 @@ module Calculus.SystemT.Base where
 open import Prelude
   hiding (_,_; ⟨_⟩; ⟪_⟫; _∎; _≡⟨_⟩_; ≡⟨⟩-syntax)
 
-open import Calculus.Type           public
-open import Calculus.Context        public
+open import Calculus.Context
+open Calculus.Context             public
+  using (∅; _,_; S_; Z)
+open import Calculus.SystemT.Type public
+  hiding (module EncodeDecode)
 
 infix  3 _⊢_
 
@@ -47,12 +50,14 @@ data _⊢_ Γ where
     → Γ ⊢ A
       ----------
     → Γ ⊢ B
+--  absurd
+--    : (A : 𝕋)
+--    → Γ ⊢ ⊥̇
+--    → Γ ⊢ A
   ⟨⟩
     : Γ ⊢ ⊤̇
   ⟨_,_⟩
     : Γ ⊢ A 
-
-
     → Γ ⊢ B
     → Γ ⊢ A ×̇ B
   projₗ
@@ -97,6 +102,7 @@ rename : Rename Γ Δ
 rename ρ (` x)        = ` ρ x
 rename ρ (ƛ M)        = ƛ rename (ext ρ) M
 rename ρ (M · N)      = rename ρ M · rename ρ N
+--rename ρ (absurd A M) = absurd A (rename ρ M)
 rename ρ ⟨⟩           = ⟨⟩
 rename ρ ⟨ M , N ⟩    = ⟨ rename ρ M , rename ρ N ⟩
 rename ρ (projₗ M)    = projₗ (rename ρ M)
@@ -129,6 +135,7 @@ _⟪_⟫
 (` x)     ⟪ σ ⟫  = σ x
 (ƛ M)     ⟪ σ ⟫  = ƛ M ⟪ exts σ ⟫
 (M · N)   ⟪ σ ⟫  = M ⟪ σ ⟫ · N ⟪ σ ⟫
+--(absurd A M) ⟪ σ ⟫ = absurd A (M ⟪ σ ⟫)
 ⟨⟩        ⟪ σ ⟫  = ⟨⟩
 ⟨ M , N ⟩ ⟪ σ ⟫  = ⟨ M ⟪ σ ⟫ , N ⟪ σ ⟫ ⟩
 (projₗ M) ⟪ σ ⟫  = projₗ (M ⟪ σ ⟫)
@@ -425,45 +432,48 @@ module _ where
 ------------------------------------------------------------------------------
 -- Decidable equality between α-equivalent terms
 
-code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
-code {Γ} {A} {Δ} {B} (` x) (` y)     =
-  (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i → Γ=Δ i ∋ A=B i) x y
-code (ƛ M)          (ƛ N)            = code M N -- code M N
-code (M₁ · N₁)      (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
-code ⟨⟩             ⟨⟩               = Unit
-code ⟨ M₁ , N₁ ⟩    ⟨ M₂ , N₂ ⟩      = code M₁ M₂ × code N₁ N₂
-code (projₗ M)      (projₗ N)        = code M N
-code (projᵣ M)      (projᵣ N)        = code M N
-code zero           zero             = Unit
-code (suc M)        (suc N)          = code M N
-code (prec M₁ N₁ L₁) (prec M₂ N₂ L₂) = code M₁ M₂ × code N₁ N₂ × code L₁ L₂ 
-code (ƛ M)          N                = ⊥
-code (` x)          _                = ⊥
-code (_ · _)        _                = ⊥
-code ⟨⟩             _                = ⊥
-code ⟨ _ , _ ⟩      _                = ⊥
-code (projₗ M)      _                = ⊥
-code (projᵣ M)      _                = ⊥
-code zero           _                = ⊥
-code (suc M)        _                = ⊥
-code (prec M M₁ M₂) _                = ⊥
+module EncodeDecode where
+  code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
+  code {Γ} {A} {Δ} {B} (` x) (` y)     =
+    (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i → Γ=Δ i ∋ A=B i) x y
+  code (ƛ M)          (ƛ N)            = code M N
+  code (M₁ · N₁)      (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
+  code ⟨⟩             ⟨⟩               = Unit
+  code ⟨ M₁ , N₁ ⟩    ⟨ M₂ , N₂ ⟩      = code M₁ M₂ × code N₁ N₂
+  code (projₗ M)      (projₗ N)        = code M N
+  code (projᵣ M)      (projᵣ N)        = code M N
+  code zero           zero             = Unit
+  code (suc M)        (suc N)          = code M N
+  code (prec M₁ N₁ L₁) (prec M₂ N₂ L₂) = code M₁ M₂ × code N₁ N₂ × code L₁ L₂ 
+  code (ƛ M)          N                = ⊥
+  code (` x)          _                = ⊥
+  code (_ · _)        _                = ⊥
+  code ⟨⟩             _                = ⊥
+  code ⟨ _ , _ ⟩      _                = ⊥
+  code (projₗ M)      _                = ⊥
+  code (projᵣ M)      _                = ⊥
+  code zero           _                = ⊥
+  code (suc M)        _                = ⊥
+  code (prec M M₁ M₂) _                = ⊥
 
-postulate
-  r : (M : Γ ⊢ A) → code M M
--- r : (M : Γ ⊢ A) → code M M
--- r (` x)   A=B Γ=Δ = {!!}
--- r (ƛ M)          = r M
--- r (M · N)        = r M Prelude., r N
--- r ⟨⟩             = tt
--- r ⟨ M , N ⟩      = r M Prelude., r N
--- r (projₗ M)      = r M
--- r (projᵣ M)      = r M
--- r zero           = tt
--- r (suc M)        = r M
--- r (prec M M₁ M₂) = r M Prelude., r M₁ Prelude., r M₂
+  postulate
+    -- TODO: write this up
+    r : (M : Γ ⊢ A) → code M M
+  -- r : (M : Γ ⊢ A) → code M M
+  -- r (` x)   A=B Γ=Δ = {!!}
+  -- r (ƛ M)          = r M
+  -- r (M · N)        = r M Prelude., r N
+  -- r ⟨⟩             = tt
+  -- r ⟨ M , N ⟩      = r M Prelude., r N
+  -- r (projₗ M)      = r M
+  -- r (projᵣ M)      = r M
+  -- r zero           = tt
+  -- r (suc M)        = r M
+  -- r (prec M M₁ M₂) = r M Prelude., r M₁ Prelude., r M₂
 
-encode : M ≡ N → code M N
-encode {M = M} M=N = transport (cong (code M) M=N) (r M)
+  encode : M ≡ N → code M N
+  encode {M = M} M=N = transport (cong (code M) M=N) (r M)
+open EncodeDecode using (encode)
 
 𝐼·zero≢zero : 𝐼 {Γ = ∅} nat · zero ≢ zero
 𝐼·zero≢zero = encode
