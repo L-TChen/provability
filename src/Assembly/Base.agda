@@ -5,7 +5,7 @@ module Assembly.Base where
 open import Prelude
   hiding (_∎; _∘_; _≡⟨_⟩_; ≡⟨⟩-syntax)
 open import Calculus.SystemT
-  renaming (_,_ to _ctx,_)
+  renaming (_,_ to _ctx,_; ⟨_,_⟩ to ⟨_,_⟩ᵗ)
 
 record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor asmstr
@@ -100,6 +100,20 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
     realisable zero    = ∣ zero , tt ∣
     realisable (suc n) = rec propTruncIsProp (λ { (M , M⊩n) → ∣ suc M , M⊩n ∣}) (realisable n)
     
+_×ₐ_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
+X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A ×̇ B) _⊩_ realisable
+  where
+    open -↠-Reasoning
+    open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_; _isRealisable to _isRealisable₁)
+    open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_; _isRealisable to _isRealisable₂)
+
+    _⊩_ : Prog (A ×̇ B) → ⟨ X ⟩ × ⟨ Y ⟩ → _
+    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] (L -↠ ⟨ M , N ⟩ᵗ) × (M ⊩x x) × (N ⊩y y)
+
+    realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (A ×̇ B) ] a ⊩ z
+    realisable (x , y) = rec propTruncIsProp
+      (λ { (M , M⊩x) → rec propTruncIsProp (λ {(N , N⊩y) → ∣ ⟨ M , N ⟩ᵗ , M , N , (_ ∎) , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
+      (x isRealisable₁)
 
 --_⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
 --X ⇒ Y = Trackable , asmstr (A →̇ B) _⊩_ {!!} -- (⟨ X ⟩ → ⟨ Y ⟩) , asmstr (A →̇ B) (Mor._tracks_ X Y) {!i!}
@@ -115,18 +129,6 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
 𝔗 : 𝕋 → Asm 𝓤₀
 𝔗 A = Prog A , asmstr A _≡_ λ M → ∣ M , refl ∣
 
---_×ₐ_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
---X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A ×̇ B) _⊩_ realisable
---  where
---    open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_; _isRealisable to _isRealisable₁)
---    open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_; _isRealisable to _isRealisable₂)
---
---    _⊩_ : Prog (A ×̇ B) → ⟨ X ⟩ × ⟨ Y ⟩ → _ ̇
---    L ⊩ (x , y) = (projₗ L ⊩x x) × (projᵣ L ⊩y y)
---
---    realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (A ×̇ B) ] a ⊩ z
---    realisable (x , y) = rec propTruncIsProp (rec (isPropΠ (λ _ → propTruncIsProp))
---      (λ { (N , N⊩y) (M , M⊩x) → ∣ {!!} ,  ∣ }) (y isRealisable₂)) (x isRealisable₁)
   
 -- ∇₀_ : (X : 𝓤 ̇) → Asm 𝓤
 -- ∇₀ X = X , asmstr {!!} _⊩∇_ ⊩∇-is-a-realisabiltiy
