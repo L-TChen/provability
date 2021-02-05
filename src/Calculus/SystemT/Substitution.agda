@@ -5,7 +5,6 @@
 module Calculus.SystemT.Substitution where
 
 open import Prelude
-  hiding (_,_; ⟨_⟩)
 
 open import Calculus.Context
 open import Calculus.SystemT.Base

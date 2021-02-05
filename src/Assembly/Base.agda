@@ -3,9 +3,8 @@
 module Assembly.Base where
 
 open import Prelude
-  hiding (_∎; _∘_; _≡⟨_⟩_; ≡⟨⟩-syntax)
+  hiding (_∘_; id)
 open import Calculus.SystemT
-  renaming (_,_ to _ctx,_; ⟨_,_⟩ to ⟨_,_⟩ᵗ)
 
 record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor asmstr
@@ -31,18 +30,18 @@ module Mor (X Y : Asm 𝓤) where
   open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_)
   open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_)
   
-  _tracks_ : (F : Prog (A →̇ B)) → (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
+  _tracks_ : (F : Prog (A `→ B)) → (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
   F tracks f = Π[ M ꞉ Prog A ] Π[ x ꞉ ⟨ X ⟩ ] (M ⊩x x → Σ[ N ꞉ Prog B ] (F · M -↠ N) × (N ⊩y f x))
 
   HasTracker : (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
-  HasTracker f = Σ[ r ꞉ Prog (A →̇ B) ] r tracks f 
+  HasTracker f = Σ[ r ꞉ Prog (A `→ B) ] r tracks f 
 
   Trackable : 𝓤 ̇
   Trackable = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] HasTracker f
 open Mor
 
-idₐ : (X : Asm 𝓤) → Trackable X X
-idₐ (|X| , asmX) = id , ƛ # 0 , λ M x M⊩x → M , ((ƛ # 0) · M -→⟨ β-ƛ· ⟩ M ∎) , M⊩x
+id : (X : Asm 𝓤) → Trackable X X
+id (|X| , asmX) = (λ (x : |X|) → x) , ƛ # 0 , λ M x M⊩x → M , ((ƛ # 0) · M -→⟨ β-ƛ· ⟩ M ∎) , M⊩x
   where open -↠-Reasoning
 
 infixr 9 _∘_
@@ -85,8 +84,16 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
 -- Constructions
 
 -- TODO: show that ⊥ is initial
-⊥ₐ : (A : 𝕋) → Asm₀
-⊥ₐ A = ⊥ , asmstr A (λ _ ()) λ ()
+⊥ₐ : Asm₀
+⊥ₐ = ⊥ , asmstr `⊤ (λ _ ()) λ ()
+
+-- TODO: Show that ⊤ is terminal
+⊤ₐ : Asm₀
+⊤ₐ = Unit , asmstr `⊤ _⊩_  λ {tt → ∣ ⟨⟩ , tt ∣}
+  where
+    _⊩_ : Prog `⊤ → Unit → 𝓤₀ ̇
+    ⟨⟩ ⊩ tt = Unit
+    _  ⊩ _  = ⊥
 
 ℕₐ : Asm₀
 ℕₐ = ℕ , asmstr nat _⊩_ realisable
@@ -101,18 +108,18 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
     realisable (suc n) = rec propTruncIsProp (λ { (M , M⊩n) → ∣ suc M , M⊩n ∣}) (realisable n)
     
 _×ₐ_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
-X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A ×̇ B) _⊩_ realisable
+X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A `× B) _⊩_ realisable
   where
     open -↠-Reasoning
     open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_; _isRealisable to _isRealisable₁)
     open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_; _isRealisable to _isRealisable₂)
 
-    _⊩_ : Prog (A ×̇ B) → ⟨ X ⟩ × ⟨ Y ⟩ → _
-    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] (L -↠ ⟨ M , N ⟩ᵗ) × (M ⊩x x) × (N ⊩y y)
+    _⊩_ : Prog (A `× B) → ⟨ X ⟩ × ⟨ Y ⟩ → _
+    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] (L -↠ (M , N)) × (M ⊩x x) × (N ⊩y y)
 
-    realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (A ×̇ B) ] a ⊩ z
+    realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (A `× B) ] a ⊩ z
     realisable (x , y) = rec propTruncIsProp
-      (λ { (M , M⊩x) → rec propTruncIsProp (λ {(N , N⊩y) → ∣ ⟨ M , N ⟩ᵗ , M , N , (_ ∎) , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
+      (λ { (M , M⊩x) → rec propTruncIsProp (λ {(N , N⊩y) → ∣ (M , N) , M , N , (_ ∎) , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
       (x isRealisable₁)
 
 --_⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤

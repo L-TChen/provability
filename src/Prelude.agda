@@ -5,11 +5,10 @@ module Prelude where
 open import Agda.Builtin.FromNat                 public
   renaming (Number to HasFromNat)
 
+open import Cubical.Foundations.Everything       public
+  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax)
 open import Cubical.Relation.Nullary             public
   hiding (⟪_⟫)
-
-open import Cubical.Foundations.Everything       public
-  hiding (id; ℓ-max)
 open import Cubical.HITs.PropositionalTruncation public
   hiding (map)
   renaming (elim to truncElim)
@@ -71,6 +70,11 @@ A ➝ B = A → B
 
 id : A → A
 id x = x
+
+module ≡-Reasoning where
+  open import Cubical.Foundations.Prelude public
+    using (_≡⟨_⟩_; ≡⟨⟩-syntax; _∎)
+  
 
 _≤?_ : (m n : ℕ) → Dec (m ≤ n)
 zero  ≤? _     = yes tt

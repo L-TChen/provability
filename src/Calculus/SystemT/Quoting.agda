@@ -3,7 +3,6 @@
 module Calculus.SystemT.Quoting where
 
 open import Prelude 
-  hiding (_≡⟨_⟩_; ≡⟨⟩-syntax; _∎)
 
 open import Calculus.SystemT.Base
 open import Calculus.SystemT.Substitution
@@ -23,17 +22,17 @@ record Quoting : 𝓤₀ ̇ where
     ⌜⌝-injective : ⌜ M ⌝ ≡ ⌜ N ⌝ → M ≡ N
     ⌜⌝-normal    : (M : Prog A) → Normal ⌜ M ⌝
 
-    -- ⊢ □ (A → B) →̇ □ A →̇ □ B
-    Ap   : Prog (nat →̇ nat →̇ nat)
+    -- ⊢ □ (A → B) ⇒ □ A ⇒ □ B
+    Ap   : Prog (nat `→ nat `→ nat)
     Ap-↠ : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M · N ⌝
 
-    -- ⊢ □ A →̇ □ (□ A)
-    Num   : Prog (nat →̇ nat)
+    -- ⊢ □ A `→ □ (□ A)
+    Num   : Prog (nat `→ nat)
     Num-↠ : Num · ⌜ M ⌝ -↠ ⌜ ⌜ M ⌝ ⌝
 
   open -↠-Reasoning
 
-  quoting-not-definable : ¬ (Σ[ Q ꞉ Prog (nat →̇ nat) ] Π[ M ꞉ Prog nat ] Q · M -↠ ⌜ M ⌝)
+  quoting-not-definable : ¬ (Σ[ Q ꞉ Prog (nat `→ nat) ] Π[ M ꞉ Prog nat ] Q · M -↠ ⌜ M ⌝)
   quoting-not-definable (Q , QM=⌜M⌝) = 𝐼·zero≢zero (⌜⌝-injective ⌜I·M⌝=⌜M⌝)
     where
       QI0-↠⌜0⌝ : Q · (𝐼 nat · zero) -↠ ⌜ zero ⌝
@@ -47,15 +46,15 @@ record Quoting : 𝓤₀ ̇ where
       ⌜I·M⌝=⌜M⌝ : ⌜ 𝐼 nat · zero ⌝ ≡ ⌜ zero ⌝
       ⌜I·M⌝=⌜M⌝ = Normal⇒Path (⌜⌝-normal (𝐼 nat · zero)) (⌜⌝-normal zero) (QM=⌜M⌝ (𝐼 nat · zero)) QI0-↠⌜0⌝
 
-  -- ⊢ □ (ℕ →̇ A) →̇ □ A
-  Diag : Γ ⊢ nat →̇ nat
+  -- ⊢ □ (ℕ `→ A) `→ □ A
+  Diag : Γ ⊢ nat `→ nat
   Diag = ƛ ↑ Ap · # 0 · (↑ Num · # 0)
 
-  U : ∀ A → Prog ((nat →̇ A) →̇ nat →̇ A)
+  U : ∀ A → Prog ((nat `→ A) `→ nat `→ A)
   U A = ƛ ƛ # 1 · (↑ Diag · # 0)
 
   -- the β-redex is for (∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝) to be true
-  W : (A : 𝕋) → Prog (nat →̇ A) → Prog (nat →̇ A)
+  W : (A : 𝕋) → Prog (nat `→ A) → Prog (nat `→ A)
   W A F = U A · F
 
   Diag-↠ : Diag · ⌜ M ⌝ -↠ ⌜ M · ⌜ M ⌝ ⌝
@@ -71,8 +70,8 @@ record Quoting : 𝓤₀ ̇ where
       ⌜ M · ⌜ M ⌝ ⌝
     ∎
   
-  -- ⊢ □ A →̇ A   ⇒   ⊢ A
-  gfix : Prog (nat →̇ A) → Prog A
+  -- ⊢ □ A `→ A   `→   ⊢ A
+  gfix : Prog (nat `→ A) → Prog A
   gfix F = Wₘ · ⌜ Wₘ ⌝
     where
       Wₘ = W _ F
@@ -94,11 +93,11 @@ record Quoting : 𝓤₀ ̇ where
     where
       Wₘ = W _ F
 
-  -- ⊢ □ (□ A →̇ A) →̇ □ A
-  igfix : (A : 𝕋) → Prog (nat →̇ nat)
+  -- ⊢ □ (□ A `→ A) `→ □ A
+  igfix : (A : 𝕋) → Prog (nat `→ nat)
   igfix A = ƛ ↑ Diag · (↑ Ap · ↑ ⌜ U A ⌝ · # 0)
 
-  igfix-⌜⌝ : (A : 𝕋) → (M : ∅ ⊢ nat →̇ A)
+  igfix-⌜⌝ : (A : 𝕋) → (M : ∅ ⊢ nat `→ A)
     → igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝
   igfix-⌜⌝ A M = begin
       igfix A · ⌜M⌝
@@ -112,16 +111,16 @@ record Quoting : 𝓤₀ ̇ where
       ⌜ Wₘ · ⌜ Wₘ ⌝ ⌝
     ∎
     where
-      Wₘ : ∅ ⊢ nat →̇ A
+      Wₘ : ∅ ⊢ nat `→ A
       Wₘ = W A M
       ⌜M⌝ = ⌜ M ⌝ 
 
-  -- -- ⊢ □ A →̇ A   ⇒   ⊢ A →̇ A   ⇒   ⊢ A
-  -- selfEval⇒fixpoint
-  --   : Σ[ e ∈ ∅ ⊢ nat →̇ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)
-  --   → (f : ∅ ⊢ A →̇ A)
+  -- -- ⊢ □ A `→ A   `→   ⊢ A `→ A   `→   ⊢ A
+  -- selfEval`→fixpoint
+  --   : Σ[ e ∈ ∅ ⊢ nat `→ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)
+  --   → (f : ∅ ⊢ A `→ A)
   --   → Σ[ a ∈ ∅ ⊢ A ] (∅ ⊢ a -↠ f · a)
-  -- selfEval⇒fixpoint {A = A} (e , e-⌜⌝-id) f = gfix f∘e ,
+  -- selfEval`→fixpoint {A = A} (e , e-⌜⌝-id) f = gfix f∘e ,
   --   (begin
   --     gfix f∘e
   --   -↠⟨ gfix-spec ⟩
@@ -135,16 +134,16 @@ record Quoting : 𝓤₀ ̇ where
   --   ∎)
   --   where
   --     open -↠-Reasoning
-  --     f∘e : ∅ ⊢ nat →̇ A
+  --     f∘e : ∅ ⊢ nat `→ A
   --     f∘e = ƛ ↑ f · (↑ e · # 0)
 
   -- -- ¬ ∀ A. □ A → A
-  -- ¬∃selfEval : (∀ A → Σ[ e ∈ ∅ ⊢ nat →̇ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)) → ⊥
-  -- ¬∃selfEval e with selfEval⇒fixpoint (e nat) (ƛ suc (# 0))
+  -- ¬∃selfEval : (∀ A → Σ[ e ∈ ∅ ⊢ nat `→ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)) → ⊥
+  -- ¬∃selfEval e with selfEval`→fixpoint (e nat) (ƛ suc (# 0))
   -- ... | a , a-↠suca = {! !}
 
   -- rice
-  --   : (d : ∅ ⊢ nat →̇ nat) (a b : ∅ ⊢ A)
+  --   : (d : ∅ ⊢ nat `→ nat) (a b : ∅ ⊢ A)
   --   → ((x y : ∅ ⊢ A) → ∅ ⊢ x -↠ y → ∅ ⊢ d · ⌜ x ⌝ -↠ d · ⌜ y ⌝)
   --   → ∅ ⊢ d · ⌜ a ⌝ -↠ zero
   --   → ∅ ⊢ d · ⌜ b ⌝ -↠ (suc zero)

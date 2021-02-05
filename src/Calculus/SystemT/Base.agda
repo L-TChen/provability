@@ -5,18 +5,18 @@
 module Calculus.SystemT.Base where
 
 open import Prelude
-  hiding (_,_; ⟨_⟩; _∎; _≡⟨_⟩_; ≡⟨⟩-syntax)
 
 open import Calculus.Context
-open Calculus.Context             public
-  using (∅; _,_; S_)
 open import Calculus.SystemT.Type public
   hiding (module EncodeDecode)
+  
+open Calculus.Context             public
+  hiding (Z)
 
 infix  3 _⊢_
 
 infixr 5 ƛ_
-infix  6 ⟨_,_⟩
+--infix  6 ⟨_,_⟩
 infixl 7 _·_
 infixl 8 _[_] _⟪_⟫
 infix  9 `_
@@ -38,33 +38,33 @@ private
 
 data _⊢_ Γ where
   `_
-    : Γ ∋ A
+    : A ∈ Γ
       ---------
     → Γ ⊢ A
   ƛ_
-    : Γ , A ⊢ B
+    : A , Γ ⊢ B
       ----------------
-    → Γ     ⊢ A →̇ B
+    → Γ     ⊢ A `→ B
   _·_
-    : Γ ⊢ A →̇ B
+    : Γ ⊢ A `→ B
     → Γ ⊢ A
       ----------
     → Γ ⊢ B
 --  absurd
 --    : (A : 𝕋)
---    → Γ ⊢ ⊥̇
+--    → Γ ⊢ `⊥
 --    → Γ ⊢ A
   ⟨⟩
-    : Γ ⊢ ⊤̇
-  ⟨_,_⟩
+    : Γ ⊢ `⊤
+  _,_
     : Γ ⊢ A 
     → Γ ⊢ B
-    → Γ ⊢ A ×̇ B
+    → Γ ⊢ A `× B
   projₗ
-    : Γ ⊢ A ×̇ B
+    : Γ ⊢ A `× B
     → Γ ⊢ A
   projᵣ
-    : Γ ⊢ A ×̇ B
+    : Γ ⊢ A `× B
     → Γ ⊢ B
   zero
     : Γ ⊢ nat
@@ -73,7 +73,7 @@ data _⊢_ Γ where
     → Γ ⊢ nat
   prec
     : Γ ⊢ A
-    → (Γ , nat) , A ⊢ A
+    → A , nat , Γ ⊢ A
     → Γ ⊢ nat
     → Γ ⊢ A
 
@@ -90,7 +90,7 @@ Prog A = ∅ ⊢ A
 ------------------------------------------------------------------------------
 -- Some combinators
 
-𝐼 : (A : 𝕋) → Γ ⊢ A →̇ A
+𝐼 : (A : 𝕋) → Γ ⊢ A `→ A
 𝐼 A = ƛ # 0
 
 ------------------------------------------------------------------------------
@@ -104,14 +104,15 @@ rename ρ (ƛ M)        = ƛ rename (ext ρ) M
 rename ρ (M · N)      = rename ρ M · rename ρ N
 --rename ρ (absurd A M) = absurd A (rename ρ M)
 rename ρ ⟨⟩           = ⟨⟩
-rename ρ ⟨ M , N ⟩    = ⟨ rename ρ M , rename ρ N ⟩
+rename ρ (M , N)      = (rename ρ M , rename ρ N)
 rename ρ (projₗ M)    = projₗ (rename ρ M)
 rename ρ (projᵣ N)    = projᵣ (rename ρ N)
 rename ρ zero         = zero
 rename ρ (suc M)      = suc (rename ρ M)
 rename ρ (prec M N L) = prec (rename ρ M) (rename (ext (ext ρ)) N) (rename ρ L)
 
-↑₁_ : Γ ⊢ A → Γ , B ⊢ A
+↑₁_ :   Γ ⊢ A
+  → B , Γ ⊢ A
 ↑₁_ = rename S_
 ↑_ : ∅ ⊢ A → Γ ⊢ A
 ↑_ = rename (λ ())
@@ -120,11 +121,11 @@ rename ρ (prec M N L) = prec (rename ρ M) (rename (ext (ext ρ)) N) (rename ρ
 -- Substitution
 
 Subst : Cxt → Cxt → Set
-Subst Γ Δ = (∀ {A} → Γ ∋ A → Δ ⊢ A)
+Subst Γ Δ = (∀ {A} → A ∈ Γ → Δ ⊢ A)
 
 exts
   : Subst Γ Δ
-  → Subst (Γ , B) (Δ , B)
+  → Subst (B , Γ) (B , Δ)
 exts σ Z     = ` Z
 exts σ (S p) = rename S_ (σ p)
 
@@ -137,7 +138,7 @@ _⟪_⟫
 (M · N)   ⟪ σ ⟫  = M ⟪ σ ⟫ · N ⟪ σ ⟫
 --(absurd A M) ⟪ σ ⟫ = absurd A (M ⟪ σ ⟫)
 ⟨⟩        ⟪ σ ⟫  = ⟨⟩
-⟨ M , N ⟩ ⟪ σ ⟫  = ⟨ M ⟪ σ ⟫ , N ⟪ σ ⟫ ⟩
+(M , N)   ⟪ σ ⟫  = (M ⟪ σ ⟫ , N ⟪ σ ⟫)
 (projₗ M) ⟪ σ ⟫  = projₗ (M ⟪ σ ⟫)
 (projᵣ M) ⟪ σ ⟫  = projᵣ (M ⟪ σ ⟫)
 zero      ⟪ σ ⟫  = zero
@@ -146,11 +147,11 @@ prec M N L ⟪ σ ⟫ = prec (M ⟪ σ ⟫) (N ⟪ exts (exts σ) ⟫) (L ⟪ σ
 
 subst-zero
   : Γ ⊢ B
-  → Subst (Γ , B) Γ
+  → Subst (B , Γ) Γ
 subst-zero N Z     = N
 subst-zero N (S x) = ` x
 
-_[_] : Γ , B ⊢ A
+_[_] : B , Γ ⊢ A
      → Γ ⊢ B
      → Γ ⊢ A
 M [ N ] = M ⟪ subst-zero N ⟫
@@ -158,12 +159,12 @@ M [ N ] = M ⟪ subst-zero N ⟫
 subst-one-zero
   : Γ ⊢ B
   → Γ ⊢ C
-  → Subst (Γ , B , C) Γ
+  → Subst (C , B , Γ) Γ
 subst-one-zero M N Z       = N
 subst-one-zero M N (S Z)   = M
 subst-one-zero M N (S S x) = ` x
 
-_[_,_]₂ : Γ , B , C ⊢ A
+_[_,_]₂ : C , B , Γ  ⊢ A
         → Γ ⊢ B
         → Γ ⊢ C
         → Γ ⊢ A
@@ -178,10 +179,10 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
     : (ƛ M) · N -→ M [ N ]
 
   β-⟨,⟩projₗ
-    : projₗ ⟨ M , N ⟩ -→ M
+    : projₗ (M , N) -→ M
 
   β-⟨,⟩projᵣ
-    : projᵣ ⟨ M , N ⟩ -→ N
+    : projᵣ (M , N) -→ N
 
   β-rec-zero
     : prec M N zero -→ M
@@ -206,12 +207,12 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
   ξ-⟨,⟩ₗ
     : M -→ M′ 
       ---------------
-    → ⟨ M , N ⟩ -→ ⟨ M′ , N ⟩
+    → (M , N) -→ (M′ , N)
 
   ξ-⟨,⟩ᵣ
     : N -→ N′ 
       ---------------
-    → ⟨ M , N ⟩ -→ ⟨ M , N′ ⟩
+    → (M , N) -→ (M , N′)
 
   ξ-projₗ
     : L -→ L′
@@ -294,69 +295,7 @@ module -↠-Reasoning where
       ----------
     → L -↠ N
   -↠-trans L-↠M M-↠N = _ -↠⟨ L-↠M ⟩ M-↠N
-open -↠-Reasoning using (_-↠_; -↠-refl; -↠-reflexive; -↠-trans) public
 
-Normal : (M : Γ ⊢ A) → 𝓤₀ ̇
-Normal M = ¬ (Σ[ N ꞉ _ ] M -→ N)
-
-data Value : (M : ∅ ⊢ A) → Set where
-  ƛ_
-    : (N : ∅ , A ⊢ B)
-      -------------------
-    → Value (ƛ N)
-
-  ⟨⟩
-    : Value ⟨⟩
-
-  ⟨_,_⟩
-    : (M : ∅ ⊢ A)
-    → (N : ∅ ⊢ B)
-    → Value ⟨ M , N ⟩
-
-  zero
-    : Value zero
-
-  suc
-    : (M : ∅ ⊢ nat)
-    → Value (suc M)
-
-------------------------------------------------------------------------------
--- Progress theorem i.e. one-step evaluator
-
-data Progress (M : ∅ ⊢ A) : Set where
-  step
-    : M -→ N
-      --------------
-    → Progress M
-
-  done
-    : Value M
-    → Progress M
-
-progress : (M : ∅ ⊢ A) → Progress M
-progress (ƛ M)       = done (ƛ M)
-progress (M · N)    with progress M | progress N
-... | step M→M′   | _         = step (ξ-·ₗ M→M′)
-... | _           | step N→N′ = step (ξ-·ᵣ N→N′)
-... | done (ƛ M′) | done vN   = step β-ƛ·
-progress ⟨⟩          = done ⟨⟩
-progress ⟨ M , N ⟩   = done ⟨ M , N ⟩
-progress (projₗ MN) with progress MN
-... | step M-→N      = step (ξ-projₗ M-→N)
-... | done ⟨ _ , _ ⟩ = step β-⟨,⟩projₗ
-progress (projᵣ MN) with progress MN
-... | step M-→N      = step (ξ-projᵣ M-→N)
-... | done ⟨ M , N ⟩ = step β-⟨,⟩projᵣ
-progress zero        = done zero
-progress (suc M)     = done (suc M)
-progress (prec M N L) with progress L
-... | step L-→L′     = step (ξ-rec₃ L-→L′)
-... | done zero      = step β-rec-zero
-... | done (suc L′)  = step β-rec-suc
-
-
-module _ where
-  open -↠-Reasoning
   ƛ-↠
     : M -↠ M′
     → ƛ M -↠ ƛ M′
@@ -405,29 +344,88 @@ module _ where
 
   ⟨,⟩ₗ-↠
     : M -↠ M′
-    → ⟨ M , N ⟩ -↠ ⟨ M′ , N ⟩
-  ⟨,⟩ₗ-↠ (M ∎)                 = ⟨ M , _ ⟩ ∎
+    → (M , N) -↠ (M′ , N)
+  ⟨,⟩ₗ-↠ (M ∎)                 = (M , _) ∎
   ⟨,⟩ₗ-↠ (M -→⟨ M→M₁ ⟩ M₁-↠M₂) =
-    ⟨ M , _ ⟩ -→⟨ ξ-⟨,⟩ₗ M→M₁ ⟩ ⟨,⟩ₗ-↠ M₁-↠M₂
+    (M , _) -→⟨ ξ-⟨,⟩ₗ M→M₁ ⟩ ⟨,⟩ₗ-↠ M₁-↠M₂
 
   ⟨,⟩ᵣ-↠
     : N -↠ N′
-    → ⟨ M , N ⟩ -↠ ⟨ M , N′ ⟩
-  ⟨,⟩ᵣ-↠ (N ∎)                 = ⟨ _ , N ⟩ ∎
+    → (M , N) -↠ (M , N′)
+  ⟨,⟩ᵣ-↠ (N ∎)                 = (_ , N) ∎
   ⟨,⟩ᵣ-↠ (N -→⟨ N→N₁ ⟩ N₁-↠N₂) =
-    ⟨ _ , N ⟩ -→⟨ ξ-⟨,⟩ᵣ N→N₁ ⟩ ⟨,⟩ᵣ-↠ N₁-↠N₂
+    (_ , N) -→⟨ ξ-⟨,⟩ᵣ N→N₁ ⟩ ⟨,⟩ᵣ-↠ N₁-↠N₂
 
   ⟨,⟩-↠
     : M -↠ M′
     → N -↠ N′
-    → ⟨ M , N ⟩ -↠ ⟨ M′ , N′ ⟩
+    → (M , N) -↠ (M′ , N′)
   ⟨,⟩-↠ M↠M′ N↠N′ = begin
-    ⟨ _ , _ ⟩
+    _ , _
       -↠⟨ ⟨,⟩ₗ-↠ M↠M′ ⟩
-    ⟨ _ , _ ⟩
+    _ , _
       -↠⟨ ⟨,⟩ᵣ-↠ N↠N′ ⟩
-    ⟨ _ , _ ⟩
+    _ , _
       ∎
+open -↠-Reasoning using (_-↠_) public
+
+Normal : (M : Γ ⊢ A) → 𝓤₀ ̇
+Normal M = ¬ (Σ[ N ꞉ _ ] M -→ N)
+
+data Value : (M : ∅ ⊢ A) → Set where
+  ƛ_
+    : (N : A , ∅ ⊢ B)
+      -------------------
+    → Value (ƛ N)
+
+  ⟨⟩
+    : Value ⟨⟩
+
+  _,_
+    : (M : ∅ ⊢ A)
+    → (N : ∅ ⊢ B)
+    → Value (M , N)
+
+  zero
+    : Value zero
+
+  suc
+    : (M : ∅ ⊢ nat)
+    → Value (suc M)
+
+------------------------------------------------------------------------------
+-- Progress theorem i.e. one-step evaluator
+
+data Progress (M : ∅ ⊢ A) : Set where
+  step
+    : M -→ N
+      --------------
+    → Progress M
+
+  done
+    : Value M
+    → Progress M
+
+progress : (M : ∅ ⊢ A) → Progress M
+progress (ƛ M)       = done (ƛ M)
+progress (M · N)    with progress M | progress N
+... | step M→M′   | _         = step (ξ-·ₗ M→M′)
+... | _           | step N→N′ = step (ξ-·ᵣ N→N′)
+... | done (ƛ M′) | done vN   = step β-ƛ·
+progress ⟨⟩          = done ⟨⟩
+progress (M , N)     = done (M , N)
+progress (projₗ MN) with progress MN
+... | step M-→N      = step (ξ-projₗ M-→N)
+... | done (_ , _)   = step β-⟨,⟩projₗ
+progress (projᵣ MN) with progress MN
+... | step M-→N      = step (ξ-projᵣ M-→N)
+... | done (M , N)   = step β-⟨,⟩projᵣ
+progress zero        = done zero
+progress (suc M)     = done (suc M)
+progress (prec M N L) with progress L
+... | step L-→L′     = step (ξ-rec₃ L-→L′)
+... | done zero      = step β-rec-zero
+... | done (suc L′)  = step β-rec-suc
 
 ------------------------------------------------------------------------------
 -- Decidable equality between α-equivalent terms
@@ -435,11 +433,11 @@ module _ where
 module EncodeDecode where
   code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
   code {Γ} {A} {Δ} {B} (` x) (` y)     =
-    (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i → Γ=Δ i ∋ A=B i) x y
+    (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i →  A=B i ∈ Γ=Δ i) x y
   code (ƛ M)          (ƛ N)            = code M N
   code (M₁ · N₁)      (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
   code ⟨⟩             ⟨⟩               = Unit
-  code ⟨ M₁ , N₁ ⟩    ⟨ M₂ , N₂ ⟩      = code M₁ M₂ × code N₁ N₂
+  code (M₁ , N₁)      (M₂ , N₂)        = code M₁ M₂ × code N₁ N₂
   code (projₗ M)      (projₗ N)        = code M N
   code (projᵣ M)      (projᵣ N)        = code M N
   code zero           zero             = Unit
@@ -449,7 +447,7 @@ module EncodeDecode where
   code (` x)          _                = ⊥
   code (_ · _)        _                = ⊥
   code ⟨⟩             _                = ⊥
-  code ⟨ _ , _ ⟩      _                = ⊥
+  code (_ , _)        _                = ⊥
   code (projₗ M)      _                = ⊥
   code (projᵣ M)      _                = ⊥
   code zero           _                = ⊥
