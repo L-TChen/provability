@@ -3,7 +3,7 @@
 module Calculus.SystemT.Quoting where
 
 open import Prelude 
-  hiding (_≡⟨_⟩_; ≡⟨⟩-syntax; _∎; ⟪_⟫)
+  hiding (_≡⟨_⟩_; ≡⟨⟩-syntax; _∎)
 
 open import Calculus.SystemT.Base
 open import Calculus.SystemT.Substitution

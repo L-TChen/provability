@@ -5,11 +5,11 @@
 module Calculus.SystemT.Base where
 
 open import Prelude
-  hiding (_,_; ⟨_⟩; ⟪_⟫; _∎; _≡⟨_⟩_; ≡⟨⟩-syntax)
+  hiding (_,_; ⟨_⟩; _∎; _≡⟨_⟩_; ≡⟨⟩-syntax)
 
 open import Calculus.Context
 open Calculus.Context             public
-  using (∅; _,_; S_; Z)
+  using (∅; _,_; S_)
 open import Calculus.SystemT.Type public
   hiding (module EncodeDecode)
 

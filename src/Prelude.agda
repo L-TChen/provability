@@ -6,6 +6,7 @@ open import Agda.Builtin.FromNat                 public
   renaming (Number to HasFromNat)
 
 open import Cubical.Relation.Nullary             public
+  hiding (⟪_⟫)
 
 open import Cubical.Foundations.Everything       public
   hiding (id; ℓ-max)
