@@ -16,8 +16,9 @@ open Calculus.Context             public
 infix  3 _⊢_
 
 infixr 5 ƛ_
---infix  6 ⟨_,_⟩
+infix  6 `⟨_,_⟩
 infixl 7 _·_
+
 infixl 8 _[_] _⟪_⟫
 infix  9 `_
 
@@ -54,9 +55,9 @@ data _⊢_ Γ where
 --    : (A : 𝕋)
 --    → Γ ⊢ `⊥
 --    → Γ ⊢ A
-  ⟨⟩
+  `tt
     : Γ ⊢ `⊤
-  _,_
+  `⟨_,_⟩
     : Γ ⊢ A 
     → Γ ⊢ B
     → Γ ⊢ A `× B
@@ -86,12 +87,11 @@ Prog A = ∅ ⊢ A
   → Γ ⊢ lookup Γ (toWitness n∈Γ)
 #_ {Γ = Γ} n {n∈Γ}  =  ` count Γ (toWitness n∈Γ)
 
-
 ------------------------------------------------------------------------------
 -- Some combinators
 
-𝐼 : (A : 𝕋) → Γ ⊢ A `→ A
-𝐼 A = ƛ # 0
+𝐼 : {A : 𝕋} → Γ ⊢ A `→ A
+𝐼 = ƛ # 0
 
 ------------------------------------------------------------------------------
 -- Variable renaming
@@ -103,8 +103,8 @@ rename ρ (` x)        = ` ρ x
 rename ρ (ƛ M)        = ƛ rename (ext ρ) M
 rename ρ (M · N)      = rename ρ M · rename ρ N
 --rename ρ (absurd A M) = absurd A (rename ρ M)
-rename ρ ⟨⟩           = ⟨⟩
-rename ρ (M , N)      = (rename ρ M , rename ρ N)
+rename ρ `tt          = `tt
+rename ρ `⟨ M , N ⟩   = `⟨ rename ρ M , rename ρ N ⟩
 rename ρ (projₗ M)    = projₗ (rename ρ M)
 rename ρ (projᵣ N)    = projᵣ (rename ρ N)
 rename ρ zero         = zero
@@ -133,16 +133,16 @@ _⟪_⟫
   : Γ  ⊢ A
   → Subst Γ Δ
   → Δ ⊢ A
-(` x)     ⟪ σ ⟫  = σ x
-(ƛ M)     ⟪ σ ⟫  = ƛ M ⟪ exts σ ⟫
-(M · N)   ⟪ σ ⟫  = M ⟪ σ ⟫ · N ⟪ σ ⟫
+(` x)      ⟪ σ ⟫  = σ x
+(ƛ M)      ⟪ σ ⟫  = ƛ M ⟪ exts σ ⟫
+(M · N)    ⟪ σ ⟫  = M ⟪ σ ⟫ · N ⟪ σ ⟫
 --(absurd A M) ⟪ σ ⟫ = absurd A (M ⟪ σ ⟫)
-⟨⟩        ⟪ σ ⟫  = ⟨⟩
-(M , N)   ⟪ σ ⟫  = (M ⟪ σ ⟫ , N ⟪ σ ⟫)
-(projₗ M) ⟪ σ ⟫  = projₗ (M ⟪ σ ⟫)
-(projᵣ M) ⟪ σ ⟫  = projᵣ (M ⟪ σ ⟫)
-zero      ⟪ σ ⟫  = zero
-suc M     ⟪ σ ⟫  = suc (M ⟪ σ ⟫)
+`tt        ⟪ σ ⟫  = `tt
+`⟨ M , N ⟩ ⟪ σ ⟫  = `⟨ M ⟪ σ ⟫ , N ⟪ σ ⟫ ⟩
+(projₗ M)  ⟪ σ ⟫  = projₗ (M ⟪ σ ⟫)
+(projᵣ M)  ⟪ σ ⟫  = projᵣ (M ⟪ σ ⟫)
+zero       ⟪ σ ⟫  = zero
+suc M      ⟪ σ ⟫  = suc (M ⟪ σ ⟫)
 prec M N L ⟪ σ ⟫ = prec (M ⟪ σ ⟫) (N ⟪ exts (exts σ) ⟫) (L ⟪ σ ⟫)
 
 subst-zero
@@ -179,10 +179,10 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
     : (ƛ M) · N -→ M [ N ]
 
   β-⟨,⟩projₗ
-    : projₗ (M , N) -→ M
+    : projₗ `⟨ M , N ⟩ -→ M
 
   β-⟨,⟩projᵣ
-    : projᵣ (M , N) -→ N
+    : projᵣ `⟨ M , N ⟩ -→ N
 
   β-rec-zero
     : prec M N zero -→ M
@@ -207,12 +207,12 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
   ξ-⟨,⟩ₗ
     : M -→ M′ 
       ---------------
-    → (M , N) -→ (M′ , N)
+    → `⟨ M , N ⟩ -→ `⟨ M′ , N ⟩
 
   ξ-⟨,⟩ᵣ
     : N -→ N′ 
       ---------------
-    → (M , N) -→ (M , N′)
+    → `⟨ M , N ⟩ -→ `⟨ M , N′ ⟩
 
   ξ-projₗ
     : L -→ L′
@@ -344,33 +344,33 @@ module -↠-Reasoning where
 
   ⟨,⟩ₗ-↠
     : M -↠ M′
-    → (M , N) -↠ (M′ , N)
-  ⟨,⟩ₗ-↠ (M ∎)                 = (M , _) ∎
+    → `⟨ M , N ⟩ -↠ `⟨ M′ , N ⟩
+  ⟨,⟩ₗ-↠ (M ∎)                 = `⟨ M , _ ⟩ ∎
   ⟨,⟩ₗ-↠ (M -→⟨ M→M₁ ⟩ M₁-↠M₂) =
-    (M , _) -→⟨ ξ-⟨,⟩ₗ M→M₁ ⟩ ⟨,⟩ₗ-↠ M₁-↠M₂
+    `⟨ M , _ ⟩ -→⟨ ξ-⟨,⟩ₗ M→M₁ ⟩ ⟨,⟩ₗ-↠ M₁-↠M₂
 
   ⟨,⟩ᵣ-↠
     : N -↠ N′
-    → (M , N) -↠ (M , N′)
-  ⟨,⟩ᵣ-↠ (N ∎)                 = (_ , N) ∎
+    → `⟨ M , N ⟩ -↠ `⟨ M , N′ ⟩
+  ⟨,⟩ᵣ-↠ (N ∎)                 = `⟨ _ , N ⟩ ∎
   ⟨,⟩ᵣ-↠ (N -→⟨ N→N₁ ⟩ N₁-↠N₂) =
-    (_ , N) -→⟨ ξ-⟨,⟩ᵣ N→N₁ ⟩ ⟨,⟩ᵣ-↠ N₁-↠N₂
+    `⟨ _ , N ⟩ -→⟨ ξ-⟨,⟩ᵣ N→N₁ ⟩ ⟨,⟩ᵣ-↠ N₁-↠N₂
 
   ⟨,⟩-↠
     : M -↠ M′
     → N -↠ N′
-    → (M , N) -↠ (M′ , N′)
+    → `⟨ M , N ⟩  -↠ `⟨ M′ , N′ ⟩
   ⟨,⟩-↠ M↠M′ N↠N′ = begin
-    _ , _
+    `⟨ _ , _ ⟩
       -↠⟨ ⟨,⟩ₗ-↠ M↠M′ ⟩
-    _ , _
+    `⟨ _ , _ ⟩ 
       -↠⟨ ⟨,⟩ᵣ-↠ N↠N′ ⟩
-    _ , _
+    `⟨ _ , _ ⟩
       ∎
 open -↠-Reasoning using (_-↠_) public
 
 Normal : (M : Γ ⊢ A) → 𝓤₀ ̇
-Normal M = ¬ (Σ[ N ꞉ _ ] M -→ N)
+Normal M = ∀ {N} → M -→ N → ⊥
 
 data Value : (M : ∅ ⊢ A) → Set where
   ƛ_
@@ -378,13 +378,13 @@ data Value : (M : ∅ ⊢ A) → Set where
       -------------------
     → Value (ƛ N)
 
-  ⟨⟩
-    : Value ⟨⟩
+  `tt
+    : Value `tt
 
-  _,_
+  `⟨_,_⟩
     : (M : ∅ ⊢ A)
     → (N : ∅ ⊢ B)
-    → Value (M , N)
+    → Value `⟨ M , N ⟩
 
   zero
     : Value zero
@@ -412,14 +412,14 @@ progress (M · N)    with progress M | progress N
 ... | step M→M′   | _         = step (ξ-·ₗ M→M′)
 ... | _           | step N→N′ = step (ξ-·ᵣ N→N′)
 ... | done (ƛ M′) | done vN   = step β-ƛ·
-progress ⟨⟩          = done ⟨⟩
-progress (M , N)     = done (M , N)
+progress `tt         = done `tt
+progress `⟨ M , N ⟩  = done `⟨ M , N ⟩
 progress (projₗ MN) with progress MN
-... | step M-→N      = step (ξ-projₗ M-→N)
-... | done (_ , _)   = step β-⟨,⟩projₗ
+... | step M-→N       = step (ξ-projₗ M-→N)
+... | done `⟨ _ , _ ⟩ = step β-⟨,⟩projₗ
 progress (projᵣ MN) with progress MN
-... | step M-→N      = step (ξ-projᵣ M-→N)
-... | done (M , N)   = step β-⟨,⟩projᵣ
+... | step M-→N       = step (ξ-projᵣ M-→N)
+... | done `⟨ M , N ⟩ = step β-⟨,⟩projᵣ
 progress zero        = done zero
 progress (suc M)     = done (suc M)
 progress (prec M N L) with progress L
@@ -434,25 +434,16 @@ module EncodeDecode where
   code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
   code {Γ} {A} {Δ} {B} (` x) (` y)     =
     (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i →  A=B i ∈ Γ=Δ i) x y
-  code (ƛ M)          (ƛ N)            = code M N
-  code (M₁ · N₁)      (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
-  code ⟨⟩             ⟨⟩               = Unit
-  code (M₁ , N₁)      (M₂ , N₂)        = code M₁ M₂ × code N₁ N₂
-  code (projₗ M)      (projₗ N)        = code M N
-  code (projᵣ M)      (projᵣ N)        = code M N
-  code zero           zero             = Unit
-  code (suc M)        (suc N)          = code M N
+  code (ƛ M)           (ƛ N)            = code M N
+  code (M₁ · N₁)       (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
+  code `tt             `tt              = Unit
+  code `⟨ M₁ , N₁ ⟩    `⟨ M₂ , N₂ ⟩     = code M₁ M₂ × code N₁ N₂
+  code (projₗ M)       (projₗ N)        = code M N
+  code (projᵣ M)       (projᵣ N)        = code M N
+  code zero            zero             = Unit
+  code (suc M)         (suc N)          = code M N
   code (prec M₁ N₁ L₁) (prec M₂ N₂ L₂) = code M₁ M₂ × code N₁ N₂ × code L₁ L₂ 
-  code (ƛ M)          N                = ⊥
-  code (` x)          _                = ⊥
-  code (_ · _)        _                = ⊥
-  code ⟨⟩             _                = ⊥
-  code (_ , _)        _                = ⊥
-  code (projₗ M)      _                = ⊥
-  code (projᵣ M)      _                = ⊥
-  code zero           _                = ⊥
-  code (suc M)        _                = ⊥
-  code (prec M M₁ M₂) _                = ⊥
+  code _               _               = ⊥
 
   postulate
     -- TODO: write this up
@@ -473,5 +464,5 @@ module EncodeDecode where
   encode {M = M} M=N = transport (cong (code M) M=N) (r M)
 open EncodeDecode using (encode)
 
-𝐼·zero≢zero : 𝐼 {Γ = ∅} nat · zero ≢ zero
+𝐼·zero≢zero : 𝐼 {Γ = ∅} · zero ≢ zero
 𝐼·zero≢zero = encode

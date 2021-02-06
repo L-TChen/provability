@@ -18,7 +18,6 @@ private
   variable
     A B C D : 𝕋
 
-
 module EncodeDecode where
   code : (A B : 𝕋) → 𝓤₀ ̇
   code `⊤       `⊤       = Unit
@@ -26,11 +25,7 @@ module EncodeDecode where
   code nat      nat      = Unit
   code (A `× B) (C `× D) = code A C × code B D
   code (A `→ B) (C `→ D) = code A C × code B D
-  code `⊤       _        = ⊥
-  code `⊥       _        = ⊥
-  code nat      _        = ⊥
-  code (_ `× _) _        = ⊥
-  code (_ `→ _) _        = ⊥
+  code _        _        = ⊥
 
   r : (A : 𝕋) → code A A
   r nat      = tt
