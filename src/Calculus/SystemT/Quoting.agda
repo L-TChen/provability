@@ -33,18 +33,18 @@ record Quoting : 𝓤₀ ̇ where
   open -↠-Reasoning
 
   quoting-not-definable : ¬ (Σ[ Q ꞉ Prog (nat `→ nat) ] Π[ M ꞉ Prog nat ] Q · M -↠ ⌜ M ⌝)
-  quoting-not-definable (Q , QM=⌜M⌝) = 𝐼·zero≢zero (⌜⌝-injective ⌜I·M⌝=⌜M⌝)
+  quoting-not-definable (Q , QM=⌜M⌝) = 𝐼·`zero≢`zero (⌜⌝-injective ⌜I·M⌝=⌜M⌝)
     where
-      QI0-↠⌜0⌝ : Q · (𝐼 · zero) -↠ ⌜ zero ⌝
+      QI0-↠⌜0⌝ : Q · (𝐼 · `zero) -↠ ⌜ `zero ⌝
       QI0-↠⌜0⌝ = begin
-        Q · (𝐼 · zero)
+        Q · (𝐼 · `zero)
           -→⟨ ξ-·ᵣ β-ƛ· ⟩
-        Q · zero
-          -↠⟨ QM=⌜M⌝ zero ⟩
-        ⌜ zero ⌝ ∎
+        Q · `zero
+          -↠⟨ QM=⌜M⌝ `zero ⟩
+        ⌜ `zero ⌝ ∎
 
-      ⌜I·M⌝=⌜M⌝ : ⌜ 𝐼 · zero ⌝ ≡ ⌜ zero ⌝
-      ⌜I·M⌝=⌜M⌝ = Normal⇒Path (⌜⌝-normal (𝐼 · zero)) (⌜⌝-normal zero) (QM=⌜M⌝ (𝐼 · zero)) QI0-↠⌜0⌝
+      ⌜I·M⌝=⌜M⌝ : ⌜ 𝐼 · `zero ⌝ ≡ ⌜ `zero ⌝
+      ⌜I·M⌝=⌜M⌝ = Normal⇒Path (⌜⌝-normal (𝐼 · `zero)) (⌜⌝-normal `zero) (QM=⌜M⌝ (𝐼 · `zero)) QI0-↠⌜0⌝
 
   -- ⊢ □ (ℕ `→ A) `→ □ A
   Diag : Γ ⊢ nat `→ nat

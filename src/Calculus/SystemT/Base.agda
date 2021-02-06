@@ -61,15 +61,15 @@ data _⊢_ Γ where
     : Γ ⊢ A 
     → Γ ⊢ B
     → Γ ⊢ A `× B
-  projₗ
+  `projₗ
     : Γ ⊢ A `× B
     → Γ ⊢ A
-  projᵣ
+  `projᵣ
     : Γ ⊢ A `× B
     → Γ ⊢ B
-  zero
+  `zero
     : Γ ⊢ nat
-  suc
+  `suc
     : Γ ⊢ nat
     → Γ ⊢ nat
   prec
@@ -105,11 +105,11 @@ rename ρ (M · N)      = rename ρ M · rename ρ N
 rename ρ (abort M)  = abort (rename ρ M)
 rename ρ `tt          = `tt
 rename ρ `⟨ M , N ⟩   = `⟨ rename ρ M , rename ρ N ⟩
-rename ρ (projₗ M)    = projₗ (rename ρ M)
+rename ρ (`projₗ M)    = `projₗ (rename ρ M)
 
-rename ρ (projᵣ N)    = projᵣ (rename ρ N)
-rename ρ zero         = zero
-rename ρ (suc M)      = suc (rename ρ M)
+rename ρ (`projᵣ N)    = `projᵣ (rename ρ N)
+rename ρ `zero         = `zero
+rename ρ (`suc M)      = `suc (rename ρ M)
 rename ρ (prec M N L) = prec (rename ρ M) (rename (ext (ext ρ)) N) (rename ρ L)
 
 ↑₁_ :   Γ ⊢ A
@@ -140,10 +140,10 @@ _⟪_⟫
 (abort M)  ⟪ σ ⟫ = abort (M ⟪ σ ⟫)
 `tt        ⟪ σ ⟫  = `tt
 `⟨ M , N ⟩ ⟪ σ ⟫  = `⟨ M ⟪ σ ⟫ , N ⟪ σ ⟫ ⟩
-(projₗ M)  ⟪ σ ⟫  = projₗ (M ⟪ σ ⟫)
-(projᵣ M)  ⟪ σ ⟫  = projᵣ (M ⟪ σ ⟫)
-zero       ⟪ σ ⟫  = zero
-suc M      ⟪ σ ⟫  = suc (M ⟪ σ ⟫)
+(`projₗ M)  ⟪ σ ⟫  = `projₗ (M ⟪ σ ⟫)
+(`projᵣ M)  ⟪ σ ⟫  = `projᵣ (M ⟪ σ ⟫)
+`zero       ⟪ σ ⟫  = `zero
+`suc M      ⟪ σ ⟫  = `suc (M ⟪ σ ⟫)
 prec M N L ⟪ σ ⟫ = prec (M ⟪ σ ⟫) (N ⟪ exts (exts σ) ⟫) (L ⟪ σ ⟫)
 
 subst-zero
@@ -179,17 +179,17 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
   β-ƛ·
     : (ƛ M) · N -→ M [ N ]
 
-  β-⟨,⟩projₗ
-    : projₗ `⟨ M , N ⟩ -→ M
+  β-⟨,⟩`projₗ
+    : `projₗ `⟨ M , N ⟩ -→ M
 
-  β-⟨,⟩projᵣ
-    : projᵣ `⟨ M , N ⟩ -→ N
+  β-⟨,⟩`projᵣ
+    : `projᵣ `⟨ M , N ⟩ -→ N
 
-  β-rec-zero
-    : prec M N zero -→ M
+  β-rec-`zero
+    : prec M N `zero -→ M
 
-  β-rec-suc
-    : prec M N (suc L) -→ N [ L , prec M N L ]₂
+  β-rec-`suc
+    : prec M N (`suc L) -→ N [ L , prec M N L ]₂
 
   ξ-ƛ
     :   M -→ M′
@@ -219,17 +219,17 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
       ---------------
     → `⟨ M , N ⟩ -→ `⟨ M , N′ ⟩
 
-  ξ-projₗ
+  ξ-`projₗ
     : L -→ L′
-    → projₗ L -→ projₗ L′
+    → `projₗ L -→ `projₗ L′
 
-  ξ-projᵣ
+  ξ-`projᵣ
     : L -→ L′
-    → projᵣ L -→ projᵣ L′
+    → `projᵣ L -→ `projᵣ L′
 
-  ξ-suc
+  ξ-`suc
     : M -→ N
-    → suc M -→ suc N
+    → `suc M -→ `suc N
 
   ξ-rec₁
     : M -→ M′
@@ -338,19 +338,19 @@ module -↠-Reasoning where
       -↠⟨ ·ᵣ-↠ N-↠N′ ⟩
     _ · _ ∎ 
 
-  projₗ-↠
+  `projₗ-↠
     : L -↠ L′
-    → projₗ L -↠ projₗ L′
-  projₗ-↠ (L ∎)                 = projₗ L ∎
-  projₗ-↠ (L -→⟨ L→L₁ ⟩ L₁-↠L₂) =
-    projₗ L -→⟨ ξ-projₗ L→L₁ ⟩ projₗ-↠ L₁-↠L₂
+    → `projₗ L -↠ `projₗ L′
+  `projₗ-↠ (L ∎)                 = `projₗ L ∎
+  `projₗ-↠ (L -→⟨ L→L₁ ⟩ L₁-↠L₂) =
+    `projₗ L -→⟨ ξ-`projₗ L→L₁ ⟩ `projₗ-↠ L₁-↠L₂
 
-  projᵣ-↠
+  `projᵣ-↠
     : L -↠ L′
-    → projᵣ L -↠ projᵣ L′
-  projᵣ-↠ (L ∎)                 = projᵣ L ∎
-  projᵣ-↠ (L -→⟨ L→L₂ ⟩ L₂-↠L₂) =
-    projᵣ L -→⟨ ξ-projᵣ L→L₂ ⟩ projᵣ-↠ L₂-↠L₂
+    → `projᵣ L -↠ `projᵣ L′
+  `projᵣ-↠ (L ∎)                 = `projᵣ L ∎
+  `projᵣ-↠ (L -→⟨ L→L₂ ⟩ L₂-↠L₂) =
+    `projᵣ L -→⟨ ξ-`projᵣ L→L₂ ⟩ `projᵣ-↠ L₂-↠L₂
 
   ⟨,⟩ₗ-↠
     : M -↠ M′
@@ -397,12 +397,12 @@ data Value : (M : ∅ ⊢ A) → Set where
     → (N : ∅ ⊢ B)
     → Value `⟨ M , N ⟩
 
-  zero
-    : Value zero
+  `zero
+    : Value `zero
 
-  suc
+  `suc
     : (M : ∅ ⊢ nat)
-    → Value (suc M)
+    → Value (`suc M)
 
 ------------------------------------------------------------------------------
 -- Progress theorem i.e. one-step evaluator
@@ -427,18 +427,18 @@ progress (abort M) with progress M
 ... | step M→M′ = step (ξ-abort M→M′)
 progress `tt          = done `tt
 progress `⟨ M , N ⟩   = done `⟨ M , N ⟩
-progress (projₗ MN) with progress MN
-... | step M-→N       = step (ξ-projₗ M-→N)
-... | done `⟨ _ , _ ⟩ = step β-⟨,⟩projₗ
-progress (projᵣ MN) with progress MN
-... | step M-→N       = step (ξ-projᵣ M-→N)
-... | done `⟨ M , N ⟩ = step β-⟨,⟩projᵣ
-progress zero        = done zero
-progress (suc M)     = done (suc M)
+progress (`projₗ MN) with progress MN
+... | step M-→N       = step (ξ-`projₗ M-→N)
+... | done `⟨ _ , _ ⟩ = step β-⟨,⟩`projₗ
+progress (`projᵣ MN) with progress MN
+... | step M-→N       = step (ξ-`projᵣ M-→N)
+... | done `⟨ M , N ⟩ = step β-⟨,⟩`projᵣ
+progress `zero        = done `zero
+progress (`suc M)     = done (`suc M)
 progress (prec M N L) with progress L
 ... | step L-→L′     = step (ξ-rec₃ L-→L′)
-... | done zero      = step β-rec-zero
-... | done (suc L′)  = step β-rec-suc
+... | done `zero      = step β-rec-`zero
+... | done (`suc L′)  = step β-rec-`suc
 
 ------------------------------------------------------------------------------
 -- Decidable equality between α-equivalent terms
@@ -452,10 +452,10 @@ module EncodeDecode where
   code (abort M)       (abort N)        = code M N
   code `tt             `tt              = Unit
   code `⟨ M₁ , N₁ ⟩    `⟨ M₂ , N₂ ⟩     = code M₁ M₂ × code N₁ N₂
-  code (projₗ M)       (projₗ N)        = code M N
-  code (projᵣ M)       (projᵣ N)        = code M N
-  code zero            zero             = Unit
-  code (suc M)         (suc N)          = code M N
+  code (`projₗ M)       (`projₗ N)        = code M N
+  code (`projᵣ M)       (`projᵣ N)        = code M N
+  code `zero            `zero             = Unit
+  code (`suc M)         (`suc N)          = code M N
   code (prec M₁ N₁ L₁) (prec M₂ N₂ L₂) = code M₁ M₂ × code N₁ N₂ × code L₁ L₂ 
   code _               _               = ⊥
 
@@ -468,15 +468,15 @@ module EncodeDecode where
   -- r (M · N)        = r M Prelude., r N
   -- r ⟨⟩             = tt
   -- r ⟨ M , N ⟩      = r M Prelude., r N
-  -- r (projₗ M)      = r M
-  -- r (projᵣ M)      = r M
-  -- r zero           = tt
-  -- r (suc M)        = r M
+  -- r (`projₗ M)      = r M
+  -- r (`projᵣ M)      = r M
+  -- r `zero           = tt
+  -- r (`suc M)        = r M
   -- r (prec M M₁ M₂) = r M Prelude., r M₁ Prelude., r M₂
 
   encode : M ≡ N → code M N
   encode {M = M} M=N = transport (cong (code M) M=N) (r M)
 open EncodeDecode using (encode)
 
-𝐼·zero≢zero : 𝐼 {Γ = ∅} · zero ≢ zero
-𝐼·zero≢zero = encode
+𝐼·`zero≢`zero : 𝐼 {Γ = ∅} · `zero ≢ `zero
+𝐼·`zero≢`zero = encode
