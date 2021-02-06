@@ -12,7 +12,7 @@ record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
     type          : 𝕋
     _⊩_           : Prog type → X → 𝓤 ̇
     _isRealisable : Π[ x ꞉ X ] ∃[ M ꞉ Prog type ] M ⊩ x
-  infix 4 _⊩_
+  infix 6 _⊩_
 
 Asm : (𝓤 : Level) → 𝓤 ⁺ ̇
 Asm 𝓤 = TypeWithStr 𝓤 AsmStr
@@ -30,8 +30,8 @@ module Mor (X Y : Asm 𝓤) where
   open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_)
   open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_)
   
-  _tracks_ : (F : Prog (A `→ B)) → (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
-  F tracks f = Π[ M ꞉ Prog A ] Π[ x ꞉ ⟨ X ⟩ ] (M ⊩x x → Σ[ N ꞉ Prog B ] (F · M -↠ N) × (N ⊩y f x))
+  _tracks_ : Prog (A `→ B) → (⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
+  F tracks f = Π[ M ꞉ Prog A ] Π[ x ꞉ ⟨ X ⟩ ] (M ⊩x x → Σ[ N ꞉ Prog B ] F · M -↠ N × N ⊩y f x)
 
   HasTracker : (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
   HasTracker f = Σ[ r ꞉ Prog (A `→ B) ] r tracks f 
@@ -54,7 +54,7 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
     open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_)
     open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_)
     open AsmStr (str Z) renaming (type to C; _⊩_ to _⊩z_)
-    GF⊩gf : ∀ M x → M ⊩x x → Σ[ L ꞉ Prog C ] ((ƛ ↑ G · (↑ F · # 0)) · M -↠ L) × (L ⊩z g (f x))
+    GF⊩gf : ∀ M x → M ⊩x x → Σ[ L ꞉ Prog C ] (ƛ ↑ G · (↑ F · # 0)) · M -↠ L × L ⊩z g (f x)
     GF⊩gf M x M⊩x = L , red , L⊩gfx
       where
         N : Prog B
@@ -67,7 +67,7 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
         L⊩gfx : L ⊩z (g (f x))
         L⊩gfx = G⊩g N (f x) N⊩fx .snd .snd
         
-        red : (ƛ ↑ G · (↑ F · # 0)) · M -↠ L -- G · (F · M) 
+        red : (ƛ ↑ G · (↑ F · # 0)) · M -↠ L
         red = begin
           (ƛ ↑ G · (↑ F · # 0)) · M
             -→⟨ β-ƛ· ⟩
@@ -84,8 +84,14 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
 -- Constructions
 
 -- TODO: show that ⊥ is initial
+_⊩⊥_ : Prog `⊥ → ⊥ → 𝓤₀ ̇
+M ⊩⊥ () 
+
 ⊥ₐ : Asm₀
-⊥ₐ = ⊥ , asmstr `⊤ (λ _ ()) λ ()
+⊥ₐ = ⊥ , asmstr `⊥ _⊩⊥_ λ ()
+
+initiality : ∀ X → Trackable ⊥ₐ X
+initiality (|X| , asmstr A _⊩_ _isRealisable) = (λ ()) , ƛ abort # 0  , λ _ ()
 
 -- TODO: Show that ⊤ is terminal
 ⊤ₐ : Asm₀
@@ -100,7 +106,7 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
     open -↠-Reasoning
     _⊩_ : Prog nat → ℕ → 𝓤₀ ̇
     M ⊩ zero  = M -↠ zero
-    M ⊩ suc n = Σ[ N ꞉ Prog nat ] (N ⊩ n) × (M -↠ suc N)
+    M ⊩ suc n = Σ[ N ꞉ Prog nat ] N ⊩ n × M -↠ suc N
 
     realisable : Π[ n ꞉ ℕ ] ∃[ M ꞉ Prog nat ] (M ⊩ n)
     realisable zero    = ∣ zero , -↠-refl ∣
@@ -116,12 +122,13 @@ X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A `× B) _⊩_ realisable
     open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_; _isRealisable to _isRealisable₂)
 
     _⊩_ : Prog (A `× B) → ⟨ X ⟩ × ⟨ Y ⟩ → _
-    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] (L -↠ `⟨ M , N ⟩) × (M ⊩x x) × (N ⊩y y)
+    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] L -↠ `⟨ M , N ⟩ × M ⊩x x × N ⊩y y
 
     realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (A `× B) ] a ⊩ z
     realisable (x , y) = rec propTruncIsProp
-      (λ { (M , M⊩x) → rec propTruncIsProp (λ {(N , N⊩y) → ∣ `⟨ M , N ⟩ , M , N , -↠-refl , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
-      (x isRealisable₁)
+      (λ { (M , M⊩x) → rec propTruncIsProp
+        (λ {(N , N⊩y) → ∣ `⟨ M , N ⟩ , M , N , -↠-refl , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
+        (x isRealisable₁)
 
 --_⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
 --X ⇒ Y = Trackable , asmstr (A →̇ B) _⊩_ {!!} -- (⟨ X ⟩ → ⟨ Y ⟩) , asmstr (A →̇ B) (Mor._tracks_ X Y) {!i!}

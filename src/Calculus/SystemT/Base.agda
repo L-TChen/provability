@@ -15,12 +15,12 @@ open Calculus.Context             public
 
 infix  3 _⊢_
 
-infixr 5 ƛ_
-infix  6 `⟨_,_⟩
-infixl 7 _·_
+infixr 8 ƛ_ abort_
+infix  9 `⟨_,_⟩
+infixl 10 _·_
 
-infixl 8 _[_] _⟪_⟫
-infix  9 `_
+infixl 11 _[_] _⟪_⟫
+infix  12 `_
 
 Cxt = Context 𝕋
 
@@ -51,10 +51,10 @@ data _⊢_ Γ where
     → Γ ⊢ A
       ----------
     → Γ ⊢ B
---  absurd
---    : (A : 𝕋)
---    → Γ ⊢ `⊥
---    → Γ ⊢ A
+  abort_
+    : Γ ⊢ `⊥
+    → {A : 𝕋}
+    → Γ ⊢ A
   `tt
     : Γ ⊢ `⊤
   `⟨_,_⟩
@@ -102,10 +102,11 @@ rename : Rename Γ Δ
 rename ρ (` x)        = ` ρ x
 rename ρ (ƛ M)        = ƛ rename (ext ρ) M
 rename ρ (M · N)      = rename ρ M · rename ρ N
---rename ρ (absurd A M) = absurd A (rename ρ M)
+rename ρ (abort M)  = abort (rename ρ M)
 rename ρ `tt          = `tt
 rename ρ `⟨ M , N ⟩   = `⟨ rename ρ M , rename ρ N ⟩
 rename ρ (projₗ M)    = projₗ (rename ρ M)
+
 rename ρ (projᵣ N)    = projᵣ (rename ρ N)
 rename ρ zero         = zero
 rename ρ (suc M)      = suc (rename ρ M)
@@ -136,7 +137,7 @@ _⟪_⟫
 (` x)      ⟪ σ ⟫  = σ x
 (ƛ M)      ⟪ σ ⟫  = ƛ M ⟪ exts σ ⟫
 (M · N)    ⟪ σ ⟫  = M ⟪ σ ⟫ · N ⟪ σ ⟫
---(absurd A M) ⟪ σ ⟫ = absurd A (M ⟪ σ ⟫)
+(abort M)  ⟪ σ ⟫ = abort (M ⟪ σ ⟫)
 `tt        ⟪ σ ⟫  = `tt
 `⟨ M , N ⟩ ⟪ σ ⟫  = `⟨ M ⟪ σ ⟫ , N ⟪ σ ⟫ ⟩
 (projₗ M)  ⟪ σ ⟫  = projₗ (M ⟪ σ ⟫)
@@ -173,7 +174,7 @@ L [ M , N ]₂ = L ⟪ subst-one-zero M N ⟫
 ------------------------------------------------------------------------------
 -- Single-step reduction
 
-infix 3 _-→_
+infix 6 _-→_
 data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
   β-ƛ·
     : (ƛ M) · N -→ M [ N ]
@@ -203,6 +204,10 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
     : M -→ M′
       ---------------
     → L · M -→ L · M′
+
+  ξ-abort
+    : M -→ M′
+    → abort_ M {A} -→ abort M′
 
   ξ-⟨,⟩ₗ
     : M -→ M′ 
@@ -242,12 +247,14 @@ data _-→_ {Γ : Cxt} : (M N : Γ ⊢ A) → Set where
 -- Multi-step beta-reduction
 
 module -↠-Reasoning where
-  infix  0 begin_
-  infix  2 _-↠_
-  infixr 2 _-→⟨_⟩_ _-↠⟨_⟩_ _≡⟨_⟩_
-  infix  3 _∎
+  infix  4 begin_
+  infix  6 _-↠_
+  infixr 6 _-→⟨_⟩_ _-↠⟨_⟩_ _≡⟨_⟩_ ≡⟨⟩-syntax
+  infix  7 _∎
+  
+  syntax ≡⟨⟩-syntax x (λ i → B) y = x ≡[ i ]⟨ B ⟩ y
 
-  data _-↠_ {Γ : Cxt} : Γ ⊢ A → Γ ⊢ A → Set where
+  data _-↠_ {Γ : Cxt} : Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
     _∎ : (M : Γ ⊢ A) → M -↠ M
 
     _-→⟨_⟩_
@@ -279,8 +286,6 @@ module -↠-Reasoning where
 
   ≡⟨⟩-syntax : ∀ L → L ≡ M → M -↠ N → L -↠ N
   ≡⟨⟩-syntax = _≡⟨_⟩_
-  infixr 2 ≡⟨⟩-syntax
-  syntax ≡⟨⟩-syntax x (λ i → B) y = x ≡[ i ]⟨ B ⟩ y
   
   -↠-refl : ∀ {M : Γ ⊢ A} → M -↠ M
   -↠-refl = _ ∎
@@ -300,8 +305,10 @@ module -↠-Reasoning where
     : M -↠ M′
     → ƛ M -↠ ƛ M′
   ƛ-↠ (M ∎)                 = ƛ M ∎
-  ƛ-↠ (M -→⟨ M→M₁ ⟩ M₁-↠M₂) =
-    ƛ M -→⟨ ξ-ƛ M→M₁ ⟩ ƛ-↠ M₁-↠M₂
+  ƛ-↠ (M -→⟨ M→M₁ ⟩ M₁-↠M₂) = begin
+    ƛ M
+      -→⟨ ξ-ƛ M→M₁ ⟩
+    ƛ-↠ M₁-↠M₂
 
   ·ₗ-↠
     : M -↠ M′
@@ -372,6 +379,7 @@ open -↠-Reasoning using (_-↠_) public
 Normal : (M : Γ ⊢ A) → 𝓤₀ ̇
 Normal M = ∀ {N} → M -→ N → ⊥
 
+-- Call-by-name
 data Value : (M : ∅ ⊢ A) → Set where
   ƛ_
     : (N : A , ∅ ⊢ B)
@@ -412,8 +420,10 @@ progress (M · N)    with progress M | progress N
 ... | step M→M′   | _         = step (ξ-·ₗ M→M′)
 ... | _           | step N→N′ = step (ξ-·ᵣ N→N′)
 ... | done (ƛ M′) | done vN   = step β-ƛ·
-progress `tt         = done `tt
-progress `⟨ M , N ⟩  = done `⟨ M , N ⟩
+progress (abort M) with progress M
+... | step M→M′ = step (ξ-abort M→M′)
+progress `tt          = done `tt
+progress `⟨ M , N ⟩   = done `⟨ M , N ⟩
 progress (projₗ MN) with progress MN
 ... | step M-→N       = step (ξ-projₗ M-→N)
 ... | done `⟨ _ , _ ⟩ = step β-⟨,⟩projₗ
@@ -436,6 +446,7 @@ module EncodeDecode where
     (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i →  A=B i ∈ Γ=Δ i) x y
   code (ƛ M)           (ƛ N)            = code M N
   code (M₁ · N₁)       (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
+  code (abort M)       (abort N)        = code M N
   code `tt             `tt              = Unit
   code `⟨ M₁ , N₁ ⟩    `⟨ M₂ , N₂ ⟩     = code M₁ M₂ × code N₁ N₂
   code (projₗ M)       (projₗ N)        = code M N

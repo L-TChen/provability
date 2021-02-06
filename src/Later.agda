@@ -13,9 +13,9 @@ module Prims where
     primLockUniv : 𝓤₁ ̇
 open Prims renaming (primLockUniv to LockU) public
 
-infixr 2 ▹-syntax
 infixl 4 _⊛_
 infixl 0 ▹_
+infixr -1 ▹-syntax
 
 private
   variable
@@ -48,13 +48,13 @@ map▹ : ((a : A) → B a)
 map▹ f x k = f (x k)
 
 Σ▹
-  : Σ[ x ∈ ▹ A ] ▹[ α ] B (x α)
+  : Σ (▹ A) (λ ▹x → ▹[ α ] B (▹x α))
   → ▹[ α ] Σ[ a ∈ A ] B a
 Σ▹ (x , y) α = (x α) , (y α)
 
 ▹Σ
   : ▹[ α ] Σ[ a ∈ A ] B a
-  → Σ[ x ∈ ▹ A ] ▹[ α ] B (x α)
+  → Σ (▹ A) λ ▹x → ▹[ α ] B (▹x α)
 ▹Σ f = (λ α → fst (f α)) , λ α → snd (f α)
 
 ▹-extensionality : {A : I → Set} {x : ▹ A i0} {y : ▹ A i1}
