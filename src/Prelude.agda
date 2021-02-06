@@ -94,8 +94,8 @@ instance
   DecEqBool : DecEq Bool
   _≟_ ⦃ DecEqBool ⦄ = Cubical.Data.Bool._≟_
   
-  DecEqℕ : DecEq ℕ
-  _≟_ ⦃ DecEqℕ ⦄ x y with x ℕₚ.≟ y
-  ... | ℕₚ.eq x=y = yes x=y
-  ... | ℕₚ.lt x<y = no (ℕₚ.<→≢ x<y)
-  ... | ℕₚ.gt x>y = no λ x=y → ℕₚ.<→≢ x>y (sym x=y)
+--  DecEqℕ : DecEq ℕ
+--  _≟_ ⦃ DecEqℕ ⦄ x y with x ℕₚ.≟ y
+--  ... | ℕₚ.eq x=y = yes x=y
+--  ... | ℕₚ.lt x<y = no (ℕₚ.<→≢ x<y)
+--  ... | ℕₚ.gt x>y = no λ x=y → ℕₚ.<→≢ x>y (sym x=y)
