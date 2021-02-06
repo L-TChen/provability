@@ -23,50 +23,68 @@ Asm₀ = Asm 𝓤₀
 private
   variable
     X Y Z : Asm 𝓤
+
 ------------------------------------------------------------------------------
 -- Morphisms between assemblies
 
-module Mor (X Y : Asm 𝓤) where
-  open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_)
-  open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_)
+record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
+  constructor _,_
   
-  _tracks_ : Prog (A `→ B) → (⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
-  F tracks f = Π[ M ꞉ Prog A ] Π[ x ꞉ ⟨ X ⟩ ] (M ⊩x x → Σ[ N ꞉ Prog B ] F · M -↠ N × N ⊩y f x)
+  module X = AsmStr (str X)
+  module Y = AsmStr (str Y)
 
-  HasTracker : (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
-  HasTracker f = Σ[ r ꞉ Prog (A `→ B) ] r tracks f 
+  _tracks_ : Prog (X.type `→ Y.type) → (⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
+  F tracks f = Π[ M ꞉ Prog X.type ] Π[ x ꞉ ⟨ X ⟩ ] (M X.⊩ x → Σ[ N ꞉ Prog Y.type ] F · M -↠ N × N Y.⊩ f x)
+  -- TODO: does N merely exist? 
 
-  Trackable : 𝓤 ̇
-  Trackable = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] HasTracker f
-open Mor
+  field
+    realiser      : Prog (X.type `→ Y.type)
+    _isRealisable : realiser tracks f
 
-id : (X : Asm 𝓤) → Trackable X X
-id (|X| , asmX) = (λ (x : |X|) → x) , ƛ # 0 , λ M x M⊩x → M , ((ƛ # 0) · M -→⟨ β-ƛ· ⟩ M ∎) , M⊩x
-  where open -↠-Reasoning
+record Trackable (X Y : Asm 𝓤) : 𝓤  ̇ where
+  constructor _,_
+  field
+    fun        : ⟨ X ⟩ → ⟨ Y ⟩
+    hasTracker : HasTracker X Y fun
+open Trackable
+    
+∼-eq : (X Y : Asm 𝓤) → (f g : Trackable X Y) → 𝓤 ̇
+∼-eq X Y (f , F , F⊩f) (g , G , G⊩g) = f ≡ g
+
+infix 4 ∼-syntax
+
+syntax ∼-syntax {X = X} {Y = Y} f g = f ∼ g ꞉ X →ₐ Y
+
+∼-syntax : {X Y : Asm 𝓤} → (f g : Trackable X Y) → 𝓤 ̇
+∼-syntax {X = X} {Y = Y} f g = ∼-eq X Y f g
+
+id : Trackable X X
+id {X = (|X| , asmX)} =
+  (λ (x : |X|) → x) ,
+  𝐼 ,
+  λ M x M⊩x → M , -→to-↠ β-ƛ· , M⊩x
 
 infixr 9 _∘_
 _∘_ : {X Y Z : Asm 𝓤} → Trackable Y Z → Trackable X Y → Trackable X Z
 _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ ↑ G · (↑ F · # 0) , GF⊩gf
   where
-    open -↠-Reasoning
-    open Mor X Y renaming (_tracks_ to _tracksXY_)
-    open Mor Y Z renaming (_tracks_ to _tracksYZ_)
-    open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_)
-    open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_)
-    open AsmStr (str Z) renaming (type to C; _⊩_ to _⊩z_)
-    GF⊩gf : ∀ M x → M ⊩x x → Σ[ L ꞉ Prog C ] (ƛ ↑ G · (↑ F · # 0)) · M -↠ L × L ⊩z g (f x)
+    module X = AsmStr (str X)
+    module Y = AsmStr (str Y)
+    module Z = AsmStr (str Z)
+    GF⊩gf : ∀ M x → M X.⊩ x → Σ[ L ꞉ Prog (Z.type) ] (ƛ ↑ G · (↑ F · # 0)) · M -↠ L × L Z.⊩ g (f x)
     GF⊩gf M x M⊩x = L , red , L⊩gfx
       where
-        N : Prog B
+        N : Prog Y.type
         N = F⊩f M x M⊩x .fst
-        N⊩fx : N ⊩y (f x)
+        N⊩fx : N Y.⊩ (f x)
         N⊩fx =  F⊩f M x M⊩x .snd .snd
 
-        L : Prog C
+        L : Prog Z.type
         L = G⊩g N (f x) N⊩fx .fst
-        L⊩gfx : L ⊩z (g (f x))
+        L⊩gfx : L Z.⊩ (g (f x))
         L⊩gfx = G⊩g N (f x) N⊩fx .snd .snd
         
+        open -↠-Reasoning
         red : (ƛ ↑ G · (↑ F · # 0)) · M -↠ L
         red = begin
           (ƛ ↑ G · (↑ F · # 0)) · M
@@ -80,30 +98,42 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
           L
             ∎ 
 
+
 ------------------------------------------------------------------------------
 -- Constructions
 
--- TODO: show that ⊥ is initial
-_⊩⊥_ : Prog `⊥ → ⊥ → 𝓤₀ ̇
-M ⊩⊥ () 
+_⊩⊥_ : Prog `⊥ → ⊥* {𝓤} → 𝓤 ̇
+_ ⊩⊥ () 
 
-⊥ₐ : Asm₀
-⊥ₐ = ⊥ , asmstr `⊥ _⊩⊥_ λ ()
+⊥ₐ : Asm 𝓤
+⊥ₐ = ⊥* , asmstr `⊥ _⊩⊥_ λ ()
 
-initiality : ∀ X → Trackable ⊥ₐ X
+-- Uniqueness up to ∼ follows from function extensionality.
+initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
 initiality (|X| , asmstr A _⊩_ _isRealisable) = (λ ()) , ƛ abort # 0  , λ _ ()
 
--- TODO: Show that ⊤ is terminal
-⊤ₐ : Asm₀
-⊤ₐ = Unit , asmstr `⊤ _⊩_  λ {tt → ∣ `tt , tt ∣}
+⊤ₐ : Asm 𝓤
+⊤ₐ {𝓤 = 𝓤} = Unit* , asmstr `⊤ _⊩_  λ {tt* → ∣ `tt , tt* ∣}
   where
-    _⊩_ : Prog `⊤ → Unit → 𝓤₀ ̇
-    _ ⊩ _ = Unit
-    
+    _⊩_ : Prog `⊤ → Unit* → 𝓤 ̇
+    _ ⊩ _ = Unit*
+
+-- Uniqueness up to ∼ follows from function extensionality.
+finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
+finality X = (λ _ → tt*) , ƛ `tt , λ M _ _ → `tt , red M , tt*
+  where
+    open -↠-Reasoning
+    red : ∀ {A} (M : Prog A) → (ƛ `tt) · M -↠ `tt
+    red M = begin
+      (ƛ `tt) · M
+        -→⟨ β-ƛ· ⟩
+      `tt [ M ]
+        ≡⟨ refl ⟩
+      `tt ∎
+
 ℕₐ : Asm₀
 ℕₐ = ℕ , asmstr nat _⊩_ realisable
   where
-    open -↠-Reasoning
     _⊩_ : Prog nat → ℕ → 𝓤₀ ̇
     M ⊩ zero  = M -↠ zero
     M ⊩ suc n = Σ[ N ꞉ Prog nat ] N ⊩ n × M -↠ suc N
@@ -115,20 +145,19 @@ initiality (|X| , asmstr A _⊩_ _isRealisable) = (λ ()) , ƛ abort # 0  , λ _
       (realisable n)
     
 _×ₐ_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
-X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A `× B) _⊩_ realisable
+X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (X.type `× Y.type) _⊩_ realisable
   where
-    open -↠-Reasoning
-    open AsmStr (str X) renaming (type to A; _⊩_ to _⊩x_; _isRealisable to _isRealisable₁)
-    open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_; _isRealisable to _isRealisable₂)
+    module X = AsmStr (str X)
+    module Y = AsmStr (str Y)
 
-    _⊩_ : Prog (A `× B) → ⟨ X ⟩ × ⟨ Y ⟩ → _
-    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] L -↠ `⟨ M , N ⟩ × M ⊩x x × N ⊩y y
+    _⊩_ : Prog (X.type `× Y.type) → ⟨ X ⟩ × ⟨ Y ⟩ → _
+    L ⊩ (x , y) = Σ[ M ꞉ Prog X.type ] Σ[ N ꞉ Prog Y.type ] L -↠ `⟨ M , N ⟩ × M X.⊩ x × N Y.⊩ y
 
-    realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (A `× B) ] a ⊩ z
+    realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (X.type `× Y.type) ] a ⊩ z
     realisable (x , y) = rec propTruncIsProp
       (λ { (M , M⊩x) → rec propTruncIsProp
-        (λ {(N , N⊩y) → ∣ `⟨ M , N ⟩ , M , N , -↠-refl , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
-        (x isRealisable₁)
+        (λ {(N , N⊩y) → ∣ `⟨ M , N ⟩ , M , N , -↠-refl , M⊩x , N⊩y ∣ }) (y Y.isRealisable) })
+        (x X.isRealisable)
 
 --_⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
 --X ⇒ Y = Trackable , asmstr (A →̇ B) _⊩_ {!!} -- (⟨ X ⟩ → ⟨ Y ⟩) , asmstr (A →̇ B) (Mor._tracks_ X Y) {!i!}
@@ -144,17 +173,6 @@ X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A `× B) _⊩_ realisable
 𝔗 : 𝕋 → Asm 𝓤₀
 𝔗 A = Prog A , asmstr A _≡_ λ M → ∣ M , refl ∣
 
+-- It does not seem possible to define one single ∇ : 𝓤 ̇ → Asm 𝓤
 -- ∇₀_ : (X : 𝓤 ̇) → Asm 𝓤
--- ∇₀ X = X , asmstr {!!} _⊩∇_ ⊩∇-is-a-realisabiltiy
---   where
---     _⊩∇_ : Prog {!!} → X → (universe-of X) ̇
---     a ⊩∇ x = Unit*
 
---     ⊩∇-is-a-realisabiltiy : Π[ x ꞉ X ] ∃[ a ꞉ Prog {!!} ] a ⊩∇ x
---     ⊩∇-is-a-realisabiltiy x =
---       truncElim {P = λ _ → ∃[ a ꞉ Prog {!!} ] Unit*} (λ _ → propTruncIsProp)
---       (λ a → ∣ a , tt* ∣) {!!}
-
-
---Exposure : (𝓤 : Universe) → 𝓤 ⁺ ̇
---Exposure 𝓤 = Σ[ 𝔔 ꞉ (Asm 𝓤 → Asm 𝓤) ] Σ[ 𝔔₁ ꞉ (∀ X Y → Trackable {𝓤} X Y → Trackable {𝓤} (𝔔 X) (𝔔 Y) ) ] {!!} 

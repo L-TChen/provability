@@ -290,8 +290,11 @@ module -↠-Reasoning where
   -↠-refl : ∀ {M : Γ ⊢ A} → M -↠ M
   -↠-refl = _ ∎
  
-  -↠-reflexive : {M N : Γ ⊢ A} → M ≡ N → M -↠ N
-  -↠-reflexive {M = M} {N} M=N = transport (cong (λ M → M -↠ N) (sym M=N)) (N ∎)
+  -↠-respect-≡ : {M N : Γ ⊢ A} → M ≡ N → M -↠ N
+  -↠-respect-≡ {M = M} {N} M=N = transport (cong (λ M → M -↠ N) (sym M=N)) (N ∎)
+
+  -→to-↠ : M -→ N → M -↠ N
+  -→to-↠ M-→N = _ -→⟨ M-→N ⟩ _ ∎ 
 
   -↠-trans
     : ∀ {L}
@@ -374,7 +377,7 @@ module -↠-Reasoning where
       -↠⟨ ⟨,⟩ᵣ-↠ N↠N′ ⟩
     `⟨ _ , _ ⟩
       ∎
-open -↠-Reasoning using (_-↠_) public
+open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠) public
 
 Normal : (M : Γ ⊢ A) → 𝓤₀ ̇
 Normal M = ∀ {N} → M -→ N → ⊥
