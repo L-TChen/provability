@@ -1,6 +1,5 @@
 {-# OPTIONS --without-K --cubical #-}
 
-
 module Assembly.Exposure where
 
 open import Prelude
@@ -41,18 +40,44 @@ module _ (Q : Quoting) where
     -- of a Gödel numbering, this reflects the fact that a well-typed
     -- metaprogram may produce a representation containing β-redexs.
       |□X| : (universe-of |X|) ̇
-      |□X| = Σ[ n̅ ꞉ Prog nat ] Σ[ ▹x ꞉ ▹ |X| ] ▹[ α ] ∃[ M ꞉ Prog A ] n̅ -↠ ⌜ M ⌝ × M ⊩ ▹x α
+      |□X| =
+        Σ[ n̅ ꞉ Prog nat ] Σ[ ▹x ꞉ ▹ |X| ] ▹[ α ] ∃[ M ꞉ Prog A ]
+        n̅ -↠ ⌜ M ⌝ × (Σ[ N ꞉ Prog A ] M -↠ N × M ⊩ ▹x α)
 
       _⊩□x_   : Prog nat → |□X| → _
-      N ⊩□x (M , x , M⊩x) = Lift (N -↠ M)
+      M′ ⊩□x (M , x , M⊩x) = Lift (M′ -↠ M)
 
       _isRealisable  : Π[ x ꞉ |□X| ] ∃[ M ꞉ Prog nat ] M ⊩□x x
       (M , x , M⊩x) isRealisable = ∣ M , lift -↠-refl ∣
 
+  □map : Trackable X Y → Trackable (□ X) (□ Y)
+  □map {X = X} {Y = Y} (f , F , F⊩f) = □f , {!!} , {!!}
+    where
+      open -↠-Reasoning
+      module Y = AsmStr (str Y)
+      □f : ⟨ □ X ⟩ → ⟨ □ Y ⟩
+      □f (n , ▹x , n⊩▹x) = {!!}
+--        Ap · ⌜ F ⌝  · n ,
+--        ▹map f ▹x ,
+--        λ α → rec propTruncIsProp
+--        (λ { (M , n-↠⌜M⌝ , N , M-↠N , N⊩x) →
+--          let witeness : Σ[ N ꞉ Prog Y.type ] F · M -↠ N × (str Y AsmStr.⊩ N) (f (▹x α))
+--              witeness = F⊩f M (▹x α) M⊩x
+--              Ap⌜F⌝n-↠⌜FM⌝ :  Ap · ⌜ F ⌝ · n -↠ ⌜ F · M ⌝
+--              Ap⌜F⌝n-↠⌜FM⌝ = begin
+--                Ap · ⌜ F ⌝ · n
+--                  -↠⟨ ·ᵣ-↠ n-↠⌜M⌝ ⟩
+--                Ap · ⌜ F ⌝ · ⌜ M ⌝
+--                  -↠⟨ Ap-↠ ⟩
+--                ⌜ F · M ⌝ ∎
+--
+--          in ∣ F · M , Ap⌜F⌝n-↠⌜FM⌝ , {!F⊩f M (▹x α) M⊩x !}  ∣})
+--        (n⊩▹x α)
+  
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ ⊥ₐ {𝓤}⟩ → ⊥* {𝓤}) → ▹ ⊥* → ⊥*
   bang eval⊥ ▹x = eval⊥ (zero , ▹x ,
-    λ α → ⊥*-elim {A = ∃[ M ꞉ Prog `⊥ ] zero -↠ ⌜ M ⌝ × M ⊩⊥ ▹x α } (▹x α))
+    λ α → ⊥*-elim (▹x α))
 
   -- Theorem. Evaluation □ ⊥ → ⊥ does not exist.
   eval-does-not-exist : Trackable {𝓤} (□ ⊥ₐ) ⊥ₐ → ⊥*

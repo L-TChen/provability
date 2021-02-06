@@ -43,9 +43,9 @@ _⊛_ : ▹ ((a : A) → B a)
   → (a : ▹ A) → ▹[ α ] B (a α)
 (f ⊛ x) k = f k (x k)
 
-map▹ : ((a : A) → B a)
+▹map : ((a : A) → B a)
   → (a : ▹ A) → ▹[ α ] B (a α)
-map▹ f x k = f (x k)
+▹map f x k = f (x k)
 
 Σ▹
   : Σ (▹ A) (λ ▹x → ▹[ α ] B (▹x α))
