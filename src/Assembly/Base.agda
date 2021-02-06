@@ -89,23 +89,24 @@ _∘_ {X = X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = (λ x → g (f x)) , ƛ 
 
 -- TODO: Show that ⊤ is terminal
 ⊤ₐ : Asm₀
-⊤ₐ = Unit , asmstr `⊤ _⊩_  λ {tt → ∣ ⟨⟩ , tt ∣}
+⊤ₐ = Unit , asmstr `⊤ _⊩_  λ {tt → ∣ `tt , tt ∣}
   where
     _⊩_ : Prog `⊤ → Unit → 𝓤₀ ̇
-    ⟨⟩ ⊩ tt = Unit
-    _  ⊩ _  = ⊥
-
+    _ ⊩ _ = Unit
+    
 ℕₐ : Asm₀
 ℕₐ = ℕ , asmstr nat _⊩_ realisable
   where
+    open -↠-Reasoning
     _⊩_ : Prog nat → ℕ → 𝓤₀ ̇
-    zero    ⊩ 0       = Unit
-    (suc M) ⊩ (suc n) = M ⊩ n
-    _       ⊩ _       = ⊥
+    M ⊩ zero  = M -↠ zero
+    M ⊩ suc n = Σ[ N ꞉ Prog nat ] (N ⊩ n) × (M -↠ suc N)
 
     realisable : Π[ n ꞉ ℕ ] ∃[ M ꞉ Prog nat ] (M ⊩ n)
-    realisable zero    = ∣ zero , tt ∣
-    realisable (suc n) = rec propTruncIsProp (λ { (M , M⊩n) → ∣ suc M , M⊩n ∣}) (realisable n)
+    realisable zero    = ∣ zero , -↠-refl ∣
+    realisable (suc n) = rec propTruncIsProp
+      (λ {(N , N⊩n) → ∣ suc N , N , N⊩n , -↠-refl ∣  })
+      (realisable n)
     
 _×ₐ_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
 X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A `× B) _⊩_ realisable
@@ -115,11 +116,11 @@ X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A `× B) _⊩_ realisable
     open AsmStr (str Y) renaming (type to B; _⊩_ to _⊩y_; _isRealisable to _isRealisable₂)
 
     _⊩_ : Prog (A `× B) → ⟨ X ⟩ × ⟨ Y ⟩ → _
-    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] (L -↠ (M , N)) × (M ⊩x x) × (N ⊩y y)
+    L ⊩ (x , y) = Σ[ M ꞉ Prog A ] Σ[ N ꞉ Prog B ] (L -↠ `⟨ M , N ⟩) × (M ⊩x x) × (N ⊩y y)
 
     realisable : Π[ z ꞉ ⟨ X ⟩ × ⟨ Y ⟩ ] ∃[ a ꞉ Prog (A `× B) ] a ⊩ z
     realisable (x , y) = rec propTruncIsProp
-      (λ { (M , M⊩x) → rec propTruncIsProp (λ {(N , N⊩y) → ∣ (M , N) , M , N , (_ ∎) , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
+      (λ { (M , M⊩x) → rec propTruncIsProp (λ {(N , N⊩y) → ∣ `⟨ M , N ⟩ , M , N , -↠-refl , M⊩x , N⊩y ∣ }) (y isRealisable₂) })
       (x isRealisable₁)
 
 --_⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
@@ -136,7 +137,6 @@ X ×ₐ Y = ⟨ X ⟩ × ⟨ Y ⟩ , asmstr (A `× B) _⊩_ realisable
 𝔗 : 𝕋 → Asm 𝓤₀
 𝔗 A = Prog A , asmstr A _≡_ λ M → ∣ M , refl ∣
 
-  
 -- ∇₀_ : (X : 𝓤 ̇) → Asm 𝓤
 -- ∇₀ X = X , asmstr {!!} _⊩∇_ ⊩∇-is-a-realisabiltiy
 --   where
