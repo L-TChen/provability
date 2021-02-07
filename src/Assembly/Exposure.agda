@@ -57,7 +57,7 @@ module _ (Q : Quoting) where
       ⊩□X-right-total (A , M , ▹x , M⊩x) = ∣ nat , ⌜ M ⌝ , lift -↠-refl ∣
 
   □map : Trackable X Y → Trackable (□ X) (□ Y)
-  □map {𝓤} {X} {Y} (f , hastracker T F F⊩f) = □f , hastracker (λ _ → nat) {!!} {!!} -- □F □F⊩□f
+  □map {𝓤} {X} {Y} (f , hastracker T F F⊩f) = □f , hastracker (λ _ → nat) □F □F⊩□f
     where
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
@@ -67,14 +67,24 @@ module _ (Q : Quoting) where
       □f (A , M , ▹x , M⊩x) = T A , F [ M ] , ▹map f ▹x , λ α → F⊩f (M⊩x α) 
 
       □F : ∀ {A} → A , ∅ ⊢ nat
-      □F = {!!}
+      □F {nat}    = ↑ Ap · (↑ ⌜ ƛ F ⌝) · (# 0)
+      □F {`⊤}     = `zero
+      □F {`⊥}     = `zero
+      □F {_ `× _} = `zero
+      □F {_ `→ _} = `zero
 
       □F⊩□f : Tracks (□ X) (□ Y) □F □f
-      □F⊩□f {nat} {n̅} {A , M , ▹x , M⊩x}    (lift n̅-↠⌜M⌝) = {!!}
-     -- lift (begin
-     --   ↑₁ Ap [ n̅ ] · ↑₁ ⌜ {!!} ⌝ [ n̅ ] · n̅
-     --     -↠⟨ {!!} ⟩
-     --   ⌜ F [ M ] ⌝ ∎)
+      □F⊩□f {nat} {n̅} {A , M , ▹x , M⊩x} (lift n̅-↠⌜M⌝) = lift (begin
+        ↑ Ap [ n̅ ] · ↑ ⌜ ƛ F ⌝ [ n̅ ] · n̅
+          -↠⟨ ·ᵣ-↠ n̅-↠⌜M⌝ ⟩
+        ↑ Ap [ n̅ ] · ↑ ⌜ ƛ F ⌝ [ n̅ ] · ⌜ M ⌝
+          ≡⟨ cong₂ (λ L N → L · N · ⌜ M ⌝) (subst-↑ _ Ap) (subst-↑ _ ⌜ ƛ F ⌝) ⟩
+        Ap · ⌜ ƛ F ⌝ · ⌜ M ⌝
+          -↠⟨ {!Ap-↠!} ⟩
+        ⌜ (ƛ F) · M ⌝
+          -↠⟨ {!!} ⟩ -- one-step reducer
+        ⌜ F [ M ] ⌝
+          ∎)
 
       -- 1. n̅ -↠ ⌜ M ⌝ by assumption
       -- ⌜ (ƛ F) · M ⌝ -↠ ⌜ F [ M ] ⌝

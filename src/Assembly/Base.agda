@@ -117,7 +117,7 @@ finality (|X| , ⊩ , _isRealisable) = (λ _ → tt*) , hastracker _ `tt λ M⊩
 
 -- -- Uniqueness up to ∼ follows from function extensionality.
 initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
-initiality {𝓤} X@(|X| , _⊩_ , _isRealisable) = ⊥*-elim , hastracker _ `zero (λ { {x = ()} })
+initiality {𝓤} X@(|X| , _⊩_ , _isRealisable) = ⊥*-elim , hastracker _ `tt (λ { {x = ()} })
 
 ⊩ℕ : (A : 𝕋) → Prog A → ℕ → 𝓤₀ ̇
 ⊩ℕ nat M zero    = M -↠ `zero
