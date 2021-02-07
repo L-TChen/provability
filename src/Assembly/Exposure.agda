@@ -29,90 +29,65 @@ record EndoExposure : 𝓤 ⁺ ̇ where
   field
     Q          : Asm 𝓤 → Asm 𝓤
     isExposure : IsEndoExposure Q
-    
+
 module _ (Q : Quoting) where
   open Quoting Q
   open -↠-Reasoning
 
   □_ : Asm 𝓤 → Asm 𝓤
-  □ (|X| , asmstr A _⊩_ _isRealisableₓ) = |□X| , asmstr nat _⊩□x_  _isRealisable
+  □_ {𝓤} X@(|X| , ⊩ , is⊩ ⊩-respect-↠ ⊩-right-total) = |□X| , ⊩□X , is⊩ ⊩□X-respect-↠ ⊩□X-right-total
     where
-    -- □ X consists of terms of type `nat` which reduces to a literal
-    -- of a Gödel numbering, this reflects the fact that a well-typed
-    -- metaprogram may produce a representation containing β-redexs.
-      |□X| : (universe-of |X|) ̇
-      |□X| =
-        Σ[ n̅ ꞉ Prog nat ] Σ[ ▹x ꞉ ▹ |X| ] ▹[ α ] ∃[ M ꞉ Prog A ]
-        -- n̅ -↠ ⌜ M ⌝ × M ⊩ ▹x α
-        n̅ -↠ ⌜ M ⌝ × (Σ[ M′ ꞉ Prog A ] M -↠ M′ × M′ ⊩ ▹x α)
+      module X = AsmStr (str X)
+      |□X| : 𝓤 ̇
+      |□X| = Σ[ A ꞉ 𝕋 ] Σ[ M ꞉ Prog A ] Σ[ ▹x ꞉ ▹ |X| ] ▹[ α ] M X.⊩ ▹x α ⦂ A
 
-      _⊩□x_   : Prog nat → |□X| → _
-      M′ ⊩□x (M , x , M⊩x) = Lift (M′ -↠ M)
+      ⊩□X  : (A : 𝕋) → (M : Prog A) → |□X| → 𝓤 ̇
+      ⊩□X nat n̅ (A , M , ▹x , M⊩▹x) = Lift (n̅ -↠ ⌜ M ⌝)
+      ⊩□X _   _ _                   = ⊥*
 
-      _isRealisable  : Π[ x ꞉ |□X| ] ∃[ M ꞉ Prog nat ] M ⊩□x x
-      (M , x , M⊩x) isRealisable = ∣ M , lift -↠-refl ∣
+      ⊩□X-respect-↠ : {A : 𝕋} {M N : Prog A} {x : |□X|}
+        → M -↠ N → ⊩□X A N x → ⊩□X A M x
+      ⊩□X-respect-↠ {A = nat}     M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
+      ⊩□X-respect-↠ {A = `⊤}      M-↠N ()
+      ⊩□X-respect-↠ {A = `⊥}      M-↠N ()
+      ⊩□X-respect-↠ {A = A `× A₁} M-↠N ()
+      ⊩□X-respect-↠ {A = A `→ A₁} M-↠N ()
+      
+      ⊩□X-right-total : (x : |□X|) → ∃[ A ꞉ 𝕋 ] Σ[ M ꞉ Prog A ] ⊩□X A M x
+      ⊩□X-right-total (A , M , ▹x , M⊩x) = ∣ nat , ⌜ M ⌝ , lift -↠-refl ∣
 
   □map : Trackable X Y → Trackable (□ X) (□ Y)
-  □map {X = X} {Y = Y} (f , F , F⊩f) = □f , □F , realisable
+  □map {𝓤} {X} {Y} (f , hastracker T F F⊩f) = □f , hastracker (λ _ → nat) {!!} {!!} -- □F □F⊩□f
     where
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
       module □X = AsmStr (str (□ X))
       module □Y = AsmStr (str (□ Y))
       □f : ⟨ □ X ⟩ → ⟨ □ Y ⟩
-      □f (n , ▹x , n⊩▹x) = Ap · ⌜ F ⌝ · n , ▹map f ▹x , λ α →
-        let x = ▹x α
---            p : Σ[ M ꞉ Prog X.type ] n -↠ ⌜ M ⌝ × M X.⊩ x
---              → ∃[ N ꞉ Prog Y.type ] Ap · ⌜ F ⌝  · n -↠ ⌜ N ⌝ × N Y.⊩ f x
-            p : Σ[ M ꞉ Prog X.type ] n -↠ ⌜ M ⌝ × (Σ[ M′ ꞉ Prog X.type ] M -↠ M′ × M′ X.⊩ x)
-              → ∃[ N ꞉ Prog Y.type ] Ap · ⌜ F ⌝ · n -↠ ⌜ N ⌝ ×
-                  (Σ[ N′ ꞉ Prog Y.type ] N -↠ N′ × N′ Y.⊩ f x) 
-            p = λ {(M , n-↠⌜M⌝ , M′ , M-↠M′ , M′⊩x) →
-              let P = F⊩f M′ x M′⊩x
-                  N = P .fst
-                  FM′-↠N = P .snd .fst
-                  N⊩fx   = P .snd .snd
-                  Ap⌜F⌝n-↠⌜FM⌝ = begin
-                    Ap · ⌜ F ⌝ · n
-                      -↠⟨ ·ᵣ-↠ n-↠⌜M⌝ ⟩
-                    Ap · ⌜ F ⌝ · ⌜ M ⌝
-                      -↠⟨ Ap-↠ ⟩
-                    ⌜ F · M ⌝
-                      ∎
-                  FM-↠N = begin
-                    F · M
-                      -↠⟨ ·ᵣ-↠ M-↠M′ ⟩
-                    F · M′
-                      -↠⟨ FM′-↠N ⟩ 
-                    N
-                      ∎
-              in ∣ F · M , Ap⌜F⌝n-↠⌜FM⌝ , N , FM-↠N , N⊩fx ∣}
-        in rec propTruncIsProp p (n⊩▹x α)
+      □f (A , M , ▹x , M⊩x) = T A , F [ M ] , ▹map f ▹x , λ α → F⊩f (M⊩x α) 
 
-      □F : Prog (nat `→ nat)
-      □F = ƛ ↑ Ap · ↑ ⌜ F ⌝ · (# 0)
+      □F : ∀ {A} → A , ∅ ⊢ nat
+      □F = {!!}
 
-      realisable : Π[ M ꞉ Prog nat ] Π[ x ꞉ ⟨ □ X ⟩ ] (M □X.⊩ x → Σ[ N ꞉ Prog nat ] □F · M -↠ N × N □Y.⊩ □f x)
-      realisable M (N , ▹x , p) (lift M-↠N) = Ap · ⌜ F ⌝ · N , red , lift -↠-refl
-        where
-          red : □F · M -↠ Ap · ⌜ F ⌝ · N
-          red = begin
-            □F · M
-              -→⟨ β-ƛ· ⟩
-            (↑ Ap) [ M ] · ↑ ⌜ F ⌝ [ M ] · M
-              ≡⟨ cong₂ (λ N L → N · L · M) (subst-↑ _ Ap) (subst-↑ _ ⌜ F ⌝) ⟩
-            Ap · ⌜ F ⌝ · M
-              -↠⟨ ·ᵣ-↠ M-↠N ⟩
-            Ap · ⌜ F ⌝ · N
-              ∎
-  
+      □F⊩□f : Tracks (□ X) (□ Y) □F □f
+      □F⊩□f {nat} {n̅} {A , M , ▹x , M⊩x}    (lift n̅-↠⌜M⌝) = {!!}
+     -- lift (begin
+     --   ↑₁ Ap [ n̅ ] · ↑₁ ⌜ {!!} ⌝ [ n̅ ] · n̅
+     --     -↠⟨ {!!} ⟩
+     --   ⌜ F [ M ] ⌝ ∎)
+
+      -- 1. n̅ -↠ ⌜ M ⌝ by assumption
+      -- ⌜ (ƛ F) · M ⌝ -↠ ⌜ F [ M ] ⌝
+      -- Ap · ⌜ ƛ F ⌝ · n̅ -↠ ⌜ F [ M ] ⌝ by
+      -- Ap · ⌜ ƛ F ⌝ · n̅ -↠ Ap · ⌜ ƛ F ⌝ · ⌜ M ⌝ -↠ ⌜ (ƛ F) · M ⌝ -↠ ⌜ F [ M ] ⌝
+
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ ⊥ₐ {𝓤}⟩ → ⊥* {𝓤}) → ▹ ⊥* → ⊥*
-  bang eval⊥ ▹x = eval⊥ (`zero , ▹x , λ α → ⊥*-elim (▹x α))
+  bang eval⊥ ▹x = eval⊥ (nat , `zero , ▹x , λ α → ⊥*-elim (▹x α))
 
   -- Theorem. Evaluation □ ⊥ → ⊥ does not exist.
   eval-does-not-exist : Trackable {𝓤} (□ ⊥ₐ) ⊥ₐ → ⊥*
   eval-does-not-exist (e , hasTracker) = fix (bang e)
 
-  -- quoting-does-not-exist : ({X : Asm 𝓤} → Trackable (𝔗 A) (□ 𝔗 A)) → ⊥
-  -- quoting-does-not-exist = {!!}
+  -- -- quoting-does-not-exist : ({X : Asm 𝓤} → Trackable (𝔗 A) (□ 𝔗 A)) → ⊥
+  -- -- quoting-does-not-exist = {!!}
