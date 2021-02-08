@@ -15,7 +15,11 @@ private
     Ty    : 𝓤 ̇
     Γ Δ   : Context Ty
     A B   : Ty
-    
+
+_⧺_ : Context Ty → Context Ty → Context Ty
+∅       ⧺ Δ = Δ
+(A , Γ) ⧺ Δ = A , Γ ⧺ Δ
+
 module CxtEncodeDecode {Ty : 𝓤 ̇} where
   code : (Γ Δ : Context Ty) → 𝓤 ̇
   code ∅       ∅       = Unit*

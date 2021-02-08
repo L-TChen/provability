@@ -6,7 +6,7 @@ open import Agda.Builtin.FromNat                 public
   renaming (Number to HasFromNat)
 
 open import Cubical.Foundations.Everything       public
-  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax)
+  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax; ⋆)
 open import Cubical.Relation.Nullary             public
   hiding (⟪_⟫)
 open import Cubical.HITs.PropositionalTruncation public
@@ -64,6 +64,16 @@ syntax ∃′ {A = A} (λ x → b) = ∃[ x ꞉ A ] b
 
 _➝_ : 𝓤 ̇ → 𝓥 ̇ → 𝓤 ⊔ 𝓥 ̇
 A ➝ B = A → B
+
+------------------------------------------------------------------------------
+-- Some properties about relation
+
+_respects_on-the-left : {A : 𝓤 ̇} {B : 𝓥 ̇}
+  → (_≈_ : A → B → 𝓤 ⊔ 𝓥 ̇) → (_∼_ : A → A → 𝓤 ̇) → 𝓤 ⊔ 𝓥 ̇
+_respects_on-the-left {𝓤} {𝓥} {A} {B} _≈_ _∼_ = {x x′ : A} {y : B} → x ∼ x′ → x′ ≈ y → x ≈ y
+
+IsRightTotal : {A : 𝓤 ̇} {B : 𝓥 ̇} (_≈_ : A → B → 𝓤 ⊔ 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
+IsRightTotal {𝓤} {𝓥} {A} {B} _≈_ = (y : B) → ∃[ x ꞉ A ] (x ≈ y)
 
 ------------------------------------------------------------------------
 -- Some simple functions

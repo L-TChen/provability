@@ -2,19 +2,19 @@
 
 -- System T
 
-module Calculus.SystemT.Substitution where
+module Calculus.Untyped.Substitution where
 
 open import Prelude
 
 open import Calculus.Context
-open import Calculus.SystemT.Base
+open import Calculus.Untyped.Base
 
 ------------------------------------------------------------------------------
 -- Properties of subst, rename
 
 private
   variable
-    A B   : 𝕋
+    A B C : 𝕋
 
 postulate
 --  rename-cong : {ρ ρ′ : Rename Γ Δ} → (∀ {A} → ρ {A} ≗ ρ′ {A}) → (M : Γ ⊢ A) → rename ρ M ≡ rename ρ′ M
@@ -35,5 +35,5 @@ postulate
 --    M
 --  ∎
 
-subst-↑ : (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → ↑ M ⟪ σ ⟫ ≡ M
+subst-↑ : (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → ↑ M ⟪ σ ⟫ ≡ M  -- ↑ M ⟪ σ ⟫ ≡ M
 subst-↑ = subst-rename-∅ λ ()

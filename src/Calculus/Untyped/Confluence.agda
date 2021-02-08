@@ -1,11 +1,9 @@
 {-# OPTIONS --without-K --cubical #-}
 
--- System T
-
-module Calculus.SystemT.Confluence where
+module Calculus.Untyped.Confluence where
 
 open import Prelude
-open import Calculus.SystemT.Base
+open import Calculus.Untyped.Base
 
 private
   variable
@@ -24,6 +22,6 @@ Normal⇒Path : Normal M₁ → Normal M₂
   → L -↠ M₁ → L -↠ M₂
   → M₁ ≡ M₂
 Normal⇒Path nM₁ nM₂ L-↠M₁ L-↠M₂ with confluence L-↠M₁ L-↠M₂
-... | N , (.N ∎ , _ ∎)                       = refl
-... | N , ((_ -→⟨ M₁-→M ⟩ _) , _)                 = ⊥-elim (nM₁ M₁-→M)
-... | N , (_ ∎               , _ -→⟨ M₂-→M ⟩ _) = ⊥-elim (nM₂ M₂-→M)
+... | N , (.N ∎ , _ ∎)                          = refl
+... | N , ((_ -→⟨ M₁-→M ⟩ _) , _)               = ⊥-elim (normal-does-not-reduce nM₁ M₁-→M)
+... | N , (_ ∎               , _ -→⟨ M₂-→M ⟩ _) = ⊥-elim (normal-does-not-reduce nM₂ M₂-→M)
