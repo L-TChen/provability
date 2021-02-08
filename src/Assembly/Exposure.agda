@@ -35,7 +35,8 @@ module _ (Q : Quoting) where
   open -↠-Reasoning
 
   □_ : Asm 𝓤 → Asm 𝓤
-  □_ {𝓤} X@(|X| , _⊩_ , ⊩-realisability) = |□X| , _⊩□X_ , is⊩ ? ⊩□X-right-total
+  □_ {𝓤} X@(|X| , _⊩_ , ⊩-realisability) = |□X| , _⊩□X_ ,
+    is⊩ (λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}) ⊩□X-right-total
     where
       module X = IsRealisability ⊩-realisability
       |□X| : 𝓤 ̇
@@ -51,7 +52,8 @@ module _ (Q : Quoting) where
       ⊩□X-right-total (M , ▹x , M⊩x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
 
   □map : Trackable X Y → Trackable (□ X) (□ Y)
-  □map {𝓤} {X} {Y} (f , hastracker {F} F⊩f) = □f , hastracker (□F⊩□f {{!!}} {{!!}})
+  □map {𝓤} {X} {Y} (f , hastracker {F} F⊩f) = □f ,
+    hastracker λ {M} {x} → □F⊩□f {M} {x}
     where
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
@@ -70,7 +72,7 @@ module _ (Q : Quoting) where
         ↑ Ap [ n̅ ] · ↑ ⌜ F ⌝ [ n̅ ] · n̅
           -↠⟨ ·ᵣ-cong n̅-↠⌜M⌝ ⟩
         ↑ Ap [ n̅ ] · ↑ ⌜ F ⌝ [ n̅ ] · ⌜ M ⌝
-          ≡⟨ {!!} ⟩
+          ≡⟨ cong₂ (λ L N → L · N · ⌜ M ⌝) (subst-↑ _ Ap) (subst-↑ _ ⌜ F ⌝) ⟩
         Ap · ⌜ F ⌝ · ⌜ M ⌝
           -↠⟨ Ap-↠ ⟩
         ⌜ F · M ⌝ 
