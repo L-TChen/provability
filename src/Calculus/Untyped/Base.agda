@@ -1,19 +1,16 @@
 {-# OPTIONS --without-K --cubical #-}
 
--- System T
-
 module Calculus.Untyped.Base where
 
 open import Prelude
 
-open import Calculus.Context
+open import Calculus.Context      public
   hiding (count)
 open import Calculus.Untyped.Type public
   
 infix  3 _⊢_
 
 infixr 8 ƛ_ ′_
-infix  9 `⟨_,_⟩
 infixl 10 _·_
 
 infixl 11 _[_] _⟪_⟫
@@ -22,7 +19,6 @@ Cxt = Context 𝕋
 
 variable
   Γ Δ Ξ  : Cxt
-
 ------------------------------------------------------------------------------
 -- Typing Rules
 
@@ -43,14 +39,13 @@ data _⊢_ (Γ : Cxt) : 𝕋 → 𝓤₀ ̇ where
 
 private
   variable
-    A B C   : 𝕋
+    A B C          : 𝕋
     M N L M′ N′ L′ : Γ ⊢ A
-
 
 count : {n : ℕ}
   → (p : n < length Γ) → ⋆ ∈ Γ
 count {⋆ , _} {zero}    tt = Z
-count {⋆ , Γ} {(suc n)} p  = S count p --S count Γ p
+count {⋆ , Γ} {(suc n)} p  = S count p
 
 #_ : (n : ℕ)
   → {n∈Γ : True (suc n ≤? length Γ)}
@@ -58,6 +53,12 @@ count {⋆ , Γ} {(suc n)} p  = S count p --S count Γ p
   → Γ ⊢ ⋆
 #_ n {n∈Γ}  = ` count (toWitness n∈Γ)
 
+instance
+  fromNat∈ : HasFromNat (Γ ⊢ ⋆)
+  fromNat∈ {Γ} = record
+    { Constraint = λ n → True (suc n ≤? length Γ)
+    ; fromNat    = λ n ⦃ n∈Γ ⦄ → #_ n {n∈Γ}
+    }
 ------------------------------------------------------------------------------
 -- Variable renaming
 
@@ -67,6 +68,13 @@ rename : Rename Γ Δ
 rename ρ (` x)   = ` ρ x
 rename ρ (ƛ M)   = ƛ rename (ext ρ) M
 rename ρ (M · N) = rename ρ M · rename ρ N
+
+↑_ : ∅ ⊢ A → Γ ⊢ A
+↑ M = rename (λ ()) M
+
+↑₁_ : Δ ⊢ A
+  → ⋆ , Δ ⊢ A
+↑₁_ = rename S_
 
 ↑ᵣ_ : Γ ⊢ A
     → Γ ⧺ Δ ⊢ A
@@ -83,13 +91,6 @@ rename ρ (M · N) = rename ρ M · rename ρ N
     ρ : Rename Δ (Γ ⧺ Δ)
     ρ {Γ = ∅}     x = x
     ρ {Γ = A , Γ} x = S (ρ x)
-
-↑₁_ : Δ ⊢ A
-  → ⋆ , Δ ⊢ A
-↑₁_ = ↑ₗ_
-
-↑_ : ∅ ⊢ A → Γ ⊢ A
-↑ M = rename (λ ()) M
 ------------------------------------------------------------------------------
 -- Substitution
 
@@ -133,35 +134,6 @@ cut {Γ} {A} {Δ} M N = N ⟪ σ ⟫
     σ Z     = ↑ᵣ M
     σ (S x) = ↑ₗ (` x)
 
-------------------------------------------------------------------------------
--- Some combinators
-
-Λ₀ : 𝓤₀ ̇
-Λ₀ = ∅ ⊢ ⋆
-
-𝑰 𝑲 𝑻 𝑭 : Λ₀
-𝑰 = ƛ # 0
-𝑲 = ƛ ƛ # 1
-𝑻 = 𝑲
-𝑭 = ƛ ƛ # 0
-
-`⟨_,_⟩ : (M N : Λ₀) → Λ₀
-`⟨ M , N ⟩ = ƛ # 0 · (↑ₗ M) · (↑ₗ N)
-
-`projₗ : Λ₀ → Λ₀ 
-`projₗ M = M · 𝑻
-
-`projᵣ : Λ₀ → Λ₀ 
-`projᵣ M = M · 𝑭
-------------------------------------------------------------------------------
--- Church endoing of naturals
-
-pre𝒄_ : ℕ → ⋆ , ⋆ , ∅ ⊢  ⋆
-pre𝒄 zero    = # 0
-pre𝒄 (suc n) = # 1 · pre𝒄 n
-
-𝒄_ : ℕ → Λ₀
-𝒄 n = ƛ ƛ pre𝒄 n 
 ------------------------------------------------------------------------------
 -- Single-step reduction
 
@@ -305,10 +277,11 @@ data Normal where
       ------------
     → Normal (ƛ N)
 
-#′_ : (n : ℕ)
-  → {n∈Γ : True (suc n ≤? length Γ)}
-  → Neutral {Γ} (#_ n {n∈Γ})
-#′_ n {n∈Γ}  =  ` count (toWitness n∈Γ)
+instance
+  fromNatNormal : {n : ℕ} → ⦃ n∈Γ : True (suc n ≤? length Γ) ⦄
+    → HasFromNat (Neutral {Γ} (HasFromNat.fromNat fromNat∈ n))
+  HasFromNat.Constraint fromNatNormal _ = Unit
+  HasFromNat.fromNat    (fromNatNormal {Γ} {n} ⦃ n∈Γ ⦄) _ = ` count {Γ} {n} (toWitness n∈Γ)
 
 neutral-does-not-reduce : Neutral M → M -→ N → ⊥
 normal-does-not-reduce  : Normal M → M -→ N → ⊥

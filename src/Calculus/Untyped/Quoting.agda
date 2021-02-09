@@ -6,6 +6,7 @@ open import Prelude
 
 open import Calculus.Context
 open import Calculus.Untyped.Base
+open import Calculus.Untyped.Combinators
 open import Calculus.Untyped.Substitution
 open import Calculus.Untyped.Confluence
  
@@ -34,7 +35,7 @@ record Quoting : 𝓤₀ ̇ where
   open -↠-Reasoning
   postulate
     quoting-not-definable : ¬ (Σ[ Q ꞉ Λ₀ ] Π[ M ꞉ Λ₀ ] Q · M -↠ ⌜ M ⌝)
-    I·x≠x : ↑₁ 𝑰 · # 0 ≢ # 0
+    I·x≠x : ↑₁ 𝑰 · 0 ≢ 0
 
   --     ⌜I·M⌝=⌜M⌝ = Normal⇒Path (⌜⌝-normal (𝐼 · `zero)) (⌜⌝-normal `zero) (QM=⌜M⌝ (𝐼 · `zero)) QI0-↠⌜0⌝
 
