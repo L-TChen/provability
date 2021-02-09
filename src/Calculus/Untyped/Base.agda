@@ -94,7 +94,7 @@ rename ρ (M · N) = rename ρ M · rename ρ N
 ------------------------------------------------------------------------------
 -- Substitution
 
-Subst : Cxt → Cxt → Set
+Subst : Cxt → Cxt → 𝓤₀ ̇
 Subst Γ Δ = (∀ {A} → A ∈ Γ → Δ ⊢ A)
 
 exts
@@ -138,7 +138,7 @@ cut {Γ} {A} {Δ} M N = N ⟪ σ ⟫
 -- Single-step reduction
 
 infix 6 _-→_
-data _-→_ {Γ : Cxt} : {A : 𝕋} → Γ ⊢ A → Γ ⊢ A → Set where
+data _-→_ {Γ : Cxt} : {A : 𝕋} → Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
   β : (ƛ M) · N -→ M [ N ]
 
   ζ
@@ -295,7 +295,7 @@ normal-does-not-reduce (ƛ M) (ζ M-→N) = normal-does-not-reduce M M-→N
 ------------------------------------------------------------------------------
 -- Progress theorem i.e. one-step evaluator
 
-data Progress (M : Γ ⊢ A) : Set where
+data Progress (M : Γ ⊢ A) : 𝓤₀ ̇ where
   step
     : M -→ N
       ----------

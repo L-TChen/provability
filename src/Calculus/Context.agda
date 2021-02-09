@@ -5,6 +5,7 @@ module Calculus.Context where
 open import Prelude
 
 infix  3 _∈_
+infixr 4 _⧺_
 
 data Context (Ty : 𝓤 ̇) : 𝓤 ̇ where
   ∅   : Context Ty
