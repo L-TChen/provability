@@ -33,8 +33,7 @@ module CxtEncodeDecode {T : 𝓤 ̇} where
   code : (Γ Δ : Context T) → 𝓤 ̇
   code ∅       ∅       = Unit*
   code (A , Γ) (B , Δ) = (A ≡ B) × code Γ Δ
-  code ∅       (_ , _) = ⊥*
-  code (_ , _) ∅       = ⊥*
+  code _       _       = ⊥*
 
   r : (Γ : Context T) → code Γ Γ
   r ∅       = tt*
@@ -79,8 +78,8 @@ ext
   : (∀ {A : T} →       A ∈ Γ →     A ∈ Δ)
     ------------------------------------------
   → (∀ {A B : T} → A ∈ B , Γ → A ∈ B , Δ)
-ext ρ (Z p)  =  Z p
-ext ρ (S x)  =  S (ρ x)
+ext ρ (Z p) =  Z p
+ext ρ (S x) =  S (ρ x)
 
 Rename : {T : 𝓤 ̇} → Context T → Context T → 𝓤 ̇ 
 Rename {T = T} Γ Δ = {A : T} → A ∈ Γ → A ∈ Δ
@@ -89,8 +88,7 @@ module ∈EncodeDecode where
   code : {T : 𝓤 ̇} {A : T} {Γ : Context T} (x y : A ∈ Γ) → 𝓤 ̇
   code (Z p) (Z q) = p ≡ q
   code (S x) (S y) = code x y
-  code (Z _) (S _) = ⊥*
-  code (S _) (Z _) = ⊥*
+  code _     _     = ⊥*
 
   r : (x : A ∈ Γ) → code x x
   r (Z _) = refl
