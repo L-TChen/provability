@@ -10,7 +10,7 @@ open ≡-Reasoning
 
 private
   variable
-    A B C : 𝕋
+    A B C   : 𝕋
     ρ ρ₁ ρ₂ : Rename Γ Δ
     σ σ₁ σ₂ : Subst Γ Δ
 
@@ -150,25 +150,23 @@ punchesIn-punchIn-comm {Ξ = C , Ξ} σ (S p) = begin
 
 punchIn-punchesIn-comm : (σ : Subst Γ Δ)
   → (M : Ξ ⧺ Γ ⊢ A)
-  → rename (punchIn B Ξ) M ⟪ punchesIn Ξ (exts σ) ⟫
-   ≡ rename (punchIn B Ξ) (M ⟪ punchesIn Ξ σ ⟫)
-punchIn-punchesIn-comm σ (` x)      = punchesIn-punchIn-comm σ x
-punchIn-punchesIn-comm σ (M · N)    = cong₂ _·_ (punchIn-punchesIn-comm σ M) (punchIn-punchesIn-comm σ N)
-punchIn-punchesIn-comm σ (ƛ M) = {!!}
-{- cong ƛ_ (begin
-  rename (ext (punchIn _ _)) M ⟪ exts (punchesIn _ (exts σ)) ⟫
-    ≡⟨ cong _⟪ exts (punchesIn _ (exts σ)) ⟫ (rename-cong ext-punchIn=punchIn M) ⟩
-  rename (punchIn _ (_ , _)) M ⟪ exts (punchesIn _ (exts σ)) ⟫
-    ≡⟨ subst-cong exts-punchesIn=punchesIn (rename (punchIn _ (_ , _)) M) ⟩
-  rename (punchIn _ (_ , _)) M ⟪ punchesIn (_ , _) (exts σ) ⟫
-    ≡⟨ punchIn-punchesIn-comm σ M ⟩
-  rename (punchIn _ (_ , _)) (M ⟪ punchesIn (_ , _) σ ⟫)
-    ≡⟨ rename-cong (sym ∘ ext-punchIn=punchIn) (M ⟪ punchesIn (_ , _) σ ⟫) ⟩
-  rename (ext (punchIn _ _)) (M ⟪ punchesIn (_ , _) σ ⟫)
-    ≡⟨ cong (rename (ext (punchIn _ _))) (subst-cong (sym ∘ exts-punchesIn=punchesIn) M) ⟩
-  rename (ext (punchIn _ _)) (M ⟪ exts (punchesIn _ σ) ⟫)
-    ∎)
--}
+  → rename (punchIn B Ξ) M ⟪ punchesIn Ξ (exts σ) ⟫ ≡ rename (punchIn B Ξ) (M ⟪ punchesIn Ξ σ ⟫)
+punchIn-punchesIn-comm σ (` x)     = punchesIn-punchIn-comm σ x
+punchIn-punchesIn-comm σ (M · N) i = (punchIn-punchesIn-comm σ M i) · (punchIn-punchesIn-comm σ N i)
+punchIn-punchesIn-comm {Γ} {Δ} {Ξ} σ (ƛ M) = begin
+  rename (punchIn _ Ξ) (ƛ M) ⟪ punchesIn Ξ (exts σ) ⟫
+    ≡⟨⟩
+  ƛ rename (ext (punchIn _ _)) M ⟪ exts (punchesIn _ (exts σ)) ⟫
+    ≡⟨ cong (ƛ_ ∘ _⟪ exts (punchesIn _ (exts σ)) ⟫) (rename-cong ext-punchIn=punchIn M) ⟩
+  ƛ rename (punchIn _ (_ , _)) M ⟪ exts (punchesIn _ (exts σ)) ⟫
+    ≡⟨ cong ƛ_ (subst-cong exts-punchesIn=punchesIn (rename (punchIn _ (_ , _)) M)) ⟩
+  ƛ rename (punchIn _ (_ , _)) M ⟪ punchesIn (_ , _) (exts σ) ⟫
+    ≡⟨ cong ƛ_ (punchIn-punchesIn-comm σ M) ⟩
+  ƛ rename (punchIn _ (_ , _)) (M ⟪ punchesIn (_ , _) σ ⟫)
+    ≡⟨ cong ƛ_ (rename-cong (sym ∘ ext-punchIn=punchIn) (M ⟪ punchesIn (_ , _) σ ⟫)) ⟩
+  ƛ rename (ext (punchIn _ _)) (M ⟪ punchesIn (_ , _) σ ⟫)
+    ≡⟨ cong (ƛ_ ∘ rename (ext (punchIn _ _))) (subst-cong (sym ∘ exts-punchesIn=punchesIn) M) ⟩
+  ƛ rename (ext (punchIn _ _)) (M ⟪ exts (punchesIn _ σ) ⟫) ∎
 
 rename-exts : (σ : Subst Γ Δ)
   → (M : Γ ⊢ A)
