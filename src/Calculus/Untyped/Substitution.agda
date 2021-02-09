@@ -41,6 +41,7 @@ subst-cong
   → M ⟪ σ₁ ⟫ ≡ M ⟪ σ₂ ⟫
 subst-cong p (` x)    = p x
 subst-cong p (M · N)  = cong₂ _·_ (subst-cong p M) (subst-cong p N)
+
 subst-cong p (ƛ M)    = cong ƛ_ (subst-cong 
   (λ {(Z _) → refl ; (S x) → cong (rename S_) (p x)}) M)
 
@@ -98,8 +99,7 @@ rename-comp ρ₁ ρ₂ {M = ƛ M}   =
   ƛ rename (ext (ρ₂ ∘ ρ₁)) M
     ≡⟨⟩
   rename (ρ₂ ∘ ρ₁) (ƛ M) ∎
-  where
-    open ≡-Reasoning
+  where open ≡-Reasoning
 
 ----------------------------------------------------------------------
 -- punchIn: Weakening at any position
@@ -149,8 +149,7 @@ punchesIn-punchIn-comm {Ξ = C , Ξ} σ (S p) = begin
     ≡⟨ sym (rename-comp S_ (punchIn _ (C , Ξ))) ⟩
   rename (punchIn _ (C , Ξ)) (rename S_ (punchesIn Ξ σ p))
     ∎
-  where
-    open ≡-Reasoning
+  where open ≡-Reasoning
 
 punchIn-punchesIn-comm : (σ : Subst Γ Δ)
   → (M : Ξ ⧺ Γ ⊢ A)
@@ -266,26 +265,23 @@ rename-subst ρ σ M = begin
     ≡⟨⟩
   M ⟪ σ ∘ ρ ⟫
     ∎
-  where
-    open ≡-Reasoning
+  where open ≡-Reasoning
 
 subst-zero-comm : (σ : Subst Γ Δ)
-  → (N : Γ ⊢ B) (x : A ∈ B , Γ)
-  → (exts σ ⨟ subst-zero (N ⟪ σ ⟫)) x ≡ (subst-zero N ⨟ σ) x
-subst-zero-comm         σ N (Z _) = {!!}
-subst-zero-comm {Γ} {Δ} σ N (S x) = begin
-  (rename S_ (σ x)) ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
-    ≡⟨ cong (_⟪ subst-zero (N ⟪ σ ⟫) ⟫) (rename=subst-ren (σ x)) ⟩
-  σ x ⟪ ren S_ ⟫ ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
-    ≡⟨ subst-assoc (ren S_) (subst-zero (N ⟪ σ ⟫)) (σ x) ⟩
-  σ x ⟪ subst-zero (N ⟪ σ ⟫) ∘ S_ ⟫ 
+  → (N : Γ ⊢ B) (p : A ∈ B , Γ)
+  → (exts σ ⨟ subst-zero (N ⟪ σ ⟫)) p ≡ (subst-zero N ⨟ σ) p
+subst-zero-comm         σ N (Z A=B) = {!!}
+subst-zero-comm {Γ} {Δ} σ N (S p) = begin
+  (rename S_ (σ p)) ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
+    ≡⟨ cong (_⟪ subst-zero (N ⟪ σ ⟫) ⟫) (rename=subst-ren (σ p)) ⟩
+  σ p ⟪ ren S_ ⟫ ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
+    ≡⟨ subst-assoc (ren S_) (subst-zero (N ⟪ σ ⟫)) (σ p) ⟩
+  σ p ⟪ subst-zero (N ⟪ σ ⟫) ∘ S_ ⟫ 
     ≡⟨ refl ⟩
-  σ x ⟪ ids ⟫ 
-    ≡⟨ subst-idL (σ x) ⟩
-  σ x
-    ∎
-  where
-    open ≡-Reasoning
+  σ p ⟪ ids ⟫ 
+    ≡⟨ subst-idL (σ p) ⟩
+  σ p ∎
+  where open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Substitution Lemma
@@ -303,8 +299,7 @@ subst-ssubst σ M N = begin
     ≡⟨ sym (subst-assoc (subst-zero N) σ M) ⟩
   (M ⟪ subst-zero N ⟫) ⟪ σ ⟫ 
     ∎
-  where
-    open ≡-Reasoning
+  where open ≡-Reasoning
 
 rename-ssubst : (ρ : Rename Γ Δ)
   → (M : A , Γ ⊢ B) (N : Γ ⊢ A)
@@ -322,8 +317,7 @@ rename-ssubst ρ M N = begin
     ≡⟨ sym (rename=subst-ren _) ⟩
   rename ρ (M [ N ])
     ∎
-  where
-    open ≡-Reasoning
+  where open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Substitution respects reduction
@@ -357,8 +351,7 @@ subst-rename-∅ ρ σ M = begin
   M ⟪ ids ⟫
     ≡⟨ subst-idL M ⟩ 
   M ∎
-  where
-    open ≡-Reasoning
+  where open ≡-Reasoning
 
 subst-↑ : (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → ↑ M ⟪ σ ⟫ ≡ M 
 subst-↑ = subst-rename-∅ λ ()
