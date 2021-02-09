@@ -44,7 +44,7 @@ private
 
 count : {n : ℕ}
   → (p : n < length Γ) → ⋆ ∈ Γ
-count {⋆ , _} {zero}    tt = Z
+count {⋆ , _} {zero}    tt = Z refl
 count {⋆ , Γ} {(suc n)} p  = S count p
 
 #_ : (n : ℕ)
@@ -81,7 +81,7 @@ rename ρ (M · N) = rename ρ M · rename ρ N
 ↑ᵣ M = rename ρ M
   where
     ρ : Rename Γ (Γ ⧺ Δ)
-    ρ Z     = Z
+    ρ (Z p) = Z p
     ρ (S x) = S ρ x
 
 ↑ₗ_ : Δ ⊢ A
@@ -100,7 +100,7 @@ Subst Γ Δ = (∀ {A} → A ∈ Γ → Δ ⊢ A)
 exts
   : Subst Γ Δ
   → Subst (A , Γ) (A , Δ)
-exts σ Z     = ` Z
+exts σ (Z p) = ` Z p
 exts σ (S p) = rename S_ (σ p)
 
 _⟪_⟫
@@ -114,8 +114,8 @@ _⟪_⟫
 subst-zero
   : Γ ⊢ A
   → Subst (A , Γ) Γ
-subst-zero N Z     = N
-subst-zero N (S x) = ` x
+subst-zero N (Z p) = subst (_ ⊢_) p N 
+subst-zero _ (S x)         = ` x
 
 _[_] : B , Γ ⊢ A
      → Γ ⊢ B
@@ -131,7 +131,7 @@ cut : Γ ⊢ A
 cut {Γ} {A} {Δ} M N = N ⟪ σ ⟫
   where
     σ : Subst (A , Δ) (Γ ⧺ Δ)
-    σ Z     = ↑ᵣ M
+    σ (Z p) = ↑ᵣ subst (_ ⊢_) p M
     σ (S x) = ↑ₗ (` x)
 
 ------------------------------------------------------------------------------

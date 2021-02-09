@@ -102,6 +102,9 @@ suc m ≤? suc n = m ≤? n
 record DecEq (A : 𝓤 ̇) : 𝓤 ̇ where
   field
     _≟_ : (x y : A) → Dec (x ≡ y)
+    
+  ≟→isSet : isSet A
+  ≟→isSet = Discrete→isSet _≟_
 
 open DecEq ⦃ ... ⦄ public
 

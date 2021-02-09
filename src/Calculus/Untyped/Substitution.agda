@@ -52,7 +52,7 @@ rename-cong p (M · N) i = rename-cong p M i · rename-cong p N i
 rename-cong {ρ₁ = ρ₁} {ρ₂} p (ƛ M) i = ƛ rename-cong ρ M i
   where
     ρ : (x : A ∈ ⋆ , _) → ext ρ₁ x ≡ ext ρ₂ x
-    ρ Z       = refl
+    ρ (Z _)   = refl
     ρ (S x) i = S p x i
 
 subst-cong : {σ₁ σ₂ : Subst Γ Δ}
@@ -62,7 +62,7 @@ subst-cong : {σ₁ σ₂ : Subst Γ Δ}
 subst-cong p (` x)    = p x
 subst-cong p (M · N)  = cong₂ _·_ (subst-cong p M) (subst-cong p N)
 subst-cong p (ƛ M)    = cong ƛ_ (subst-cong 
-  (λ {Z → refl ; (S x) → cong (rename S_) (p x)}) M)
+  (λ {(Z _) → refl ; (S x) → cong (rename S_) (p x)}) M)
 
 ----------------------------------------------------------------------
 -- Properties of ext 
@@ -70,7 +70,7 @@ subst-cong p (ƛ M)    = cong ƛ_ (subst-cong
 ext-comp : (ρ₁ : Rename Γ Δ) (ρ₂ : Rename Δ Ξ)
   → (x : A ∈ B , Γ)
   → (ext ρ₂ ∘ ext ρ₁) x ≡ ext (ρ₂ ∘ ρ₁) x
-ext-comp ρ₁ ρ₂ Z     = refl
+ext-comp ρ₁ ρ₂ (Z _) = refl
 ext-comp ρ₁ ρ₂ (S x) = refl
 
 ----------------------------------------------------------------------
@@ -99,7 +99,7 @@ rename=subst-ren {ρ = ρ} (ƛ M) =
   where
     ren-ext : (ρ : Rename Γ Δ)
       → ∀ {B} (x : B ∈ A , Γ) → ren (ext ρ) x ≡ exts (ren ρ) x
-    ren-ext ρ Z     = refl
+    ren-ext ρ (Z _) = refl
     ren-ext ρ (S x) = refl
 
 rename-comp
