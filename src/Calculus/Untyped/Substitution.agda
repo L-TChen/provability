@@ -6,7 +6,6 @@ open import Prelude
 open import Calculus.Context
 open import Calculus.Untyped.Base
 
-open ≡-Reasoning
 
 private
   variable
@@ -32,7 +31,7 @@ rename-cong p (` x)   i = ` p x i
 rename-cong p (M · N) i = rename-cong p M i · rename-cong p N i
 rename-cong {ρ₁ = ρ₁} {ρ₂} p (ƛ M) i = ƛ rename-cong rho M i
   where
-    rho : (x : A ∈ ⋆ , _) → ext ρ₁ x ≡ ext ρ₂ x
+    rho : (x : A ∈ B , _) → ext ρ₁ x ≡ ext ρ₂ x
     rho (Z _)   = refl
     rho (S x) i = S p x i
 
@@ -77,6 +76,7 @@ rename=subst-ren {ρ = ρ} (ƛ M) =
     ≡⟨⟩
   (ƛ M) ⟪ ren ρ ⟫ ∎
   where
+    open ≡-Reasoning
     ren-ext : (ρ : Rename Γ Δ)
       → ∀ {B} (x : B ∈ A , Γ) → ren (ext ρ) x ≡ exts (ren ρ) x
     ren-ext ρ (Z _) = refl
@@ -98,6 +98,8 @@ rename-comp ρ₁ ρ₂ {M = ƛ M}   =
   ƛ rename (ext (ρ₂ ∘ ρ₁)) M
     ≡⟨⟩
   rename (ρ₂ ∘ ρ₁) (ƛ M) ∎
+  where
+    open ≡-Reasoning
 
 ----------------------------------------------------------------------
 -- punchIn: Weakening at any position
@@ -147,6 +149,8 @@ punchesIn-punchIn-comm {Ξ = C , Ξ} σ (S p) = begin
     ≡⟨ sym (rename-comp S_ (punchIn _ (C , Ξ))) ⟩
   rename (punchIn _ (C , Ξ)) (rename S_ (punchesIn Ξ σ p))
     ∎
+  where
+    open ≡-Reasoning
 
 punchIn-punchesIn-comm : (σ : Subst Γ Δ)
   → (M : Ξ ⧺ Γ ⊢ A)
@@ -167,6 +171,8 @@ punchIn-punchesIn-comm {Γ} {Δ} {Ξ} σ (ƛ M) = begin
   ƛ rename (ext (punchIn _ _)) (M ⟪ punchesIn (_ , _) σ ⟫)
     ≡⟨ cong (ƛ_ ∘ rename (ext (punchIn _ _))) (subst-cong (sym ∘ exts-punchesIn=punchesIn) M) ⟩
   ƛ rename (ext (punchIn _ _)) (M ⟪ exts (punchesIn _ σ) ⟫) ∎
+  where
+    open ≡-Reasoning
 
 rename-exts : (σ : Subst Γ Δ)
   → (M : Γ ⊢ A)
@@ -180,6 +186,8 @@ rename-exts σ M = begin
     ≡⟨ rename-cong (sym ∘ S=punchIn) (M ⟪ σ ⟫) ⟩
   rename S_ (M ⟪ σ ⟫)
     ∎ 
+  where
+    open ≡-Reasoning
 
 ren-ext-comm : (ρ : Rename Γ Δ)
     → (x : A ∈ B , Γ)
@@ -206,6 +214,7 @@ subst-idL (ƛ_ M)     = begin
     ≡⟨ cong ƛ_ (subst-idL M) ⟩
   ƛ M  ∎
   where
+    open ≡-Reasoning
     exts-ids=ids : (x : B ∈ A , Γ) → (exts ids) x ≡ ids x
     exts-ids=ids (Z _) = refl
     exts-ids=ids (S _) = refl
@@ -227,6 +236,7 @@ subst-assoc σ₁ σ₂ (ƛ M)      = begin
     ≡⟨⟩
   (ƛ M) ⟪ σ₁ ⨟ σ₂ ⟫ ∎
   where
+    open ≡-Reasoning
     exts-subst : (σ₁ : Subst Γ Δ) (σ₂ : Subst Δ Ξ)
       → (x : A ∈ B , Γ) 
       → (exts σ₁ ⨟ exts σ₂) x ≡ exts (σ₁ ⨟ σ₂) x
@@ -256,6 +266,8 @@ rename-subst ρ σ M = begin
     ≡⟨⟩
   M ⟪ σ ∘ ρ ⟫
     ∎
+  where
+    open ≡-Reasoning
 
 subst-zero-comm : (σ : Subst Γ Δ)
   → (N : Γ ⊢ B) (x : A ∈ B , Γ)
@@ -272,6 +284,8 @@ subst-zero-comm {Γ} {Δ} σ N (S x) = begin
     ≡⟨ subst-idL (σ x) ⟩
   σ x
     ∎
+  where
+    open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Substitution Lemma
@@ -289,6 +303,8 @@ subst-ssubst σ M N = begin
     ≡⟨ sym (subst-assoc (subst-zero N) σ M) ⟩
   (M ⟪ subst-zero N ⟫) ⟪ σ ⟫ 
     ∎
+  where
+    open ≡-Reasoning
 
 rename-ssubst : (ρ : Rename Γ Δ)
   → (M : A , Γ ⊢ B) (N : Γ ⊢ A)
@@ -306,6 +322,8 @@ rename-ssubst ρ M N = begin
     ≡⟨ sym (rename=subst-ren _) ⟩
   rename ρ (M [ N ])
     ∎
+  where
+    open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Substitution respects reduction
@@ -313,7 +331,9 @@ rename-ssubst ρ M N = begin
 rename-reduce : {ρ : Rename Γ Δ} {M N : Γ ⊢ A}
   → M -→ N
   → rename ρ M -→ rename ρ N
-rename-reduce {ρ = ρ} (β {M = M} {N}) = {!rename-ssubst ρ M N!}
+rename-reduce {ρ = ρ} (β {M = M} {N}) =
+  subst (rename ρ ((ƛ M) · N) -→_) (rename-ssubst ρ M N) β
+  where open -↠-Reasoning
 rename-reduce (ζ M-→N)  = ζ  (rename-reduce M-→N)
 rename-reduce (ξₗ M-→N) = ξₗ (rename-reduce M-→N)
 rename-reduce (ξᵣ M-→N) = ξᵣ (rename-reduce M-→N)
@@ -321,8 +341,9 @@ rename-reduce (ξᵣ M-→N) = ξᵣ (rename-reduce M-→N)
 subst-reduce : {σ : Subst Γ Δ} {M N : Γ ⊢ A}
   → M -→ N
   → M ⟪ σ ⟫ -→ N ⟪ σ ⟫
-subst-reduce {σ = σ} (β {M = M} {N}) = {!!}
---  rewrite Eq.sym (subst-ssubst σ M N) = β-ƛ·
+subst-reduce {σ = σ} (β {M = M} {N}) =
+  subst ((ƛ M) ⟪ σ ⟫ · N ⟪ σ ⟫ -→_) (subst-ssubst σ M N) β
+  where open -↠-Reasoning
 subst-reduce (ζ M-→N)  = ζ  (subst-reduce M-→N)
 subst-reduce (ξₗ M-→N) = ξₗ (subst-reduce M-→N)
 subst-reduce (ξᵣ M-→N) = ξᵣ (subst-reduce M-→N)
@@ -336,6 +357,8 @@ subst-rename-∅ ρ σ M = begin
   M ⟪ ids ⟫
     ≡⟨ subst-idL M ⟩ 
   M ∎
+  where
+    open ≡-Reasoning
 
 subst-↑ : (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → ↑ M ⟪ σ ⟫ ≡ M 
 subst-↑ = subst-rename-∅ λ ()
