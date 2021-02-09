@@ -64,9 +64,9 @@ count {⋆ , Γ} {(suc n)} p  = S count p --S count Γ p
 rename : Rename Γ Δ
   → Γ ⊢ A
   → Δ ⊢ A
-rename ρ (` x)        = ` ρ x
-rename ρ (ƛ M)        = ƛ rename (ext ρ) M
-rename ρ (M · N)      = rename ρ M · rename ρ N
+rename ρ (` x)   = ` ρ x
+rename ρ (ƛ M)   = ƛ rename (ext ρ) M
+rename ρ (M · N) = rename ρ M · rename ρ N
 
 ↑ᵣ_ : Γ ⊢ A
     → Γ ⧺ Δ ⊢ A
@@ -106,9 +106,9 @@ _⟪_⟫
   : Γ  ⊢ A
   → Subst Γ Δ
   → Δ ⊢ A
-(` x)       ⟪ σ ⟫  = σ x
-(ƛ M)       ⟪ σ ⟫  = ƛ M ⟪ exts σ ⟫
-(M · N)     ⟪ σ ⟫  = M ⟪ σ ⟫ · N ⟪ σ ⟫
+(` x)   ⟪ σ ⟫ = σ x
+(ƛ M)   ⟪ σ ⟫ = ƛ M ⟪ exts σ ⟫
+(M · N) ⟪ σ ⟫ = M ⟪ σ ⟫ · N ⟪ σ ⟫
 
 subst-zero
   : Γ ⊢ A

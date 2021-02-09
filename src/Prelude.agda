@@ -84,7 +84,15 @@ id x = x
 module ≡-Reasoning where
   open import Cubical.Foundations.Prelude public
     using (_≡⟨_⟩_; ≡⟨⟩-syntax; _∎)
+
+  infix  1 begin_
+  infixr 2 _≡⟨⟩_
   
+  begin_ : {x y : A} (r : x ≡ y) → x ≡ y
+  begin x=y = x=y
+
+  _≡⟨⟩_ : (x {y} : A) → x ≡ y → x ≡ y
+  x ≡⟨⟩ x≡y = x≡y
 
 _≤?_ : (m n : ℕ) → Dec (m ≤ n)
 zero  ≤? _     = yes tt

@@ -35,10 +35,10 @@ module CxtEncodeDecode {Ty : 𝓤 ̇} where
   encode {A = A} A=B = transport (cong (code A) A=B) (r A)
   
   decode : {Γ Δ : Context Ty} → code Γ Δ → Γ ≡ Δ
-  decode {Γ = ∅}     {∅}     tt*  = refl
-  decode {Γ = A , Γ} {B , Δ} (A=B , Γ=Δ) i = A=B i , decode Γ=Δ i 
-  decode {Γ = ∅}     {_ , _} ()
-  decode {Γ = _ , _} {∅}     ()
+  decode {∅}     {∅}     tt*  = refl
+  decode {A , Γ} {B , Δ} (A=B , Γ=Δ) i = A=B i , decode Γ=Δ i 
+  decode {∅}     {_ , _} ()
+  decode {_ , _} {∅}     ()
 
   module _ ⦃ _ : DecEq Ty ⦄ where
     _≟Cxt_ : (Γ Δ : Context Ty) → Dec (Γ ≡ Δ)
@@ -102,4 +102,4 @@ module ∈EncodeDecode {Ty : 𝓤 ̇} where
   encode {x = x} x=y = transport (cong (code x) x=y) (r x)
 
   postulate
-    decode : {x y : _∈_ {𝓤} {Ty} A Γ} → code x y → x ≡ y
+    decode : {x y : A ∈ Γ} → code x y → x ≡ y
