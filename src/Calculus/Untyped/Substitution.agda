@@ -282,7 +282,7 @@ N ⟪ σ ⟫ ------------------------------------------------------> subst (Δ �
 N ⟪ σ ⟫ -------------------------------------------------------> (subst (Γ ⊢_) A=B N) ⟪ σ ⟫
 Δ ⊢ A                                                              Δ ⊢ B
 -}
-subst-path-subst {Γ} {Δ} σ M A=B i = comp (λ j → Δ ⊢ A=B j)
+subst-path-subst {_} {Δ} σ M A=B i = comp (λ j → Δ ⊢ A=B j)
   (λ { j (i = i0) → transport-filler (cong (_ ⊢_) A=B) (M ⟪ σ ⟫) j
      ; j (i = i1) → (transport-filler (cong (_ ⊢_) A=B) M j) ⟪ σ ⟫
      })
@@ -374,5 +374,45 @@ subst-rename-∅ ρ σ M = begin
   M ∎
   where open ≡-Reasoning
 
-subst-↑ : (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → ↑ M ⟪ σ ⟫ ≡ M 
-subst-↑ = subst-rename-∅ λ ()
+subst-↑₁ : (σ : Subst (⋆ , ∅) ∅) → (M : ∅ ⊢ A) → (↑₁ M) ⟪ σ ⟫ ≡ M 
+subst-↑₁ = subst-rename-∅ S_
+
+------------------------------------------------------------------------------
+-- Special cut rule
+
+γ_ : (N : A , Γ ⊢ B) → Subst (B , ∅) (A , Γ) 
+(γ N) (Z B=A) = subst (_ ⊢_) B=A N
+
+_∘′_ : {A B C : 𝕋}
+  → B , ∅ ⊢ C
+  → A , ∅ ⊢ B
+  → A , ∅ ⊢ C
+_∘′_ {A} {B} {C} M N = M ⟪ γ N ⟫
+
+postulate
+  lem : ∀ (M : A , ∅ ⊢ B) (N : ∅ ⊢ A) (p : C ∈ B , ∅) → (γ M ⨟ subst-zero N) p ≡ subst-zero (M [ N ]) p
+
+∘-ssubst-ssubst : (L : B , ∅ ⊢ C) (M : A , ∅ ⊢ B) (N : ∅ ⊢ A)
+  → (L ∘′ M) [ N ] ≡ L [ M [ N ] ]
+∘-ssubst-ssubst L M N = begin
+  (L ∘′ M) [ N ]
+    ≡⟨⟩
+  L ⟪ γ M ⟫ ⟪ subst-zero N ⟫
+    ≡⟨ subst-assoc (γ M) (subst-zero N) L ⟩
+  L ⟪ γ M ⨟ subst-zero N ⟫
+    ≡[ i ]⟨ L ⟪ (λ p → lem M N p i) ⟫ ⟩
+  L ⟪ subst-zero (M ⟪ subst-zero N ⟫) ⟫
+    ≡⟨⟩
+  L [ M [ N ] ] ∎
+  where open ≡-Reasoning
+{-
+∘′-right-id : (M : A , ∅ ⊢ B) → M ∘′ (` Z refl) ≡ M
+∘′-right-id M = {!!}
+
+∘′-left-id : (M : A , ∅ ⊢ B) → (` Z refl) ∘′ M ≡ M
+∘′-left-id M = {!!}
+
+∘′-assoc :  (L : C , ∅ ⊢ B) (M : B , ∅ ⊢ C) (N : A , ∅ ⊢ B)
+  → L ∘′ (M ∘′ N) ≡ (L ∘′ M) ∘′ N
+∘′-assoc L M N = {!!}
+-}

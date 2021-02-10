@@ -3,6 +3,7 @@
 module Calculus.Untyped.Base where
 
 open import Prelude
+  hiding (_∘_)
 
 open import Calculus.Context      public
   hiding (count)
@@ -69,9 +70,6 @@ rename ρ (` x)   = ` ρ x
 rename ρ (ƛ M)   = ƛ rename (ext ρ) M
 rename ρ (M · N) = rename ρ M · rename ρ N
 
-↑_ : ∅ ⊢ A → Γ ⊢ A
-↑ M = rename (λ ()) M
-
 ↑₁_ : Δ ⊢ A
   → ⋆ , Δ ⊢ A
 ↑₁_ = rename S_
@@ -121,18 +119,6 @@ _[_] : B , Γ ⊢ A
      → Γ ⊢ B
      → Γ ⊢ A
 M [ N ] = M ⟪ subst-zero N ⟫
-
-------------------------------------------------------------------------------
--- Cut rule
-
-cut : Γ ⊢ A
-  → A , Δ ⊢ B
-  → Γ ⧺ Δ ⊢ B
-cut {Γ} {A} {Δ} M N = N ⟪ σ ⟫
-  where
-    σ : Subst (A , Δ) (Γ ⧺ Δ)
-    σ (Z p) = ↑ᵣ subst (_ ⊢_) p M
-    σ (S x) = ↑ₗ (` x)
 
 ------------------------------------------------------------------------------
 -- Single-step reduction

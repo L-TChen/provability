@@ -88,7 +88,7 @@ syntax ∼-syntax {X = X} {Y = Y} f g = f ∼ g ꞉ X →ₐ Y
 ∼-syntax {X = X} {Y = Y} f g = ∼-eq X Y f g
 
 id : Trackable X X
-id = (λ x → x) , 0 , λ M⊩x → M⊩x
+id = (λ x → x) , 0 , λ M⊩x → ?
 
 infixr 9 _∘_
 
@@ -139,18 +139,18 @@ _×ₐ_ {𝓤} X Y = ⟨ X ⟩ × ⟨ Y ⟩ , _⊩_ , is⊩ ⊩-respect-↠ ⊩-
       (Y.⊩-right-total y)}) (X.⊩-right-total x)
 
 projₗ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) X
-projₗ X Y = (λ {(x , y) → x}) , 0 · ↑ 𝑻 , F⊩projₗ
+projₗ X Y = (λ {(x , y) → x}) , 0 · ↑₁ 𝑻 , F⊩projₗ
   where
     module X = AsmStr (str X)
-    F⊩projₗ : Tracks (X ×ₐ Y) X (0 · ↑ 𝑻) λ {(x , y) → x}
-    F⊩projₗ (_ , _ , π₁L-↠M , M⊩x , _ , _) = X.⊩-respects-↠ π₁L-↠M M⊩x
+    F⊩projₗ : Tracks (X ×ₐ Y) X (0 · ↑₁ 𝑻) λ {(x , y) → x}
+    F⊩projₗ (_ , _ , π₁L-↠M , M⊩x , _ , _) = ? -- X.⊩-respects-↠ π₁L-↠M M⊩x
 
 projᵣ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) Y
-projᵣ X Y = (λ {(x , y) → y}) , 0 · ↑ 𝑭 , F⊩projᵣ
+projᵣ X Y = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⊩projᵣ
   where
     module Y = AsmStr (str Y)
-    F⊩projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑ 𝑭) λ {(x , y) → y}
-    F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⊩y) = Y.⊩-respects-↠ π₂L-↠N N⊩y
+    F⊩projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑₁ 𝑭) λ {(x , y) → y}
+    F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⊩y) = ? -- Y.⊩-respects-↠ π₂L-↠N N⊩y
 
 -- Exponentia consists of trackable functions.
 _⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
@@ -162,14 +162,14 @@ _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f �
       module Y = AsmStr (str Y)
 
       _⊩_ : Λ₀ → Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f ∥ → 𝓤 ̇
-      F ⊩ (f , _) = Tracks X Y (↑ F · 0) f 
+      F ⊩ (f , _) = Tracks X Y (↑₁ F · 0) f 
 
       ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
       ⊩-respects-↠ {G} {F} {f , _} G-↠F F⊩f {M} M⊩x = Y.⊩-respects-↠
         (begin
-          (↑ G · 0) [ M ]
+          (↑₁ G · 0) [ M ]
             -↠⟨ {!G-↠F!} ⟩
-          (↑ F · 0) [ M ] ∎)
+          (↑₁ F · 0) [ M ] ∎)
         (F⊩f M⊩x) 
 
       ⊩-right-total : _
