@@ -5,6 +5,7 @@ module Assembly.Exposure where
 open import Prelude
   hiding (id; _∘_)
 open import Calculus.Untyped
+  hiding (Z)
 open import Assembly.Base
 
 private
@@ -52,31 +53,33 @@ module _ (Q : Quoting) where
       ⊩□X-right-total (M , ▹x , M⊩x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
 
   □map : Trackable X Y → Trackable (□ X) (□ Y)
-  □map {𝓤} {X} {Y} (f , hastracker {F} F⊩f) = □f ,
-    hastracker λ {M} {x} → □F⊩□f {M} {x}
+  □map {𝓤} {X} {Y} (f , F , F⊩f) = □f , □F , 
+    λ {M} {x} → □F⊩□f {M} {x}
     where
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
       module □X = AsmStr (str (□ X))
       module □Y = AsmStr (str (□ Y))
       □f : ⟨ □ X ⟩ → ⟨ □ Y ⟩
-      □f (M , ▹x , M⊩x) = F · M , ▹map f ▹x , λ α → F⊩f (M⊩x α)
+      □f (M , ▹x , M⊩x) = F [ M ] , ▹map f ▹x , λ α → F⊩f (M⊩x α)
 
-      □F : Λ₀
-      □F = ƛ ↑ Ap · ↑ ⌜ F ⌝ · (# 0) 
+      □F : ⋆ , ∅ ⊢ ⋆
+      □F = ↑₁ Ap · ↑₁ ⌜ F ⌝ · 0 -- we also need the one-step reducer
 
       □F⊩□f : Tracks (□ X) (□ Y) □F □f
-      □F⊩□f {n̅} {M , ▹x , M⊩x} (lift n̅-↠⌜M⌝) = lift (begin
-        (ƛ ↑ Ap · ↑ ⌜ F ⌝ · # 0) · n̅
+      □F⊩□f {n̅} {M , ▹x , M⊩x} (lift n̅-↠⌜M⌝) = {!!}
+      {- lift (begin
+        (ƛ ↑₁ Ap · ↑₁ ⌜ F ⌝ · # 0) · n̅
           -→⟨ β ⟩
-        ↑ Ap [ n̅ ] · ↑ ⌜ F ⌝ [ n̅ ] · n̅
+        ↑₁ Ap [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
           -↠⟨ ·ᵣ-cong n̅-↠⌜M⌝ ⟩
-        ↑ Ap [ n̅ ] · ↑ ⌜ F ⌝ [ n̅ ] · ⌜ M ⌝
-          ≡⟨ cong₂ (λ L N → L · N · ⌜ M ⌝) (subst-↑ _ Ap) (subst-↑ _ ⌜ F ⌝) ⟩
+        ↑₁ Ap [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · ⌜ M ⌝
+          ≡⟨ cong₂ (λ L N → L · N · ⌜ M ⌝) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ F ⌝) ⟩
         Ap · ⌜ F ⌝ · ⌜ M ⌝
           -↠⟨ Ap-↠ ⟩
         ⌜ F · M ⌝ 
           ∎)
+          -}
 
   -- -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ ⊥ₐ {𝓤}⟩ → ⊥* {𝓤}) → ▹ ⊥* → ⊥*
