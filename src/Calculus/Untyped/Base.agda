@@ -70,10 +70,6 @@ rename ρ (` x)   = ` ρ x
 rename ρ (ƛ M)   = ƛ rename (ext ρ) M
 rename ρ (M · N) = rename ρ M · rename ρ N
 
-↑₁_ : Δ ⊢ A
-  → ⋆ , Δ ⊢ A
-↑₁_ = rename S_
-
 ↑ᵣ_ : Γ ⊢ A
     → Γ ⧺ Δ ⊢ A
 ↑ᵣ M = rename ρ M
@@ -89,6 +85,11 @@ rename ρ (M · N) = rename ρ M · rename ρ N
     ρ : Rename Δ (Γ ⧺ Δ)
     ρ {Γ = ∅}     x = x
     ρ {Γ = A , Γ} x = S (ρ x)
+
+↑₁_ : Δ ⊢ A
+  → ⋆ , Δ ⊢ A
+↑₁_ = ↑ₗ_
+
 ------------------------------------------------------------------------------
 -- Substitution
 
@@ -110,14 +111,15 @@ _⟪_⟫
 (M · N) ⟪ σ ⟫ = M ⟪ σ ⟫ · N ⟪ σ ⟫
 
 subst-zero
-  : Γ ⊢ A
-  → Subst (A , Γ) Γ
-subst-zero N (Z p) = subst (_ ⊢_) p N 
+  : Γ ⊢ B
+  → Subst (B , Γ) Γ
+subst-zero N (Z p) = subst (_ ⊢_) p N
 subst-zero _ (S x) = ` x
 
-_[_] : B , Γ ⊢ A
-     → Γ ⊢ B
-     → Γ ⊢ A
+_[_]
+  : B , Γ ⊢ A
+  → Γ ⊢ B
+  → Γ ⊢ A
 M [ N ] = M ⟪ subst-zero N ⟫
 
 ------------------------------------------------------------------------------
@@ -310,21 +312,44 @@ progress (L@(_ · _) · M) with progress L
 -- Decidable equality between α-equivalent terms
 
 module EncodeDecode where
-  code : (M : Γ ⊢ A) (N : Δ ⊢ B) → 𝓤₀ ̇
-  code {Γ} {A} {Δ} {B} (` x) (` y)     =
-    (A=B : A ≡ B) → (Γ=Δ : Γ ≡ Δ) → PathP (λ i →  A=B i ∈ Γ=Δ i) x y
-  code (ƛ M)           (ƛ N)            = code M N
-  code (M₁ · N₁)       (M₂ · N₂)        = code M₁ M₂ × code N₁ N₂
-  code _               _               = ⊥
+  code : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
+  code (` x)     (` y)     = ∈EncodeDecode.code x y
+  code (ƛ M)     (ƛ N)     = code M N
+  code (M₁ · N₁) (M₂ · N₂) = code M₁ M₂ × code N₁ N₂
+  code _               _         = ⊥
 
-  postulate
-    -- TODO: write this up
-    r : (M : Γ ⊢ A) → code M M
-  -- r : (M : Γ ⊢ A) → code M M
-  -- r (` x)   A=B Γ=Δ = {!!}
-  -- r (ƛ M)          = r M
-  -- r (M · N)        = r M Prelude., r N
+  r : (M : Γ ⊢ A) → code M M
+  r (` x)   = ∈EncodeDecode.r x
+  r (ƛ M)   = r M
+  r (M · N) = r M , r N
 
   encode : M ≡ N → code M N
   encode {M = M} M=N = transport (cong (code M) M=N) (r M)
+
+  decode : code M N → M ≡ N
+  decode {Γ} {A} {` x}      {` y}    c         = cong `_ (∈EncodeDecode.decode {A = A} {Γ} {x} {y} c)
+  decode {Γ} {A} {ƛ M}     {ƛ N}     c         = cong {B = λ _ → Γ ⊢ ⋆} ƛ_ (decode c)
+  decode {Γ} {A} {L₁ · M₁} {L₂ · M₂} (c₁ , c₂) = cong₂ {x = L₁}  _·_ (decode c₁) {M₁} {M₂} (decode c₂)
+
+  _≟⊢_ : (M N : Γ ⊢ A) → Dec (M ≡ N)
+  (` x)     ≟⊢ (` y) with x ≟ y
+  ... | yes p = yes (cong `_ p)
+  ... | no ¬p = no λ x=y → ¬p (∈EncodeDecode.decode (encode x=y))
+  (ƛ M)     ≟⊢ (ƛ N) with M ≟⊢ N
+  ... | yes p = yes (cong ƛ_ p)
+  ... | no ¬p = no λ ƛM=ƛN → ¬p (decode (encode ƛM=ƛN))
+  (M₁ · N₁) ≟⊢ (M₂ · N₂) with M₁ ≟⊢ M₂ | N₁ ≟⊢ N₂
+  ... | yes p | yes q = yes (decode (encode p , encode q))
+  ... | yes p | no ¬q = no λ M=N → ¬q (decode (encode M=N .snd))
+  ... | no ¬p | q     = no λ M=N → ¬p (decode (encode M=N .fst))
+  (` _)   ≟⊢ (ƛ _)    = no encode
+  (` _)   ≟⊢ (_ · _)  = no encode
+  (ƛ _)   ≟⊢ (` _)    = no encode
+  (ƛ _)   ≟⊢ (_ · _)  = no encode
+  (_ · _) ≟⊢ (` _)    = no encode
+  (_ · _) ≟⊢ (ƛ _)    = no encode
+
+  instance
+    DecEq⊢ : DecEq (Γ ⊢ A)
+    _≟_ ⦃ DecEq⊢ ⦄ = _≟⊢_
 open EncodeDecode using (encode)
