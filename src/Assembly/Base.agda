@@ -88,21 +88,22 @@ syntax ∼-syntax {X = X} {Y = Y} f g = f ∼ g ꞉ X →ₐ Y
 ∼-syntax {X = X} {Y = Y} f g = ∼-eq X Y f g
 
 id : Trackable X X
-id = (λ x → x) , 0 , λ M⊩x → ?
+id {X = X} = (λ x → x) , 0 , (subst (_⊩ _) (transport-filler _ _))
+  where open AsmStr (str X)
 
 infixr 9 _∘_
 
 _∘_ : {X Y Z : Asm 𝓤} → Trackable Y Z → Trackable X Y → Trackable X Z
-_∘_ {𝓤} {X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , {!!} , λ {M} {x} M⊩x → {!G⊩g !}
+_∘_ {𝓤} {X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ M⊩x →
+  subst (_⊩ g (f _)) (∘-ssubst-ssubst G F _ ⁻¹) (G⊩g (F⊩f M⊩x))
+    where open AsmStr (str Z)
 
 -- ------------------------------------------------------------------------------
 -- Universality
 
--- Uniqueness up to ∼ follows from function extensionality.
 finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
 finality (|X| , ⊩ , _isRealisable) = (λ _ → tt*) , 0 , λ x → tt* 
 
--- Uniqueness up to ∼ follows from function extensionality.
 initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
 initiality {𝓤} X@(|X| , _⊩_ , _isRealisable) = ⊥*-elim , 0 , (λ { {x = ()} })
 
@@ -142,15 +143,17 @@ projₗ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) X
 projₗ X Y = (λ {(x , y) → x}) , 0 · ↑₁ 𝑻 , F⊩projₗ
   where
     module X = AsmStr (str X)
-    F⊩projₗ : Tracks (X ×ₐ Y) X (0 · ↑₁ 𝑻) λ {(x , y) → x}
-    F⊩projₗ (_ , _ , π₁L-↠M , M⊩x , _ , _) = ? -- X.⊩-respects-↠ π₁L-↠M M⊩x
+    postulate
+      F⊩projₗ : Tracks (X ×ₐ Y) X (0 · ↑₁ 𝑻) λ {(x , y) → x}
+      --F⊩projₗ (_ , _ , π₁L-↠M , M⊩x , _ , _) = {!!} -- X.⊩-respects-↠ π₁L-↠M M⊩x
 
 projᵣ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) Y
 projᵣ X Y = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⊩projᵣ
   where
     module Y = AsmStr (str Y)
-    F⊩projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑₁ 𝑭) λ {(x , y) → y}
-    F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⊩y) = ? -- Y.⊩-respects-↠ π₂L-↠N N⊩y
+    postulate
+      F⊩projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑₁ 𝑭) λ {(x , y) → y}
+      --F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⊩y) = {!!} -- Y.⊩-respects-↠ π₂L-↠N N⊩y
 
 -- Exponentia consists of trackable functions.
 _⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
@@ -168,17 +171,29 @@ _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f �
       ⊩-respects-↠ {G} {F} {f , _} G-↠F F⊩f {M} M⊩x = Y.⊩-respects-↠
         (begin
           (↑₁ G · 0) [ M ]
-            -↠⟨ {!G-↠F!} ⟩
+            -↠⟨ subst-reduce* {σ = subst-zero M} {(↑₁ G) · 0} {(↑₁ F) · 0} (·ₗ-cong (rename-reduce* G-↠F)) ⟩
           (↑₁ F · 0) [ M ] ∎)
         (F⊩f M⊩x) 
 
       ⊩-right-total : _
       ⊩-right-total (f , t) = rec propTruncIsProp
-        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠ {!!} (F⊩f M⊩x)) ∣}) t
+        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠ (lem F M) (F⊩f M⊩x)) ∣}) t
+        where
+          open -↠-Reasoning
+          lem : (F : ⋆ , ∅ ⊢ ⋆) → (M : Λ₀) → ((↑₁ (ƛ F)) · 0) [ M ] -↠ F [ M ]
+          lem F M = begin
+            ↑₁ (ƛ F) [ M ] · 0 [ M ]
+              ≡[ i ]⟨ ↑₁ (ƛ F) [ M ]  · transport-filler (λ _ → Λ₀) M (~ i) ⟩
+            ↑₁ (ƛ F) [ M ] · M
+              ≡⟨ cong {B = λ _ → Λ₀} (_· M) (subst-rename-∅ _ (subst-zero M) (ƛ F)) ⟩
+            (ƛ F) · M
+              -→⟨ β ⟩
+            F [ M ]
+              ∎
 
-ev : (X Y : Asm 𝓤) → Trackable ((X ⇒ Y) ×ₐ X) Y
-ev X Y = {!!}
-  where
-    module X = AsmStr (str X)
-    module Y = AsmStr (str Y)
-
+postulate
+  ev : (X Y : Asm 𝓤) → Trackable ((X ⇒ Y) ×ₐ X) Y
+--ev X Y = {!!}
+--  where
+--    module X = AsmStr (str X)
+--    module Y = AsmStr (str Y)

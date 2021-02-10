@@ -33,11 +33,12 @@ record Quoting : 𝓤₀ ̇ where
 
     reduce-one : Σ[ R ꞉ Λ₀ ] R · ⌜ (ƛ M) · N ⌝ -↠ ⌜ M [ N ] ⌝
   open -↠-Reasoning
-  postulate
-    quoting-not-definable : ¬ (Σ[ Q ꞉ Λ₀ ] Π[ M ꞉ Λ₀ ] Q · M -↠ ⌜ M ⌝)
-    I·x≠x : ↑₁ 𝑰 · 0 ≢ 0
 
-  --     ⌜I·M⌝=⌜M⌝ = Normal⇒Path (⌜⌝-normal (𝐼 · `zero)) (⌜⌝-normal `zero) (QM=⌜M⌝ (𝐼 · `zero)) QI0-↠⌜0⌝
+  I·x≠x : ↑₁ 𝑰 · 0 ≢ 0
+  I·x≠x = encode
+
+  postulate
+    quoting-not-definable : ¬ (Σ[ Q ꞉ ⋆ , ∅ ⊢ ⋆ ] Π[ M ꞉ ∅ ⊢ ⋆ ] (ƛ Q) · M -↠ ⌜ M ⌝)
 
   -- -- ⊢ □ (ℕ `→ A) `→ □ A
   -- Diag : Γ ⊢ nat `→ nat

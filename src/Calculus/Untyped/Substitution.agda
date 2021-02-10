@@ -340,29 +340,6 @@ rename-ssubst {Γ} {Δ} {A} {B} ρ M N = begin
     ∎
   where open ≡-Reasoning
 
-------------------------------------------------------------------------------
--- Substitution respects reduction
-
-rename-reduce : {ρ : Rename Γ Δ} {M N : Γ ⊢ A}
-  → M -→ N
-  → rename ρ M -→ rename ρ N
-rename-reduce {ρ = ρ} (β {M = M} {N}) =
-  subst (rename ρ ((ƛ M) · N) -→_) (rename-ssubst ρ M N) β
-  where open -↠-Reasoning
-rename-reduce (ζ M-→N)  = ζ  (rename-reduce M-→N)
-rename-reduce (ξₗ M-→N) = ξₗ (rename-reduce M-→N)
-rename-reduce (ξᵣ M-→N) = ξᵣ (rename-reduce M-→N)
-
-subst-reduce : {σ : Subst Γ Δ} {M N : Γ ⊢ A}
-  → M -→ N
-  → M ⟪ σ ⟫ -→ N ⟪ σ ⟫
-subst-reduce {σ = σ} (β {M = M} {N}) =
-  subst ((ƛ M) ⟪ σ ⟫ · N ⟪ σ ⟫ -→_) (subst-ssubst σ M N) β
-  where open -↠-Reasoning
-subst-reduce (ζ M-→N)  = ζ  (subst-reduce M-→N)
-subst-reduce (ξₗ M-→N) = ξₗ (subst-reduce M-→N)
-subst-reduce (ξᵣ M-→N) = ξᵣ (subst-reduce M-→N)
-
 subst-rename-∅ : (ρ : Rename ∅ Γ) (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → rename ρ M ⟪ σ ⟫ ≡ M
 subst-rename-∅ ρ σ M = begin
   rename ρ M ⟪ σ ⟫
@@ -371,11 +348,43 @@ subst-rename-∅ ρ σ M = begin
     ≡⟨ subst-cong (λ ()) M ⟩
   M ⟪ ids ⟫
     ≡⟨ subst-idL M ⟩ 
-  M ∎
-  where open ≡-Reasoning
+  M ∎ where open ≡-Reasoning
+  
+------------------------------------------------------------------------------
+-- Substitution respects reduction
 
-subst-↑₁ : (σ : Subst (⋆ , ∅) ∅) → (M : ∅ ⊢ A) → (↑₁ M) ⟪ σ ⟫ ≡ M 
-subst-↑₁ = subst-rename-∅ S_
+module _ where
+  open -↠-Reasoning
+
+  rename-reduce : {ρ : Rename Γ Δ} {M N : Γ ⊢ A}
+    → M -→ N
+    → rename ρ M -→ rename ρ N
+  rename-reduce {ρ = ρ} (β {M = M} {N}) =
+    subst (rename ρ ((ƛ M) · N) -→_) (rename-ssubst ρ M N) β
+  rename-reduce (ζ M-→N)  = ζ  (rename-reduce M-→N)
+  rename-reduce (ξₗ M-→N) = ξₗ (rename-reduce M-→N)
+  rename-reduce (ξᵣ M-→N) = ξᵣ (rename-reduce M-→N)
+
+  rename-reduce* : {ρ : Rename Γ Δ} {M N : Γ ⊢ A}
+    → M -↠ N
+    → rename ρ M -↠ rename ρ N
+  rename-reduce* (M ∎)               = -↠-refl
+  rename-reduce* (L -→⟨ L-→M ⟩ M-↠N) = _ -→⟨ rename-reduce L-→M ⟩ rename-reduce* M-↠N
+
+  subst-reduce : {σ : Subst Γ Δ} {M N : Γ ⊢ A}
+    → M -→ N
+    → M ⟪ σ ⟫ -→ N ⟪ σ ⟫
+  subst-reduce {σ = σ} (β {M = M} {N}) =
+    subst ((ƛ M) ⟪ σ ⟫ · N ⟪ σ ⟫ -→_) (subst-ssubst σ M N) β
+  subst-reduce (ζ M-→N)  = ζ  (subst-reduce M-→N)
+  subst-reduce (ξₗ M-→N) = ξₗ (subst-reduce M-→N)
+  subst-reduce (ξᵣ M-→N) = ξᵣ (subst-reduce M-→N)
+
+  subst-reduce* : {σ : Subst Γ Δ} {M N : Γ ⊢ A}
+    → M -↠ N
+    → M ⟪ σ ⟫ -↠ N ⟪ σ ⟫
+  subst-reduce* (M ∎)               = -↠-refl
+  subst-reduce* (L -→⟨ L-→M ⟩ M-↠N) = _ -→⟨ subst-reduce L-→M ⟩ subst-reduce* M-↠N
 
 ------------------------------------------------------------------------------
 -- Special cut rule
@@ -389,9 +398,6 @@ _∘′_ : {A B C : 𝕋}
   → A , ∅ ⊢ C
 _∘′_ {A} {B} {C} M N = M ⟪ γ N ⟫
 
-postulate
-  lem : ∀ (M : A , ∅ ⊢ B) (N : ∅ ⊢ A) (p : C ∈ B , ∅) → (γ M ⨟ subst-zero N) p ≡ subst-zero (M [ N ]) p
-
 ∘-ssubst-ssubst : (L : B , ∅ ⊢ C) (M : A , ∅ ⊢ B) (N : ∅ ⊢ A)
   → (L ∘′ M) [ N ] ≡ L [ M [ N ] ]
 ∘-ssubst-ssubst L M N = begin
@@ -400,11 +406,16 @@ postulate
   L ⟪ γ M ⟫ ⟪ subst-zero N ⟫
     ≡⟨ subst-assoc (γ M) (subst-zero N) L ⟩
   L ⟪ γ M ⨟ subst-zero N ⟫
+    -- ≡[ i ]⟨ L ⟪ (λ p → lem M N p i) ⟫ ⟩
     ≡[ i ]⟨ L ⟪ (λ p → lem M N p i) ⟫ ⟩
   L ⟪ subst-zero (M ⟪ subst-zero N ⟫) ⟫
     ≡⟨⟩
   L [ M [ N ] ] ∎
-  where open ≡-Reasoning
+  where
+    open ≡-Reasoning
+    lem : (M : A , ∅ ⊢ B) (N : ∅ ⊢ A) (p : C ∈ B , ∅) → (γ M ⨟ subst-zero N) p ≡ subst-zero (M [ N ]) p
+    lem M N (Z B=C) =  subst-path-subst (subst-zero N) M B=C ⁻¹
+
 {-
 ∘′-right-id : (M : A , ∅ ⊢ B) → M ∘′ (` Z refl) ≡ M
 ∘′-right-id M = {!!}
