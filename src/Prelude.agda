@@ -99,13 +99,22 @@ zero  ≤? _     = yes tt
 suc m ≤? zero  = no λ ()
 suc m ≤? suc n = m ≤? n
 
+record Code (A : 𝓤 ̇) :  𝓤 ⁺ ̇ where
+  field
+    code   : A → A → 𝓤 ̇
+    r      : (a : A)   → code a a
+    decode : {a b : A} → code a b → a ≡ b
+
+  encode : {a b : A} → a ≡ b    → code a b
+  encode {a = a} a=b = transport (cong (code a) a=b) (r a)
+
+open Code ⦃ ... ⦄ public
+
 record DecEq (A : 𝓤 ̇) : 𝓤 ̇ where
   field
     _≟_ : (x y : A) → Dec (x ≡ y)
-    
   ≟→isSet : isSet A
   ≟→isSet = Discrete→isSet _≟_
-
 open DecEq ⦃ ... ⦄ public
 
 instance
@@ -114,9 +123,3 @@ instance
 
   DecEqBool : DecEq Bool
   _≟_ ⦃ DecEqBool ⦄ = Cubical.Data.Bool._≟_
-  
---  DecEqℕ : DecEq ℕ
---  _≟_ ⦃ DecEqℕ ⦄ x y with x ℕₚ.≟ y
---  ... | ℕₚ.eq x=y = yes x=y
---  ... | ℕₚ.lt x<y = no (ℕₚ.<→≢ x<y)
---  ... | ℕₚ.gt x>y = no λ x=y → ℕₚ.<→≢ x>y (sym x=y)

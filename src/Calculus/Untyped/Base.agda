@@ -311,30 +311,33 @@ progress (L@(_ · _) · M) with progress L
 ------------------------------------------------------------------------------
 -- Decidable equality between α-equivalent terms
 
-module EncodeDecode where
-  code : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
-  code (` x)     (` y)     = ∈EncodeDecode.code x y
-  code (ƛ M)     (ƛ N)     = code M N
-  code (M₁ · N₁) (M₂ · N₂) = code M₁ M₂ × code N₁ N₂
-  code _               _         = ⊥
+module _ where
+  private
+    code⊢ : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
+    code⊢ (` x)     (` y)     = code x y
+    code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
+    code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
+    code⊢ _               _         = ⊥
 
-  r : (M : Γ ⊢ A) → code M M
-  r (` x)   = ∈EncodeDecode.r x
-  r (ƛ M)   = r M
-  r (M · N) = r M , r N
+    r⊢ : (M : Γ ⊢ A) → code⊢ M M
+    r⊢ (` x)   = r x
+    r⊢ (ƛ M)   = r⊢ M
+    r⊢ (M · N) = r⊢ M , r⊢ N
 
-  encode : M ≡ N → code M N
-  encode {M = M} M=N = transport (cong (code M) M=N) (r M)
+    decode⊢ : code⊢ M N → M ≡ N
+    decode⊢ {M = ` x}     {` y}    c         = cong {B = λ _ → _ ⊢ _} `_ (decode c)
+    decode⊢ {M = ƛ M}     {ƛ N}    c         = cong {B = λ _ → _ ⊢ _} ƛ_ (decode⊢ c)
+    decode⊢ {M = L₁ · M₁} {_ · M₂} (c₁ , c₂) = cong₂ {x = L₁}  _·_ (decode⊢ c₁) {M₁} {M₂} (decode⊢ c₂)
 
-  decode : code M N → M ≡ N
-  decode {Γ} {A} {` x}      {` y}    c         = cong `_ (∈EncodeDecode.decode {A = A} {Γ} {x} {y} c)
-  decode {Γ} {A} {ƛ M}     {ƛ N}     c         = cong {B = λ _ → Γ ⊢ ⋆} ƛ_ (decode c)
-  decode {Γ} {A} {L₁ · M₁} {L₂ · M₂} (c₁ , c₂) = cong₂ {x = L₁}  _·_ (decode c₁) {M₁} {M₂} (decode c₂)
+  instance
+    Code⊢ : Code (Γ ⊢ A)
+    Code⊢ = record { code = code⊢ ; r = r⊢ ; decode = decode⊢ }
 
+private
   _≟⊢_ : (M N : Γ ⊢ A) → Dec (M ≡ N)
   (` x)     ≟⊢ (` y) with x ≟ y
   ... | yes p = yes (cong `_ p)
-  ... | no ¬p = no λ x=y → ¬p (∈EncodeDecode.decode (encode x=y))
+  ... | no ¬p = no λ x=y → ¬p (decode (encode x=y))
   (ƛ M)     ≟⊢ (ƛ N) with M ≟⊢ N
   ... | yes p = yes (cong ƛ_ p)
   ... | no ¬p = no λ ƛM=ƛN → ¬p (decode (encode ƛM=ƛN))
@@ -349,7 +352,6 @@ module EncodeDecode where
   (_ · _) ≟⊢ (` _)    = no encode
   (_ · _) ≟⊢ (ƛ _)    = no encode
 
-  instance
-    DecEq⊢ : DecEq (Γ ⊢ A)
-    _≟_ ⦃ DecEq⊢ ⦄ = _≟⊢_
-open EncodeDecode using (encode)
+instance
+  DecEq⊢ : DecEq (Γ ⊢ A)
+  _≟_ ⦃ DecEq⊢ ⦄ = _≟⊢_
