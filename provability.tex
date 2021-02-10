@@ -64,9 +64,9 @@
 %TODO: Polish abstract
 \begin{abstract}
   In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
-  We consider the ordinary category $\Asm(\Lambda)$ of assemblies on untyped lambda calculus and \emph{functions with trackers} in contrast to the $\PER$-category $\ASM(\mathcal{A})$ of assemblies on an arbitrary partial combinatory algebra $\mathcal{A}$ proposed by Kavvos.
+  We consider the ordinary category $\Asm(\Lambda)$ of assemblies on untyped $\lambda$-calculus and \emph{maps with trackers} similar to the $\PER$-category $\ASM(\mathcal{A})$ of assemblies on an arbitrary partial combinatory algebra $\mathcal{A}$ proposed previously. 
   Then, we construct an endofunctor as the interpretation of the (provability) modality~$\Box$.
-  Of the utmost significance of our understanding for $\Box A$ is that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo \emph{$\alpha$-equivalence only}, inspired by its provability reading.
+  Of the utmost significance of our understanding for $\Box A$ is that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms \emph{modulo $\alpha$-equivalence only}, inspired by its provability reading.
   Our results are established in a cubical type theory extended with guarded recursion and formalised in Guarded Cubical Agda.
   Apart from its own theoretical interest, following the interpretation of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
 \end{abstract}
@@ -83,27 +83,16 @@
 \cite{Kavvos2017,Kavvos2020}
 \cite{Shamkanov2014,Shamkanov2016a}
 
-\section{Preliminaries}
+\section{Prelude: Intrinsically scoped \texorpdfstring{$\lambda$}{λ}-calculus in homotopy type theory}
 
-\subsection{Guarded recursion}
+\section{Variation: Assemblies on \texorpdfstring{$\lambda$}{λ}-calculus and maps with trackers}
 
-\subsection{Intensionality}
-\begin{definition}[Partial equivalence relation]
-  
-\end{definition}
-%\section{Realising provability using topos of trees}
-%\subsection{Topos of trees and its internal logic}
-%\cite{Birkedal2012,Clouston2016}
-\section{Category of assemblies over untyped lambda calculus}
-
-\subsection{Realisability}
-\begin{definition}[Assembly and trackable map]
+\begin{definition}[Assembly, trackers, maps with trackers, trackable map]
   
 \end{definition}
 
-\section{Realising provability using guarded cubical type theory}
+\section{Main theme: Realising provability using guarded cubical type theory}
 
-\subsection{Guarded cubical type theory}
 \begin{enumerate}
   \item Show that there is no $\Box A \to A$ natural in $A$.
   \item Show that there is no $A \to \Box A$ natural in $A$.
