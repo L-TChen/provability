@@ -115,7 +115,7 @@ subst-zero
   : Γ ⊢ A
   → Subst (A , Γ) Γ
 subst-zero N (Z p) = subst (_ ⊢_) p N 
-subst-zero _ (S x)         = ` x
+subst-zero _ (S x) = ` x
 
 _[_] : B , Γ ⊢ A
      → Γ ⊢ B

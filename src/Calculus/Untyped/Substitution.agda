@@ -267,10 +267,31 @@ rename-subst ρ σ M = begin
     ∎
   where open ≡-Reasoning
 
+subst-path-subst : (σ : Subst Γ Δ) (M : Γ ⊢ A) (A=B : A ≡ B)
+  → subst (Δ ⊢_) A=B (M ⟪ σ ⟫) ≡ subst (Γ ⊢_) A=B M ⟪ σ ⟫
+{-
+         transport-filler (cong (_ ⊢_) A=B) (N ⟪ σ ⟫)
+N ⟪ σ ⟫ ------------------------------------------------------> subst (Δ ⊢_) A=B (N ⟪ σ ⟫)
+Δ ⊢ A                                                        Δ ⊢ B
+  |                                                                       |
+  |                                                                       |
+  | refl                                                                  | hcomp _ (N ⟪ σ ⟫)
+  |                                                                       |
+  v                                                                       v
+         λ i → (transport-filler (cong (_ ⊢_) A=B)) N i ⟪ σ ⟫
+N ⟪ σ ⟫ -------------------------------------------------------> (subst (Γ ⊢_) A=B N) ⟪ σ ⟫
+Δ ⊢ A                                                              Δ ⊢ B
+-}
+subst-path-subst {Γ} {Δ} σ M A=B i = comp (λ j → Δ ⊢ A=B j)
+  (λ { j (i = i0) → transport-filler (cong (_ ⊢_) A=B) (M ⟪ σ ⟫) j
+     ; j (i = i1) → (transport-filler (cong (_ ⊢_) A=B) M j) ⟪ σ ⟫
+     })
+  (M ⟪ σ ⟫) 
+
 subst-zero-comm : (σ : Subst Γ Δ)
   → (N : Γ ⊢ B) (p : A ∈ B , Γ)
   → (exts σ ⨟ subst-zero (N ⟪ σ ⟫)) p ≡ (subst-zero N ⨟ σ) p
-subst-zero-comm         σ N (Z A=B) = {!!}
+subst-zero-comm {Γ} {Δ} σ N (Z A=B) = subst-path-subst σ N A=B
 subst-zero-comm {Γ} {Δ} σ N (S p) = begin
   (rename S_ (σ p)) ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
     ≡⟨ cong (_⟪ subst-zero (N ⟪ σ ⟫) ⟫) (rename=subst-ren (σ p)) ⟩
@@ -304,13 +325,13 @@ subst-ssubst σ M N = begin
 rename-ssubst : (ρ : Rename Γ Δ)
   → (M : A , Γ ⊢ B) (N : Γ ⊢ A)
   → rename (ext ρ) M [ rename ρ N ] ≡ rename ρ (M [ N ])
-rename-ssubst ρ M N = begin
+rename-ssubst {Γ} {Δ} {A} {B} ρ M N = begin
   rename (ext ρ) M [ rename ρ N ]
     ≡⟨ cong (_⟪ subst-zero (rename ρ N) ⟫) (rename=subst-ren M) ⟩
   M ⟪ ren (ext ρ) ⟫ ⟪ subst-zero (rename ρ N) ⟫
     ≡⟨ cong _⟪ subst-zero (rename ρ N) ⟫ (subst-cong (ren-ext-comm ρ) M) ⟩
   M ⟪ exts (ren ρ) ⟫ ⟪ subst-zero (rename ρ N) ⟫
-    ≡⟨ subst-cong (λ { (Z p) → {!!} ; (S x) → refl}) (M ⟪ exts (ren ρ) ⟫) ⟩
+    ≡⟨ subst-cong (λ { (Z p) i → subst-zero (rename=subst-ren {ρ = ρ} N i) (Z p) ; (S x) → refl}) (M ⟪ exts (ren ρ) ⟫) ⟩
   M ⟪ exts (ren ρ) ⟫ [ N ⟪ ren ρ ⟫ ]
     ≡⟨ subst-ssubst (ren ρ) M N ⟩
   M [ N ] ⟪ ren ρ ⟫
