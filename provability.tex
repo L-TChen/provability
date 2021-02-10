@@ -7,8 +7,11 @@
 \newcommand{\later}{\mathord{\blacktriangleright}}
 \newcommand{\laterp}{\mathord{\vartriangleright}}
 \newcommand{\PER}{\mathbf{PER}}
+\newcommand{\Asm}{\mathbf{Asm}}
+\newcommand{\ASM}{\mathfrak{Asm}}
+\newcommand{\Asmt}{\mathbf{Asm}_t}
 
-\title{Realising Löb's Axiom as Intensional (Guarded) Recursion in Homotopy Type Theory} 
+\title{Realising Löb's Axiom in Guarded Homotopy Type Theory} 
 \author{Liang-Ting Chen}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://l-tchen.github.io}}%
   {liang.ting.chen.tw@gmail.com}%
@@ -34,7 +37,7 @@
 
 \funding{This work was supported by the Ministry of Science and Technology of Taiwan under grant MOST~109-2222-E-001-002-MY3.}
 
-\acknowledgements{We want to thank Alex Kavvos and Martin Escard\'o. We are indebted to online platforms such as Zulip teams on Homotopy Type Theory and Agda for generous help and general discussions.}
+\acknowledgements{We want to thank Alex Kavvos and Tsung-Ju Chiang. We are indebted to online platforms such as Zulip teams on Homotopy Type Theory and Agda for generous help and general discussions.}
 
 \nolinenumbers %uncomment to disable line numbering
 
@@ -61,13 +64,12 @@
 %TODO: Polish abstract
 \begin{abstract}
   In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
-  We construct an endoexposure of the $\PER$-category of assemblies internal to guarded type theory as the interpretation of the provability modality~$\Box$.
-  Of the utmost significance of our understanding for $\Box A$ is that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or realisers, inspired by its provability reading.
-  Our results are established in the framework of ticked cubical type theory---an extension of cubical type theory with guarded recursion and formalised in Guarded Cubical Agda.
-  By viewing~$\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
+  We consider the ordinary category $\Asm(\Lambda)$ of assemblies on untyped lambda calculus and \emph{functions with trackers} in contrast to the $\PER$-category $\ASM(\mathcal{A})$ of assemblies on an arbitrary partial combinatory algebra $\mathcal{A}$ proposed by Kavvos.
+  Then, we construct an endofunctor as the interpretation of the (provability) modality~$\Box$.
+  Of the utmost significance of our understanding for $\Box A$ is that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo \emph{$\alpha$-equivalence only}, inspired by its provability reading.
+  Our results are established in a cubical type theory extended with guarded recursion and formalised in Guarded Cubical Agda.
+  Apart from its own theoretical interest, following the interpretation of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
 \end{abstract}
-
-\ltnote{Shall we include Chiang as a coauthor?}
 
 \section{Introduction}
 \cite{Litak2014}
@@ -89,31 +91,15 @@
 \begin{definition}[Partial equivalence relation]
   
 \end{definition}
-\begin{definition}[Categories enriched over $\mathbf{PER}$]
-  
-\end{definition}
-\begin{definition}[Exposure]
-  also comonadic exposure
-\end{definition}
-
-
-\subsection{Realisability}
-\cite{Escardo2017a,Knapp2018}
-\begin{definition}[Partial map classifer]
-  
-\end{definition}
-\begin{definition}[Ordered partial combinatory algebra]
-\end{definition}
-\begin{definition}[Assembly and trackable map]
-  
-\end{definition}
-
-
-
 %\section{Realising provability using topos of trees}
 %\subsection{Topos of trees and its internal logic}
 %\cite{Birkedal2012,Clouston2016}
-\section{Ordered partial combinatory algebra with numbering}
+\section{Category of assemblies over untyped lambda calculus}
+
+\subsection{Realisability}
+\begin{definition}[Assembly and trackable map]
+  
+\end{definition}
 
 \section{Realising provability using guarded cubical type theory}
 
