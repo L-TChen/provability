@@ -17,6 +17,7 @@ record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor _,_
   field
     _⊩_             : Λ₀ → X → 𝓤 ̇
+    -- TODO: Perhaps ⊩ should also be a mere proposition
     isRealisability : IsRealisability _⊩_
   open IsRealisability isRealisability public
   infix 6 _⊩_
@@ -56,6 +57,7 @@ Tracks : (X Y : Asm 𝓤)
 Tracks X Y F f = {M : Λ₀} {x : ⟨ X ⟩}
   →     M   X.⊩ x    
   → F [ M ] Y.⊩ (f x)
+  -- TODO: Clarify if this needs to be ∥ ... ∥
   where
     module X = AsmStr (str X)
     module Y = AsmStr (str Y)
@@ -88,7 +90,7 @@ syntax ∼-syntax {X = X} {Y = Y} f g = f ∼ g ꞉ X →ₐ Y
 ∼-syntax {X = X} {Y = Y} f g = ∼-eq X Y f g
 
 id : Trackable X X
-id = (λ x → x) , 0 , λ M⊩x → M⊩x
+id = 𝓤.id , 0 , 𝓤.id
 
 infixr 9 _∘_
 

@@ -40,7 +40,8 @@ module _ (Q : Quoting) where
     is⊩ (λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}) ⊩□X-right-total
     where
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ |X| ] ∥ ▹[ α ] M ⊩ ▹x α ∥
+      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ |X| ] ▹[ α ] M ⊩ ▹x α
+      -- can we remove truncation? If so, is □id still equal to id? 
 
       _⊩□X_ : (M : Λ₀) → |□X| → 𝓤 ̇
       n̅ ⊩□X (M , ▹x , M⊩▹x) = Lift (n̅ -↠ ⌜ M ⌝)
@@ -56,7 +57,7 @@ module _ (Q : Quoting) where
     λ {M} {x} → □F⊩□f {M} {x}
     where
       □f : ⟨ □ X ⟩ → ⟨ □ Y ⟩
-      □f (M , ▹x , M⊩x) = F [ M ] , ▹map f ▹x , rec propTruncIsProp (λ M⊩x → ∣ (λ α → F⊩f (M⊩x α)) ∣) M⊩x
+      □f (M , ▹x , M⊩x) = F [ M ] , ▹map f ▹x , λ α → F⊩f (M⊩x α)
 
       □F : ⋆ , ∅ ⊢ ⋆
       □F = ↑₁ Ap · ↑₁ ⌜ F ⌝ · 0
@@ -73,7 +74,7 @@ module _ (Q : Quoting) where
 
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ ⊥ₐ {𝓤}⟩ → ⊥* {𝓤}) → ▹ ⊥* → ⊥*
-  bang eval⊥ ▹x = eval⊥ (𝑰 , ▹x , ∣ (λ α → ⊥*-elim (▹x α)) ∣)
+  bang eval⊥ ▹x = eval⊥ (𝑰 , ▹x , λ α → ⊥*-elim (▹x α))
 
   -- Theorem. Evaluation □ ⊥ → ⊥ does not exist.
   eval-does-not-exist : Trackable {𝓤} (□ ⊥ₐ) ⊥ₐ → ⊥*
