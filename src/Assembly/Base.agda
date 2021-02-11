@@ -101,10 +101,10 @@ _∘_ {𝓤} {X} {Y} {Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘
 -- Universality
 
 finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
-finality (|X| , ⊩ , _isRealisable) = (λ _ → tt*) , 0 , λ x → tt* 
+finality X = (λ _ → tt*) , 0 , λ x → tt* 
 
 initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
-initiality {𝓤} X@(|X| , _⊩_ , _isRealisable) = ⊥*-elim , 0 , (λ { {x = ()} })
+initiality X = ⊥*-elim , 0 , (λ { {x = ()} })
 
 _⊩ℕ_ : Λ₀ → ℕ → 𝓤₀ ̇
 M ⊩ℕ n = M -↠ 𝒄 n
@@ -166,10 +166,7 @@ _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f �
 
       ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
       ⊩-respects-↠ {G} {F} {f , _} G-↠F F⊩f {M} M⊩x = Y.⊩-respects-↠
-        (begin
-          (↑₁ G · 0) [ M ]
-            -↠⟨ subst-reduce* {σ = subst-zero M} {(↑₁ G) · 0} {(↑₁ F) · 0} (·ₗ-cong (rename-reduce* G-↠F)) ⟩
-          (↑₁ F · 0) [ M ] ∎)
+        (subst-reduce* {σ = subst-zero M} {(↑₁ G) · 0} (·ₗ-cong (rename-reduce* G-↠F)))
         (F⊩f M⊩x) 
 
       ⊩-right-total : _

@@ -36,12 +36,11 @@ module _ (Q : Quoting) where
   open -↠-Reasoning
 
   □_ : Asm 𝓤 → Asm 𝓤
-  □_ {𝓤} X@(|X| , _⊩_ , ⊩-realisability) = |□X| , _⊩□X_ ,
+  □_ {𝓤} (|X| , _⊩_ , ⊩-realisability) = |□X| , _⊩□X_ ,
     is⊩ (λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}) ⊩□X-right-total
     where
-      module X = IsRealisability ⊩-realisability
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ |X| ] ▹[ α ] M ⊩ ▹x α
+      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ |X| ] ∥ ▹[ α ] M ⊩ ▹x α ∥
 
       _⊩□X_ : (M : Λ₀) → |□X| → 𝓤 ̇
       n̅ ⊩□X (M , ▹x , M⊩▹x) = Lift (n̅ -↠ ⌜ M ⌝)
@@ -56,36 +55,27 @@ module _ (Q : Quoting) where
   □map {𝓤} {X} {Y} (f , F , F⊩f) = □f , □F , 
     λ {M} {x} → □F⊩□f {M} {x}
     where
-      module X = AsmStr (str X)
-      module Y = AsmStr (str Y)
-      module □X = AsmStr (str (□ X))
-      module □Y = AsmStr (str (□ Y))
       □f : ⟨ □ X ⟩ → ⟨ □ Y ⟩
-      □f (M , ▹x , M⊩x) = F [ M ] , ▹map f ▹x , λ α → F⊩f (M⊩x α)
+      □f (M , ▹x , M⊩x) = F [ M ] , ▹map f ▹x , rec propTruncIsProp (λ M⊩x → ∣ (λ α → F⊩f (M⊩x α)) ∣) M⊩x
 
       □F : ⋆ , ∅ ⊢ ⋆
-      □F = ↑₁ Ap · ↑₁ ⌜ F ⌝ · 0 -- we also need the one-step reducer
+      □F = ↑₁ Ap · ↑₁ ⌜ F ⌝ · 0
 
       □F⊩□f : Tracks (□ X) (□ Y) □F □f
-      □F⊩□f {n̅} {M , ▹x , M⊩x} (lift n̅-↠⌜M⌝) = {!!}
-      {- lift (begin
-        (ƛ ↑₁ Ap · ↑₁ ⌜ F ⌝ · # 0) · n̅
-          -→⟨ β ⟩
+      □F⊩□f {n̅} {M , _ , _} (lift n̅-↠⌜M⌝) = lift (begin
         ↑₁ Ap [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
+          ≡[ i ]⟨ subst-rename-∅ {ρ = S_} (subst-zero n̅) Ap i · subst-rename-∅ {ρ = S_} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
+        Ap · ⌜ F ⌝ · n̅
           -↠⟨ ·ᵣ-cong n̅-↠⌜M⌝ ⟩
-        ↑₁ Ap [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · ⌜ M ⌝
-          ≡⟨ cong₂ (λ L N → L · N · ⌜ M ⌝) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ F ⌝) ⟩
         Ap · ⌜ F ⌝ · ⌜ M ⌝
-          -↠⟨ Ap-↠ ⟩
-        ⌜ F · M ⌝ 
-          ∎)
-          -}
+          -↠⟨ Ap-↠′ ⟩
+        ⌜ F [ M ] ⌝ ∎)
 
-  -- -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
+  -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ ⊥ₐ {𝓤}⟩ → ⊥* {𝓤}) → ▹ ⊥* → ⊥*
-  bang eval⊥ ▹x = eval⊥ (𝑰 , ▹x , λ α → ⊥*-elim (▹x α))
+  bang eval⊥ ▹x = eval⊥ (𝑰 , ▹x , ∣ (λ α → ⊥*-elim (▹x α)) ∣)
 
-  -- -- Theorem. Evaluation □ ⊥ → ⊥ does not exist.
+  -- Theorem. Evaluation □ ⊥ → ⊥ does not exist.
   eval-does-not-exist : Trackable {𝓤} (□ ⊥ₐ) ⊥ₐ → ⊥*
   eval-does-not-exist (e , hasTracker) = fix (bang e)
 

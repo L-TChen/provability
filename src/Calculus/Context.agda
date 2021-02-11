@@ -29,28 +29,27 @@ _⧺_ : Context T → Context T → Context T
 ∅       ⧺ Δ = Δ
 (A , Γ) ⧺ Δ = A , Γ ⧺ Δ
 
-module _ {T : 𝓤 ̇} where
-  private
-    codeCtx : (Γ Δ : Context T) → 𝓤 ̇
-    codeCtx ∅       ∅       = Unit*
-    codeCtx (A , Γ) (B , Δ) = (A ≡ B) × codeCtx Γ Δ
-    codeCtx _       _       = ⊥*
+private
+  codeCtx : {T : 𝓤 ̇} (Γ Δ : Context T) → 𝓤 ̇
+  codeCtx ∅       ∅       = Unit*
+  codeCtx (A , Γ) (B , Δ) = (A ≡ B) × codeCtx Γ Δ
+  codeCtx _       _       = ⊥*
 
-    rCtx : (Γ : Context T) → codeCtx Γ Γ
-    rCtx ∅       = tt*
-    rCtx (A , Γ) = refl , rCtx Γ
+  rCtx : (Γ : Context T) → codeCtx Γ Γ
+  rCtx ∅       = tt*
+  rCtx (A , Γ) = refl , rCtx Γ
 
-    decodeCtx : {Γ Δ : Context T} → codeCtx Γ Δ → Γ ≡ Δ
-    decodeCtx {∅}     {∅}     tt*           = refl
-    decodeCtx {A , Γ} {B , Δ} (A=B , Γ=Δ) i = A=B i , decodeCtx Γ=Δ i 
-    decodeCtx {∅}     {_ , _} ()
-    decodeCtx {_ , _} {∅}     ()
+  decodeCtx : {Γ Δ : Context T} → codeCtx Γ Δ → Γ ≡ Δ
+  decodeCtx {Γ = ∅}     {∅}     tt*           = refl
+  decodeCtx {Γ = A , Γ} {B , Δ} (A=B , Γ=Δ) i = A=B i , decodeCtx Γ=Δ i 
+  decodeCtx {Γ = ∅}     {_ , _} ()
+  decodeCtx {Γ = _ , _} {∅}     ()
 
-  instance
-    CodeContext : Code (Context T)
-    code   ⦃ CodeContext ⦄ = codeCtx
-    r      ⦃ CodeContext ⦄ = rCtx
-    decode ⦃ CodeContext ⦄ = decodeCtx
+instance
+  CodeContext : Code (Context T)
+  code   ⦃ CodeContext ⦄ = codeCtx
+  r      ⦃ CodeContext ⦄ = rCtx
+  decode ⦃ CodeContext ⦄ = decodeCtx
 
 _≟Cxt_ : ⦃ _ : DecEq T ⦄ → (Γ Δ : Context T) → Dec (Γ ≡ Δ)
 ∅       ≟Cxt ∅       = yes (decode tt*)
@@ -86,26 +85,26 @@ ext ρ (S x) =  S (ρ x)
 Rename : {T : 𝓤 ̇} → Context T → Context T → 𝓤 ̇ 
 Rename {T = T} Γ Δ = {A : T} → A ∈ Γ → A ∈ Δ
 
-module _ {T : 𝓤 ̇} where
-  private
-    code∈ : {A : T} {Γ : Context T} (x y : A ∈ Γ) → 𝓤 ̇
-    code∈ (Z p) (Z q) = p ≡ q
-    code∈ (S x) (S y) = code∈ x y
-    code∈ _     _     = ⊥*
+private
+  code∈ : {A : T} (x y : A ∈ Γ) → universe-of T ̇
+  code∈ (Z p) (Z q) = p ≡ q -- p ≡ q
+  code∈ (S x) (S y) = code∈ x y
+  code∈ _     _     = ⊥*
 
-    r∈ : {A : T} (x : A ∈ Γ) → code∈ x x
-    r∈ (Z _) = refl
-    r∈ (S x) = r∈ x
+  r∈ : (x : A ∈ Γ) → code∈ x x
+  r∈ (Z _) = refl
+  r∈ (S x) = r∈ x
 
-    decode∈ : {A : T} {x y : A ∈ Γ} → code∈ x y → x ≡ y
-    decode∈ {x = Z p} {Z q} c = cong Z c  
-    decode∈ {x = S x} {S y} c = cong S_ (decode∈ c)
+  decode∈ : {x y : A ∈ Γ} → code∈ x y → x ≡ y
+  decode∈ {x = Z p} {Z q} c = cong Z c  
+  decode∈ {x = S x} {S y} c = cong S_ (decode∈ c)
 
-  instance
-    Code∈ : {A : T} → Code (A ∈ Γ)
-    Code∈ = record { code = code∈ ; r = r∈ ; decode = decode∈ }
+instance
+  Code∈ : Code (A ∈ Γ)
+  Code∈ = record { code = code∈ ; r = r∈ ; decode = decode∈ }
 
-_≟∈_ : ⦃ DecEq T ⦄ → {A : T} (x y : A ∈ Γ) → Dec (x ≡ y)
+_≟∈_ : ⦃ DecEq T ⦄ → {A : T}
+  → (x y : A ∈ Γ) → Dec (x ≡ y)
 Z p   ≟∈ Z q = yes (cong Z (≟→isSet _ _ p q ))
 (S x) ≟∈ (S y) with x ≟∈ y
 ... | yes p = yes (cong S_ p)

@@ -3,7 +3,6 @@
 module Calculus.Untyped.Substitution where
 
 open import Prelude
-open import Calculus.Context
 open import Calculus.Untyped.Base
 
 
@@ -27,23 +26,13 @@ rename-cong
   : (∀ {A} (x : A ∈ Γ) → ρ₁ x ≡ ρ₂ x)
   → (M : Γ ⊢ A)
   → rename ρ₁ M ≡ rename ρ₂ M
-rename-cong p (` x)   i = ` p x i
-rename-cong p (M · N) i = rename-cong p M i · rename-cong p N i
-rename-cong {ρ₁ = ρ₁} {ρ₂} p (ƛ M) i = ƛ rename-cong rho M i
-  where
-    rho : (x : A ∈ B , _) → ext ρ₁ x ≡ ext ρ₂ x
-    rho (Z _)   = refl
-    rho (S x) i = S p x i
+rename-cong p M i = rename (funExt p i) M
 
 subst-cong
   : ({A : 𝕋} (x : A ∈ Γ) → σ₁ x ≡ σ₂ x)
   → (M : Γ ⊢ A)
   → M ⟪ σ₁ ⟫ ≡ M ⟪ σ₂ ⟫
-subst-cong p (` x)    = p x
-subst-cong p (M · N)  = cong₂ _·_ (subst-cong p M) (subst-cong p N)
-
-subst-cong p (ƛ M)    = cong ƛ_ (subst-cong 
-  (λ {(Z _) → refl ; (S x) → cong (rename S_) (p x)}) M)
+subst-cong p M i = M ⟪ funExt p i ⟫
 
 ----------------------------------------------------------------------
 -- Properties of ext 
@@ -72,7 +61,7 @@ rename=subst-ren {ρ = ρ} (ƛ M) =
   ƛ rename (ext ρ) M
     ≡⟨ cong ƛ_ (rename=subst-ren M) ⟩
   ƛ M ⟪ ren (ext ρ) ⟫
-    ≡⟨ cong ƛ_ (subst-cong (ren-ext ρ) M) ⟩
+    ≡[ i ]⟨ ƛ M ⟪ funExt (ren-ext ρ) i ⟫ ⟩
   ƛ M ⟪ exts (ren ρ) ⟫
     ≡⟨⟩
   (ƛ M) ⟪ ren ρ ⟫ ∎
@@ -87,15 +76,15 @@ rename-comp
   : (ρ₁ : Rename Γ Δ) (ρ₂ : Rename Δ Ξ)
   → {M : Γ ⊢ A}
   → rename ρ₂ (rename ρ₁ M) ≡ rename (ρ₂ ∘ ρ₁) M
-rename-comp ρ₁ ρ₂ {M = ` x}   = refl
+rename-comp ρ₁ ρ₂ {M = ` x}     = refl
 rename-comp ρ₁ ρ₂ {M = M · N} i = rename-comp ρ₁ ρ₂ {M} i · rename-comp ρ₁ ρ₂ {N} i 
-rename-comp ρ₁ ρ₂ {M = ƛ M}   =
+rename-comp ρ₁ ρ₂ {M = ƛ M}     =
   rename ρ₂ (rename ρ₁ (ƛ M))
     ≡⟨⟩
   ƛ rename (ext ρ₂) (rename (ext ρ₁) M)
     ≡[ i ]⟨ ƛ rename-comp (ext ρ₁) (ext ρ₂) {M} i ⟩
   ƛ rename (ext ρ₂ ∘ ext ρ₁) M
-    ≡[ i ]⟨ ƛ rename-cong (ext-comp ρ₁ ρ₂) M i ⟩
+    ≡[ i ]⟨ ƛ rename (funExt (ext-comp ρ₁ ρ₂) i) M ⟩
   ƛ rename (ext (ρ₂ ∘ ρ₁)) M
     ≡⟨⟩
   rename (ρ₂ ∘ ρ₁) (ƛ M) ∎
@@ -204,13 +193,13 @@ subst-idR σ = refl
 subst-idL
   : (M : Γ ⊢ A)
   → M ⟪ ids ⟫ ≡ M
-subst-idL (` x)      = refl
-subst-idL (M · N)    = cong₂ _·_    (subst-idL M) (subst-idL N)
-subst-idL (ƛ_ M)     = begin
+subst-idL (` x)   = refl
+subst-idL (M · N) = cong₂ _·_ (subst-idL M) (subst-idL N)
+subst-idL (ƛ_ M)  = begin
   ƛ M ⟪ exts ids ⟫ 
-    ≡⟨ cong ƛ_ (subst-cong exts-ids=ids M) ⟩ 
+    ≡[ i ]⟨ ƛ M ⟪ (λ p → exts-ids=ids p i) ⟫ ⟩
   ƛ M ⟪ ids ⟫
-    ≡⟨ cong ƛ_ (subst-idL M) ⟩
+    ≡[ i ]⟨ ƛ subst-idL M i ⟩
   ƛ M  ∎
   where
     open ≡-Reasoning
@@ -222,15 +211,15 @@ subst-assoc
   : (σ₁ : Subst Γ Δ) (σ₂ : Subst Δ Ξ)
   → (M : Γ ⊢ A)
   →  M ⟪ σ₁ ⟫ ⟪ σ₂ ⟫ ≡ M ⟪ σ₁ ⨟ σ₂ ⟫
-subst-assoc σ₁ σ₂ (` x)      = refl
-subst-assoc σ₁ σ₂ (M · N)    = cong₂ _·_ (subst-assoc σ₁ σ₂ M) (subst-assoc σ₁ σ₂ N)
-subst-assoc σ₁ σ₂ (ƛ M)      = begin
+subst-assoc σ₁ σ₂ (` x)   = refl
+subst-assoc σ₁ σ₂ (M · N) = cong₂ _·_ (subst-assoc σ₁ σ₂ M) (subst-assoc σ₁ σ₂ N)
+subst-assoc σ₁ σ₂ (ƛ M)   = begin
   (ƛ M) ⟪ σ₁ ⟫ ⟪ σ₂ ⟫
     ≡⟨⟩
   ƛ M ⟪ exts σ₁ ⟫ ⟪ exts σ₂ ⟫
-    ≡⟨ cong ƛ_ (subst-assoc (exts σ₁) (exts σ₂) M) ⟩
+    ≡[ i ]⟨ ƛ subst-assoc (exts σ₁) (exts σ₂) M i ⟩
   ƛ M ⟪ _⟪ exts σ₂ ⟫ ∘ exts σ₁ ⟫
-    ≡⟨ cong ƛ_ (subst-cong (exts-subst σ₁ σ₂) M) ⟩
+    ≡[ i ]⟨ ƛ M ⟪ (λ p → exts-subst σ₁ σ₂ p i) ⟫ ⟩
   ƛ M ⟪ exts (σ₁ ⨟ σ₂) ⟫
     ≡⟨⟩
   (ƛ M) ⟪ σ₁ ⨟ σ₂ ⟫ ∎
@@ -240,15 +229,7 @@ subst-assoc σ₁ σ₂ (ƛ M)      = begin
       → (x : A ∈ B , Γ) 
       → (exts σ₁ ⨟ exts σ₂) x ≡ exts (σ₁ ⨟ σ₂) x
     exts-subst σ₁ σ₂ (Z _) = refl
-    exts-subst σ₁ σ₂ (S x) = begin
-      (exts σ₁ ⨟ exts σ₂) (S x)
-        ≡⟨⟩
-      rename S_ (σ₁ x) ⟪ exts σ₂ ⟫ 
-        ≡⟨ rename-exts σ₂ (σ₁ x)  ⟩
-      rename S_ (σ₁ x ⟪ σ₂ ⟫)
-        ≡⟨⟩
-      exts (σ₁ ⨟ σ₂) (S x)
-        ∎
+    exts-subst σ₁ σ₂ (S x) = rename-exts σ₂ (σ₁ x)
 
 ----------------------------------------------------------------------
 -- 
@@ -258,37 +239,12 @@ rename-subst : (ρ : Rename Γ Δ) (σ : Subst Δ Ξ)
   →  rename ρ M ⟪ σ ⟫ ≡ M ⟪ σ ∘ ρ ⟫
 rename-subst ρ σ M = begin
   (rename ρ M) ⟪ σ ⟫ 
-    ≡⟨ cong _⟪ σ ⟫ (rename=subst-ren M) ⟩
+    ≡[ i ]⟨ (rename=subst-ren {ρ = ρ} M i) ⟪ σ ⟫ ⟩
   (M ⟪ ren ρ ⟫) ⟪ σ ⟫ 
     ≡⟨ subst-assoc (ren ρ) σ M ⟩
-  M ⟪ ren ρ ⨟ σ ⟫
-    ≡⟨⟩
   M ⟪ σ ∘ ρ ⟫
     ∎
   where open ≡-Reasoning
-
-{-
-subst-path-subst : (σ : Subst Γ Δ) (M : Γ ⊢ A) (A=B : A ≡ B)
-  → subst (Δ ⊢_) A=B (M ⟪ σ ⟫) ≡ subst (Γ ⊢_) A=B M ⟪ σ ⟫
-{-
-         transport-filler (cong (_ ⊢_) A=B) (N ⟪ σ ⟫)
-N ⟪ σ ⟫ ------------------------------------------------------> subst (Δ ⊢_) A=B (N ⟪ σ ⟫)
-Δ ⊢ A                                                        Δ ⊢ B
-  |                                                                       |
-  |                                                                       |
-  | refl                                                                  | hcomp _ (N ⟪ σ ⟫)
-  |                                                                       |
-  v                                                                       v
-         λ i → (transport-filler (cong (_ ⊢_) A=B)) N i ⟪ σ ⟫
-N ⟪ σ ⟫ -------------------------------------------------------> (subst (Γ ⊢_) A=B N) ⟪ σ ⟫
-Δ ⊢ A                                                              Δ ⊢ B
--}
-subst-path-subst {_} {Δ} σ M A=B i = comp (λ j → Δ ⊢ A=B j)
-  (λ { j (i = i0) → transport-filler (cong (_ ⊢_) A=B) (M ⟪ σ ⟫) j
-     ; j (i = i1) → (transport-filler (cong (_ ⊢_) A=B) M j) ⟪ σ ⟫
-     })
-  (M ⟪ σ ⟫) 
--}
 
 subst-zero-S=ids : {N : Γ ⊢ B}
   → (x : A ∈ Γ)→ subst-zero N (S x) ≡ ids x
@@ -305,7 +261,7 @@ subst-zero-comm {Γ} {Δ} {⋆} {⋆} σ N (S p) = begin
   σ p ⟪ ren S_ ⟫ ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
     ≡⟨ subst-assoc (ren S_) (subst-zero (N ⟪ σ ⟫)) (σ p) ⟩
   σ p ⟪ subst-zero (N ⟪ σ ⟫) ∘ S_ ⟫ 
-    ≡⟨ subst-cong (subst-zero-S=ids {Δ} {⋆}) (σ p) ⟩
+    ≡[ i ]⟨ σ p ⟪ (λ p → subst-zero-S=ids {N = N ⟪ σ ⟫} p i) ⟫ ⟩
   σ p ⟪ ids ⟫ 
     ≡⟨ subst-idL (σ p) ⟩
   σ p ∎ where open ≡-Reasoning
@@ -320,7 +276,7 @@ subst-ssubst σ M N = begin
   M ⟪ exts σ ⟫ [ N ⟪ σ ⟫ ]
     ≡⟨ subst-assoc (exts σ) (subst-zero (N ⟪ σ ⟫)) M ⟩
   M ⟪ exts σ ⨟ subst-zero (N ⟪ σ ⟫) ⟫
-    ≡⟨ subst-cong (subst-zero-comm σ N) M ⟩ 
+    ≡[ i ]⟨ M ⟪ (λ p → subst-zero-comm σ N p i) ⟫ ⟩ 
   M ⟪ subst-zero N ⨟ σ ⟫
     ≡⟨ sym (subst-assoc (subst-zero N) σ M) ⟩
   (M ⟪ subst-zero N ⟫) ⟪ σ ⟫ 
