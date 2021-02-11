@@ -113,8 +113,8 @@ _⟪_⟫
 subst-zero
   : Γ ⊢ B
   → Subst (B , Γ) Γ
-subst-zero N (Z p) = subst (_ ⊢_) p N
-subst-zero _ (S x) = ` x
+subst-zero N (Z {⋆} {⋆} p) = N
+subst-zero _ (S x)         = ` x
 
 _[_]
   : B , Γ ⊢ A
@@ -128,16 +128,13 @@ M [ N ] = M ⟪ subst-zero N ⟫
 infix 6 _-→_
 data _-→_ {Γ : Cxt} : {A : 𝕋} → Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
   β : (ƛ M) · N -→ M [ N ]
-
   ζ
     :   M -→ M′
     → ƛ M -→ ƛ M′
-
   ξₗ
     : L -→ L′
       ---------------
     → L · M -→ L′ · M
-
   ξᵣ
     : M -→ M′
       ---------------
@@ -163,7 +160,6 @@ module -↠-Reasoning where
       → M -↠ N
         ----------
       → L -↠ N
-
   begin_
     : M -↠ N
     → M -↠ N
@@ -311,27 +307,26 @@ progress (L@(_ · _) · M) with progress L
 ------------------------------------------------------------------------------
 -- Decidable equality between α-equivalent terms
 
-module _ where
-  private
-    code⊢ : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
-    code⊢ (` x)     (` y)     = code x y
-    code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
-    code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
-    code⊢ _               _         = ⊥
+private
+  code⊢ : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
+  code⊢ (` x)     (` y)     = code x y
+  code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
+  code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
+  code⊢ _               _   = ⊥
 
-    r⊢ : (M : Γ ⊢ A) → code⊢ M M
-    r⊢ (` x)   = r x
-    r⊢ (ƛ M)   = r⊢ M
-    r⊢ (M · N) = r⊢ M , r⊢ N
+  r⊢ : (M : Γ ⊢ A) → code⊢ M M
+  r⊢ (` x)   = r x
+  r⊢ (ƛ M)   = r⊢ M
+  r⊢ (M · N) = r⊢ M , r⊢ N
 
-    decode⊢ : code⊢ M N → M ≡ N
-    decode⊢ {M = ` x}     {` y}    c         = cong {B = λ _ → _ ⊢ _} `_ (decode c)
-    decode⊢ {M = ƛ M}     {ƛ N}    c         = cong {B = λ _ → _ ⊢ _} ƛ_ (decode⊢ c)
-    decode⊢ {M = L₁ · M₁} {_ · M₂} (c₁ , c₂) = cong₂ {x = L₁}  _·_ (decode⊢ c₁) {M₁} {M₂} (decode⊢ c₂)
+  decode⊢ : code⊢ M N → M ≡ N
+  decode⊢ {M = ` x}     {` y}    c        = cong {B = λ _ → _ ⊢ _} `_ (decode c)
+  decode⊢ {M = ƛ M}     {ƛ N}    c        = cong {B = λ _ → _ ⊢ _} ƛ_ (decode⊢ c)
+  decode⊢ {M = L₁ · M₁} {_ · _} (c₁ , c₂) = cong₂ {x = L₁}  _·_ (decode⊢ c₁) {M₁} (decode⊢ c₂)
 
-  instance
-    Code⊢ : Code (Γ ⊢ A)
-    Code⊢ = record { code = code⊢ ; r = r⊢ ; decode = decode⊢ }
+instance
+  Code⊢ : Code (Γ ⊢ A)
+  Code⊢ = record { code = code⊢ ; r = r⊢ ; decode = decode⊢ }
 
 private
   _≟⊢_ : (M N : Γ ⊢ A) → Dec (M ≡ N)

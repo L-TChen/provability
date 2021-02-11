@@ -267,6 +267,7 @@ rename-subst ρ σ M = begin
     ∎
   where open ≡-Reasoning
 
+{-
 subst-path-subst : (σ : Subst Γ Δ) (M : Γ ⊢ A) (A=B : A ≡ B)
   → subst (Δ ⊢_) A=B (M ⟪ σ ⟫) ≡ subst (Γ ⊢_) A=B M ⟪ σ ⟫
 {-
@@ -287,26 +288,30 @@ subst-path-subst {_} {Δ} σ M A=B i = comp (λ j → Δ ⊢ A=B j)
      ; j (i = i1) → (transport-filler (cong (_ ⊢_) A=B) M j) ⟪ σ ⟫
      })
   (M ⟪ σ ⟫) 
+-}
+
+subst-zero-S=ids : {N : Γ ⊢ B}
+  → (x : A ∈ Γ)→ subst-zero N (S x) ≡ ids x
+subst-zero-S=ids {Γ} {⋆} (Z {⋆} {⋆} B=A) = refl
+subst-zero-S=ids {Γ} {⋆} {⋆} (S x)       = refl
 
 subst-zero-comm : (σ : Subst Γ Δ)
   → (N : Γ ⊢ B) (p : A ∈ B , Γ)
   → (exts σ ⨟ subst-zero (N ⟪ σ ⟫)) p ≡ (subst-zero N ⨟ σ) p
-subst-zero-comm {Γ} {Δ} σ N (Z A=B) = subst-path-subst σ N A=B
-subst-zero-comm {Γ} {Δ} σ N (S p) = begin
+subst-zero-comm {Γ} {Δ} σ N (Z {⋆} {⋆} A=B) = refl
+subst-zero-comm {Γ} {Δ} {⋆} {⋆} σ N (S p) = begin
   (rename S_ (σ p)) ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
     ≡⟨ cong (_⟪ subst-zero (N ⟪ σ ⟫) ⟫) (rename=subst-ren (σ p)) ⟩
   σ p ⟪ ren S_ ⟫ ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
     ≡⟨ subst-assoc (ren S_) (subst-zero (N ⟪ σ ⟫)) (σ p) ⟩
   σ p ⟪ subst-zero (N ⟪ σ ⟫) ∘ S_ ⟫ 
-    ≡⟨ refl ⟩
+    ≡⟨ subst-cong (subst-zero-S=ids {Δ} {⋆}) (σ p) ⟩
   σ p ⟪ ids ⟫ 
     ≡⟨ subst-idL (σ p) ⟩
-  σ p ∎
-  where open ≡-Reasoning
+  σ p ∎ where open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Substitution Lemma
-
   
 subst-ssubst : (σ : Subst Γ Δ)
   → (M : A , Γ ⊢ B) (N : Γ ⊢ A)
@@ -319,8 +324,7 @@ subst-ssubst σ M N = begin
   M ⟪ subst-zero N ⨟ σ ⟫
     ≡⟨ sym (subst-assoc (subst-zero N) σ M) ⟩
   (M ⟪ subst-zero N ⟫) ⟪ σ ⟫ 
-    ∎
-  where open ≡-Reasoning
+    ∎ where open ≡-Reasoning
 
 rename-ssubst : (ρ : Rename Γ Δ)
   → (M : A , Γ ⊢ B) (N : Γ ⊢ A)
@@ -331,17 +335,15 @@ rename-ssubst {Γ} {Δ} {A} {B} ρ M N = begin
   M ⟪ ren (ext ρ) ⟫ ⟪ subst-zero (rename ρ N) ⟫
     ≡⟨ cong _⟪ subst-zero (rename ρ N) ⟫ (subst-cong (ren-ext-comm ρ) M) ⟩
   M ⟪ exts (ren ρ) ⟫ ⟪ subst-zero (rename ρ N) ⟫
-    ≡⟨ subst-cong (λ { (Z p) i → subst-zero (rename=subst-ren {ρ = ρ} N i) (Z p) ; (S x) → refl}) (M ⟪ exts (ren ρ) ⟫) ⟩
+    ≡⟨ subst-cong (λ { (Z {⋆} {⋆} B=A) → rename=subst-ren N; (S_ {⋆} {_} {⋆} x) → refl}) (M ⟪ exts (ren ρ) ⟫) ⟩
   M ⟪ exts (ren ρ) ⟫ [ N ⟪ ren ρ ⟫ ]
     ≡⟨ subst-ssubst (ren ρ) M N ⟩
   M [ N ] ⟪ ren ρ ⟫
     ≡⟨ sym (rename=subst-ren _) ⟩
-  rename ρ (M [ N ])
-    ∎
-  where open ≡-Reasoning
+  rename ρ (M [ N ]) ∎ where open ≡-Reasoning
 
-subst-rename-∅ : (ρ : Rename ∅ Γ) (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → rename ρ M ⟪ σ ⟫ ≡ M
-subst-rename-∅ ρ σ M = begin
+subst-rename-∅ : {ρ : Rename ∅ Γ} (σ : Subst Γ ∅) → (M : ∅ ⊢ A) → rename ρ M ⟪ σ ⟫ ≡ M
+subst-rename-∅ {ρ = ρ} σ M = begin
   rename ρ M ⟪ σ ⟫
     ≡⟨ rename-subst ρ σ M ⟩
   M ⟪ σ ∘ ρ ⟫
@@ -389,8 +391,8 @@ module _ where
 ------------------------------------------------------------------------------
 -- Special cut rule
 
-γ_ : (N : A , Γ ⊢ B) → Subst (B , ∅) (A , Γ) 
-(γ N) (Z B=A) = subst (_ ⊢_) B=A N
+γ : (N : A , ∅ ⊢ B) → Subst (B , ∅) (A , ∅) 
+γ {⋆} {⋆} N {⋆} (Z B=A) = N
 
 _∘′_ : {A B C : 𝕋}
   → B , ∅ ⊢ C
@@ -400,30 +402,20 @@ _∘′_ {A} {B} {C} M N = M ⟪ γ N ⟫
 
 ∘-ssubst-ssubst : (L : B , ∅ ⊢ C) (M : A , ∅ ⊢ B) (N : ∅ ⊢ A)
   → (L ∘′ M) [ N ] ≡ L [ M [ N ] ]
-∘-ssubst-ssubst L M N = begin
+∘-ssubst-ssubst {⋆} {⋆} {⋆} L M N = begin
   (L ∘′ M) [ N ]
     ≡⟨⟩
   L ⟪ γ M ⟫ ⟪ subst-zero N ⟫
     ≡⟨ subst-assoc (γ M) (subst-zero N) L ⟩
   L ⟪ γ M ⨟ subst-zero N ⟫
-    -- ≡[ i ]⟨ L ⟪ (λ p → lem M N p i) ⟫ ⟩
-    ≡[ i ]⟨ L ⟪ (λ p → lem M N p i) ⟫ ⟩
-  L ⟪ subst-zero (M ⟪ subst-zero N ⟫) ⟫
-    ≡⟨⟩
+    ≡⟨ subst-cong (λ { (Z {⋆} {⋆} B=A) → refl}) L ⟩
   L [ M [ N ] ] ∎
-  where
-    open ≡-Reasoning
-    lem : (M : A , ∅ ⊢ B) (N : ∅ ⊢ A) (p : C ∈ B , ∅) → (γ M ⨟ subst-zero N) p ≡ subst-zero (M [ N ]) p
-    lem M N (Z B=C) =  subst-path-subst (subst-zero N) M B=C ⁻¹
+  where open ≡-Reasoning
 
-{-
-∘′-right-id : (M : A , ∅ ⊢ B) → M ∘′ (` Z refl) ≡ M
-∘′-right-id M = {!!}
+∘′-id-left  : (M : A , ∅ ⊢ B) → (` Z refl) ∘′ M ≡ M
+∘′-id-left {⋆} {⋆} M = refl
 
-∘′-left-id : (M : A , ∅ ⊢ B) → (` Z refl) ∘′ M ≡ M
-∘′-left-id M = {!!}
-
-∘′-assoc :  (L : C , ∅ ⊢ B) (M : B , ∅ ⊢ C) (N : A , ∅ ⊢ B)
-  → L ∘′ (M ∘′ N) ≡ (L ∘′ M) ∘′ N
-∘′-assoc L M N = {!!}
--}
+postulate
+  ∘′-assoc    :  (L : C , ∅ ⊢ B) (M : B , ∅ ⊢ C) (N : A , ∅ ⊢ B)
+    → L ∘′ (M ∘′ N) ≡ (L ∘′ M) ∘′ N
+  ∘′-id-right : (M : A , ∅ ⊢ B) (p : A ≡ A) → M ∘′ (` Z p) ≡ M

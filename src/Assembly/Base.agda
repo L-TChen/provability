@@ -88,8 +88,7 @@ syntax ∼-syntax {X = X} {Y = Y} f g = f ∼ g ꞉ X →ₐ Y
 ∼-syntax {X = X} {Y = Y} f g = ∼-eq X Y f g
 
 id : Trackable X X
-id {X = X} = (λ x → x) , 0 , (subst (_⊩ _) (transport-filler _ _))
-  where open AsmStr (str X)
+id = (λ x → x) , 0 , λ M⊩x → M⊩x
 
 infixr 9 _∘_
 
@@ -143,17 +142,15 @@ projₗ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) X
 projₗ X Y = (λ {(x , y) → x}) , 0 · ↑₁ 𝑻 , F⊩projₗ
   where
     module X = AsmStr (str X)
-    postulate
-      F⊩projₗ : Tracks (X ×ₐ Y) X (0 · ↑₁ 𝑻) λ {(x , y) → x}
-      --F⊩projₗ (_ , _ , π₁L-↠M , M⊩x , _ , _) = {!!} -- X.⊩-respects-↠ π₁L-↠M M⊩x
+    F⊩projₗ : Tracks (X ×ₐ Y) X (0 · ↑₁ 𝑻) λ {(x , y) → x}
+    F⊩projₗ (_ , _ , πₗL-↠M , M⊩x , _ , _) = X.⊩-respects-↠ πₗL-↠M M⊩x
 
 projᵣ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) Y
 projᵣ X Y = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⊩projᵣ
   where
     module Y = AsmStr (str Y)
-    postulate
-      F⊩projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑₁ 𝑭) λ {(x , y) → y}
-      --F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⊩y) = {!!} -- Y.⊩-respects-↠ π₂L-↠N N⊩y
+    F⊩projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑₁ 𝑭) λ {(x , y) → y}
+    F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⊩y) = Y.⊩-respects-↠ π₂L-↠N N⊩y
 
 -- Exponentia consists of trackable functions.
 _⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
@@ -182,10 +179,8 @@ _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f �
           open -↠-Reasoning
           lem : (F : ⋆ , ∅ ⊢ ⋆) → (M : Λ₀) → ((↑₁ (ƛ F)) · 0) [ M ] -↠ F [ M ]
           lem F M = begin
-            ↑₁ (ƛ F) [ M ] · 0 [ M ]
-              ≡[ i ]⟨ ↑₁ (ƛ F) [ M ]  · transport-filler (λ _ → Λ₀) M (~ i) ⟩
             ↑₁ (ƛ F) [ M ] · M
-              ≡⟨ cong {B = λ _ → Λ₀} (_· M) (subst-rename-∅ _ (subst-zero M) (ƛ F)) ⟩
+              ≡⟨ cong {B = λ _ → Λ₀} (_· M) (subst-rename-∅ (subst-zero M) (ƛ F)) ⟩
             (ƛ F) · M
               -→⟨ β ⟩
             F [ M ]
@@ -193,7 +188,3 @@ _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f �
 
 postulate
   ev : (X Y : Asm 𝓤) → Trackable ((X ⇒ Y) ×ₐ X) Y
---ev X Y = {!!}
---  where
---    module X = AsmStr (str X)
---    module Y = AsmStr (str Y)
