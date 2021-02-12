@@ -11,15 +11,13 @@ open import Calculus.Untyped.Type public
   
 infix  3 _⊢_
 
-infixr 8 ƛ_ ′_
+infixr 8 ƛ_
 infixl 10 _·_
 
 infixl 11 _[_] _⟪_⟫
 
 Cxt = Context 𝕋
 
-variable
-  Γ Δ Ξ  : Cxt
 ------------------------------------------------------------------------------
 -- Typing Rules
 
@@ -41,6 +39,7 @@ data _⊢_ (Γ : Cxt) : 𝕋 → 𝓤₀ ̇ where
 private
   variable
     A B C          : 𝕋
+    Γ Δ Ξ          : Cxt
     M N L M′ N′ L′ : Γ ⊢ A
 
 count : {n : ℕ}
@@ -48,18 +47,59 @@ count : {n : ℕ}
 count {⋆ , _} {zero}    tt = Z refl
 count {⋆ , Γ} {(suc n)} p  = S count p
 
-#_ : (n : ℕ)
-  → {n∈Γ : True (suc n ≤? length Γ)}
-    --------------------------------
-  → Γ ⊢ ⋆
-#_ n {n∈Γ}  = ` count (toWitness n∈Γ)
-
 instance
   fromNat∈ : HasFromNat (Γ ⊢ ⋆)
   fromNat∈ {Γ} = record
     { Constraint = λ n → True (suc n ≤? length Γ)
-    ; fromNat    = λ n ⦃ n∈Γ ⦄ → #_ n {n∈Γ}
+    ; fromNat    = λ n ⦃ n∈Γ ⦄ → ` count (toWitness n∈Γ) 
     }
+
+------------------------------------------------------------------------------
+-- Decidable equality between α-equivalent terms
+
+private
+  code⊢ : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
+  code⊢ (` x)     (` y)     = code x y
+  code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
+  code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
+  code⊢ _               _   = ⊥
+
+  r⊢ : (M : Γ ⊢ A) → code⊢ M M
+  r⊢ (` x)   = r x
+  r⊢ (ƛ M)   = r⊢ M
+  r⊢ (M · N) = r⊢ M , r⊢ N
+
+  decode⊢ : code⊢ M N → M ≡ N
+  decode⊢ {M = ` x}     {` y} c       = cong `_ (decode c)
+  decode⊢ {M = ƛ M}     {ƛ N} c       = cong ƛ_ (decode⊢ c)
+  decode⊢ {M = _ · _} {_ · _} (c , d) = cong₂ _·_ (decode⊢ c) (decode⊢ d)
+
+instance
+  Code⊢ : Code (Γ ⊢ A)
+  Code⊢ = record { code = code⊢ ; r = r⊢ ; decode = decode⊢ }
+
+private
+  _≟⊢_ : (M N : Γ ⊢ A) → Dec (M ≡ N)
+  (` x)     ≟⊢ (` y) with x ≟ y
+  ... | yes p = yes (cong `_ p)
+  ... | no ¬p = no λ x=y → ¬p (decode (encode x=y))
+  (ƛ M)     ≟⊢ (ƛ N) with M ≟⊢ N
+  ... | yes p = yes (cong ƛ_ p)
+  ... | no ¬p = no λ ƛM=ƛN → ¬p (decode (encode ƛM=ƛN))
+  (M₁ · N₁) ≟⊢ (M₂ · N₂) with M₁ ≟⊢ M₂ | N₁ ≟⊢ N₂
+  ... | yes p | yes q = yes (decode (encode p , encode q))
+  ... | yes p | no ¬q = no λ M=N → ¬q (decode (encode M=N .snd))
+  ... | no ¬p | q     = no λ M=N → ¬p (decode (encode M=N .fst))
+  (` _)   ≟⊢ (ƛ _)    = no encode
+  (` _)   ≟⊢ (_ · _)  = no encode
+  (ƛ _)   ≟⊢ (` _)    = no encode
+  (ƛ _)   ≟⊢ (_ · _)  = no encode
+  (_ · _) ≟⊢ (` _)    = no encode
+  (_ · _) ≟⊢ (ƛ _)    = no encode
+
+instance
+  DecEq⊢ : DecEq (Γ ⊢ A)
+  _≟_ ⦃ DecEq⊢ ⦄ = _≟⊢_
 ------------------------------------------------------------------------------
 -- Variable renaming
 
@@ -234,119 +274,3 @@ module -↠-Reasoning where
       -↠⟨ ·ᵣ-cong N-↠N′ ⟩
     _ · _ ∎ 
 open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠) public
-
-------------------------------------------------------------------------------
--- Normal terms
-
-data Neutral {Γ : Cxt} : Γ ⊢ A → 𝓤₀ ̇
-data Normal  {Γ : Cxt} : Γ ⊢ A → 𝓤₀ ̇
-
-data Neutral {Γ} where
-  `_  : (x : A ∈ Γ)
-      -------------
-    → Neutral (` x)
-  _·_ 
-    : Neutral L
-    → Normal M
-      ---------------
-    → Neutral (L · M)
-
-data Normal where
-  ′_
-    : Neutral M
-      ---------
-    → Normal M
-  ƛ_ 
-    : Normal N
-      ------------
-    → Normal (ƛ N)
-
-instance
-  fromNatNormal : {n : ℕ} → ⦃ n∈Γ : True (suc n ≤? length Γ) ⦄
-    → HasFromNat (Neutral {Γ} (HasFromNat.fromNat fromNat∈ n))
-  HasFromNat.Constraint fromNatNormal _ = Unit
-  HasFromNat.fromNat    (fromNatNormal {Γ} {n} ⦃ n∈Γ ⦄) _ = ` count {Γ} {n} (toWitness n∈Γ)
-
-neutral-does-not-reduce : Neutral M → M -→ N → ⊥
-normal-does-not-reduce  : Normal M → M -→ N → ⊥
-
-neutral-does-not-reduce (` x) ()
-neutral-does-not-reduce (M · N) (ξₗ M-→N) = neutral-does-not-reduce M M-→N
-neutral-does-not-reduce (M · N) (ξᵣ M-→N) = normal-does-not-reduce N M-→N
-
-normal-does-not-reduce (′ M) M-→N     = neutral-does-not-reduce M M-→N
-normal-does-not-reduce (ƛ M) (ζ M-→N) = normal-does-not-reduce M M-→N
-------------------------------------------------------------------------------
--- Progress theorem i.e. one-step evaluator
-
-data Progress (M : Γ ⊢ A) : 𝓤₀ ̇ where
-  step
-    : M -→ N
-      ----------
-    → Progress M
-
-  done
-    : Normal M
-    → Progress M
-
-progress : (M : Γ ⊢ A) → Progress M
-progress (` x)                                 =  done (′ ` x )
-progress (ƛ N)  with  progress N
-... | step N—→N′                               =  step (ζ N—→N′)
-... | done NrmN                                =  done (ƛ NrmN)
-progress (` x · M) with progress M
-... | step M—→M′                               =  step (ξᵣ M—→M′)
-... | done NrmM                                =  done (′ (` x) · NrmM)
-progress ((ƛ N) · M)                           =  step β
-progress (L@(_ · _) · M) with progress L
-... | step L—→L′                               =  step (ξₗ L—→L′)
-... | done (′ NeuL) with progress M
-...    | step M—→M′                            =  step (ξᵣ M—→M′)
-...    | done NrmM                             =  done (′ NeuL · NrmM)
-
-------------------------------------------------------------------------------
--- Decidable equality between α-equivalent terms
-
-private
-  code⊢ : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
-  code⊢ (` x)     (` y)     = code x y
-  code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
-  code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
-  code⊢ _               _   = ⊥
-
-  r⊢ : (M : Γ ⊢ A) → code⊢ M M
-  r⊢ (` x)   = r x
-  r⊢ (ƛ M)   = r⊢ M
-  r⊢ (M · N) = r⊢ M , r⊢ N
-
-  decode⊢ : code⊢ M N → M ≡ N
-  decode⊢ {M = ` x}     {` y}    c        = cong {B = λ _ → _ ⊢ _} `_ (decode c)
-  decode⊢ {M = ƛ M}     {ƛ N}    c        = cong {B = λ _ → _ ⊢ _} ƛ_ (decode⊢ c)
-  decode⊢ {M = L₁ · M₁} {_ · _} (c₁ , c₂) = cong₂ {x = L₁}  _·_ (decode⊢ c₁) {M₁} (decode⊢ c₂)
-
-instance
-  Code⊢ : Code (Γ ⊢ A)
-  Code⊢ = record { code = code⊢ ; r = r⊢ ; decode = decode⊢ }
-
-private
-  _≟⊢_ : (M N : Γ ⊢ A) → Dec (M ≡ N)
-  (` x)     ≟⊢ (` y) with x ≟ y
-  ... | yes p = yes (cong `_ p)
-  ... | no ¬p = no λ x=y → ¬p (decode (encode x=y))
-  (ƛ M)     ≟⊢ (ƛ N) with M ≟⊢ N
-  ... | yes p = yes (cong ƛ_ p)
-  ... | no ¬p = no λ ƛM=ƛN → ¬p (decode (encode ƛM=ƛN))
-  (M₁ · N₁) ≟⊢ (M₂ · N₂) with M₁ ≟⊢ M₂ | N₁ ≟⊢ N₂
-  ... | yes p | yes q = yes (decode (encode p , encode q))
-  ... | yes p | no ¬q = no λ M=N → ¬q (decode (encode M=N .snd))
-  ... | no ¬p | q     = no λ M=N → ¬p (decode (encode M=N .fst))
-  (` _)   ≟⊢ (ƛ _)    = no encode
-  (` _)   ≟⊢ (_ · _)  = no encode
-  (ƛ _)   ≟⊢ (` _)    = no encode
-  (ƛ _)   ≟⊢ (_ · _)  = no encode
-  (_ · _) ≟⊢ (` _)    = no encode
-  (_ · _) ≟⊢ (ƛ _)    = no encode
-
-instance
-  DecEq⊢ : DecEq (Γ ⊢ A)
-  _≟_ ⦃ DecEq⊢ ⦄ = _≟⊢_

@@ -4,9 +4,12 @@ module Calculus.Untyped.Confluence where
 
 open import Prelude
 open import Calculus.Untyped.Base
+open import Calculus.Untyped.Progress
+  using (Normal; normal-does-not-reduce)
 
 private
   variable
+    Γ            : Cxt 
     A B C        : 𝕋
     M N L M₁ M₂  : Γ ⊢ A
 

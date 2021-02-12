@@ -9,6 +9,7 @@ open import Calculus.Untyped.Substitution
 
 private
   variable
+    Γ Δ   : Cxt
     A B C : 𝕋
     M N L : Γ ⊢ A
 

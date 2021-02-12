@@ -5,10 +5,10 @@ module Calculus.Untyped.Substitution where
 open import Prelude
 open import Calculus.Untyped.Base
 
-
 private
   variable
     A B C   : 𝕋
+    Γ Δ Ξ   : Cxt
     ρ ρ₁ ρ₂ : Rename Γ Δ
     σ σ₁ σ₂ : Subst Γ Δ
 
@@ -22,11 +22,6 @@ ids = `_
 
 ----------------------------------------------------------------------
 -- Congruence rules
-rename-cong 
-  : (∀ {A} (x : A ∈ Γ) → ρ₁ x ≡ ρ₂ x)
-  → (M : Γ ⊢ A)
-  → rename ρ₁ M ≡ rename ρ₂ M
-rename-cong p M i = rename (funExt p i) M
 
 subst-cong
   : ({A : 𝕋} (x : A ∈ Γ) → σ₁ x ≡ σ₂ x)
@@ -124,8 +119,8 @@ S=punchIn (S x) = refl
 punchesIn-punchIn-comm : (σ : Subst Γ Δ)
   → (x : A ∈ Ξ ⧺ Γ)
   → punchesIn Ξ (exts σ) (punchIn B Ξ x) ≡ rename (punchIn B Ξ) (punchesIn Ξ σ x)
-punchesIn-punchIn-comm {Ξ = ∅}     σ (Z p) = rename-cong S=punchIn (σ (Z p))
-punchesIn-punchIn-comm {Ξ = ∅}     σ (S p) = rename-cong S=punchIn (σ (S p))
+punchesIn-punchIn-comm {Ξ = ∅}     σ (Z p) i = rename (funExt S=punchIn i) (σ (Z p))
+punchesIn-punchIn-comm {Ξ = ∅}     σ (S p) i = rename (funExt S=punchIn i) (σ (S p))
 punchesIn-punchIn-comm {Ξ = T , Ξ} σ (Z p) = refl
 punchesIn-punchIn-comm {Ξ = C , Ξ} σ (S p) = begin
   rename S_ (punchesIn Ξ (exts σ) (punchIn _ Ξ p))
@@ -137,8 +132,7 @@ punchesIn-punchIn-comm {Ξ = C , Ξ} σ (S p) = begin
   rename ((punchIn _ (C , Ξ)) ∘ S_) (punchesIn Ξ σ p)
     ≡⟨ sym (rename-comp S_ (punchIn _ (C , Ξ))) ⟩
   rename (punchIn _ (C , Ξ)) (rename S_ (punchesIn Ξ σ p))
-    ∎
-  where open ≡-Reasoning
+    ∎ where open ≡-Reasoning
 
 punchIn-punchesIn-comm : (σ : Subst Γ Δ)
   → (M : Ξ ⧺ Γ ⊢ A)
@@ -149,33 +143,30 @@ punchIn-punchesIn-comm {Γ} {Δ} {Ξ} σ (ƛ M) = begin
   rename (punchIn _ Ξ) (ƛ M) ⟪ punchesIn Ξ (exts σ) ⟫
     ≡⟨⟩
   ƛ rename (ext (punchIn _ _)) M ⟪ exts (punchesIn _ (exts σ)) ⟫
-    ≡⟨ cong (ƛ_ ∘ _⟪ exts (punchesIn _ (exts σ)) ⟫) (rename-cong ext-punchIn=punchIn M) ⟩
+    ≡[ i ]⟨ ƛ rename (funExt ext-punchIn=punchIn i) M ⟪ exts (punchesIn _ (exts σ)) ⟫ ⟩
   ƛ rename (punchIn _ (_ , _)) M ⟪ exts (punchesIn _ (exts σ)) ⟫
     ≡⟨ cong ƛ_ (subst-cong exts-punchesIn=punchesIn (rename (punchIn _ (_ , _)) M)) ⟩
   ƛ rename (punchIn _ (_ , _)) M ⟪ punchesIn (_ , _) (exts σ) ⟫
     ≡⟨ cong ƛ_ (punchIn-punchesIn-comm σ M) ⟩
   ƛ rename (punchIn _ (_ , _)) (M ⟪ punchesIn (_ , _) σ ⟫)
-    ≡⟨ cong ƛ_ (rename-cong (sym ∘ ext-punchIn=punchIn) (M ⟪ punchesIn (_ , _) σ ⟫)) ⟩
+    ≡[ i ]⟨ ƛ rename (funExt ext-punchIn=punchIn (~ i)) (M ⟪ punchesIn (_ , _) σ ⟫) ⟩ 
   ƛ rename (ext (punchIn _ _)) (M ⟪ punchesIn (_ , _) σ ⟫)
     ≡⟨ cong (ƛ_ ∘ rename (ext (punchIn _ _))) (subst-cong (sym ∘ exts-punchesIn=punchesIn) M) ⟩
   ƛ rename (ext (punchIn _ _)) (M ⟪ exts (punchesIn _ σ) ⟫) ∎
-  where
-    open ≡-Reasoning
+  where open ≡-Reasoning
 
 rename-exts : (σ : Subst Γ Δ)
   → (M : Γ ⊢ A)
   → rename (S_ {B = B}) M ⟪ exts σ ⟫ ≡ rename S_ (M ⟪ σ ⟫)
 rename-exts σ M = begin
   rename S_ M ⟪ exts σ ⟫
-    ≡⟨ cong _⟪ exts σ ⟫ (rename-cong S=punchIn M) ⟩
+    ≡[ i ]⟨ rename (funExt S=punchIn i) M ⟪ exts σ ⟫ ⟩
   rename (punchIn _ ∅) M ⟪ punchesIn ∅ (exts σ) ⟫
     ≡⟨ punchIn-punchesIn-comm σ M ⟩
   rename (punchIn _ ∅) (M ⟪ σ ⟫)
-    ≡⟨ rename-cong (sym ∘ S=punchIn) (M ⟪ σ ⟫) ⟩
+    ≡[ i ]⟨ rename (funExt S=punchIn (~ i)) (M ⟪ σ ⟫) ⟩
   rename S_ (M ⟪ σ ⟫)
-    ∎ 
-  where
-    open ≡-Reasoning
+    ∎ where open ≡-Reasoning
 
 ren-ext-comm : (ρ : Rename Γ Δ)
     → (x : A ∈ B , Γ)
@@ -243,8 +234,7 @@ rename-subst ρ σ M = begin
   (M ⟪ ren ρ ⟫) ⟪ σ ⟫ 
     ≡⟨ subst-assoc (ren ρ) σ M ⟩
   M ⟪ σ ∘ ρ ⟫
-    ∎
-  where open ≡-Reasoning
+    ∎ where open ≡-Reasoning
 
 subst-zero-S=ids : {N : Γ ⊢ B}
   → (x : A ∈ Γ)→ subst-zero N (S x) ≡ ids x
@@ -303,7 +293,7 @@ subst-rename-∅ {ρ = ρ} σ M = begin
   rename ρ M ⟪ σ ⟫
     ≡⟨ rename-subst ρ σ M ⟩
   M ⟪ σ ∘ ρ ⟫
-    ≡⟨ subst-cong (λ ()) M ⟩
+    ≡[ i ]⟨ M ⟪ funExt {f = σ ∘ ρ} {g = ids} (λ ()) i ⟫ ⟩
   M ⟪ ids ⟫
     ≡⟨ subst-idL M ⟩ 
   M ∎ where open ≡-Reasoning
@@ -346,6 +336,7 @@ module _ where
 
 ------------------------------------------------------------------------------
 -- Special cut rule
+-- TODO: Simplify these special cases
 
 γ : (N : A , ∅ ⊢ B) → Subst (B , ∅) (A , ∅) 
 γ {⋆} {⋆} N {⋆} (Z B=A) = N
@@ -371,7 +362,28 @@ _∘′_ {A} {B} {C} M N = M ⟪ γ N ⟫
 ∘′-id-left  : (M : A , ∅ ⊢ B) → (` Z refl) ∘′ M ≡ M
 ∘′-id-left {⋆} {⋆} M = refl
 
-postulate
-  ∘′-assoc    :  (L : C , ∅ ⊢ B) (M : B , ∅ ⊢ C) (N : A , ∅ ⊢ B)
-    → L ∘′ (M ∘′ N) ≡ (L ∘′ M) ∘′ N
-  ∘′-id-right : (M : A , ∅ ⊢ B) (p : A ≡ A) → M ∘′ (` Z p) ≡ M
+∘′-id-right : (M : A , ∅ ⊢ B) → M ∘′ (` Z refl) ≡ M
+∘′-id-right {⋆} {⋆} M = begin
+  M ⟪ γ (` Z refl) ⟫
+    ≡⟨ subst-cong γZ=ids M ⟩
+  M ⟪ ids ⟫
+    ≡⟨ subst-idL M ⟩
+  M ∎
+  where
+    open ≡-Reasoning
+    γZ=ids : {A : 𝕋} (x : A ∈ B , ∅) → γ (` Z refl) x ≡ ids  x
+    γZ=ids {⋆} {⋆} (Z B=A) i = ` Z (≟→isSet ⋆ ⋆ refl B=A i)
+
+∘′-assoc    :  (L : C , ∅ ⊢ B) (M : B , ∅ ⊢ C) (N : A , ∅ ⊢ B)
+  → (L ∘′ M) ∘′ N ≡ L ∘′ (M ∘′ N)
+∘′-assoc {⋆} {⋆} {⋆} L M N = begin
+  L ⟪ γ M ⟫ ⟪ γ N ⟫
+    ≡⟨ subst-assoc _ _ L ⟩
+  L ⟪ γ M ⨟ γ N ⟫
+    ≡⟨ subst-cong (λ { {⋆} → γ-subst-dist {M = M} }) L ⟩
+  L ⟪ γ (M ⟪ γ N ⟫) ⟫ ∎
+  where
+    open ≡-Reasoning
+    γ-subst-dist : {A B C : 𝕋} {M : B , ∅ ⊢ C} {N : A , ∅ ⊢ B}
+      → (x : A ∈ C , ∅) → γ M x ⟪ γ N ⟫ ≡ γ (M ⟪ γ N ⟫) x
+    γ-subst-dist {⋆} {⋆} {⋆} (Z B=A) = refl

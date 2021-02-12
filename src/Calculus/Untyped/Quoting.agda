@@ -4,14 +4,16 @@ module Calculus.Untyped.Quoting where
 
 open import Prelude 
 
-open import Calculus.Context
 open import Calculus.Untyped.Base
+open import Calculus.Untyped.Progress
+  using (Normal)
 open import Calculus.Untyped.Combinators
 open import Calculus.Untyped.Substitution
 open import Calculus.Untyped.Confluence
  
 private
   variable
+    Γ Δ   : Cxt
     A B C : 𝕋
     L M N F : Γ ⊢ A
 
