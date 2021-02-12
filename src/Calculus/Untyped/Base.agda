@@ -3,130 +3,189 @@
 module Calculus.Untyped.Base where
 
 open import Prelude
-  hiding (_∘_)
+  hiding (_∘_; _≤?_)
 
-open import Calculus.Context      public
-  hiding (count)
+--open import Calculus.Context      public
+--  hiding (count)
+open import Cubical.Data.Nat.Order.Recursive
 open import Calculus.Untyped.Type public
   
-infix  3 _⊢_
-
 infixr 8 ƛ_ ′_
 infixl 10 _·_
 
 infixl 11 _[_] _⟪_⟫
 
-Cxt = Context 𝕋
-
-variable
-  Γ Δ Ξ  : Cxt
 ------------------------------------------------------------------------------
 -- Typing Rules
 
-data _⊢_ (Γ : Cxt) : 𝕋 → 𝓤₀ ̇ where
-  `_ : {A : 𝕋}
-    → A ∈ Γ
+private
+  variable
+    n m : ℕ
+    
+record Fin (n : ℕ) : 𝓤₀ ̇ where
+  constructor fin
+  field
+    k       : ℕ
+    ⦃ k<n ⦄ : k < n
+
+pattern fzero   = fin zero
+pattern fsucc x = fin (suc x)
+
+fsuc : Fin n → Fin (suc n)
+fsuc (fin k) = fin (suc k)
+
+data Λ (n : ℕ) : 𝓤₀ ̇ where
+  `_
+    : Fin n
       ---------
-    → Γ ⊢ A
+    → Λ n
   ƛ_
-    : ⋆ , Γ ⊢ ⋆
+    : Λ (suc n)
       --------------
-    → Γ     ⊢ ⋆
+    → Λ n
 
   _·_
-    : Γ ⊢ ⋆ → Γ ⊢ ⋆
+    : (M N : Λ n)
       -------------
-    → Γ ⊢ ⋆
+    → Λ n
 
 private
   variable
-    A B C          : 𝕋
-    M N L M′ N′ L′ : Γ ⊢ A
+    M N L M′ N′ L′ : Λ n
 
-count : {n : ℕ}
-  → (p : n < length Γ) → ⋆ ∈ Γ
-count {⋆ , _} {zero}    tt = Z refl
-count {⋆ , Γ} {(suc n)} p  = S count p
-
-#_ : (n : ℕ)
-  → {n∈Γ : True (suc n ≤? length Γ)}
+#_ : (x : ℕ)
+  → ⦃ x<n : x < n ⦄
     --------------------------------
-  → Γ ⊢ ⋆
-#_ n {n∈Γ}  = ` count (toWitness n∈Γ)
+  → Λ n
+#_ x ⦃ x<n ⦄  = ` fin x 
 
 instance
-  fromNat∈ : HasFromNat (Γ ⊢ ⋆)
-  fromNat∈ {Γ} = record
-    { Constraint = λ n → True (suc n ≤? length Γ)
-    ; fromNat    = λ n ⦃ n∈Γ ⦄ → #_ n {n∈Γ}
+  fromNat∈ : HasFromNat (Λ n)
+  fromNat∈ {n} = record
+    { Constraint = λ x → (x < n)
+    ; fromNat    = #_
     }
+
+------------------------------------------------------------------------------
+-- Decidable equality between α-equivalent terms
+
+private
+  code⊢ : (M N : Λ n) → 𝓤₀ ̇
+  code⊢ (` fin k) (` fin l) = code k l
+  code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
+  code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
+  code⊢ _               _   = ⊥
+
+  r⊢ : (M : Λ n) → code⊢ M M
+  r⊢ (` fin x)   = r x
+  r⊢ (ƛ M)   = r⊢ M
+  r⊢ (M · N) = r⊢ M , r⊢ N
+
+  decode⊢ : {M N : Λ n} → code⊢ M N → M ≡ N
+  decode⊢ {n} {` fin k} {` fin l} c       = {!!}
+  decode⊢ {n} {ƛ M}     {ƛ N}     c       = cong  ƛ_ (decode⊢ c)
+  decode⊢ {n} {L₁ · M₁} {_ · _}   (c , d) = cong₂ _·_ (decode⊢ c) (decode⊢ d)
+instance
+  Code⊢ : Code (Λ n)
+  Code⊢ = record { code = code⊢ ; r = r⊢ ; decode = decode⊢ }
+
+private
+  _≟⊢_ : (M N : Λ n) → Dec (M ≡ N)
+  (` x)     ≟⊢ (` y) with x ≟ y
+  ... | yes p = yes (cong `_ p)
+  ... | no ¬p = no λ x=y → ¬p (decode (encode x=y))
+  (ƛ M)     ≟⊢ (ƛ N) with M ≟⊢ N
+  ... | yes p = yes (cong ƛ_ p)
+  ... | no ¬p = no λ ƛM=ƛN → ¬p (decode (encode ƛM=ƛN))
+  (M₁ · N₁) ≟⊢ (M₂ · N₂) with M₁ ≟⊢ M₂ | N₁ ≟⊢ N₂
+  ... | yes p | yes q = yes (decode (encode p , encode q))
+  ... | yes p | no ¬q = no λ M=N → ¬q (decode (encode M=N .snd))
+  ... | no ¬p | q     = no λ M=N → ¬p (decode (encode M=N .fst))
+  (` _)   ≟⊢ (ƛ _)    = no encode
+  (` _)   ≟⊢ (_ · _)  = no encode
+  (ƛ _)   ≟⊢ (` _)    = no encode
+  (ƛ _)   ≟⊢ (_ · _)  = no encode
+  (_ · _) ≟⊢ (` _)    = no encode
+  (_ · _) ≟⊢ (ƛ _)    = no encode
+
+-- -- instance
+-- --   DecEq⊢ : DecEq (Γ ⊢ A)
+-- --   _≟_ ⦃ DecEq⊢ ⦄ = _≟⊢_
 ------------------------------------------------------------------------------
 -- Variable renaming
 
-rename : Rename Γ Δ
-  → Γ ⊢ A
-  → Δ ⊢ A
+Rename : ℕ → ℕ → 𝓤₀ ̇
+Rename n m = Fin n → Fin m
+
+ext : Rename n m → Rename (suc n) (suc m)
+ext ρ (fzero )  = fzero
+ext ρ (fsucc x) = fsuc (ρ (fin x))
+
+rename : Rename n m
+  → Λ n
+  → Λ m
 rename ρ (` x)   = ` ρ x
 rename ρ (ƛ M)   = ƛ rename (ext ρ) M
 rename ρ (M · N) = rename ρ M · rename ρ N
 
-↑ᵣ_ : Γ ⊢ A
-    → Γ ⧺ Δ ⊢ A
-↑ᵣ M = rename ρ M
-  where
-    ρ : Rename Γ (Γ ⧺ Δ)
-    ρ (Z p) = Z p
-    ρ (S x) = S ρ x
+-- ↑ᵣ_ : Γ ⊢ A
+--     → Γ ⧺ Δ ⊢ A
+-- ↑ᵣ M = rename ρ M
+--   where
+--     ρ : Rename Γ (Γ ⧺ Δ)
+--     ρ (Z p) = Z p
+--     ρ (S x) = S ρ x
 
-↑ₗ_ : Δ ⊢ A
-    → Γ ⧺ Δ ⊢ A
-↑ₗ M = rename ρ M
-  where
-    ρ : Rename Δ (Γ ⧺ Δ)
-    ρ {Γ = ∅}     x = x
-    ρ {Γ = A , Γ} x = S (ρ x)
+-- ↑ₗ_ : Δ ⊢ A
+--     → Γ ⧺ Δ ⊢ A
+-- ↑ₗ M = rename ρ M
+--   where
+--     ρ : Rename Δ (Γ ⧺ Δ)
+--     ρ {Γ = ∅}     x = x
+--     ρ {Γ = A , Γ} x = S (ρ x)
 
-↑₁_ : Δ ⊢ A
-  → ⋆ , Δ ⊢ A
-↑₁_ = ↑ₗ_
+-- ↑₁_ : Δ ⊢ A
+--   → ⋆ , Δ ⊢ A
+-- ↑₁_ = ↑ₗ_
 
 ------------------------------------------------------------------------------
 -- Substitution
 
-Subst : Cxt → Cxt → 𝓤₀ ̇
-Subst Γ Δ = (∀ {A} → A ∈ Γ → Δ ⊢ A)
+Subst : (n m : ℕ) → 𝓤₀ ̇
+Subst n m = Fin n → Λ m
 
 exts
-  : Subst Γ Δ
-  → Subst (A , Γ) (A , Δ)
-exts σ (Z p) = ` Z p
-exts σ (S p) = rename S_ (σ p)
+  : Subst n       m
+  → Subst (suc n) (suc m)
+exts σ fzero = 0
+exts σ (fsucc n) = rename fsuc (σ (fin n))
 
 _⟪_⟫
-  : Γ  ⊢ A
-  → Subst Γ Δ
-  → Δ ⊢ A
+  : Λ n
+  → Subst n m
+  → Λ m
 (` x)   ⟪ σ ⟫ = σ x
 (ƛ M)   ⟪ σ ⟫ = ƛ M ⟪ exts σ ⟫
 (M · N) ⟪ σ ⟫ = M ⟪ σ ⟫ · N ⟪ σ ⟫
 
 subst-zero
-  : Γ ⊢ B
-  → Subst (B , Γ) Γ
-subst-zero N (Z {⋆} {⋆} p) = N
-subst-zero _ (S x)         = ` x
+  : Λ n
+  → Subst (suc n) n
+subst-zero N fzero     = N
+subst-zero N (fsucc k) = ` fin k
 
 _[_]
-  : B , Γ ⊢ A
-  → Γ ⊢ B
-  → Γ ⊢ A
+  : Λ (suc n)
+  → Λ n
+  → Λ n
 M [ N ] = M ⟪ subst-zero N ⟫
 
 ------------------------------------------------------------------------------
 -- Single-step reduction
 
 infix 6 _-→_
-data _-→_ {Γ : Cxt} : {A : 𝕋} → Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
+
+data _-→_ {n : ℕ} : Λ n → Λ n → 𝓤₀ ̇ where
   β : (ƛ M) · N -→ M [ N ]
   ζ
     :   M -→ M′
@@ -140,7 +199,7 @@ data _-→_ {Γ : Cxt} : {A : 𝕋} → Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ whe
       ---------------
     → L · M -→ L · M′
 
-------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Multi-step beta-reduction
 
 module -↠-Reasoning where
@@ -148,17 +207,17 @@ module -↠-Reasoning where
   infix  6 _-↠_
   infixr 6 _-→⟨_⟩_ _-↠⟨_⟩_ _≡⟨_⟩_ ≡⟨⟩-syntax
   infix  7 _∎
-  
+
   syntax ≡⟨⟩-syntax x (λ i → B) y = x ≡[ i ]⟨ B ⟩ y
 
-  data _-↠_ {Γ : Cxt} : Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
-    _∎ : (M : Γ ⊢ A) → M -↠ M
+  data _-↠_ {n : ℕ} : Λ n → Λ n → 𝓤₀ ̇ where
+    _∎ : (M : Λ n) → M -↠ M
 
     _-→⟨_⟩_
       : ∀ L
       → L -→ M
       → M -↠ N
-        ----------
+     ----------
       → L -↠ N
   begin_
     : M -↠ N
@@ -182,11 +241,11 @@ module -↠-Reasoning where
 
   ≡⟨⟩-syntax : ∀ L → L ≡ M → M -↠ N → L -↠ N
   ≡⟨⟩-syntax = _≡⟨_⟩_
-  
-  -↠-refl : ∀ {M : Γ ⊢ A} → M -↠ M
+
+  -↠-refl : M -↠ M
   -↠-refl = _ ∎
- 
-  -↠-respect-≡ : {M N : Γ ⊢ A} → M ≡ N → M -↠ N
+
+  -↠-respect-≡ : M ≡ N → M -↠ N
   -↠-respect-≡ {M = M} {N} M=N = transport (cong (λ M → M -↠ N) (sym M=N)) (N ∎)
 
   -→to-↠ : M -→ N → M -↠ N
@@ -238,11 +297,12 @@ open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠) public
 ------------------------------------------------------------------------------
 -- Normal terms
 
-data Neutral {Γ : Cxt} : Γ ⊢ A → 𝓤₀ ̇
-data Normal  {Γ : Cxt} : Γ ⊢ A → 𝓤₀ ̇
+{-
+data Neutral {n : ℕ} : Λ n → 𝓤₀ ̇
+data Normal  {n : ℕ} : Λ n → 𝓤₀ ̇
 
-data Neutral {Γ} where
-  `_  : (x : A ∈ Γ)
+data Neutral {n} where
+  `_  : (x : Fin n)
       -------------
     → Neutral (` x)
   _·_ 
@@ -261,12 +321,6 @@ data Normal where
       ------------
     → Normal (ƛ N)
 
-instance
-  fromNatNormal : {n : ℕ} → ⦃ n∈Γ : True (suc n ≤? length Γ) ⦄
-    → HasFromNat (Neutral {Γ} (HasFromNat.fromNat fromNat∈ n))
-  HasFromNat.Constraint fromNatNormal _ = Unit
-  HasFromNat.fromNat    (fromNatNormal {Γ} {n} ⦃ n∈Γ ⦄) _ = ` count {Γ} {n} (toWitness n∈Γ)
-
 neutral-does-not-reduce : Neutral M → M -→ N → ⊥
 normal-does-not-reduce  : Normal M → M -→ N → ⊥
 
@@ -279,7 +333,7 @@ normal-does-not-reduce (ƛ M) (ζ M-→N) = normal-does-not-reduce M M-→N
 ------------------------------------------------------------------------------
 -- Progress theorem i.e. one-step evaluator
 
-data Progress (M : Γ ⊢ A) : 𝓤₀ ̇ where
+data Progress (M : Λ n) : 𝓤₀ ̇ where
   step
     : M -→ N
       ----------
@@ -289,7 +343,7 @@ data Progress (M : Γ ⊢ A) : 𝓤₀ ̇ where
     : Normal M
     → Progress M
 
-progress : (M : Γ ⊢ A) → Progress M
+progress : (M : Λ n) → Progress M
 progress (` x)                                 =  done (′ ` x )
 progress (ƛ N)  with  progress N
 ... | step N—→N′                               =  step (ζ N—→N′)
@@ -303,50 +357,5 @@ progress (L@(_ · _) · M) with progress L
 ... | done (′ NeuL) with progress M
 ...    | step M—→M′                            =  step (ξᵣ M—→M′)
 ...    | done NrmM                             =  done (′ NeuL · NrmM)
+-}
 
-------------------------------------------------------------------------------
--- Decidable equality between α-equivalent terms
-
-private
-  code⊢ : (M : Γ ⊢ A) (N : Γ ⊢ A) → 𝓤₀ ̇
-  code⊢ (` x)     (` y)     = code x y
-  code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
-  code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
-  code⊢ _               _   = ⊥
-
-  r⊢ : (M : Γ ⊢ A) → code⊢ M M
-  r⊢ (` x)   = r x
-  r⊢ (ƛ M)   = r⊢ M
-  r⊢ (M · N) = r⊢ M , r⊢ N
-
-  decode⊢ : code⊢ M N → M ≡ N
-  decode⊢ {M = ` x}     {` y}    c        = cong {B = λ _ → _ ⊢ _} `_ (decode c)
-  decode⊢ {M = ƛ M}     {ƛ N}    c        = cong {B = λ _ → _ ⊢ _} ƛ_ (decode⊢ c)
-  decode⊢ {M = L₁ · M₁} {_ · _} (c₁ , c₂) = cong₂ {x = L₁}  _·_ (decode⊢ c₁) {M₁} (decode⊢ c₂)
-
-instance
-  Code⊢ : Code (Γ ⊢ A)
-  Code⊢ = record { code = code⊢ ; r = r⊢ ; decode = decode⊢ }
-
-private
-  _≟⊢_ : (M N : Γ ⊢ A) → Dec (M ≡ N)
-  (` x)     ≟⊢ (` y) with x ≟ y
-  ... | yes p = yes (cong `_ p)
-  ... | no ¬p = no λ x=y → ¬p (decode (encode x=y))
-  (ƛ M)     ≟⊢ (ƛ N) with M ≟⊢ N
-  ... | yes p = yes (cong ƛ_ p)
-  ... | no ¬p = no λ ƛM=ƛN → ¬p (decode (encode ƛM=ƛN))
-  (M₁ · N₁) ≟⊢ (M₂ · N₂) with M₁ ≟⊢ M₂ | N₁ ≟⊢ N₂
-  ... | yes p | yes q = yes (decode (encode p , encode q))
-  ... | yes p | no ¬q = no λ M=N → ¬q (decode (encode M=N .snd))
-  ... | no ¬p | q     = no λ M=N → ¬p (decode (encode M=N .fst))
-  (` _)   ≟⊢ (ƛ _)    = no encode
-  (` _)   ≟⊢ (_ · _)  = no encode
-  (ƛ _)   ≟⊢ (` _)    = no encode
-  (ƛ _)   ≟⊢ (_ · _)  = no encode
-  (_ · _) ≟⊢ (` _)    = no encode
-  (_ · _) ≟⊢ (ƛ _)    = no encode
-
-instance
-  DecEq⊢ : DecEq (Γ ⊢ A)
-  _≟_ ⦃ DecEq⊢ ⦄ = _≟⊢_

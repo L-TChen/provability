@@ -22,7 +22,7 @@ open import Cubical.Data.Bool                      public
 open import Cubical.Data.Nat                       public
   using (ℕ; zero; suc; _+_; _∸_; fromNatℕ)
 open import Cubical.Data.Nat.Order.Recursive as ℕₚ public
-  using (_≤_; _<_)
+  using (_≤_; _<_; _≤?_)
 
 open import Universes public
 open import Later     public
@@ -81,6 +81,9 @@ IsRightTotal {𝓤} {𝓥} {A} {B} _≈_ = (y : B) → ∃[ x ꞉ A ] (x ≈ y)
 id : A → A
 id x = x
 
+_<?_ : (m n : ℕ) → Dec (m < n)
+m <? n = (suc m) ≤? n
+
 module ≡-Reasoning where
   open import Cubical.Foundations.Prelude public
     using (_≡⟨_⟩_; ≡⟨⟩-syntax; _∎)
@@ -94,11 +97,6 @@ module ≡-Reasoning where
   _≡⟨⟩_ : (x {y} : A) → x ≡ y → x ≡ y
   x ≡⟨⟩ x≡y = x≡y
 
-_≤?_ : (m n : ℕ) → Dec (m ≤ n)
-zero  ≤? _     = yes tt
-suc m ≤? zero  = no λ ()
-suc m ≤? suc n = m ≤? n
-
 record Code (A : 𝓤 ̇) :  𝓤 ⁺ ̇ where
   field
     code   : A → A → 𝓤 ̇
@@ -110,6 +108,24 @@ record Code (A : 𝓤 ̇) :  𝓤 ⁺ ̇ where
 
 open Code ⦃ ... ⦄ public
 
+private
+  codeℕ : ℕ → ℕ → 𝓤₀ ̇
+  codeℕ zero    zero    = Unit
+  codeℕ (suc n) (suc m) = codeℕ n m
+  codeℕ _       _       = ⊥
+
+  rℕ : (n : ℕ) → codeℕ n n
+  rℕ zero    = tt
+  rℕ (suc n) = rℕ n
+
+  decodeℕ : codeℕ n m → n ≡ m
+  decodeℕ {zero}  {zero}  c = refl
+  decodeℕ {suc n} {suc m} c = cong suc (decodeℕ c)
+
+instance
+  Codeℕ : Code ℕ
+  Codeℕ = record { code = codeℕ ; r = rℕ ; decode = decodeℕ }
+  
 record DecEq (A : 𝓤 ̇) : 𝓤 ̇ where
   field
     _≟_ : (x y : A) → Dec (x ≡ y)
@@ -117,9 +133,19 @@ record DecEq (A : 𝓤 ̇) : 𝓤 ̇ where
   ≟→isSet = Discrete→isSet _≟_
 open DecEq ⦃ ... ⦄ public
 
+private
+  _≟ℕ_ : (n m : ℕ) → Dec (n ≡ m)
+  zero  ≟ℕ zero  = yes refl
+  zero  ≟ℕ suc m = no encode
+  suc n ≟ℕ zero  = no encode
+  suc n ≟ℕ suc m = mapDec (cong suc) (λ n≠m n=m → n≠m (decode (encode n=m))) (n ≟ℕ m)
+
 instance
   DecEqUnit : DecEq Unit
   DecEqUnit = record { _≟_ = λ {tt tt → yes refl} }
 
   DecEqBool : DecEq Bool
   _≟_ ⦃ DecEqBool ⦄ = Cubical.Data.Bool._≟_
+
+  DecEqℕ    : DecEq ℕ
+  _≟_ ⦃ DecEqℕ ⦄ = _≟ℕ_
