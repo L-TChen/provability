@@ -8,7 +8,7 @@ open import Prelude
 open import Calculus.Context      public
   hiding (count)
 open import Calculus.Untyped.Type public
-  
+
 infix  3 _⊢_
 
 infixr 8 ƛ_
@@ -51,7 +51,7 @@ instance
   fromNat∈ : HasFromNat (Γ ⊢ ⋆)
   fromNat∈ {Γ} = record
     { Constraint = λ n → True (suc n ≤? length Γ)
-    ; fromNat    = λ n ⦃ n∈Γ ⦄ → ` count (toWitness n∈Γ) 
+    ; fromNat    = λ n ⦃ n∈Γ ⦄ → ` count (toWitness n∈Γ)
     }
 
 ------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ module -↠-Reasoning where
   infix  6 _-↠_
   infixr 6 _-→⟨_⟩_ _-↠⟨_⟩_ _≡⟨_⟩_ ≡⟨⟩-syntax
   infix  7 _∎
-  
+
   syntax ≡⟨⟩-syntax x (λ i → B) y = x ≡[ i ]⟨ B ⟩ y
 
   data _-↠_ {Γ : Cxt} : Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
@@ -222,15 +222,15 @@ module -↠-Reasoning where
 
   ≡⟨⟩-syntax : ∀ L → L ≡ M → M -↠ N → L -↠ N
   ≡⟨⟩-syntax = _≡⟨_⟩_
-  
+
   -↠-refl : ∀ {M : Γ ⊢ A} → M -↠ M
   -↠-refl = _ ∎
- 
+
   -↠-respect-≡ : {M N : Γ ⊢ A} → M ≡ N → M -↠ N
   -↠-respect-≡ {M = M} {N} M=N = transport (cong (λ M → M -↠ N) (sym M=N)) (N ∎)
 
   -→to-↠ : M -→ N → M -↠ N
-  -→to-↠ M-→N = _ -→⟨ M-→N ⟩ _ ∎ 
+  -→to-↠ M-→N = _ -→⟨ M-→N ⟩ _ ∎
 
   -↠-trans
     : ∀ {L}
@@ -272,5 +272,5 @@ module -↠-Reasoning where
       -↠⟨ ·ₗ-cong M-↠M′ ⟩
     _ · _
       -↠⟨ ·ᵣ-cong N-↠N′ ⟩
-    _ · _ ∎ 
+    _ · _ ∎
 open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠) public

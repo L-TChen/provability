@@ -8,5 +8,5 @@ data 𝕋 : 𝓤₀ ̇ where
   ⋆ : 𝕋
 
 instance
-  DecEq𝕋 : DecEq 𝕋 
+  DecEq𝕋 : DecEq 𝕋
   _≟_ ⦃ DecEq𝕋 ⦄ = λ { ⋆ ⋆ → yes refl}

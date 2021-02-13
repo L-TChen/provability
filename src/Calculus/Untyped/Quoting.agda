@@ -2,7 +2,7 @@
 
 module Calculus.Untyped.Quoting where
 
-open import Prelude 
+open import Prelude
 
 open import Calculus.Untyped.Base
 open import Calculus.Untyped.Progress
@@ -10,7 +10,7 @@ open import Calculus.Untyped.Progress
 open import Calculus.Untyped.Combinators
 open import Calculus.Untyped.Substitution
 open import Calculus.Untyped.Confluence
- 
+
 private
   variable
     Γ Δ   : Cxt
@@ -66,7 +66,7 @@ record Quoting : 𝓤₀ ̇ where
   --   -↠⟨ Ap-↠ ⟩
   --     ⌜ M · ⌜ M ⌝ ⌝
   --   ∎
-  
+
   -- -- ⊢ □ A `→ A   `→   ⊢ A
   -- gfix : Prog (nat `→ A) → Prog A
   -- gfix F = Wₘ · ⌜ Wₘ ⌝
@@ -80,7 +80,7 @@ record Quoting : 𝓤₀ ̇ where
   --     (ƛ ↑₁ F · (↑ Diag ⟪ _ ⟫ · # 0)) · ⌜ Wₘ ⌝
   --   -→⟨ β-ƛ· ⟩
   --     ↑₁ F [ ⌜ Wₘ ⌝ ] · (↑ Diag ⟪ _ ⟫ [ ⌜ Wₘ ⌝ ] · ⌜ Wₘ ⌝)
-  --   ≡⟨ cong₂ (λ N L → N · (L · ⌜ Wₘ ⌝)) (subst-rename-∅ S_ _ F) (subst-subst _ _ (↑ Diag)) ⟩ 
+  --   ≡⟨ cong₂ (λ N L → N · (L · ⌜ Wₘ ⌝)) (subst-rename-∅ S_ _ F) (subst-subst _ _ (↑ Diag)) ⟩
   --     F · (↑ Diag ⟪ _ ⟫ · ⌜ Wₘ ⌝)
   --   ≡⟨ cong (λ M → F · (M · ⌜ Wₘ ⌝)) (subst-↑ _ Diag) ⟩
   --     F · (Diag · ⌜ Wₘ ⌝)
@@ -110,7 +110,7 @@ record Quoting : 𝓤₀ ̇ where
   --   where
   --     Wₘ : ∅ ⊢ nat `→ A
   --     Wₘ = W A M
-  --     ⌜M⌝ = ⌜ M ⌝ 
+  --     ⌜M⌝ = ⌜ M ⌝
 
   -- -- -- ⊢ □ A `→ A   `→   ⊢ A `→ A   `→   ⊢ A
   -- -- selfEval`→fixpoint
@@ -153,4 +153,4 @@ record Quoting : 𝓤₀ ̇ where
   -- --   -- -↠ d (gnum (if d (gfix r) then a else b))
   -- --   -- -↠ { d ⌜ a ⌝ -↠ 0   if d (gfix r) -↠ 1
   -- --   --    ; d (gnum b) -↠ 1   if d (gfix r) -↠ 0
-  
+

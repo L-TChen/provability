@@ -15,7 +15,7 @@ private
 infixr 5 _⨟_
 
 _⨟_ : ∀{Γ Δ Σ} → Subst Γ Δ → Subst Δ Σ → Subst Γ Σ
-(σ ⨟ τ) x = σ x ⟪ τ ⟫ 
+(σ ⨟ τ) x = σ x ⟪ τ ⟫
 
 ids : Subst Γ Γ
 ids = `_
@@ -30,7 +30,7 @@ subst-cong
 subst-cong p M i = M ⟪ funExt p i ⟫
 
 ----------------------------------------------------------------------
--- Properties of ext 
+-- Properties of ext
 
 ext-comp : (ρ₁ : Rename Γ Δ) (ρ₂ : Rename Δ Ξ)
   → (x : A ∈ B , Γ)
@@ -50,7 +50,7 @@ rename=subst-ren
 rename=subst-ren (` x)      = refl
 rename=subst-ren (M · N)    =
   cong₂ _·_ (rename=subst-ren M) (rename=subst-ren N)
-rename=subst-ren {ρ = ρ} (ƛ M) = 
+rename=subst-ren {ρ = ρ} (ƛ M) =
   rename ρ (ƛ M)
     ≡⟨⟩
   ƛ rename (ext ρ) M
@@ -72,7 +72,7 @@ rename-comp
   → {M : Γ ⊢ A}
   → rename ρ₂ (rename ρ₁ M) ≡ rename (ρ₂ ∘ ρ₁) M
 rename-comp ρ₁ ρ₂ {M = ` x}     = refl
-rename-comp ρ₁ ρ₂ {M = M · N} i = rename-comp ρ₁ ρ₂ {M} i · rename-comp ρ₁ ρ₂ {N} i 
+rename-comp ρ₁ ρ₂ {M = M · N} i = rename-comp ρ₁ ρ₂ {M} i · rename-comp ρ₁ ρ₂ {N} i
 rename-comp ρ₁ ρ₂ {M = ƛ M}     =
   rename ρ₂ (rename ρ₁ (ƛ M))
     ≡⟨⟩
@@ -149,7 +149,7 @@ punchIn-punchesIn-comm {Γ} {Δ} {Ξ} σ (ƛ M) = begin
   ƛ rename (punchIn _ (_ , _)) M ⟪ punchesIn (_ , _) (exts σ) ⟫
     ≡⟨ cong ƛ_ (punchIn-punchesIn-comm σ M) ⟩
   ƛ rename (punchIn _ (_ , _)) (M ⟪ punchesIn (_ , _) σ ⟫)
-    ≡[ i ]⟨ ƛ rename (funExt ext-punchIn=punchIn (~ i)) (M ⟪ punchesIn (_ , _) σ ⟫) ⟩ 
+    ≡[ i ]⟨ ƛ rename (funExt ext-punchIn=punchIn (~ i)) (M ⟪ punchesIn (_ , _) σ ⟫) ⟩
   ƛ rename (ext (punchIn _ _)) (M ⟪ punchesIn (_ , _) σ ⟫)
     ≡⟨ cong (ƛ_ ∘ rename (ext (punchIn _ _))) (subst-cong (sym ∘ exts-punchesIn=punchesIn) M) ⟩
   ƛ rename (ext (punchIn _ _)) (M ⟪ exts (punchesIn _ σ) ⟫) ∎
@@ -175,7 +175,7 @@ ren-ext-comm ρ (Z _) = refl
 ren-ext-comm ρ (S _) = refl
 
 ----------------------------------------------------------------------
--- Monad Laws 
+-- Monad Laws
 
 subst-idR : (σ : Subst Γ Δ) {x : A ∈ Γ}
   → ` x ⟪ σ ⟫ ≡ σ x
@@ -187,7 +187,7 @@ subst-idL
 subst-idL (` x)   = refl
 subst-idL (M · N) = cong₂ _·_ (subst-idL M) (subst-idL N)
 subst-idL (ƛ_ M)  = begin
-  ƛ M ⟪ exts ids ⟫ 
+  ƛ M ⟪ exts ids ⟫
     ≡[ i ]⟨ ƛ M ⟪ (λ p → exts-ids=ids p i) ⟫ ⟩
   ƛ M ⟪ ids ⟫
     ≡[ i ]⟨ ƛ subst-idL M i ⟩
@@ -217,21 +217,21 @@ subst-assoc σ₁ σ₂ (ƛ M)   = begin
   where
     open ≡-Reasoning
     exts-subst : (σ₁ : Subst Γ Δ) (σ₂ : Subst Δ Ξ)
-      → (x : A ∈ B , Γ) 
+      → (x : A ∈ B , Γ)
       → (exts σ₁ ⨟ exts σ₂) x ≡ exts (σ₁ ⨟ σ₂) x
     exts-subst σ₁ σ₂ (Z _) = refl
     exts-subst σ₁ σ₂ (S x) = rename-exts σ₂ (σ₁ x)
 
 ----------------------------------------------------------------------
--- 
+--
 
 rename-subst : (ρ : Rename Γ Δ) (σ : Subst Δ Ξ)
   → (M : Γ ⊢ A)
   →  rename ρ M ⟪ σ ⟫ ≡ M ⟪ σ ∘ ρ ⟫
 rename-subst ρ σ M = begin
-  (rename ρ M) ⟪ σ ⟫ 
+  (rename ρ M) ⟪ σ ⟫
     ≡[ i ]⟨ (rename=subst-ren {ρ = ρ} M i) ⟪ σ ⟫ ⟩
-  (M ⟪ ren ρ ⟫) ⟪ σ ⟫ 
+  (M ⟪ ren ρ ⟫) ⟪ σ ⟫
     ≡⟨ subst-assoc (ren ρ) σ M ⟩
   M ⟪ σ ∘ ρ ⟫
     ∎ where open ≡-Reasoning
@@ -246,30 +246,30 @@ subst-zero-comm : (σ : Subst Γ Δ)
   → (exts σ ⨟ subst-zero (N ⟪ σ ⟫)) p ≡ (subst-zero N ⨟ σ) p
 subst-zero-comm {Γ} {Δ} σ N (Z {⋆} {⋆} A=B) = refl
 subst-zero-comm {Γ} {Δ} {⋆} {⋆} σ N (S p) = begin
-  (rename S_ (σ p)) ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
+  (rename S_ (σ p)) ⟪ subst-zero (N ⟪ σ ⟫) ⟫
     ≡⟨ cong (_⟪ subst-zero (N ⟪ σ ⟫) ⟫) (rename=subst-ren (σ p)) ⟩
-  σ p ⟪ ren S_ ⟫ ⟪ subst-zero (N ⟪ σ ⟫) ⟫ 
+  σ p ⟪ ren S_ ⟫ ⟪ subst-zero (N ⟪ σ ⟫) ⟫
     ≡⟨ subst-assoc (ren S_) (subst-zero (N ⟪ σ ⟫)) (σ p) ⟩
-  σ p ⟪ subst-zero (N ⟪ σ ⟫) ∘ S_ ⟫ 
+  σ p ⟪ subst-zero (N ⟪ σ ⟫) ∘ S_ ⟫
     ≡[ i ]⟨ σ p ⟪ (λ p → subst-zero-S=ids {N = N ⟪ σ ⟫} p i) ⟫ ⟩
-  σ p ⟪ ids ⟫ 
+  σ p ⟪ ids ⟫
     ≡⟨ subst-idL (σ p) ⟩
   σ p ∎ where open ≡-Reasoning
 
 ------------------------------------------------------------------------------
 -- Substitution Lemma
-  
+
 subst-ssubst : (σ : Subst Γ Δ)
   → (M : A , Γ ⊢ B) (N : Γ ⊢ A)
-  → M ⟪ exts σ ⟫ [ N ⟪ σ ⟫ ] ≡ M [ N ] ⟪ σ ⟫ 
+  → M ⟪ exts σ ⟫ [ N ⟪ σ ⟫ ] ≡ M [ N ] ⟪ σ ⟫
 subst-ssubst σ M N = begin
   M ⟪ exts σ ⟫ [ N ⟪ σ ⟫ ]
     ≡⟨ subst-assoc (exts σ) (subst-zero (N ⟪ σ ⟫)) M ⟩
   M ⟪ exts σ ⨟ subst-zero (N ⟪ σ ⟫) ⟫
-    ≡[ i ]⟨ M ⟪ (λ p → subst-zero-comm σ N p i) ⟫ ⟩ 
+    ≡[ i ]⟨ M ⟪ (λ p → subst-zero-comm σ N p i) ⟫ ⟩
   M ⟪ subst-zero N ⨟ σ ⟫
     ≡⟨ sym (subst-assoc (subst-zero N) σ M) ⟩
-  (M ⟪ subst-zero N ⟫) ⟪ σ ⟫ 
+  (M ⟪ subst-zero N ⟫) ⟪ σ ⟫
     ∎ where open ≡-Reasoning
 
 rename-ssubst : (ρ : Rename Γ Δ)
@@ -295,9 +295,9 @@ subst-rename-∅ {ρ = ρ} σ M = begin
   M ⟪ σ ∘ ρ ⟫
     ≡[ i ]⟨ M ⟪ funExt {f = σ ∘ ρ} {g = ids} (λ ()) i ⟫ ⟩
   M ⟪ ids ⟫
-    ≡⟨ subst-idL M ⟩ 
+    ≡⟨ subst-idL M ⟩
   M ∎ where open ≡-Reasoning
-  
+
 ------------------------------------------------------------------------------
 -- Substitution respects reduction
 
@@ -338,7 +338,7 @@ module _ where
 -- Special cut rule
 -- TODO: Simplify these special cases
 
-γ : (N : A , ∅ ⊢ B) → Subst (B , ∅) (A , ∅) 
+γ : (N : A , ∅ ⊢ B) → Subst (B , ∅) (A , ∅)
 γ {⋆} {⋆} N {⋆} (Z B=A) = N
 
 _∘′_ : {A B C : 𝕋}

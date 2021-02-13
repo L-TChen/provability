@@ -5,7 +5,7 @@ module Assembly.Base where
 open import Prelude as 𝓤
   hiding (_∘_; id)
 open import Calculus.Untyped
-  hiding (Z)
+  hiding (Z; _⁺)
 
 record IsRealisability {X : 𝓤 ̇} (_⊩_ : Λ₀ → X → 𝓤 ̇) : 𝓤 ̇ where
   constructor is⊩

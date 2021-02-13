@@ -5,14 +5,14 @@ module Calculus.Untyped.Progress where
 open import Prelude
   hiding (_∘_)
 open import Calculus.Untyped.Base
-  
+
 private
   variable
     A B C          : 𝕋
     Γ Δ Ξ          : Cxt
     M N L M′ N′ L′ : Γ ⊢ A
 
-infix  8  ′_  
+infix  8  ′_
 ------------------------------------------------------------------------------
 -- Normal terms
 
@@ -23,7 +23,7 @@ data Neutral {Γ} where
   `_  : (x : A ∈ Γ)
       -------------
     → Neutral (` x)
-  _·_ 
+  _·_
     : Neutral L
     → Normal M
       ---------------
@@ -34,7 +34,7 @@ data Normal where
     : Neutral M
       ---------
     → Normal M
-  ƛ_ 
+  ƛ_
     : Normal N
       ------------
     → Normal (ƛ N)
