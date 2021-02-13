@@ -79,9 +79,11 @@ id = 𝓤.id , 0 , 𝓤.id
 
 infixr 9 _∘_
 
+-- TODO: Clarify this definition. It seems that _∘_ preserves identities and is associative
+-- with respect to three components.
 _∘_ : {X Y Z : Asm 𝓤} → Trackable Y Z → Trackable X Y → Trackable X Z
-_∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ M⊩x →
-  subst (_⊩ g (f _)) (∘-ssubst-ssubst G F _ ⁻¹) (G⊩g (F⊩f M⊩x))
+_∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ {_} {x} M⊩x →
+  subst (_⊩ g (f x)) (∘-ssubst-ssubst G F _ ⁻¹) (G⊩g (F⊩f M⊩x))
     where open AsmStr (str Z)
 
 ------------------------------------------------------------------------------
