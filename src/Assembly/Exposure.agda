@@ -3,7 +3,7 @@
 module Assembly.Exposure where
 
 open import Prelude
-  hiding (id; _∘_)
+  hiding (id; _∘_; Sub)
 open import Calculus.Untyped
   hiding (Z; _⁺)
 open import Assembly.Base
@@ -60,16 +60,16 @@ module _ (Q : Quoting) where
       □f (M , ▹x , M⊩x) = F [ M ] , ▹map f ▹x , λ α → F⊩f (M⊩x α)
 
       □F : ⋆ , ∅ ⊢ ⋆
-      □F = ↑₁ Ap · ↑₁ ⌜ F ⌝ · 0
+      □F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
 
       □F⊩□f : Tracks (□ X) (□ Y) □F □f
       □F⊩□f {n̅} {M , _ , _} (lift n̅-↠⌜M⌝) = lift (begin
-        ↑₁ Ap [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
-          ≡[ i ]⟨ subst-rename-∅ {ρ = S_} (subst-zero n̅) Ap i · subst-rename-∅ {ρ = S_} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
-        Ap · ⌜ F ⌝ · n̅
+        ↑₁ Sub [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
+          ≡[ i ]⟨ subst-rename-∅ {ρ = S_} (subst-zero n̅) Sub i · subst-rename-∅ {ρ = S_} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
+        Sub · ⌜ F ⌝ · n̅
           -↠⟨ ·ᵣ-cong n̅-↠⌜M⌝ ⟩
-        Ap · ⌜ F ⌝ · ⌜ M ⌝
-          -↠⟨ Ap-↠′ ⟩
+        Sub · ⌜ F ⌝ · ⌜ M ⌝
+          -↠⟨ Sub-↠ ⟩
         ⌜ F [ M ] ⌝ ∎)
 
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.

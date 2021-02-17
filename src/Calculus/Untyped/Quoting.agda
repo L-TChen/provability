@@ -3,6 +3,7 @@
 module Calculus.Untyped.Quoting where
 
 open import Prelude
+  hiding (Sub)
 
 open import Calculus.Untyped.Base
 open import Calculus.Untyped.Progress
@@ -26,10 +27,11 @@ record Quoting : 𝓤₀ ̇ where
     ⌜⌝-normal    : (M : Γ ⊢ ⋆) → Normal ⌜ M ⌝
 
     -- ⊢ □ (A → B) ⇒ □ A ⇒ □ B
-    Ap   : Λ₀
-    Ap-↠ : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M · N ⌝
-    Ap-↠′ : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M [ N ] ⌝
+    Ap    : Λ₀
+    Ap-↠  : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M · N ⌝
     -- Sub : Λ₀
+    Sub   : Λ₀
+    Sub-↠ : Sub · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M [ N ] ⌝
 
     -- ⊢ □ A `→ □ (□ A)
     Num   : Λ₀
