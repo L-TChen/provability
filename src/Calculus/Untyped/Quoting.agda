@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --guarded #-}
 
 module Calculus.Untyped.Quoting where
 
@@ -29,6 +29,7 @@ record Quoting : 𝓤₀ ̇ where
     Ap   : Λ₀
     Ap-↠ : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M · N ⌝
     Ap-↠′ : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M [ N ] ⌝
+    -- Sub : Λ₀
 
     -- ⊢ □ A `→ □ (□ A)
     Num   : Λ₀

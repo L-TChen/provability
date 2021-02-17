@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --guarded #-}
 
 module Calculus.Untyped.Combinators where
 

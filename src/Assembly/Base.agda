@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --guarded #-}
 
 module Assembly.Base where
 
@@ -10,7 +10,7 @@ open import Calculus.Untyped
 record IsRealisability {X : 𝓤 ̇} (_⊩_ : Λ₀ → X → 𝓤 ̇) : 𝓤 ̇ where
   constructor is⊩
   field
-    ⊩-respects-↠   : _⊩_ respects _-↠_ on-the-left
+    ⊩-respects-↠  : _⊩_ respects _-↠_ on-the-left
     ⊩-right-total : IsRightTotal _⊩_ 
 
 record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
@@ -75,7 +75,7 @@ syntax ∼-syntax {X = X} {Y = Y} f g = f ∼ g ꞉ X →ₐ Y
 ∼-syntax {X = X} {Y = Y} f g = ∼-eq X Y f g
 
 id : Trackable X X
-id = 𝓤.id , 0 , 𝓤.id
+id = (λ x → x) , 0 , λ M⊩x → M⊩x
 
 infixr 9 _∘_
 
@@ -106,7 +106,7 @@ _∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ
 -- Universality
 
 finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
-finality X = (λ _ → tt*) , 0 , λ x → tt* 
+finality X = (λ _ → tt*) , 0 , λ M⊩x → tt*
 
 initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
 initiality X = ⊥*-elim , 0 , (λ { {x = ()} })
@@ -157,7 +157,7 @@ projᵣ X Y = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⊩projᵣ
     F⊩projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑₁ 𝑭) λ {(x , y) → y}
     F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⊩y) = Y.⊩-respects-↠ π₂L-↠N N⊩y
 
--- Exponentia consists of trackable functions.
+-- Exponential consists of trackable functions.
 _⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
 _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f ∥) , _⊩_ ,
   is⊩ (λ {x} {x′} {y} → ⊩-respects-↠ {x} {x′} {y}) ⊩-right-total

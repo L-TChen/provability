@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --guarded #-}
 
 module Calculus.Untyped.Base where
 
@@ -62,7 +62,7 @@ private
   code⊢ (` x)     (` y)     = code x y
   code⊢ (ƛ M)     (ƛ N)     = code⊢ M N
   code⊢ (M₁ · N₁) (M₂ · N₂) = code⊢ M₁ M₂ × code⊢ N₁ N₂
-  code⊢ _               _   = ⊥
+  code⊢ _         _         = ⊥
 
   r⊢ : (M : Γ ⊢ A) → code⊢ M M
   r⊢ (` x)   = r x

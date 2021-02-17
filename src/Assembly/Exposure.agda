@@ -1,11 +1,11 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --guarded #-}
 
 module Assembly.Exposure where
 
 open import Prelude
   hiding (id; _∘_)
 open import Calculus.Untyped
-  hiding (Z)
+  hiding (Z; _⁺)
 open import Assembly.Base
 
 private

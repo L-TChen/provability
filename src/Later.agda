@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical  #-}
+{-# OPTIONS --without-K --cubical --guarded #-}
 
 -- Most of definitions are from LaterPrims.agda
 

@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --guarded #-}
 
 module Calculus.Context where
 
@@ -87,7 +87,7 @@ Rename {T = T} Γ Δ = {A : T} → A ∈ Γ → A ∈ Δ
 
 private
   code∈ : {A : T} (x y : A ∈ Γ) → universe-of T ̇
-  code∈ (Z p) (Z q) = p ≡ q -- p ≡ q
+  code∈ (Z p) (Z q) = p ≡ q
   code∈ (S x) (S y) = code∈ x y
   code∈ _     _     = ⊥*
 
