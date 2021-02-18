@@ -5,7 +5,7 @@ module Assembly.Base where
 open import Prelude as 𝓤
   hiding (_∘_; id)
 open import Calculus.Untyped
-  hiding (Z; _⁺)
+  hiding (Z)
 
 record IsRealisability {X : 𝓤 ̇} (_⊩_ : Λ₀ → X → 𝓤 ̇) : 𝓤 ̇ where
   constructor is⊩
@@ -81,11 +81,17 @@ infixr 9 _∘_
 
 -- TODO: Clarify this definition. It seems that _∘_ preserves identities and is associative
 -- with respect to three components.
-_∘_ : {X Y Z : Asm 𝓤} → Trackable Y Z → Trackable X Y → Trackable X Z
+_∘_ : Trackable Y Z → Trackable X Y → Trackable X Z
 _∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ {_} {x} M⊩x →
   subst (_⊩ g (f x)) (∘-ssubst-ssubst G F _ ⁻¹) (G⊩g (F⊩f M⊩x))
     where open AsmStr (str Z)
 
+∘-id : (f : Trackable X Y) → f ∘ id ≡ f
+∘-id (f , F , F⊩f) = {!!}
+
+Tracker-≡ : (f g : ⟨ X ⟩ → ⟨ Y ⟩) → (F G : ⋆ , ∅ ⊢ ⋆) → (F⊩f : Tracks X Y F f) (G⊩g : Tracks X Y G g)
+  → f ≡ g → F ≡ G → F⊩f ≡ G⊩g → (f , F , F⊩f) ≡ (g , G , G⊩g)
+Tracker-≡ = ?
 ------------------------------------------------------------------------------
 -- Examples
 

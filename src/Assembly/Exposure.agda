@@ -5,7 +5,7 @@ module Assembly.Exposure where
 open import Prelude
   hiding (id; _∘_; Sub)
 open import Calculus.Untyped
-  hiding (Z; _⁺)
+  hiding (Z)
 open import Assembly.Base
 
 private

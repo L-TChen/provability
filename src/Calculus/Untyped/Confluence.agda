@@ -155,43 +155,44 @@ sub-par {⋆} {Γ} {⋆} {M} {M′} {N} {N′} M⇛M′ N⇛N′ =
 ------------------------------------------------------------------------------
 -- Confluence
 
-_⁺ : Γ ⊢ A → Γ ⊢ A
-(` x) ⁺       =  ` x
-(ƛ M) ⁺       = ƛ (M ⁺)
-((ƛ M) · N) ⁺ = M ⁺ [ N ⁺ ]
-(M · N) ⁺     = M ⁺ · (N ⁺)
+private
+  _⁺ : Γ ⊢ A → Γ ⊢ A
+  (` x) ⁺       =  ` x
+  (ƛ M) ⁺       = ƛ (M ⁺)
+  ((ƛ M) · N) ⁺ = M ⁺ [ N ⁺ ]
+  (M · N) ⁺     = M ⁺ · (N ⁺)
 
-par-triangle
-  : M ⇛ N
-    -------
-  → N ⇛ M ⁺
-par-triangle pvar = pvar
-par-triangle (pbeta M⇛M′ N⇛N′)               = sub-par (par-triangle M⇛M′) (par-triangle N⇛N′)
-par-triangle (pabs M⇛M′)                     = pabs (par-triangle M⇛M′)
-par-triangle (papp {ƛ _}   (pabs M⇛M′) N⇛N′) = pbeta (par-triangle M⇛M′) (par-triangle N⇛N′)
-par-triangle (papp {` x}   pvar        N)    = papp (par-triangle pvar)  (par-triangle N)
-par-triangle (papp {L · M} LM⇛M′       N)    = papp (par-triangle LM⇛M′) (par-triangle N)
+  par-triangle
+    : M ⇛ N
+      -------
+    → N ⇛ M ⁺
+  par-triangle pvar = pvar
+  par-triangle (pbeta M⇛M′ N⇛N′)               = sub-par (par-triangle M⇛M′) (par-triangle N⇛N′)
+  par-triangle (pabs M⇛M′)                     = pabs (par-triangle M⇛M′)
+  par-triangle (papp {ƛ _}   (pabs M⇛M′) N⇛N′) = pbeta (par-triangle M⇛M′) (par-triangle N⇛N′)
+  par-triangle (papp {` x}   pvar        N)    = papp (par-triangle pvar)  (par-triangle N)
+  par-triangle (papp {L · M} LM⇛M′       N)    = papp (par-triangle LM⇛M′) (par-triangle N)
 
-strip
-  : M ⇛ N
-  → M ⇛* N′
-    ------------------------------------
-  → Σ[ L ∈ Γ ⊢ A ] (N ⇛* L)  ×  (N′ ⇛ L)
-strip mn (M ∎) = ( _ , _ ∎ , mn)
-strip mn (M ⇛⟨ mm' ⟩ m'n')
-  with strip (par-triangle mm') m'n'
-... | (L , ll' , n'l') =
-      (L , (_ ⇛⟨ par-triangle mn ⟩ ll') , n'l')
+  strip
+    : M ⇛ N
+    → M ⇛* N′
+      ------------------------------------
+    → Σ[ L ∈ Γ ⊢ A ] (N ⇛* L)  ×  (N′ ⇛ L)
+  strip mn (M ∎) = ( _ , _ ∎ , mn)
+  strip mn (M ⇛⟨ mm' ⟩ m'n')
+    with strip (par-triangle mm') m'n'
+  ... | (L , ll' , n'l') =
+        (L , (_ ⇛⟨ par-triangle mn ⟩ ll') , n'l')
 
-par-confluence
-  : L ⇛* M
-  → L ⇛* M′
-    ------------------------------------
-  → Σ[ N ∈ Γ ⊢ A ] (M ⇛* N) × (M′ ⇛* N)
-par-confluence {Γ} {A} {L} {.L} {N} (L ∎) L⇛*N = N , L⇛*N , N ∎
-par-confluence {Γ} {A} {L} {M₁′} {M₂} (L ⇛⟨ L⇛M₁ ⟩ M₁⇛*M₁′) L⇛*M₂ with strip L⇛M₁ L⇛*M₂
-... | N , M₁⇛*N , M₂⇛N with par-confluence M₁⇛*M₁′ M₁⇛*N
-... | N′ , M₁′⇛*N′ , N⇛*N′ = N′ , M₁′⇛*N′ , (M₂ ⇛⟨ M₂⇛N ⟩ N⇛*N′)
+  par-confluence
+    : L ⇛* M
+    → L ⇛* M′
+      ------------------------------------
+    → Σ[ N ∈ Γ ⊢ A ] (M ⇛* N) × (M′ ⇛* N)
+  par-confluence {Γ} {A} {L} {.L} {N} (L ∎) L⇛*N = N , L⇛*N , N ∎
+  par-confluence {Γ} {A} {L} {M₁′} {M₂} (L ⇛⟨ L⇛M₁ ⟩ M₁⇛*M₁′) L⇛*M₂ with strip L⇛M₁ L⇛*M₂
+  ... | N , M₁⇛*N , M₂⇛N with par-confluence M₁⇛*M₁′ M₁⇛*N
+  ... | N′ , M₁′⇛*N′ , N⇛*N′ = N′ , M₁′⇛*N′ , (M₂ ⇛⟨ M₂⇛N ⟩ N⇛*N′)
 
 confluence
   : L -↠ M
