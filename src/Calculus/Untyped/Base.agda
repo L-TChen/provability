@@ -273,4 +273,4 @@ module -↠-Reasoning where
     _ · _
       -↠⟨ ·ᵣ-cong N-↠N′ ⟩
     _ · _ ∎
-open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠) public
+open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠; ·-cong; ·ₗ-cong; ·ᵣ-cong) public

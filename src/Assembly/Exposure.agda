@@ -36,8 +36,9 @@ module _ (Q : Quoting) where
   open -↠-Reasoning
 
   □_ : Asm 𝓤 → Asm 𝓤
-  □_ {𝓤} (|X| , _⊩_ , ⊩-realisability) = |□X| , _⊩□X_ ,
-    is⊩ (λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}) ⊩□X-right-total
+  □_ {𝓤} (|X| , _⊩_ , ⊩-realisability) = |□X| , _⊩□X_ , record
+    { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}
+    ; ⊩-right-total = ⊩□X-right-total }
     where
       |□X| : 𝓤 ̇
       |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ |X| ] ▹[ α ] M ⊩ ▹x α

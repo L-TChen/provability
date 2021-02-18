@@ -9,6 +9,7 @@ private
   variable
     A B C   : 𝕋
     Γ Δ Ξ   : Cxt
+    M N M′ N′ : Γ ⊢ A
     ρ ρ₁ ρ₂ : Rename Γ Δ
     σ σ₁ σ₂ : Subst Γ Δ
 
@@ -304,8 +305,8 @@ subst-rename-∅ {ρ = ρ} σ M = begin
 module _ where
   open -↠-Reasoning
 
-  rename-reduce : {ρ : Rename Γ Δ} {M N : Γ ⊢ A}
-    → M -→ N
+  rename-reduce
+    : M -→ N
     → rename ρ M -→ rename ρ N
   rename-reduce {ρ = ρ} (β {M = M} {N}) =
     subst (rename ρ ((ƛ M) · N) -→_) (rename-ssubst ρ M N) β
@@ -313,14 +314,14 @@ module _ where
   rename-reduce (ξₗ M-→N) = ξₗ (rename-reduce M-→N)
   rename-reduce (ξᵣ M-→N) = ξᵣ (rename-reduce M-→N)
 
-  rename-reduce* : {ρ : Rename Γ Δ} {M N : Γ ⊢ A}
-    → M -↠ N
+  rename-reduce*
+    : M -↠ N
     → rename ρ M -↠ rename ρ N
   rename-reduce* (M ∎)               = -↠-refl
   rename-reduce* (L -→⟨ L-→M ⟩ M-↠N) = _ -→⟨ rename-reduce L-→M ⟩ rename-reduce* M-↠N
 
-  subst-reduce : {σ : Subst Γ Δ} {M N : Γ ⊢ A}
-    → M -→ N
+  subst-reduce
+    : M -→ N
     → M ⟪ σ ⟫ -→ N ⟪ σ ⟫
   subst-reduce {σ = σ} (β {M = M} {N}) =
     subst ((ƛ M) ⟪ σ ⟫ · N ⟪ σ ⟫ -→_) (subst-ssubst σ M N) β
@@ -328,8 +329,8 @@ module _ where
   subst-reduce (ξₗ M-→N) = ξₗ (subst-reduce M-→N)
   subst-reduce (ξᵣ M-→N) = ξᵣ (subst-reduce M-→N)
 
-  subst-reduce* : {σ : Subst Γ Δ} {M N : Γ ⊢ A}
-    → M -↠ N
+  subst-reduce*
+    : M -↠ N
     → M ⟪ σ ⟫ -↠ N ⟪ σ ⟫
   subst-reduce* (M ∎)               = -↠-refl
   subst-reduce* (L -→⟨ L-→M ⟩ M-↠N) = _ -→⟨ subst-reduce L-→M ⟩ subst-reduce* M-↠N

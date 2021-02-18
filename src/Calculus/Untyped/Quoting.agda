@@ -24,7 +24,7 @@ record Quoting : 𝓤₀ ̇ where
 
     -- ⌜-⌝ reflects equality
     ⌜⌝-injective : ⌜ M ⌝ ≡ ⌜ N ⌝ → M ≡ N
-    ⌜⌝-normal    : (M : Γ ⊢ ⋆) → Normal ⌜ M ⌝
+    ⌜⌝-normal    : Normal ⌜ M ⌝
 
     -- ⊢ □ (A → B) ⇒ □ A ⇒ □ B
     Ap    : Λ₀
@@ -37,61 +37,66 @@ record Quoting : 𝓤₀ ̇ where
     Num   : Λ₀
     Num-↠ : Num · ⌜ M ⌝ -↠ ⌜ ⌜ M ⌝ ⌝
 
-    reduce-one : Σ[ R ꞉ Λ₀ ] R · ⌜ (ƛ M) · N ⌝ -↠ ⌜ M [ N ] ⌝
+    reduce   : Λ₀
+    reduce-↠ : reduce · ⌜ (ƛ M) · N ⌝ -↠ ⌜ M [ N ] ⌝ 
   open -↠-Reasoning
 
-  I·x≠x : ↑₁ 𝑰 · 0 ≢ 0
-  I·x≠x = encode
+  I·I≠I : 𝑰 · 𝑰 ≢ 𝑰
+  I·I≠I = encode
 
-  postulate
-    quoting-not-definable : ¬ (Σ[ Q ꞉ ⋆ , ∅ ⊢ ⋆ ] Π[ M ꞉ ∅ ⊢ ⋆ ] (ƛ Q) · M -↠ ⌜ M ⌝)
+  quoting-not-definable : ¬ (Σ[ Q ꞉ ∅ ⊢ ⋆ ] Π[ M ꞉ ∅ ⊢ ⋆ ] Q · M -↠ ⌜ M ⌝ )
+  quoting-not-definable (Q , QM-↠⌜M⌝) = I·I≠I (⌜⌝-injective (Normal⇒Path ⌜⌝-normal ⌜⌝-normal (QM-↠⌜M⌝ (𝑰 · 𝑰)) QII-↠⌜I⌝ ))
+    where
+      QII-↠⌜I⌝ : Q · (𝑰 · 𝑰) -↠ ⌜ 𝑰 ⌝
+      QII-↠⌜I⌝ = begin
+        Q · (𝑰 · 𝑰)
+          -→⟨ ξᵣ β ⟩
+        Q · 𝑰
+          -↠⟨ QM-↠⌜M⌝ 𝑰 ⟩
+        ⌜ 𝑰 ⌝ ∎
 
-  -- -- ⊢ □ (ℕ `→ A) `→ □ A
-  -- Diag : Γ ⊢ nat `→ nat
-  -- Diag = ƛ ↑ Ap · # 0 · (↑ Num · # 0)
+  -- ⊢ □ (ℕ `→ A) `→ □ A
+  Diag : Λ₀
+  Diag = ƛ ↑ₗ Ap · 0 · (↑ₗ Num · 0)
 
-  -- U : ∀ A → Prog ((nat `→ A) `→ nat `→ A)
-  -- U A = ƛ ƛ # 1 · (↑ Diag · # 0)
+  U : Λ₀
+  U = ƛ ƛ 1 · (↑ₗ Diag · 0)
 
-  -- -- the β-redex is for (∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝) to be true
-  -- W : (A : 𝕋) → Prog (nat `→ A) → Prog (nat `→ A)
-  -- W A F = U A · F
+  -- the β-redex is for (∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝) to be true
+  W : Λ₀ → Λ₀
+  W F = U · F
 
-  -- Diag-↠ : Diag · ⌜ M ⌝ -↠ ⌜ M · ⌜ M ⌝ ⌝
-  -- Diag-↠ {M = M} = begin
-  --     Diag · ⌜ M ⌝
-  --   -→⟨ β-ƛ· ⟩
-  --     ↑ Ap [ ⌜ M ⌝ ] · ⌜ M ⌝ · (↑ Num [ ⌜ M ⌝ ] · ⌜ M ⌝)
-  --   ≡⟨ cong₂ (λ N L → N · ⌜ M ⌝ · (L · ⌜ M ⌝)) (subst-↑ _ Ap) (subst-↑ _ Num) ⟩
-  --     Ap · ⌜ M ⌝ · (Num · ⌜ M ⌝)
-  --   -↠⟨ ·ᵣ-↠ Num-↠ ⟩
-  --     Ap · ⌜ M ⌝ · ⌜ ⌜ M ⌝ ⌝
-  --   -↠⟨ Ap-↠ ⟩
-  --     ⌜ M · ⌜ M ⌝ ⌝
-  --   ∎
+  Diag-↠ : Diag · ⌜ M ⌝ -↠ ⌜ M · ⌜ M ⌝ ⌝
+  Diag-↠ {M = M} = begin
+      Diag · ⌜ M ⌝
+    -→⟨ β ⟩
+      ↑₁ Ap [ ⌜ M ⌝ ] · ⌜ M ⌝ · (↑₁ Num [ ⌜ M ⌝ ] · ⌜ M ⌝)
+    ≡⟨ cong₂ (λ N L → N · ⌜ M ⌝ · (L · ⌜ M ⌝)) (subst-rename-∅ _ Ap) (subst-rename-∅ _ Num) ⟩
+      Ap · ⌜ M ⌝ · (Num · ⌜ M ⌝)
+    -↠⟨ ·ᵣ-cong Num-↠ ⟩
+      Ap · ⌜ M ⌝ · ⌜ ⌜ M ⌝ ⌝
+    -↠⟨ Ap-↠ ⟩
+      ⌜ M · ⌜ M ⌝ ⌝ ∎
 
-  -- -- ⊢ □ A `→ A   `→   ⊢ A
-  -- gfix : Prog (nat `→ A) → Prog A
-  -- gfix F = Wₘ · ⌜ Wₘ ⌝
-  --   where
-  --     Wₘ = W _ F
+  -- ⊢ □ A `→ A   `→   ⊢ A
+  gfix : Λ₀ → Λ₀
+  gfix F = Wₘ · ⌜ Wₘ ⌝
+    where Wₘ = W F
 
-  -- gfix-↠ : gfix F -↠ F · ⌜ gfix F ⌝
-  -- gfix-↠ {F = F} = begin
-  --     Wₘ · ⌜ Wₘ ⌝
-  --   -→⟨ ξ-·ₗ β-ƛ· ⟩
-  --     (ƛ ↑₁ F · (↑ Diag ⟪ _ ⟫ · # 0)) · ⌜ Wₘ ⌝
-  --   -→⟨ β-ƛ· ⟩
-  --     ↑₁ F [ ⌜ Wₘ ⌝ ] · (↑ Diag ⟪ _ ⟫ [ ⌜ Wₘ ⌝ ] · ⌜ Wₘ ⌝)
-  --   ≡⟨ cong₂ (λ N L → N · (L · ⌜ Wₘ ⌝)) (subst-rename-∅ S_ _ F) (subst-subst _ _ (↑ Diag)) ⟩
-  --     F · (↑ Diag ⟪ _ ⟫ · ⌜ Wₘ ⌝)
-  --   ≡⟨ cong (λ M → F · (M · ⌜ Wₘ ⌝)) (subst-↑ _ Diag) ⟩
-  --     F · (Diag · ⌜ Wₘ ⌝)
-  --   -↠⟨ ·ᵣ-↠ Diag-↠ ⟩
-  --     F · ⌜ Wₘ · ⌜ Wₘ ⌝ ⌝
-  --   ∎
-  --   where
-  --     Wₘ = W _ F
+  gfix-↠ : gfix F -↠ F · ⌜ gfix F ⌝
+  gfix-↠ {F = F} = begin
+      Wₘ · ⌜ Wₘ ⌝
+    -→⟨ ξₗ β ⟩
+      (ƛ ↑₁ F · (↑ₗ Diag ⟪ _ ⟫ · 0)) · ⌜ Wₘ ⌝
+    -→⟨ β ⟩
+      ↑₁ F [ ⌜ Wₘ ⌝ ] · (↑ₗ Diag ⟪ _ ⟫ [ ⌜ Wₘ ⌝ ] · ⌜ Wₘ ⌝)
+    ≡⟨ cong₂ (λ N L → N · (L · ⌜ Wₘ ⌝)) (subst-rename-∅ _ F) (subst-assoc _ _ (↑ₗ Diag)) ⟩
+      F · (↑ₗ Diag ⟪ _ ⟫ · ⌜ Wₘ ⌝)
+    ≡⟨ cong (λ M → F · (M · ⌜ Wₘ ⌝)) (subst-rename-∅ _ Diag) ⟩
+      F · (Diag · ⌜ Wₘ ⌝)
+    -↠⟨ ·ᵣ-cong Diag-↠ ⟩
+      F · ⌜ Wₘ · ⌜ Wₘ ⌝ ⌝ ∎
+    where Wₘ = W F
 
   -- -- ⊢ □ (□ A `→ A) `→ □ A
   -- igfix : (A : 𝕋) → Prog (nat `→ nat)
