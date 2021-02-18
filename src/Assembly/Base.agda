@@ -56,12 +56,8 @@ record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
     F   : ⋆ , ∅ ⊢ ⋆
     F⊩f : Tracks X Y F f
 
-record Trackable (X Y : Asm 𝓤) : 𝓤 ̇ where
-  constructor _,_
-  field
-    fun        : ⟨ X ⟩ → ⟨ Y ⟩
-    hasTracker : HasTracker X Y fun
-  open HasTracker hasTracker public
+Trackable : (X Y : Asm 𝓤) → 𝓤 ̇
+Trackable X Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] HasTracker X Y f
  
 ∼-eq : (X Y : Asm 𝓤) → (f g : Trackable X Y) → 𝓤 ̇
 ∼-eq X Y (f , _) (g , _) = f ≡ g
@@ -78,10 +74,9 @@ id = 𝓤.id , 0 , 𝓤.id
 
 infixr 9 _∘_
 
--- TODO: Clarify this definition. It seems that _∘_ preserves identities and is associative
--- with respect to three components.
+-- TODO: Clarify this definition.
 _∘_ : Trackable Y Z → Trackable X Y → Trackable X Z
-_∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ {M} {x} M⊩x →
+_∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ {_} {x} M⊩x →
   subst (_⊩ g (f x)) (∘-ssubst-ssubst G F _ ⁻¹) (G⊩g (F⊩f M⊩x))
     where open AsmStr (str Z)
 
