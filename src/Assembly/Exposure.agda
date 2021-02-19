@@ -15,7 +15,6 @@ private
 -- Endo-exposure
 
 record IsExposure (Q : Asm 𝓤 → Asm 𝓤) (map : {X Y : Asm 𝓤} → Trackable X Y → Trackable (Q X) (Q Y)) : 𝓤 ⁺ ̇ where 
-  constructor is-exposure
   field
     preserve-id   : (X : Asm 𝓤)
       → map id ∼ id ꞉ Q X →ₐ Q X
@@ -26,6 +25,7 @@ record IsExposure (Q : Asm 𝓤 → Asm 𝓤) (map : {X Y : Asm 𝓤} → Tracka
       →     f ∼ g     ꞉ X   →ₐ Y
 
 record Exposure : 𝓤 ⁺ ̇ where
+  constructor isexposure
   field
     Q          : Asm 𝓤 → Asm 𝓤
     map        : {X Y : Asm 𝓤} → Trackable X Y → Trackable (Q X) (Q Y)
