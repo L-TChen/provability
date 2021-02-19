@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical --guarded #-}
+{-# OPTIONS --without-K --cubical #-}
 
 module Calculus.Untyped.Progress where
 

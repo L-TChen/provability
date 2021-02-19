@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical --guarded #-}
+{-# OPTIONS --without-K --cubical #-}
 
 module Prelude where
 
@@ -25,7 +25,6 @@ open import Cubical.Data.Nat.Order.Recursive as ℕₚ public
   using (_≤_; _<_)
 
 open import Universes public
-open import Later     public
 
 private
   variable

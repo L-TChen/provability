@@ -57,19 +57,19 @@ _⊛_ : ▹ ((a : A) → B a)
   → Σ (▹ A) λ ▹x → ▹[ α ] B (▹x α)
 ▹Σ f = (λ α → fst (f α)) , λ α → snd (f α)
 
-▹-extensionality : {A : I → Set} {x : ▹ A i0} {y : ▹ A i1}
+▹-extensionality : {A : I → 𝓤 ̇} {x : ▹ A i0} {y : ▹ A i1}
   → ▹[ α ] PathP A (x α) (y α) → PathP (λ i → ▹ A i) x y
 ▹-extensionality p i α = p α i
 
-▹isProp→isProp▹ : {A : ▹ Set}
+▹isProp→isProp▹ : {A : ▹ 𝓤 ̇}
   → ▹[ α ] isProp (A α)
   → isProp (▹[ α ] (A α))
 ▹isProp→isProp▹ p x y = λ i α → p α (x α) (y α) i
 
-transp▹ : (A : I → ▹ Set) → ▸ (A i0) → ▸ (A i1)
+transp▹ : (A : I → ▹ 𝓤 ̇) → ▸ (A i0) → ▸ (A i1)
 transp▹ A = transp (λ i → ▸ (A i)) i0
 
-hcomp▹ : (A : ▹ Set) (φ : I) (u : I → Partial φ (▸ A))
+hcomp▹ : (A : ▹ 𝓤 ̇) (φ : I) (u : I → Partial φ (▸ A))
   → (u0 : ▸ A [ φ ↦ u i0 ]) → ▸ A
 hcomp▹ A φ u u0 a = hcomp (λ { i (φ = i1) → u i 1=1 a }) (outS u0 a)
 
