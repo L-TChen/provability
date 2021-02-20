@@ -44,14 +44,14 @@ record Quoting : 𝓤₀ ̇ where
   I·I≠I : 𝑰 · 𝑰 ≢ 𝑰
   I·I≠I = encode
 
-  quoting-not-definable : ¬ (Σ[ Q ꞉ ∅ ⊢ ⋆ ] Π[ M ꞉ ∅ ⊢ ⋆ ] Q · M -↠ ⌜ M ⌝ )
-  quoting-not-definable (Q , QM-↠⌜M⌝) = I·I≠I (⌜⌝-injective (Normal⇒Path ⌜⌝-normal ⌜⌝-normal (QM-↠⌜M⌝ (𝑰 · 𝑰)) QII-↠⌜I⌝ ))
+  quoting-not-definable : ¬ (Σ[ Q ꞉ Λ₁ ] Π[ M ꞉ Λ₀ ] Q [ M ] -↠ ⌜ M ⌝ )
+  quoting-not-definable (Q , QM-↠⌜M⌝) = I·I≠I (⌜⌝-injective (Normal⇒Path ⌜⌝-normal ⌜⌝-normal (QM-↠⌜M⌝ (𝑰 · 𝑰)) QII-↠⌜I⌝))
     where
-      QII-↠⌜I⌝ : Q · (𝑰 · 𝑰) -↠ ⌜ 𝑰 ⌝
+      QII-↠⌜I⌝ : Q [ 𝑰 · 𝑰 ] -↠ ⌜ 𝑰 ⌝
       QII-↠⌜I⌝ = begin
-        Q · (𝑰 · 𝑰)
-          -→⟨ ξᵣ β ⟩
-        Q · 𝑰
+        Q [ 𝑰 · 𝑰 ]
+          -↠⟨ reduce-ssubst Q (-→to-↠ β) ⟩
+        Q [ 𝑰 ]
           -↠⟨ QM-↠⌜M⌝ 𝑰 ⟩
         ⌜ 𝑰 ⌝ ∎
 

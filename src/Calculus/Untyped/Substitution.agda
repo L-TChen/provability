@@ -335,6 +335,30 @@ module _ where
   subst-reduce* (M ∎)               = -↠-refl
   subst-reduce* (L -→⟨ L-→M ⟩ M-↠N) = _ -→⟨ subst-reduce L-→M ⟩ subst-reduce* M-↠N
 
+  extsσ-↠σ′ : {σ σ′ : Subst Γ Δ} → ((x : A ∈ Γ) → σ x -↠ σ′ x)
+    → (x : A ∈ ⋆ , Γ)
+    → exts σ x -↠ exts σ′ x
+  extsσ-↠σ′ σ-↠σ′ (Z B=A) = -↠-refl
+  extsσ-↠σ′ σ-↠σ′ (S x)   = rename-reduce* (σ-↠σ′ x)
+
+  reduce-subst
+    : {σ σ′ : Subst Γ Δ}
+    → (M : Γ ⊢ A)
+    → ((x : A ∈ Γ) → σ x -↠ σ′ x)
+    → M ⟪ σ ⟫ -↠ M ⟪ σ′ ⟫
+  reduce-subst {Γ} {Δ} {A}  {σ} {σ′} (` x)   σ-↠σ′ = σ-↠σ′ x
+  reduce-subst {Γ} {Δ} {.⋆} {σ} {σ′} (ƛ M)   σ-↠σ′ = ƛ-cong (reduce-subst M (extsσ-↠σ′ σ-↠σ′))
+  reduce-subst {Γ} {Δ} {.⋆} {σ} {σ′} (M · N) σ-↠σ′ = ·-cong (reduce-subst M σ-↠σ′) (reduce-subst N σ-↠σ′)
+
+  reduce-ssubst
+    : (M : B , Γ ⊢ A)
+    → N -↠ N′
+    → M [ N ] -↠ M [ N′ ]
+  reduce-ssubst {B} {Γ} {A} {N} {N′} M N-↠N′ = reduce-subst M σ-↠σ′
+    where
+      σ-↠σ′ : (x : A ∈ B , Γ) → subst-zero N x -↠ subst-zero N′ x
+      σ-↠σ′ (Z {⋆} {⋆} B=A)    = N-↠N′
+      σ-↠σ′ (S_ {⋆} {_} {⋆} x) = -↠-refl
 ------------------------------------------------------------------------------
 -- Special cut rule
 -- TODO: Simplify these special cases

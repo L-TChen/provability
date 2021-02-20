@@ -9,14 +9,15 @@ open import Calculus.Untyped
 
 record IsRealisability {X : 𝓤 ̇} (_⫣_ : X → Λ₀ → 𝓤 ̇) : 𝓤 ̇ where
   field
-    ⫣-respects-↠  : _⫣_ respects _-↠_ on-the-right
+    ⫣-respects-↠ : _⫣_ respects _-↠_ on-the-right
     ⫣-left-total : _⫣_ IsLeftTotal 
+--    ⫣-isProp     : (x : X) → (M : Λ₀) → isProp (x ⫣ M) 
+    -- ⫣-isProp is usefu when defining □
 
 record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor _,_
   field
-    _⫣_             : X → Λ₀ → 𝓤 ̇
-    -- TODO: Perhaps ⊩ should also be a mere proposition
+    _⫣_            : X → Λ₀ → 𝓤 ̇
     isRealisability : IsRealisability _⫣_
   open IsRealisability isRealisability public
   infix 6 _⫣_
@@ -54,13 +55,13 @@ record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
 
   field
     F   : Λ₁
-    F⊩f : Tracks X Y F f
+    F⫣f : Tracks X Y F f
 
 Trackable : (X Y : Asm 𝓤) → 𝓤 ̇
 Trackable X Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] HasTracker X Y f
  
 ∼-eq : (X Y : Asm 𝓤) → (f g : Trackable X Y) → 𝓤 ̇
-∼-eq X Y (f , _) (g , _) = f ≡ g
+∼-eq X Y (f , _) (g , _) = (x : ⟨ X ⟩) → f x ≡ g x
 
 infix 4 ∼-syntax
 
@@ -80,13 +81,17 @@ _∘_ {Z = Z} (g , G , g⫣G) (f , F , f⫣F) = g 𝓤.∘ f , (G ∘′ F) , λ
   subst (g (f x) ⫣_) (∘-ssubst-ssubst G F _ ⁻¹) (g⫣G (f⫣F x⫣M))
     where open AsmStr (str Z)
 
+∘-commutes-𝓤∘ : (g : Trackable Y Z) (f : Trackable X Y) → (x : ⟨ X ⟩) → (g ∘ f) .fst x ≡ g .fst (f .fst x)
+∘-commutes-𝓤∘ g f x = refl
 ------------------------------------------------------------------------------
 -- Examples
 
 ∇_ : (X : 𝓤 ̇) → Asm 𝓤
 ∇ X = X , (λ _ _ → Unit*) , record
   { ⫣-respects-↠ = λ _ _ → tt*
-  ; ⫣-left-total = λ _ → ∣ 𝑰 , tt* ∣ }
+  ; ⫣-left-total = λ _ → ∣ 𝑰 , tt* ∣
+--  ; ⫣-isProp     = λ _ _ → isPropUnit*
+  }
 
 ⫣⊥ : ⊥* {𝓤} → Λ₀ → 𝓤 ̇
 ⫣⊥ ()
@@ -95,19 +100,21 @@ _∘_ {Z = Z} (g , G , g⫣G) (f , F , f⫣F) = g 𝓤.∘ f , (G ∘′ F) , λ
 ⊥ₐ = ⊥* , ⫣⊥ , record
   { ⫣-respects-↠ = λ { {x = ()} }
   ; ⫣-left-total = λ ()
+--  ; ⫣-isProp     = λ ()
   }
 
 ⊤ₐ : Asm 𝓤
-⊤ₐ = Unit* , (λ _ M → Lift (M -↠ 𝑰)) , record
-  { ⫣-respects-↠ = λ { M-↠M′ (lift M′-↠ƛ0) → lift (-↠-trans M-↠M′ M′-↠ƛ0) }
-  ; ⫣-left-total = λ _ → ∣ 𝑰 , lift -↠-refl ∣
+⊤ₐ = Unit* , (λ _ M → ∥ Lift (M -↠ 𝑰) ∥) , record
+  { ⫣-respects-↠ = λ { M-↠M′ M′-↠ƛ0 → rec propTruncIsProp (λ { (lift r) → ∣ lift (-↠-trans M-↠M′ r) ∣ }) M′-↠ƛ0 } 
+  ; ⫣-left-total = λ _ → ∣ 𝑰 , ∣ lift -↠-refl ∣ ∣
+  -- ; ⫣-isProp     = λ _ _ → propTruncIsProp 
   }
 
 ------------------------------------------------------------------------------
 -- Universality
 
 weak-finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
-weak-finality X = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → lift -↠-refl
+weak-finality X = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → ∣ lift -↠-refl ∣
 
 initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
 initiality X = ⊥*-elim , 0 , (λ { {x = ()} })
