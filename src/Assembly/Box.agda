@@ -155,3 +155,13 @@ module _ (Q : Quoting) where
           ≡[ i ]⟨ ⌜ fst (snd (lem1 M i) ) ⌝ ⟩
         ⌜ M ⌝ ∎
         where open -↠-Reasoning
+
+  GL₀ : ⟨ □ ((□ X) ⇒ X) ⟩ → ⟨ □ X ⟩
+  GL₀ {X = X} (f , F , F⊩f) = fix λ ▹x → (λ α → f α .fst (▹x α)) , gfix F , λ α → {!!}
+    where
+      open -↠-Reasoning
+      module X = AsmStr (str X)
+
+  GL : Trackable (□ (□ X ⇒ X)) (□ X)
+  GL = GL₀ , {!!} , {!!}
+  
