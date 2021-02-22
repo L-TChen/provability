@@ -110,14 +110,31 @@ _∘_ {Z = Z} (g , G , g⫣G) (f , F , f⫣F) = g 𝓤.∘ f , (G ∘′ F) , λ
   -- ; ⫣-isProp     = λ _ _ → propTruncIsProp 
   }
 
+-- Proposition: The set Λ₀ of lambda terms is equipped with an assembly structure.
+Λ₀ₐ : Asm 𝓤₀
+Λ₀ₐ = Λ₀ , (λ M N → N -↠ M) , record
+  { ⫣-respects-↠ = -↠-trans
+  ; ⫣-left-total = λ M → ∣ M , -↠-refl ∣
+  }
 ------------------------------------------------------------------------------
--- Universality
+-- Universality up to the extensional equality ∼
 
-weak-finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
-weak-finality X = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → ∣ lift -↠-refl ∣
+finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
+finality X = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → ∣ lift -↠-refl ∣
 
 initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
 initiality X = ⊥*-elim , 0 , (λ { {x = ()} })
+
+global-element : {X : Asm 𝓤}
+  → (x : ⟨ X ⟩) → (M : Λ₀) → (AsmStr._⫣_ (str X) x M)
+  → Trackable ⊤ₐ X
+global-element {X = X} x M x⫣M = (λ _ → x) , (↑₁ M) , λ _ → ⫣-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) x⫣M
+  where
+    open AsmStr (str X)
+    open -↠-Reasoning
+
+*→Λ : (M : Λ₀) → Trackable ⊤ₐ Λ₀ₐ
+*→Λ M = global-element M M -↠-refl
 
 _⫣ℕ_ : ℕ → Λ₀ → 𝓤₀ ̇
 n ⫣ℕ M = M -↠ 𝒄 n
@@ -169,6 +186,8 @@ projᵣ X Y = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⫣projᵣ
     F⫣projᵣ (_ , _ , _ , _ , π₂L-↠N , N⫣y) = Y.⫣-respects-↠ π₂L-↠N N⫣y
 
 -- Exponential consists of trackable functions.
+infixr 15 _⇒_
+
 _⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
 _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f ∥) , _⫣_ , record
   { ⫣-respects-↠ = λ {x} {x′} {y} → ⫣-respects-↠ {x} {x′} {y}

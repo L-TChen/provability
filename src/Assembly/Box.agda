@@ -8,7 +8,7 @@ open import Later
 
 open import Calculus.Untyped
   hiding (Z)
-
+  
 open import Assembly.Base
 open import Assembly.Exposure
 
@@ -73,7 +73,6 @@ module _ (Q : Quoting) where
     where 
       postulate
       -- Use cubical argument to prove this.
-      -- □gf=□g□f (g , G , G⊩g) (f , F , F⊩f) i (M , ▹x , ▹M⊩x) = {!!} , (λ α → g (f (▹x α))) , {!!}
         □gf=□g□f : (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ □ X ⟩) → □map₀ (g ∘ f) x ≡ □map₀ g (□map₀ f x)
         ↑ₗ-injective : {Γ Δ : Cxt} {A : 𝕋} {M N : Δ ⊢ A} → ↑ₗ_ {Δ} {_} {Γ} M ≡ ↑ₗ N → M ≡ N
 
@@ -81,7 +80,7 @@ module _ (Q : Quoting) where
       □F=□G→F=G F G □F=□G = ⌜⌝-injective (↑ₗ-injective (decode (encode □F=□G .fst .snd)))
 
       postulate
-        -- this is required to prove `□reflects∼`
+        -- this is required to prove `□reflects∼`, but unfortunately we canno't have this verified in the model. 
         ▹map-injective : {X Y : 𝓤 ̇} → (f g : X → Y) → ▹map f ≡ ▹map g → f ≡ g
 
         □reflects∼ : (f g : Trackable X Y)
@@ -99,42 +98,16 @@ module _ (Q : Quoting) where
   eval-does-not-exist : Trackable {𝓤} (□ ⊥ₐ) ⊥ₐ → ⊥*
   eval-does-not-exist (e , hasTracker) = fix (bang e)
 
-  -- Show that there is no natural transformation I ⇒ □.
-  Λ₀ₐ : Asm 𝓤₀
-  Λ₀ₐ = Λ₀ , (λ M N → N -↠ M) , record
-    { ⫣-respects-↠ = -↠-trans
-    ; ⫣-left-total = λ M → ∣ M , -↠-refl ∣
-    }
-
-  Λ-singleton : Λ₀ → Asm 𝓤₀
-  Λ-singleton M = Unit , (λ _ N → N -↠ M) , record
-    { ⫣-respects-↠ = -↠-trans
-    ; ⫣-left-total = λ _ → ∣ M , -↠-refl ∣
-    }
-
-  *→Λ : (M : Λ₀) → Trackable (Λ-singleton M) Λ₀ₐ
-  *→Λ M = (λ _ → M) , ↑₁ M , λ {N} N-↠M → begin
-    ↑₁ M [ N ]
-      ≡⟨ subst-rename-∅ _ M ⟩
-    M
-      -↠⟨ -↠-refl ⟩
-    M ∎
-    where open -↠-Reasoning
-
-  □*→Λ : (M : Λ₀) → Trackable (□ Λ-singleton M) (□ Λ₀ₐ)
-  □*→Λ M = □map (*→Λ M)
-  
+  -- Lemma: □ sends constant maps to constant maps
+  -- The proof is clear.x
+  -- Theorem: There is no natural transformation q : I ⇒ □.
+  -- Proof sketch: By naturality, qΛ is determined by its component at the terminal object ⊤ₐ. 
+  -- 
   quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
   quoting-does-not-exist (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
     where
       qQ-at-Λ : Trackable Λ₀ₐ (□ Λ₀ₐ)
-      qQ-at-Λ = fun {X = Λ₀ₐ}
-
-      qQ-at- : (M : Λ₀) → Trackable (Λ-singleton M) (□ Λ-singleton M)
-      qQ-at- M = fun {X = Λ-singleton M}
-
-      qM : (M : Λ₀) → Unit → Σ[ ▹x ꞉ ▹ Unit ] Σ[ N ꞉ Λ₀ ] ▹ N -↠ M
-      qM M = qQ-at- M .fst
+      qQ-at-Λ = fun
 
       qΛ : Λ₀ → Σ[ ▹M ꞉ ▹ Λ₀ ] Σ[ N ꞉ Λ₀ ] ▹[ α ] N -↠ ▹M α
       qΛ = qQ-at-Λ .fst
@@ -142,28 +115,32 @@ module _ (Q : Quoting) where
       QΛ : Λ₁
       QΛ = HasTracker.F (qQ-at-Λ .snd)
 
-      □*→Λ-is-constant : ∀ (M : Λ₀) x → (□*→Λ M) .fst x ≡ (next M , M , λ _ → -↠-refl)
+      qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
+      qQ-at-⊤ = fun
+
+      q⊤ : Unit* → Σ[ ▹x ꞉ ▹ Unit* ] Σ[ N ꞉ Λ₀ ] ▹[ α ] ∥ Lift (N -↠ 𝑰) ∥
+      q⊤ = qQ-at-⊤ .fst 
+
+      □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (next M , M , λ _ → -↠-refl)
       □*→Λ-is-constant M x = begin
-        (□*→Λ M) .fst x
+        □map (*→Λ M) .fst x
           ≡⟨ refl ⟩
         next M , ↑₁ M [ _ ] , _
-          ≡⟨ {!!} ⟩
-        next M , M , {!!}
-          ≡⟨ {!!} ⟩
-        (next M , M , λ _ → -↠-refl) ∎
+          ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (next M , L , N)) (subst-rename-∅ _ M) {!!} ⟩
+        next M , M , (λ _ → -↠-refl) ∎
         where open ≡-Reasoning
 
-      natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at- M ꞉ Λ-singleton M →ₐ □ Λ₀ₐ
+      natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ Λ₀ₐ
       natural-on-*→Λ M = naturality (*→Λ M)
 
       lem1 : (M : Λ₀) → qΛ M ≡ (next M , M , λ _ → -↠-refl)
       lem1 M = begin
         (qQ-at-Λ .fst) M
           ≡⟨ refl ⟩
-        (qQ-at-Λ .fst) (*→Λ M .fst tt)
-          ≡⟨ natural-on-*→Λ M tt ⟩
-        (□*→Λ M) .fst (qQ-at- M .fst tt)
-          ≡⟨ □*→Λ-is-constant M (qQ-at- M .fst tt) ⟩
+        (qQ-at-Λ .fst) (*→Λ M .fst tt*)
+          ≡⟨ natural-on-*→Λ M tt* ⟩
+        □map (*→Λ M) .fst (qQ-at-⊤ .fst tt*)
+          ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst tt*) ⟩
         (next M , M , λ _ → -↠-refl) ∎
         where open ≡-Reasoning
         
