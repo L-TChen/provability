@@ -59,13 +59,6 @@ record Quoting : 𝓤₀ ̇ where
   Diag : Λ₀
   Diag = ƛ ↑ₗ Ap · 0 · (↑ₗ Num · 0)
 
-  U : Λ₀
-  U = ƛ ƛ 1 · (↑ₗ Diag · 0)
-
-  -- the β-redex is for (∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝) to be true
-  W : Λ₀ → Λ₀
-  W F = U · F
-
   Diag-↠ : Diag · ⌜ M ⌝ -↠ ⌜ M · ⌜ M ⌝ ⌝
   Diag-↠ {M = M} = begin
       Diag · ⌜ M ⌝
@@ -78,7 +71,14 @@ record Quoting : 𝓤₀ ̇ where
     -↠⟨ Ap-↠ ⟩
       ⌜ M · ⌜ M ⌝ ⌝ ∎
 
+  U : Λ₀
+  U = ƛ ƛ 1 · (↑ₗ Diag · 0)
+
+  -- the β-redex is for (∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝) to be true
+  W : Λ₀ → Λ₀
+  W F = U · F
   -- ⊢ □ A `→ A   `→   ⊢ A
+
   gfix : Λ₀ → Λ₀
   gfix F = Wₘ · ⌜ Wₘ ⌝
     where Wₘ = W F

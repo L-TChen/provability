@@ -112,7 +112,6 @@ record Code (A : 𝓤 ̇) :  𝓤 ⁺ ̇ where
 
   encode : {a b : A} → a ≡ b    → code a b
   encode {a = a} a=b = transport (cong (code a) a=b) (r a)
-
 open Code ⦃ ... ⦄ public
 
 record DecEq (A : 𝓤 ̇) : 𝓤 ̇ where

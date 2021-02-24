@@ -3,7 +3,7 @@
 module Assembly.Box where
 
 open import Prelude           as 𝓤
-  hiding (id; _∘_; Sub)
+  hiding (id; _∘_; Sub; r)
 open import Later
 
 open import Calculus.Untyped
@@ -118,9 +118,6 @@ module _ (Q : Quoting) where
       qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
       qQ-at-⊤ = fun
 
-      q⊤ : Unit* → Σ[ ▹x ꞉ ▹ Unit* ] Σ[ N ꞉ Λ₀ ] ▹[ α ] ∥ Lift (N -↠ 𝑰) ∥
-      q⊤ = qQ-at-⊤ .fst 
-
       □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (next M , M , λ _ → -↠-refl)
       □*→Λ-is-constant M x = begin
         □map (*→Λ M) .fst x
@@ -137,10 +134,10 @@ module _ (Q : Quoting) where
       lem1 M = begin
         (qQ-at-Λ .fst) M
           ≡⟨ refl ⟩
-        (qQ-at-Λ .fst) (*→Λ M .fst tt*)
-          ≡⟨ natural-on-*→Λ M tt* ⟩
-        □map (*→Λ M) .fst (qQ-at-⊤ .fst tt*)
-          ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst tt*) ⟩
+        (qQ-at-Λ .fst) (*→Λ M .fst _)
+          ≡⟨ natural-on-*→Λ M _ ⟩
+        □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
+          ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
         (next M , M , λ _ → -↠-refl) ∎
         where open ≡-Reasoning
         
@@ -156,12 +153,28 @@ module _ (Q : Quoting) where
         ⌜ M ⌝ ∎
         where open -↠-Reasoning
 
-  GL₀ : ⟨ □ ((□ X) ⇒ X) ⟩ → ⟨ □ X ⟩
-  GL₀ {X = X} (f , F , F⊩f) = fix λ ▹x → (λ α → f α .fst (▹x α)) , gfix F , λ α → {!!}
-    where
-      open -↠-Reasoning
-      module X = AsmStr (str X)
+  GL₀ : {X : Asm 𝓤} → ⟨ □ (□ X ⇒ X) ⟩ → ⟨ □ X ⟩
+  GL₀ {X = X@(|X| , _⫣_ , ⫣-is-realisability)} (▹f , F , ▹f⫣F) = {!!}
+      where
+        open IsRealisability ⫣-is-realisability
+        module □X   = AsmStr (str (□ X))
+        module □X⇒X = AsmStr (str (□ X ⇒ X))
+        r : ▹ (Σ[ f ꞉ (⟨ □ X ⟩ → ⟨ X ⟩) ]
+            ({n̅ M : Λ₀} {▹x : ▹ ⟨ X ⟩} (▹x⫣M : ▹[ α ] ▹x α ⫣ M) → n̅ -↠ ⌜ M ⌝ → f (▹x , M , ▹x⫣M) ⫣ (F · n̅)))
+          → Σ[ M ꞉ Λ₀ ] ▹ (Σ[ x ꞉ ⟨ X ⟩ ] (x ⫣ M))
+        r ▹hyp = F · ⌜ gfix F ⌝ , λ α →
+          let f    = ▹hyp α .fst
+              f⫣F = ▹hyp α .snd
+          in fix λ ▹x →
+            f ((λ β → ▹x β .fst) ,
+            gfix F ,
+            λ β → ⫣-respects-↠ gfix-↠ (▹x β .snd)) ,
+            f⫣F (λ β → ⫣-respects-↠ gfix-↠ (▹x β .snd)) -↠-refl
+        R : Λ₀
+        R = ?
 
-  GL : Trackable (□ (□ X ⇒ X)) (□ X)
-  GL = GL₀ , {!!} , {!!}
+        
+
+  -- GL : Trackable (□ (□ X ⇒ X)) → □ X
+  -- GL = GL₀ , {!!} , {!!}
   
