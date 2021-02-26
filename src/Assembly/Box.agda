@@ -144,7 +144,7 @@ module _ (Q : Quoting) where
         where open ≡-Reasoning
         
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .snd .fst ⌝)
-      QΛ[M] =  HasTracker.f⊩F (qQ-at-Λ .snd) 
+      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
 
       QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
       QΛ-is-quoting M = begin

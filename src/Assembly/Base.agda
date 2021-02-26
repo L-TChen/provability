@@ -57,8 +57,23 @@ Trackable X Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] HasTracker X Y f
 ------------------------------------------------------------------------------
 -- Extensional equality between morphisms
 
+-- Partial equivalence relation
+record PER {X : 𝓤 ̇} (_∼_ : X → X → 𝓤 ̇) : 𝓤 ⁺ ̇ where
+  field
+    symmetric  : {x y : X}
+      → x ∼ y → y ∼ x
+    transitive : {x y z : X}
+      → x ∼ y → y ∼ z → x ∼ z
+      
 ∼-eq : (X Y : Asm 𝓤) → (f g : Trackable X Y) → 𝓤 ̇
 ∼-eq X Y (f , _) (g , _) = (x : ⟨ X ⟩) → f x ≡ g x
+
+∼-is-PER : {X Y : Asm 𝓤}
+  → PER (∼-eq X Y)
+∼-is-PER = record
+  { symmetric  = λ { {f , _} {g , _}         f=g x     → sym (f=g x) }
+  ; transitive = λ { {f , _} {g , _} {h , _} f=g g=h x → f=g x ∙ g=h x }
+  }
 
 infix 4 ∼-syntax
 

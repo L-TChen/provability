@@ -3,9 +3,9 @@
 module Assembly.Properties where
 
 open import Prelude as 𝓤
-  hiding (_∘_; id)
-open import Calculus.Untyped
-  hiding (Z)
+  hiding (_∘_; id; uncurry)
+open import Calculus.Untyped as Λ
+  hiding (Z; `⟨_,_⟩)
 
 open import Assembly.Base
 
@@ -39,38 +39,56 @@ private
 ------------------------------------------------------------------------------
 -- Finality
 ⊤ₐ : Asm 𝓤
-⊤ₐ = Unit* , (λ M _ → ∥ Lift (M -↠ 𝑰) ∥) , record
-  { ⊩-respects-↠  = λ { M-↠M′ M′-↠ƛ0 → rec propTruncIsProp (λ { (lift r) → ∣ lift (-↠-trans M-↠M′ r) ∣ }) M′-↠ƛ0 } 
-  ; ⊩-right-total = λ _ → ∣ 𝑰 , ∣ lift -↠-refl ∣ ∣
+⊤ₐ = Unit* , _⊩_ , record
+  { ⊩-respects-↠  = ⊩-respects-↠ -- λ { M-↠M′ M′-↠ƛ0 → rec propTruncIsProp (λ { (lift r) → ∣ lift (-↠-trans M-↠M′ r) ∣ }) M′-↠ƛ0 } 
+  ; ⊩-right-total = ⊩-right-total -- λ _ → ∣ 𝑰 , ∣ lift -↠-refl ∣ ∣
   -- ; ⫣-isProp     = λ _ _ → propTruncIsProp 
   }
-finality : (X : Asm 𝓤) → Trackable X ⊤ₐ
-finality X = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → ∣ lift -↠-refl ∣
+  where
+    _⊩_ : Λ₀ → Unit* {𝓤} → 𝓤 ̇
+    M ⊩ _ = Lift (M -↠ 𝑰)
+
+    ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
+    ⊩-respects-↠ M-↠M′ (lift M′-↠𝑰) = lift (-↠-trans M-↠M′ M′-↠𝑰)
+
+    ⊩-right-total : _⊩_ IsRightTotal
+    ⊩-right-total _ = ∣ 𝑰 , lift -↠-refl ∣
+    
+module Final (X : Asm 𝓤) where
+  open AsmStr (str X)
+  open -↠-Reasoning
+  
+  universality : Trackable X ⊤ₐ
+  universality = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → lift -↠-refl
+
+  global-element : (x : ⟨ X ⟩) → (M : Λ₀) → M ⊩ x
+    → Trackable ⊤ₐ X
+  global-element x M M⊩x = (λ _ → x) , (↑₁ M) , λ _ → ⊩-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
+
+*→Λ : (M : Λ₀) → Trackable ⊤ₐ Λ₀ₐ
+*→Λ M = Final.global-element Λ₀ₐ M M -↠-refl
 
 ------------------------------------------------------------------------------
 -- Initiality
 ⊥ₐ : Asm 𝓤
-⊥ₐ = ⊥* , ⊩⊥ , record
-  { ⊩-respects-↠  = λ { {y = ()} }
-  ; ⊩-right-total = λ ()
+⊥ₐ = ⊥* , _⊩_ , record
+  { ⊩-respects-↠  = ⊩-respects-↠ 
+  ; ⊩-right-total = ⊩-right-total
 --  ; ⫣-isProp     = λ ()
   }
   where
-    ⊩⊥ : Λ₀ → ⊥* {𝓤} → 𝓤 ̇
-    ⊩⊥ _ ()
+    _⊩_ : Λ₀ → ⊥* {𝓤} → 𝓤 ̇
+    _ ⊩ ()
 
-initiality : (X : Asm 𝓤) → Trackable ⊥ₐ X
-initiality X = ⊥*-elim , 0 , (λ { {x = ()} })
+    ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
+    ⊩-respects-↠ {y = ()}
+    
+    ⊩-right-total : _⊩_ IsRightTotal
+    ⊩-right-total ()
 
-global-element : (X : Asm 𝓤) → (x : ⟨ X ⟩) → (M : Λ₀) → (AsmStr._⊩_ (str X) M x)
-  → Trackable ⊤ₐ X
-global-element X x M M⊩x = (λ _ → x) , (↑₁ M) , λ _ → ⊩-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
-  where
-    open AsmStr (str X)
-    open -↠-Reasoning
-
-*→Λ : (M : Λ₀) → Trackable ⊤ₐ Λ₀ₐ
-*→Λ M = global-element Λ₀ₐ M M -↠-refl
+module Initial (X : Asm 𝓤) where 
+  universality : Trackable ⊥ₐ X
+  universality = ⊥*-elim , 0 , (λ { {x = ()} })
     
 ------------------------------------------------------------------------------
 -- Product
@@ -83,56 +101,98 @@ _×ₐ_ {𝓤} X Y = ⟨ X ⟩ × ⟨ Y ⟩ , _⊩_ , record
     module Y = AsmStr (str Y)
 
     _⊩_ : Λ₀ → ⟨ X ⟩ × ⟨ Y ⟩ → 𝓤 ̇
-    L ⊩ (x , y) = Σ[ M ꞉ Λ₀ ] Σ[ N ꞉ Λ₀ ] `projₗ L -↠ M × M X.⊩ x × `projᵣ L -↠ N × N Y.⊩ y
+    L ⊩ (x , y) =
+       Σ[ M ꞉ Λ₀ ] `projₗ L -↠ M × M X.⊩ x ×
+      (Σ[ N ꞉ Λ₀ ] `projᵣ L -↠ N × N Y.⊩ y)
 
     ⊩-respect-↠   : _⊩_ respects _-↠_ on-the-left
-    ⊩-respect-↠ L-↠L′ (M , N , proj₁L-↠M , x⊩M , projᵣL-↠N , y⊩N) =
-      M , N , -↠-trans (·ₗ-cong L-↠L′) proj₁L-↠M , x⊩M , -↠-trans (·ₗ-cong L-↠L′) projᵣL-↠N , y⊩N
+    ⊩-respect-↠ L-↠L′ (M , proj₁L-↠M , x⊩M , N , projᵣL-↠N , y⊩N) =
+      M , -↠-trans (·ₗ-cong L-↠L′) proj₁L-↠M , x⊩M ,
+      N , -↠-trans (·ₗ-cong L-↠L′) projᵣL-↠N , y⊩N
 
     ⊩-right-total : _⊩_ IsRightTotal
-    ⊩-right-total (x , y) = rec propTruncIsProp
-      (λ {(M , M⫣x) → rec propTruncIsProp
-      (λ {(N , N⫣y) → ∣ `⟨ M , N ⟩ , M , N , β-projₗ , M⫣x , β-projᵣ , N⫣y ∣})
-      (Y.⊩-right-total y)}) (X.⊩-right-total x)
+    ⊩-right-total (x , y) = rec2 propTruncIsProp
+      (λ { (M , M⊩x) (N , N⊩y) → ∣ Λ.`⟨ M , N ⟩ , M , β-projₗ , M⊩x , N , β-projᵣ , N⊩y ∣ })
+      (X.⊩-right-total x) (Y.⊩-right-total y)
 
-projₗ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) X
-projₗ X Y = (λ {(x , y) → x}) , 0 · ↑₁ 𝑻 , F⫣projₗ
-  where
-    module X = AsmStr (str X)
-    F⫣projₗ : Tracks (X ×ₐ Y) X (0 · ↑₁ 𝑻) fst 
-    F⫣projₗ (_ , _ , πₗL-↠M , M⫣x , _ , _) = X.⊩-respects-↠ πₗL-↠M M⫣x
+module Product (X Y : Asm 𝓤) where
+  module X = AsmStr (str X)
+  module Y = AsmStr (str Y)
 
-projᵣ : (X Y : Asm 𝓤) → Trackable (X ×ₐ Y) Y
-projᵣ X Y = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⫣projᵣ
-  where
-    module Y = AsmStr (str Y)
-    F⫣projᵣ : Tracks (X ×ₐ Y) Y (0 · ↑₁ 𝑭) snd
-    F⫣projᵣ (_ , _ , _ , _ , π₂L-↠N , N⫣y) = Y.⊩-respects-↠ π₂L-↠N N⫣y
+  X×Y = X ×ₐ Y
+  module X×Y = AsmStr (str X×Y)
+  
+  
+  projₗ : Trackable X×Y X
+  projₗ = (λ {(x , y) → x}) , 0 · ↑₁ 𝑻 , F⊩projₗ
+    where
+      F⊩projₗ : Tracks X×Y X (0 · ↑₁ 𝑻) fst
+      F⊩projₗ (_ , πₗL-↠M , M⫣x , _ , _ , _) = X.⊩-respects-↠ πₗL-↠M M⫣x
 
--- Exponential consists of trackable functions.
+  projᵣ : Trackable X×Y Y
+  projᵣ = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⊩projᵣ
+    where
+      F⊩projᵣ : Tracks X×Y Y (0 · ↑₁ 𝑭) snd
+      F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⫣y) = Y.⊩-respects-↠ π₂L-↠N N⫣y
+      
+  `⟨_,_⟩ : {Z : Asm 𝓤}
+    → Trackable Z X → Trackable Z Y → Trackable Z (X ×ₐ Y)
+  `⟨_,_⟩ {Z = Z} (f , F , F⊩f) (g , G , G⊩g) = h , H , H⊩h 
+    where
+      module Z   = AsmStr (str Z)
+      open -↠-Reasoning
+
+      h : _ → ⟨ X×Y ⟩
+      h z = f z , g z
+
+      H = Λ.`⟨ F , G ⟩
+
+      H⊩h : Tracks Z (X ×ₐ Y) H h
+      H⊩h {L} {z} L⊩z = F [ L ] , lem₁ , F⊩f L⊩z , G [ L ] , lem₂ , G⊩g L⊩z
+        where
+          lem₁ = begin
+            `projₗ (H [ L ])
+              ≡⟨ refl ⟩
+            (ƛ 0 · ↑₁ F ⟪ exts (subst-zero L) ⟫ · ↑₁ G ⟪ exts (subst-zero L) ⟫) · 𝑻
+              ≡⟨ cong₂ (λ M N → (ƛ 0 · M · N) · 𝑻) (rename-exts (subst-zero L) F) (rename-exts (subst-zero L) G) ⟩
+            (ƛ 0 · ↑₁ (F [ L ]) · ↑₁ (G [ L ])) · 𝑻
+              -↠⟨ β-projₗ ⟩
+            F [ L ] ∎
+
+          lem₂ = begin
+            `projᵣ (H [ L ])
+              ≡⟨ refl ⟩
+            (ƛ 0 · ↑₁ F ⟪ exts (subst-zero L) ⟫ · ↑₁ G ⟪ exts (subst-zero L) ⟫) · 𝑭
+              ≡⟨ cong₂ (λ M N → (ƛ 0 · M · N) · 𝑭) (rename-exts (subst-zero L) F) (rename-exts (subst-zero L) G) ⟩
+            (ƛ 0 · ↑₁ (F [ L ]) · ↑₁ (G [ L ])) · 𝑭
+              -↠⟨ β-projᵣ ⟩
+            G [ L ] ∎
+------------------------------------------------------------------------------
+-- Exponential object
 infixr 15 _⇒_
 
 _⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
-_⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∃[ F ꞉ Λ₁ ] Tracks X Y F f) , _⊩_ , record
+_⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
   { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respects-↠ {x} {x′} {y}
   ; ⊩-right-total = ⊩-right-total }
     where
+      open -↠-Reasoning
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
+
+      X⇒Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∃[ F ꞉ Λ₁ ] Tracks X Y F f
 
       _⊩_ : Λ₀ → Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] (∃[ F ꞉ Λ₁ ] Tracks X Y F f) → 𝓤 ̇
       F ⊩ (f , _) = Tracks X Y (↑₁ F · 0) f
 
       ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
       ⊩-respects-↠ {G} {F} G-↠F F⫣f M⫣x = Y.⊩-respects-↠
-        (subst-reduce* {M = ↑₁ G · 0} (·ₗ-cong (rename-reduce* G-↠F)))
-        (F⫣f M⫣x) 
+        (subst-reduce* {M = ↑₁ G · 0} (·ₗ-cong (rename-reduce* G-↠F))) (F⫣f M⫣x) 
 
       ⊩-right-total : _⊩_ IsRightTotal
       ⊩-right-total (f , ∃F⊩f) = rec propTruncIsProp
         (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠ (lem F M) (F⊩f M⊩x)) ∣ }) ∃F⊩f
         where
-          open -↠-Reasoning
           lem : (F : Λ₁) → (M : Λ₀) → (↑₁ (ƛ F) · 0) [ M ] -↠ F [ M ]
           lem F M = begin
             ↑₁ (ƛ F) [ M ] · M
@@ -141,8 +201,20 @@ _⇒_ {𝓤} X Y = (Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∃[ F ꞉ Λ₁ ] Tra
               -→⟨ β ⟩
             F [ M ]
               ∎
-
 {-
-ev : (X Y : Asm 𝓤) → Trackable ((X ⇒ Y) ×ₐ X) Y
-ev X Y = {!!}
+module Exponential (X Y : Asm 𝓤) where
+  module X = AsmStr (str X)
+  module Y = AsmStr (str Y)
+  X⇒Y = X ⇒ Y
+  module X⇒Y = AsmStr (str X⇒Y)
+
+  uncurry : Trackable (Z ×ₐ X) Y → Trackable Z (X ⇒ Y)
+  uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp
+    (λ { (L , L⊩z) → ∣ ↑₁ (ƛ F) · Λ.`⟨ ↑₁ L , 0 ⟩ , {!!} ∣ }) (Z.⊩-right-total z)) , 
+    {!!} , {!!}
+    where
+      module Z = AsmStr (str Z)
+
+  eval : Trackable (X⇒Y ×ₐ X) Y
+  eval = {!!}
 -}
