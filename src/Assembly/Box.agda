@@ -10,6 +10,7 @@ open import Calculus.Untyped
   hiding (Z)
   
 open import Assembly.Base
+open import Assembly.Properties
 open import Assembly.Exposure
 
 private
@@ -20,25 +21,26 @@ module _ (Q : Quoting) where
   open Quoting Q
 
   □_ : Asm 𝓤 → Asm 𝓤
-  □_ {𝓤} (|X| , _⫣_ , ⫣-is-realisability) = |□X| , _⫣□X_ , record
-    { ⫣-respects-↠ = λ {x} {x′} {y} → ⫣□X-respect-↠ {x} {x′} {y}
-    ; ⫣-left-total = ⫣□X-left-total
+  □_ {𝓤} X = |□X| , _⊩_ , record
+    { ⊩-respects-↠ = λ {x} {x′} {y} → ⊩-respect-↠ {x} {x′} {y}
+    ; ⊩-right-total = ⊩-right-total
     }
     where
+      module X = AsmStr (str X)
       |□X| : 𝓤 ̇
-      |□X| = Σ[ ▹x ꞉ ▹ |X| ] Σ[ M ꞉ Λ₀ ] ▹[ α ] ▹x α ⫣ M 
+      |□X| = Σ[ ▹x ꞉ ▹ ⟨ X ⟩ ] Σ[ M ꞉ Λ₀ ] ▹[ α ] (M X.⊩ ▹x α)
       -- Can we remove truncation? If so, is □id still equal to id? 
       -- Ans. If we assume that ⫣ is a mere proposition, then ▹[ α ] (...) is also a mere proposition (▹isProp→isProp▹).
       -- Therefore, we don't need propositional truncation here.
 
-      _⫣□X_ : |□X| → (M : Λ₀) → 𝓤 ̇
-      (▹x , M , ▹x⫣M) ⫣□X n̅ = Lift (n̅ -↠ ⌜ M ⌝)
+      _⊩_ : (M : Λ₀) → |□X| → 𝓤 ̇
+      n̅ ⊩ (▹x , M , ▹x⫣M)= Lift (n̅ -↠ ⌜ M ⌝)
 
-      ⫣□X-respect-↠ : _⫣□X_ respects _-↠_ on-the-right
-      ⫣□X-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
+      ⊩-respect-↠ : _⊩_ respects _-↠_ on-the-left
+      ⊩-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
       
-      ⫣□X-left-total :  _⫣□X_ IsLeftTotal
-      ⫣□X-left-total (▹x , M , M⫣x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
+      ⊩-right-total :  _⊩_ IsRightTotal
+      ⊩-right-total (▹x , M , M⫣x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
 
   □map₀ : Trackable X Y → ⟨ □ X ⟩ → ⟨ □ Y ⟩
   □map₀ (f , F , f⫣F) (▹x , M , x⫣M) = ▹map f ▹x , F [ M ] , λ α → f⫣F (x⫣M α)
@@ -61,7 +63,7 @@ module _ (Q : Quoting) where
           -↠⟨ Sub-↠ ⟩
         ⌜ F [ M ] ⌝ ∎)
 
-  □id=id : (X : Asm 𝓤) → (x : ⟨ □ X ⟩) → □map₀ (id {X = X}) x ≡ x
+  □id=id : (X : Asm 𝓤) → (x : ⟨ □ X ⟩) → □map₀ (id X) x ≡ x
   □id=id X x = refl
 
   □-isExposure : IsExposure {𝓤} □_  □map
@@ -142,7 +144,7 @@ module _ (Q : Quoting) where
         where open ≡-Reasoning
         
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .snd .fst ⌝)
-      QΛ[M] =  HasTracker.F⫣f (qQ-at-Λ .snd) 
+      QΛ[M] =  HasTracker.f⊩F (qQ-at-Λ .snd) 
 
       QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
       QΛ-is-quoting M = begin
@@ -154,25 +156,31 @@ module _ (Q : Quoting) where
         where open -↠-Reasoning
 
   GL₀ : {X : Asm 𝓤} → ⟨ □ (□ X ⇒ X) ⟩ → ⟨ □ X ⟩
-  GL₀ {X = X@(|X| , _⫣_ , ⫣-is-realisability)} (▹f , F , ▹f⫣F) = {!!}
+  GL₀ {X = X@(|X| , _⊩_ , ⊩-is-realisability)} (▹f , F , ▹f⫣F) = {!!} , {!!} , {!!}
       where
-        open IsRealisability ⫣-is-realisability
+        open IsRealisability ⊩-is-realisability
         module □X   = AsmStr (str (□ X))
         module □X⇒X = AsmStr (str (□ X ⇒ X))
         r : ▹ (Σ[ f ꞉ (⟨ □ X ⟩ → ⟨ X ⟩) ]
-            ({n̅ M : Λ₀} {▹x : ▹ ⟨ X ⟩} (▹x⫣M : ▹[ α ] ▹x α ⫣ M) → n̅ -↠ ⌜ M ⌝ → f (▹x , M , ▹x⫣M) ⫣ (F · n̅)))
-          → Σ[ M ꞉ Λ₀ ] ▹ (Σ[ x ꞉ ⟨ X ⟩ ] (x ⫣ M))
+            ({n̅ M : Λ₀} {▹x : ▹ ⟨ X ⟩} (▹M⊩x : ▹[ α ] M ⊩ ▹x α) → n̅ -↠ ⌜ M ⌝ → (F · n̅) ⊩ f (▹x , M , ▹M⊩x) ))
+          → Σ[ M ꞉ Λ₀ ] ▹ (Σ[ x ꞉ ⟨ X ⟩ ] (M ⊩ x))
         r ▹hyp = F · ⌜ gfix F ⌝ , λ α →
           let f    = ▹hyp α .fst
               f⫣F = ▹hyp α .snd
           in fix λ ▹x →
             f ((λ β → ▹x β .fst) ,
             gfix F ,
-            λ β → ⫣-respects-↠ gfix-↠ (▹x β .snd)) ,
-            f⫣F (λ β → ⫣-respects-↠ gfix-↠ (▹x β .snd)) -↠-refl
+            λ β → ⊩-respects-↠ gfix-↠ (▹x β .snd)) ,
+            f⫣F (λ β → ⊩-respects-↠ gfix-↠ (▹x β .snd)) -↠-refl
         R : Λ₀
-        R = ?
+        R = {!!}
 
+  GL : {X : Asm 𝓤}
+    → Trackable (□ X) X
+    → ⟨ □ X ⟩
+  GL {X = X} (f , F , f⫣F) = {!!}
+    where
+      module X = AsmStr (str X)
         
 
   -- GL : Trackable (□ (□ X ⇒ X)) → □ X
