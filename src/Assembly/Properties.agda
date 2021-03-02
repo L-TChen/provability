@@ -182,39 +182,30 @@ _⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
 
       X⇒Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∃[ F ꞉ Λ₁ ] Tracks X Y F f
 
-      _⊩_ : Λ₀ → Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] (∃[ F ꞉ Λ₁ ] Tracks X Y F f) → 𝓤 ̇
-      F ⊩ (f , _) = Tracks X Y (↑₁ F · 0) f
+      _⊩_ : Λ₀ → X⇒Y → 𝓤 ̇
+      F ⊩ (f , _) = {M : Λ₀} {x : ⟨ X ⟩} → M X.⊩ x → F · M Y.⊩ f x
 
       ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
-      ⊩-respects-↠ {G} {F} G-↠F F⫣f M⫣x = Y.⊩-respects-↠
-        (subst-reduce* {M = ↑₁ G · 0} (·ₗ-cong (rename-reduce* G-↠F))) (F⫣f M⫣x) 
+      ⊩-respects-↠ {G} {F} G-↠F F⊩f M⊩x = Y.⊩-respects-↠ (·ₗ-cong G-↠F) (F⊩f M⊩x)
 
       ⊩-right-total : _⊩_ IsRightTotal
       ⊩-right-total (f , ∃F⊩f) = rec propTruncIsProp
-        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠ (lem F M) (F⊩f M⊩x)) ∣ }) ∃F⊩f
-        where
-          lem : (F : Λ₁) → (M : Λ₀) → (↑₁ (ƛ F) · 0) [ M ] -↠ F [ M ]
-          lem F M = begin
-            ↑₁ (ƛ F) [ M ] · M
-              ≡⟨ cong {B = λ _ → Λ₀} (_· M) (subst-rename-∅ (subst-zero M) (ƛ F)) ⟩
-            (ƛ F) · M
-              -→⟨ β ⟩
-            F [ M ]
-              ∎
-{-
-module Exponential (X Y : Asm 𝓤) where
-  module X = AsmStr (str X)
-  module Y = AsmStr (str Y)
-  X⇒Y = X ⇒ Y
-  module X⇒Y = AsmStr (str X⇒Y)
+        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠ (-→to-↠ β) (F⊩f M⊩x)) ∣})
+        ∃F⊩f
+-- {-
+-- module Exponential (X Y : Asm 𝓤) where
+--   module X = AsmStr (str X)
+--   module Y = AsmStr (str Y)
+--   X⇒Y = X ⇒ Y
+--   module X⇒Y = AsmStr (str X⇒Y)
 
-  uncurry : Trackable (Z ×ₐ X) Y → Trackable Z (X ⇒ Y)
-  uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp
-    (λ { (L , L⊩z) → ∣ ↑₁ (ƛ F) · Λ.`⟨ ↑₁ L , 0 ⟩ , {!!} ∣ }) (Z.⊩-right-total z)) , 
-    {!!} , {!!}
-    where
-      module Z = AsmStr (str Z)
+--   uncurry : Trackable (Z ×ₐ X) Y → Trackable Z (X ⇒ Y)
+--   uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp
+--     (λ { (L , L⊩z) → ∣ ↑₁ (ƛ F) · Λ.`⟨ ↑₁ L , 0 ⟩ , {!!} ∣ }) (Z.⊩-right-total z)) , 
+--     {!!} , {!!}
+--     where
+--       module Z = AsmStr (str Z)
 
-  eval : Trackable (X⇒Y ×ₐ X) Y
-  eval = {!!}
--}
+--   eval : Trackable (X⇒Y ×ₐ X) Y
+--   eval = {!!}
+-- -}

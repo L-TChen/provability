@@ -9,7 +9,7 @@ open import Calculus.Untyped
 
 record IsRealisability {X : 𝓤 ̇} (_⊩_ : Λ₀ → X → 𝓤 ̇) : 𝓤 ̇ where
   field
-    ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
+    ⊩-respects-↠  : _⊩_ respects _-↠_ on-the-left
     ⊩-right-total : _⊩_ IsRightTotal
     -- ⊩-isProp     : Π[ M ꞉ Λ₀ ] Π[ x ꞉ X ] isProp (M ⊩ x)
     -- ⊩-isProp is useful when defining □, but however it does not seem necessary to define ASM?
