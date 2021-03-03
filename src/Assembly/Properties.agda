@@ -190,7 +190,8 @@ _⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
 
       ⊩-right-total : _⊩_ IsRightTotal
       ⊩-right-total (f , ∃F⊩f) = rec propTruncIsProp
-        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠ (-→to-↠ β) (F⊩f M⊩x)) ∣})
+        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠
+          ((ƛ F) · M -→⟨ β ⟩ F [ M ] ∎) (F⊩f M⊩x)) ∣})
         ∃F⊩f
 -- {-
 -- module Exponential (X Y : Asm 𝓤) where

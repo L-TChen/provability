@@ -1,4 +1,8 @@
 \documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+
+% 
 \usepackage[draft,inline,nomargin]{fixme}
 \FXRegisterAuthor{lt}{alt}{LT}
 \FXRegisterAuthor{hs}{ahs}{Josh}
@@ -7,11 +11,19 @@
 \newcommand{\later}{\mathord{\blacktriangleright}}
 \newcommand{\laterp}{\mathord{\vartriangleright}}
 \newcommand{\PER}{\mathbf{PER}}
-\newcommand{\Asm}{\mathbf{Asm}}
-\newcommand{\ASM}{\mathfrak{Asm}}
-\newcommand{\Asmt}{\mathbf{Asm}_t}
+\newcommand{\PP}{\mathscr{P}}
+%\newcommand{\Asm}{\mathbf{Asm}}
+\newcommand{\Asm}{\mathsf{Asm}}
+\newcommand{\ASM}{\mathsf{ASM}}
+\newcommand{\defeq}{\coloneqq}
+\newcommand{\Univ}{\mathcal{U}}
 
-\title{Realising Löb's Axiom in Guarded Homotopy Type Theory} 
+\DeclareRobustCommand\longtwoheadrightarrow{\relbar\joinrel\twoheadrightarrow}
+\newcommand{\reduce}{\twoheadrightarrow}
+
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+
+\title{A Realisability Semantics for Löb's Axiom in Guarded Homotopy Type Theory} 
 \author{Liang-Ting Chen}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://l-tchen.github.io}}%
   {liang.ting.chen.tw@gmail.com}%
@@ -26,22 +38,20 @@
 \ccsdesc{Theory of computation~Type theory}
 \ccsdesc{Theory of computation~Logic}
 \ccsdesc{Theory of computation~Constructive mathematics}
-\keywords{Löb's theorem, guarded recursion, realizability, homotopy type theory, modal type theory, metaprogramming}
+\keywords{Löb's theorem, provability, guarded recursion, realizability, homotopy type theory, modal type theory, metaprogramming}
 
-\category{} %optional, e.g. invited paper
-
-\relatedversion{} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
+\relatedversion{} %optional, e.g. full version hosted on arXiv
 %\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
 
-\supplement{The results were formalised in Guarded Cubical Agda with source code available at \url{https://github.com/L-TChen/provability}.}
+\supplement{The results were formalised in (Guarded) Cubical Agda with source code available at \url{https://github.com/L-TChen/provability}.}
 
 \funding{This work was supported by the Ministry of Science and Technology of Taiwan under grant MOST~109-2222-E-001-002-MY3.}
 
-\acknowledgements{We want to thank Alex Kavvos and Tsung-Ju Chiang. We are indebted to online platforms such as Zulip teams on Homotopy Type Theory and Agda for generous help and general discussions.}
+\acknowledgements{\ltnote{Alex Kavvos, Tsung-Ju Chiang, Rasmus Ejlers Møgelberg, Churn-Jung Liau}}
 
-\nolinenumbers %uncomment to disable line numbering
+\nolinenumbers 
 
-%\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
+%\hideLIPIcs  %uncomment to remove references to LIPIcs series
 
 %Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \EventEditors{John Q. Open and Joan R. Access}
@@ -61,14 +71,12 @@
 
 \maketitle
 
-%TODO: Polish abstract
 \begin{abstract}
-  In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
-  We consider the ordinary category $\Asm(\Lambda)$ of assemblies on untyped $\lambda$-calculus and \emph{maps with trackers} similar to the $\PER$-category $\ASM(\mathcal{A})$ of assemblies on an arbitrary partial combinatory algebra $\mathcal{A}$ proposed previously. 
-  Then, we construct an endofunctor as the interpretation of the (provability) modality~$\Box$.
-  Of the utmost significance of our understanding for $\Box A$ is that its denotation should involve not only extensions but also intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms \emph{modulo $\alpha$-equivalence only}, inspired by its provability reading.
-  Our results are established in a cubical type theory extended with guarded recursion and formalised in Guarded Cubical Agda.
-  Apart from its own theoretical interest, following the interpretation of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
+  In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
+  We consider an exposure-like construction $\Box\colon \ASM(\Lambda) \to \ASM(\Lambda)$ of the $\PP$-category of assemblies on untyped $\lambda$-calculus and trackable maps internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
+  We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle $A \to \Box A$ but proves the Löb axiom only.
+  Of the utmost significance of our interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms \emph{modulo $\alpha$-equivalence only} given its provability reading but also their extensions. 
+  Apart from its own theoretical interest, following the intuitive interpretation of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
 \end{abstract}
 
 \section{Introduction}
@@ -83,15 +91,58 @@
 \cite{Kavvos2017,Kavvos2020}
 \cite{Shamkanov2014,Shamkanov2016a}
 
-\section{Prelude: Intrinsically scoped \texorpdfstring{$\lambda$}{λ}-calculus in homotopy type theory}
+\section{Preliminaries}
+\ltnote{Some basic results in $\lambda$-calculus}
 
-\section{Variation: Assemblies on \texorpdfstring{$\lambda$}{λ}-calculus and maps with trackers}
+\section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}
 
-\begin{definition}[Assembly, trackers, maps with trackers, trackable map]
-  
+Classically, an assembly is a set $|X|$ with a \emph{realisability} relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ there exists some $a$ with $a \Vdash x$. We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $n \Vdash x$.
+The notion of assemblies is often defined in a more general setting based on (ordered) partial combinatory algebra~\cite{Oosten2008}.
+Our definition below is, although very similar, not an instance of the general notion.
+\ltnote{Point out why it is not.}
+
+\begin{definition}
+  An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} type $|X| : \Univ$ and a relation ${\Vdash_X}$ from $\Lambda_0$ to $|X|$ such that
+  \emph{(a)} $\Vdash_X$ respects the $\beta$-reduction $\reduce$, that is, $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$;
+  \emph{(b)} $\Vdash_X$ is right-total: every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$. 
+  To put it formally, 
+  \[
+    \Asm_0(\Lambda) \defeq \sum_{|X| : \Univ}\;\sum_{\mathord{\Vdash_X}:\Lambda_0 \to |X| \to \Univ} 
+    \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right)
+      \times \mathsf{isRightTotal}({\Vdash_X})
+  \]
+  where 
+  \[
+    \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right) \defeq
+    \prod_{M N : \Lambda_0} \prod_{x : |X|} \left( M \reduce N \times N \Vdash x \to M \Vdash x \right)
+  \]
+  and $\mathsf{isRightTotal}(\Vdash_X) \defeq \forall (x : |X|).\, \exists (M : \Lambda_0).\, M \Vdash x$.
+\end{definition}
+The required properties regarding $\Vdash$ departs slightly from the conventional definition. 
+\ltnote{Explain why $\Vdash$ respects $\reduce$}
+A plausible formulation of the right totality was $\prod (x : |X|).\, \sum (M : \Lambda_0).\, M \Vdash x$ which  would further require an explicit choice of realiser for each given inhabitant $x : |X|$.
+This is not reasonable if, say, $|X|$ is of function type since it amounts to giving a standard implementation in $\lambda$-calculus for any function $f$.
+In fact, with functional extensionality which holds in homotopy type theory, any inhabitant of the alternative formulation leads to a contradiction~\cite{Troelstra1977}. \ltnote{check this}
+
+
+Again, classically, a trackable map is a function $f$ with the property that $f$ is tracked by some $b$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f(x)$ where the $\cdot$ is the application operation of a partial combinatory algebra. In this case, $b$ is called the tracker of $f$.
+It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the semantics side we have to consider the tracker as part of structure instead of its mere existence.
+\begin{definition}
+  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $f : |X| \to |Y|$ and a term $F : \Lambda_1$ with a free variable $x$ such that $F[M/x] \Vdash f(x)$ whenever $M \Vdash x$.
+  To put if formally, a trackable map is an inhabitant of
+  \[
+    \mathsf{Trackable}(X, Y) \defeq \prod_{f : |X| \to |Y|} \prod_{F : \Lambda_1}
+    \mathsf{Tracks}_{X, Y}(F, f)
+  \]
+  where 
+    $\mathsf{Tracks}_{X, Y}(F, f) \defeq \prod_{M : \Lambda_0} \prod_{x : |X|}\left( M \Vdash_X x \to F[M/x] \Vdash_Y f\,x \right)$.
 \end{definition}
 
-\section{Main theme: Realising provability using guarded cubical type theory}
+
+\begin{proposition}
+  
+\end{proposition}
+\section{Realisability semantics for provability}
 
 \begin{enumerate}
   \item Show that there is no $\Box A \to A$ natural in $A$.
@@ -118,7 +169,7 @@
 %% Please use bibtex, 
 
 \bibliographystyle{plainurl}% the mandatory bibstyle
-\bibliography{./ref}
+\bibliography{../../library_fixed}
 
 \appendix
 
@@ -126,20 +177,6 @@
 \section{Styles of lists, enumerations, and descriptions}\label{sec:itemStyles}
 
 List of different predefined enumeration styles:
-
-\begin{itemize}
-\item \verb|\begin{itemize}...\end{itemize}|
-\item \dots
-\item \dots
-%\item \dots
-\end{itemize}
-
-\begin{enumerate}
-\item \verb|\begin{enumerate}...\end{enumerate}|
-\item \dots
-\item \dots
-%\item \dots
-\end{enumerate}
 
 \begin{alphaenumerate}
 \item \verb|\begin{alphaenumerate}...\end{alphaenumerate}|
@@ -162,54 +199,11 @@ List of different predefined enumeration styles:
 %\item \dots
 \end{bracketenumerate}
 
-\begin{description}
-\item[Description 1] \verb|\begin{description} \item[Description 1]  ...\end{description}|
-\item[Description 2] Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\item[Description 3]  \dots
-%\item \dots
-\end{description}
-
-\cref{testenv-proposition} and \autoref{testenv-proposition} ...
 
 \section{Theorem-like environments}\label{sec:theorem-environments}
 
 List of different predefined enumeration styles:
 
-\begin{theorem}[Quisque blandit tempus nunc]\label{testenv-theorem}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{theorem}
-
-\begin{lemma}\label{testenv-lemma}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{lemma}
-
-\begin{corollary}\label{testenv-corollary}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{corollary}
-
-\begin{proposition}\label{testenv-proposition}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{proposition}
-
-\begin{conjecture}\label{testenv-conjecture}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{conjecture}
-
-\begin{observation}\label{testenv-observation}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{observation}
-
-\begin{exercise}\label{testenv-exercise}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{exercise}
-
-\begin{definition}\label{testenv-definition}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{definition}
-
-\begin{example}\label{testenv-example}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{example}
 
 \begin{note}\label{testenv-note}
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
@@ -219,14 +213,6 @@ Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
 \end{note*}
 
-\begin{remark}\label{testenv-remark}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{remark}
-
-\begin{remark*}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{remark*}
-
 \begin{claim}\label{testenv-claim}
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
 \end{claim}
@@ -234,10 +220,6 @@ Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui
 \begin{claim*}\label{testenv-claim2}
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
 \end{claim*}
-
-\begin{proof}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{proof}
 
 \begin{claimproof}
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
