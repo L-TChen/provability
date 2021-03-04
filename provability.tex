@@ -3,27 +3,54 @@
 \usepackage{mathtools}
 
 % 
-\usepackage[draft,inline,nomargin]{fixme}
+\usepackage[draft,noinline,margin]{fixme}
 \FXRegisterAuthor{lt}{alt}{LT}
 \FXRegisterAuthor{hs}{ahs}{Josh}
 
+% the following is copied from the HoTT book
+\newcommand{\trunc}[2]{\mathopen{}\left\Vert #2\right\Vert_{#1}\mathclose{}}
+\newcommand{\ttrunc}[2]{\bigl\Vert #2\bigr\Vert_{#1}}
+\newcommand{\Trunc}[2]{\Bigl\Vert #2\Bigr\Vert_{#1}}
+\newcommand{\truncf}[1]{\Vert \blank \Vert_{#1}}
+\newcommand{\tproj}[3][]{\mathopen{}\left|#3\right|_{#2}^{#1}\mathclose{}}
+\newcommand{\tprojf}[2][]{|\blank|_{#2}^{#1}}
+\def\pizero{\trunc0}
+
+\newcommand{\brck}[1]{\trunc{}{#1}}
+\newcommand{\bbrck}[1]{\ttrunc{}{#1}}
+\newcommand{\Brck}[1]{\Trunc{}{#1}}
+\newcommand{\bproj}[1]{\tproj{}{#1}}
+\newcommand{\bprojf}{\tprojf{}}
+
+%
 \newcommand{\Tree}{\mathcal{S}}
 \newcommand{\later}{\mathord{\blacktriangleright}}
 \newcommand{\laterp}{\mathord{\vartriangleright}}
 \newcommand{\PER}{\mathbf{PER}}
+\newcommand{\Nat}{\mathbb{N}}
 \newcommand{\PP}{\mathscr{P}}
 %\newcommand{\Asm}{\mathbf{Asm}}
 \newcommand{\Asm}{\mathsf{Asm}}
 \newcommand{\ASM}{\mathsf{ASM}}
-\newcommand{\defeq}{\coloneqq}
+%\newcommand{\defeq}{\coloneqq}
+\newcommand{\defeq}{\vcentcolon\equiv} 
 \newcommand{\Univ}{\mathcal{U}}
+\newcommand{\comp}{\circ}
+\newcommand{\transport}{\mathsf{transport}}
+\newcommand{\blank}{{-}}
+\newcommand{\id}{\mathsf{id}}
+\newcommand{\Unit}{\mathbf{1}}
+\newcommand{\Empty}{\mathbf{0}}
 
 \DeclareRobustCommand\longtwoheadrightarrow{\relbar\joinrel\twoheadrightarrow}
-\newcommand{\reduce}{\twoheadrightarrow}
+\newcommand{\reduce}{\longtwoheadrightarrow_{\beta}}
 
 \newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+%
+\theoremstyle{plain}
+\newtheorem*{notation*}{Notation}
 
-\title{A Realisability Semantics for Löb's Axiom in Guarded Homotopy Type Theory} 
+\title{A Realisability Semantics for Gödel-Löb Axiom in Guarded Homotopy Type Theory} 
 \author{Liang-Ting Chen}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://l-tchen.github.io}}%
   {liang.ting.chen.tw@gmail.com}%
@@ -72,14 +99,14 @@
 \maketitle
 
 \begin{abstract}
-  In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
+  In this paper we give a positive answer to an open problem recently posed by Kavvos: is there any categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ but refuting~$A \to \Box A$?
   We consider an exposure-like construction $\Box\colon \ASM(\Lambda) \to \ASM(\Lambda)$ of the $\PP$-category of assemblies on untyped $\lambda$-calculus and trackable maps internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
-  We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle $A \to \Box A$ but proves the Löb axiom only.
-  Of the utmost significance of our interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms \emph{modulo $\alpha$-equivalence only} given its provability reading but also their extensions. 
+  We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle $A \to \Box A$ but models the Gödel-Löb axiom only.
+  Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms \emph{modulo $\alpha$-equivalence only} given its provability reading but also their extensions. 
   Apart from its own theoretical interest, following the intuitive interpretation of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
 \end{abstract}
 
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 \cite{Litak2014}
 
 \paragraph*{Contributions}
@@ -91,21 +118,21 @@
 \cite{Kavvos2017,Kavvos2020}
 \cite{Shamkanov2014,Shamkanov2016a}
 
-\section{Preliminaries}
+\section{Preliminaries}\label{sec:preliminaries}
+
 \ltnote{Some basic results in $\lambda$-calculus}
 
-\section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}
+\section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
 
-Classically, an assembly is a set $|X|$ with a \emph{realisability} relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ there exists some $a$ with $a \Vdash x$. We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $n \Vdash x$.
-The notion of assemblies is often defined in a more general setting based on (ordered) partial combinatory algebra~\cite{Oosten2008}.
-Our definition below is, although very similar, not an instance of the general notion.
-\ltnote{Point out why it is not.}
-
-\begin{definition}
+\paragraph*{Assembly}
+Classically an assembly is a set $|X|$ with a \emph{realisability} relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ there exists some $a$ with $a \Vdash x$. We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $n \Vdash x$.
+The notion of assemblies is nowadays often defined on an (ordered) partial applicative structure satisfying combinatory completeness, i.e.\ an (ordered) partial combinatory algebra~\cite{Oosten2008}.
+Our definition below is, apart from being type-theoretic, not an instance of the general notion.
+\begin{definition}\label{def:assembly}
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} type $|X| : \Univ$ and a relation ${\Vdash_X}$ from $\Lambda_0$ to $|X|$ such that
-  \emph{(a)} $\Vdash_X$ respects the $\beta$-reduction $\reduce$, that is, $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$;
-  \emph{(b)} $\Vdash_X$ is right-total: every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$. 
-  To put it formally, 
+  \emph{(a)} $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$;
+  \emph{(b)} every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$. 
+  To put it formally, an assembly is an inhabitant $(|X|, \Vdash_X, r_X, t_X)$ of
   \[
     \Asm_0(\Lambda) \defeq \sum_{|X| : \Univ}\;\sum_{\mathord{\Vdash_X}:\Lambda_0 \to |X| \to \Univ} 
     \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right)
@@ -114,35 +141,125 @@ Our definition below is, although very similar, not an instance of the general n
   where 
   \[
     \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right) \defeq
-    \prod_{M N : \Lambda_0} \prod_{x : |X|} \left( M \reduce N \times N \Vdash x \to M \Vdash x \right)
+    \prod_{M N : \Lambda_0} \prod_{x : |X|} \left( \left(M \reduce N\right) \to N \Vdash x \to M \Vdash x \right)
   \]
   and $\mathsf{isRightTotal}(\Vdash_X) \defeq \forall (x : |X|).\, \exists (M : \Lambda_0).\, M \Vdash x$.
 \end{definition}
-The required properties regarding $\Vdash$ departs slightly from the conventional definition. 
-\ltnote{Explain why $\Vdash$ respects $\reduce$}
-A plausible formulation of the right totality was $\prod (x : |X|).\, \sum (M : \Lambda_0).\, M \Vdash x$ which  would further require an explicit choice of realiser for each given inhabitant $x : |X|$.
-This is not reasonable if, say, $|X|$ is of function type since it amounts to giving a standard implementation in $\lambda$-calculus for any function $f$.
-In fact, with functional extensionality which holds in homotopy type theory, any inhabitant of the alternative formulation leads to a contradiction~\cite{Troelstra1977}. \ltnote{check this}
+The required properties departs from the conventional definition. 
+First, we do not require the realisability relation $\Vdash$ to be a mere proposition (contrary to its topos-theoretic formulation~\cite{Birkedal2002a}).
+Although this may simplify many constructions later, we do not find it necessary to impose this condition.
+Second, as we would like to account for intensional equality in addition to extensional equality between terms,
+we cannot identify $\beta$-equivalent terms \emph{a priori}.
+As a result, the interaction with reduction is formulated as an additional property, so it remains to see how $\reduce$ and $\Vdash$ should be related. 
+Our formulation is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
+This formulation also agrees with the one on an ordered partial combinatory algebra~\cite[Section~2.3]{Hofstra2003}.
+Third, a plausible alternative to the right totality is
+\[
+  \prod (x : |X|).\, \sum (M : \Lambda_0).\, M \Vdash x
+\]
+stating that each $x : |X|$ has an \emph{explicit} choice of realiser.
+This is not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any merely realisable function $f$.
+Indeed, with functional extensionality which holds in homotopy type theory, any inhabitant of the alternative formulation leads to a contradiction~\cite{Troelstra1977}. \ltnote{check this}
 
-
-Again, classically, a trackable map is a function $f$ with the property that $f$ is tracked by some $b$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f(x)$ where the $\cdot$ is the application operation of a partial combinatory algebra. In this case, $b$ is called the tracker of $f$.
-It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the semantics side we have to consider the tracker as part of structure instead of its mere existence.
-\begin{definition}
-  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $f : |X| \to |Y|$ and a term $F : \Lambda_1$ with a free variable $x$ such that $F[M/x] \Vdash f(x)$ whenever $M \Vdash x$.
-  To put if formally, a trackable map is an inhabitant of
+\begin{example}
+  The unit assembly $\top$ is defined as $(\Unit, \Vdash_{\Unit}, r_{\Unit}, t_{\Unit})$ where $\Unit$ is the unit type,  
+  $\Vdash_{\Unit}$ a relation defined by
   \[
-    \mathsf{Trackable}(X, Y) \defeq \prod_{f : |X| \to |Y|} \prod_{F : \Lambda_1}
-    \mathsf{Tracks}_{X, Y}(F, f)
+    M \Vdash_{\Unit} \star \defeq M \reduce \mathtt{\lambda x.\, x}, 
   \]
-  where 
-    $\mathsf{Tracks}_{X, Y}(F, f) \defeq \prod_{M : \Lambda_0} \prod_{x : |X|}\left( M \Vdash_X x \to F[M/x] \Vdash_Y f\,x \right)$.
+  $r_{\Unit}: (M \reduce N) \to (N \reduce L) \to (M \reduce L)$ the transitivity of the reduction relation $\reduce$,
+  and $t_{\Unit}$ follows from the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{\lambda x.\, x}$ by reflexivity.
+  The empty assembly $\bot$ consists of the empty type $\Empty$ and a relation $\Vdash_\bot : \Lambda_0 \to \Empty \to \Univ$ given by the elimination rule for the empty type. The other two components $r_\Empty$ and $t_\Empty$ are trivial.
+  It is straightforward but tedious to define the product of assemblies, so we leave this as an exercise to the reader. 
+\end{example}
+
+
+\begin{example}
+  Another useful assembly which plays a significant role in~\Cref{sec:provability} is the type $\Lambda_0$ of closed terms itself with $\Vdash_\Lambda$ defined by
+  \[
+    M \Vdash_\Lambda N \defeq M \reduce N.
+  \]
+  Similarly, $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
+  
+\end{example}
+
+\begin{example}
+  The assembly of natural numbers is also important but not here.
+  Nevertheless, we define a realisability relation $\Vdash_{\Nat}$ for natural numbers by
+  \[
+    M \Vdash_\Nat n \defeq M \reduce \mathtt{c}_n
+  \]
+  where $\mathtt{c}_n$ is the Church encoding of a natural number $n : \Nat$ with $r_\Nat$ and $t_\Nat$ easy to define. 
+  
+\end{example}
+
+\paragraph*{Trackable map}%
+Again, classically, a trackable map is a function $f$ with the property that $f$ is tracked by some $b$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f(x)$ where the $\cdot$ is the application operation of a partial combinatory algebra. In this case, $b$ is called the \emph{tracker} of $f$.
+It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the semantics side we have to consider the tracker as part of structure instead of its mere existence.
+\ltnote{explain the difference between property and structure in \Cref{sec:preliminaries}}
+\begin{definition}\label{def:trackable}
+  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $f$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ with a free variable $\mathtt{x}$ such that $F[M/\mathtt{x}] \Vdash f(x)$ whenever $M \Vdash x$.
+  To put if formally, a trackable map is an inhabitant of $\Asm_1(X, Y) \defeq \sum_{f : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f)$ where
+  \[
+    \mathsf{Tracks}_{X, Y}(F, f) \defeq \prod_{M : \Lambda_0} \prod_{x : |X|}
+    \left( M \Vdash_X x \to F[M/\mathtt{x}] \Vdash_Y f\, x \right).
+  \]
+  In the following context, we write $F[M]$ instead of $F[M/\mathtt{x}]$ if there is no danger of confusion since each $F$ has at most one free variable.
 \end{definition}
 
 
-\begin{proposition}
-  
+\begin{example}
+  Every assembly $X$ has a trackable map $\id_X$ defined as $(\mathsf{id}_{|X|}, \mathtt{x}, \mathsf{idr}_{\Vdash_X})$
+  where
+    $\mathsf{idr}_{\Vdash_X} \defeq \lambda M.\,\lambda x.\,\lambda p.\, p
+    : \prod_{M : \Lambda_0} \prod_{x : |X|} \left( M \Vdash_X x \to M  \Vdash_X x  \right)$
+  since $\mathtt{x}[M/\mathtt{x}]$ is judgementally equal to $M$.
+\end{example}
+Now consider the term substitution $(G, F)
+\mapsto G [ F ]$ and
+\[
+  \lambda M .\, \lambda x .\, \lambda p .\, \mathsf{transport}^{P(M, x, \blank)}(p, \mathfrak{g}\,(\mathfrak{f}\,p))
+  : \prod_{M : \Lambda_0} \prod_{x : |X|}
+  \left(M \Vdash_X x \to  G [ F ] [ M ] \Vdash_Z g\,(f\,x)\right)
+\]
+where $P(M, \mathtt{x}, L) \defeq L[M] \Vdash g\,(f\,x)$ and $p$ is a path from $G[F[M]]$ to $G[F] [M]$.
+Then, it follows that the function composition with aforementioned operations amount to an operation $(g, f) \mapsto g \circ f$ of type
+\[
+  \prod_{X, Y, Z : \Asm_0(\Lambda)} \Asm_1(Y, Z) \to \Asm_1(X, Y) \to \Asm_1(X, Z)
+\]
+for trackable maps. It is not hard to see that $f \circ \id = f$ and $\id \circ f = f$ hold propositionally.
+\ltnote{use the fact that there is a lifted path from $x$ to the transported one}
+
+\begin{proposition}\label{prop:category-of-assemblies}
+  The type $\Asm_0(\Lambda)$ of assemblies and the type of trackable maps from $X$ to $Y$ for each $X$ and $Y$ of type $\Asm_0(\Lambda)$ with the composition $\circ$ for trackable maps and identities $\id$ form a category denoted by $\Asm(\Lambda)$.
 \end{proposition}
-\section{Realisability semantics for provability}
+We may also consider reductions $F_1 \reduce F_2$ between morphisms $(f_1, F_1, \mathfrak{f}_1)$
+and $(f_2, F_2, \mathfrak{f}_2)$ as two cells since $F_1 \reduce F_2$ implies $F_1[M] \reduce F_2[M]$.
+That is, we do have a $2$-category of assemblies in the spirit of Seely's $2$-categorical model~\cite{Seely1987}.
+This line of research is out of scope of this paper, so we refrain ourselves from further discussion. 
+
+
+
+The construction of exponential $Y^X$ is a bit intriguing.
+With the definition of trackable maps, we may expect the exponential assembly $Y^X$ to consists of trackable maps, but however the exponential assembly $Y^X$ has the type of \emph{merely} trackable maps as its carrier following the Kavvos' definition~\cite{Kavvos2017c}.  
+\begin{example}
+  \begin{align*}
+    |Y^X| & \defeq \sum_{f : |X| \to |Y|} \brck{\sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f) } \equiv \sum_{f : |X| \to |Y|} \exists (F : \Lambda_1).\, \mathsf{Tracks}_{X, Y}(F, f)
+  \end{align*}
+  
+\end{example}
+\paragraph*{Extensional equality}
+We then define the (partial) equivalence relation $\sim$ referred as the \emph{extensional equality} on trackable maps by $(f_1, F_1, \mathfrak{f}_1) \sim (f_2, F_2, \mathfrak{f}_2)$ if $f_1 = f_2$.
+\begin{corollary}
+  $\Asm(\Lambda)$ with the extensional equality $\sim$ is a $\PP$-category denoted by $\ASM(\Lambda)$.
+\end{corollary}
+\begin{proof}
+  This statement follows from~\Cref{prop:category-of-assemblies}.
+\end{proof}
+
+Viewing the unit $\top$ and the empty $\bot$ assemblies as objects of $\ASM(\Lambda)$, we can see that they are the terminal and the initial object up to $\sim$.
+
+\section{Realisability semantics for provability by guarded recursion}\label{sec:provability}
 
 \begin{enumerate}
   \item Show that there is no $\Box A \to A$ natural in $A$.
@@ -153,7 +270,7 @@ It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the
 
 \cite{Mogelberg2019a,Veltri2020}
 
-\section{Conclusion}
+\section{Conclusion}\label{sec:conclusion}
 \paragraph*{Future work}
 \begin{enumerate}
   \item topos-theoretic arguments
@@ -174,52 +291,35 @@ It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the
 \appendix
 
 
-\section{Styles of lists, enumerations, and descriptions}\label{sec:itemStyles}
-
-List of different predefined enumeration styles:
+\section{environments}
 
 \begin{alphaenumerate}
 \item \verb|\begin{alphaenumerate}...\end{alphaenumerate}|
 \item \dots
 \item \dots
-%\item \dots
 \end{alphaenumerate}
 
 \begin{romanenumerate}
 \item \verb|\begin{romanenumerate}...\end{romanenumerate}|
 \item \dots
 \item \dots
-%\item \dots
 \end{romanenumerate}
 
 \begin{bracketenumerate}
 \item \verb|\begin{bracketenumerate}...\end{bracketenumerate}|
 \item \dots
 \item \dots
-%\item \dots
 \end{bracketenumerate}
-
-
-\section{Theorem-like environments}\label{sec:theorem-environments}
-
-List of different predefined enumeration styles:
 
 
 \begin{note}\label{testenv-note}
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
 \end{note}
 
-\begin{note*}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{note*}
-
 \begin{claim}\label{testenv-claim}
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
 \end{claim}
 
-\begin{claim*}\label{testenv-claim2}
-Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-\end{claim*}
 
 \begin{claimproof}
 Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
