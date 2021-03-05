@@ -193,20 +193,20 @@ _⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
         (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠
           ((ƛ F) · M -→⟨ β ⟩ F [ M ] ∎) (F⊩f M⊩x)) ∣})
         ∃F⊩f
--- {-
--- module Exponential (X Y : Asm 𝓤) where
---   module X = AsmStr (str X)
---   module Y = AsmStr (str Y)
---   X⇒Y = X ⇒ Y
---   module X⇒Y = AsmStr (str X⇒Y)
+        
+module Exponential (X Y : Asm 𝓤) where
+  module X = AsmStr (str X)
+  module Y = AsmStr (str Y)
+  X⇒Y = X ⇒ Y
+  module X⇒Y = AsmStr (str X⇒Y)
 
---   uncurry : Trackable (Z ×ₐ X) Y → Trackable Z (X ⇒ Y)
---   uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp
---     (λ { (L , L⊩z) → ∣ ↑₁ (ƛ F) · Λ.`⟨ ↑₁ L , 0 ⟩ , {!!} ∣ }) (Z.⊩-right-total z)) , 
---     {!!} , {!!}
---     where
---       module Z = AsmStr (str Z)
-
---   eval : Trackable (X⇒Y ×ₐ X) Y
---   eval = {!!}
--- -}
+  postulate
+    uncurry : Trackable (Z ×ₐ X) Y → Trackable Z (X ⇒ Y)
+    eval : Trackable (X⇒Y ×ₐ X) Y
+    {-
+      uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp
+        (λ { (L , L⊩z) → ∣ ↑₁ (ƛ F) · Λ.`⟨ ↑₁ L , 0 ⟩ , {!!} ∣ }) (Z.⊩-right-total z)) , 
+        {!!} , {!!}
+        where
+          module Z = AsmStr (str Z)
+      -}
