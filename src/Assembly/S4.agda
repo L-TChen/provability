@@ -20,28 +20,28 @@ module _ (Q : Quoting) where
   open Quoting Q
 
   □_ : Asm 𝓤 → Asm 𝓤
-  □_ {𝓤} (|X| , _⫣_ , ⫣-is-realisability) = |□X| , _⫣□X_ , record
-    { ⫣-respects-↠ = λ {x} {x′} {y} → ⫣□X-respect-↠ {x} {x′} {y}
-    ; ⫣-left-total = ⫣□X-left-total
+  □_ {𝓤} (|X| , _⊩_ , ⊩-is-realisability) = |□X| , _⊩□X_ , record
+    { ⊩-respects-↠ = λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}
+    ; ⊩-right-total = ⊩□X-right-total
     }
     where
       |□X| : 𝓤 ̇
-      |□X| = Σ[ x ꞉ |X| ] Σ[ M ꞉ Λ₀ ] x ⫣ M 
+      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ x ꞉ |X| ] M ⊩ x
       -- Can we remove truncation? If so, is □id still equal to id? 
       -- Ans. If we assume that ⫣ is a mere proposition, then ▹[ α ] (...) is also a mere proposition (▹isProp→isProp▹).
       -- Therefore, we don't need propositional truncation here.
 
-      _⫣□X_ : |□X| → (M : Λ₀) → 𝓤 ̇
-      (▹x , M , ▹x⫣M) ⫣□X n̅ = Lift (n̅ -↠ ⌜ M ⌝)
+      _⊩□X_ : (M : Λ₀) → |□X| → 𝓤 ̇
+      n̅ ⊩□X (M , _ , _) = Lift (n̅ -↠ ⌜ M ⌝)
 
-      ⫣□X-respect-↠ : _⫣□X_ respects _-↠_ on-the-right
-      ⫣□X-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
+      ⊩□X-respect-↠ : _⊩□X_ respects _-↠_ on-the-left
+      ⊩□X-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
       
-      ⫣□X-left-total :  _⫣□X_ IsLeftTotal
-      ⫣□X-left-total (▹x , M , M⫣x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
+      ⊩□X-right-total :  _⊩□X_ IsRightTotal
+      ⊩□X-right-total (M , _ , M⫣x) = ∣ ⌜ M ⌝ , lift (⌜ M ⌝ _-↠_.∎) ∣
 
   □map₀ : Trackable X Y → ⟨ □ X ⟩ → ⟨ □ Y ⟩
-  □map₀ (f , F , f⫣F) (x , M , x⫣M) = f x , F [ M ] , f⫣F x⫣M
+  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , f x , F⊩f M⊩x
 
   □map₁ : Λ₁ → Λ₁
   □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
@@ -52,7 +52,7 @@ module _ (Q : Quoting) where
     where
       open -↠-Reasoning
       □F⊩□f : Tracks (□ X) (□ Y) (□map₁ F) (□map₀ Ff)
-      □F⊩□f {n̅} {_ , M , _} (lift n̅-↠⌜M⌝) = lift (begin
+      □F⊩□f {n̅} {M , _ , _} (lift n̅-↠⌜M⌝) = lift (begin
         ↑₁ Sub [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
           ≡[ i ]⟨ subst-rename-∅ {ρ = S_} (subst-zero n̅) Sub i · subst-rename-∅ {ρ = S_} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
         Sub · ⌜ F ⌝ · n̅
@@ -61,7 +61,7 @@ module _ (Q : Quoting) where
           -↠⟨ Sub-↠ ⟩
         ⌜ F [ M ] ⌝ ∎)
 
-  □id=id : (X : Asm 𝓤) → (x : ⟨ □ X ⟩) → □map₀ (id {X = X}) x ≡ x
+  □id=id : (X : Asm 𝓤) → (x : ⟨ □ X ⟩) → □map₀ (id X) x ≡ x
   □id=id X x = refl
 
   □-isExposure : IsExposure {𝓤} □_  □map
@@ -88,8 +88,9 @@ module _ (Q : Quoting) where
   □-exposure = exposure □_ □map □-isExposure
 
   eval : Trackable (□ X) X
-  eval {X = X} = fst , E , λ { {N} {x , M , M⫣x} N-↠⌜M⌝ →
-    X.⫣-respects-↠ (reduce-ssubst E (lower N-↠⌜M⌝)) (X.⫣-respects-↠ (E-↠ M) M⫣x)}
+  eval {X = X} = (λ x → fst (snd x)) , E ,
+    λ { {N} {M , x , M⊩x} N-↠⌜M⌝ →
+      X.⊩-respects-↠ (reduce-ssubst E (lower N-↠⌜M⌝)) ((X.⊩-respects-↠ (E-↠ M) M⊩x)) }
     where
       module X  = AsmStr (str X)
       module □X = AsmStr (str (□ X))
