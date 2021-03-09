@@ -1,11 +1,16 @@
 \documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
 \usepackage{mathrsfs}
 \usepackage{mathtools}
+\usepackage[all]{xy}
+\usepackage{xspace}
 
 % 
 \usepackage[draft,noinline,margin]{fixme}
 \FXRegisterAuthor{lt}{alt}{LT}
 \FXRegisterAuthor{hs}{ahs}{Josh}
+
+%
+\newcommand{\eqv}[2]{\ensuremath{#1 \simeq #2}\xspace}
 
 % the following is copied from the HoTT book
 \newcommand{\trunc}[2]{\mathopen{}\left\Vert #2\right\Vert_{#1}\mathclose{}}
@@ -54,8 +59,14 @@
 \newcommand{\transport}{\mathsf{transport}}
 \newcommand{\blank}{{-}}
 \newcommand{\id}{\mathsf{id}}
+\newcommand{\iid}{\mathit{id}}
 \newcommand{\Unit}{\mathbf{1}}
 \newcommand{\Empty}{\mathbf{0}}
+\newcommand{\pr}{\mathsf{pr}}
+
+\newcommand{\Quote}{\mathtt{quote}}
+\newcommand{\Eval}{\mathtt{eval}}
+\newcommand{\Subst}{\mathtt{subst}}
 
 \DeclareRobustCommand\longtwoheadrightarrow{\relbar\joinrel\twoheadrightarrow}
 \newcommand{\reduce}{\longtwoheadrightarrow_{\beta}}
@@ -181,7 +192,7 @@ stating that each $x : |X|$ has an explicit choice of realisers.
 This is intuitively not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
 Indeed, with functional extensionality which holds in homotopy type theory, any inhabitant of the alternative formulation leads to a \emph{contradiction}~\cite{Troelstra1977}. \ltnote{check this}
 
-\begin{example}
+\begin{example}\label{ex:assembly-lambda}
   A useful assembly which plays a significant role in~\Cref{sec:provability} is the type $\Lambda_0$ of closed terms itself with ${\reduce} : \Lambda_0 \to \Lambda_0 \to \Univ$ as its realisability relation.
   Similarly, $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
   
@@ -211,11 +222,14 @@ It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the
 \end{definition}
 Note that a trackable map is actually a triple $(f, F, \mathfrak{f})$ since $\mathsf{Tracks}_{X, Y}(F, f)$ is not just a mere proposition.
 
-\begin{example}
-  Every assembly $X$ has a trackable map $\id_X$ defined as $(\mathsf{id}_{|X|}, \mathtt{x}, \mathsf{idr}_{\Vdash_X})$
-  where $\mathsf{idr}_{\Vdash_X} \defeq \lambda M.\,\lambda x.\,\lambda r.\, r$ and its type is
-    $\prod_{M : \Lambda_0} \prod_{x : |X|} \left( M \Vdash_X x \to M  \Vdash_X x  \right)$
-  since $\mathtt{x}[M/\mathtt{x}]$ is judgementally equal to $M$.
+\begin{example}[Identity]
+  Every assembly $X$ has a trackable map
+  \[
+    \iid_X \defeq (\id_{|X|}, \mathtt{x}, \pr_3)
+    \quad\text{where}\quad
+  \pr_3 \defeq \lambda M.\,\lambda x.\,\lambda r.\, r : \prod_{M : \Lambda_0} \prod_{x : |X|} \left( M \Vdash_X x \to M  \Vdash_X x  \right)
+  \]
+  since $\mathtt{x}[M]$ is judgementally equal to $M$.
 \end{example}
 Now we proceed with defining the composition of trackable maps. Consider the term substitution $(G, F)
 \mapsto G [ F ]$ and the path $p : G[F[M]] =_{\Lambda_0} G[F] [M]$.
@@ -236,27 +250,34 @@ That is, we do have a $2$-category of assemblies in the spirit of Seely's $2$-ca
 This line of research is out of scope of this paper, so we refrain ourselves from further discussion. 
 
 
-\paragraph*{Extensional equality}
-We then define the (partial) equivalence relation $\sim$ referred as the \emph{extensional equality} on trackable maps by $(f_1, F_1, \mathfrak{f}_1) \sim (f_2, F_2, \mathfrak{f}_2)$ if $f_1 = f_2$.
-It is not hard to see that $\Asm(\Lambda)$ with the extensional equality $\sim$, denoted by $\ASM(\Lambda)$, is a $\PP$-category. 
+\paragraph*{Extensional equality and \texorpdfstring{$\PP$}{P}-category of assemblies}
+Now we define the (partial) equivalence relation $\sim$ referred as the \emph{extensional equality} on trackable maps by $(f_1, F_1, \mathfrak{f}_1) \sim (f_2, F_2, \mathfrak{f}_2)$ if $f_1 = f_2$.
+It is not hard to see that $\Asm(\Lambda)$ with the extensional equality $\sim$ is a $\PP$-category, denoted by $\ASM(\Lambda)$. 
 We now investigate some of its basic properties.
 
-The unit assembly $\top$ is an initial object defined as $(\Unit, \Vdash_{\Unit}, r_{\Unit}, t_{\Unit})$ where $\Unit$ is the unit type,  
-$\Vdash_{\Unit}$ a relation defined by
-\[
-  M \Vdash_{\Unit} \star \defeq M \reduce \mathtt{\lambda x.\, x}, 
-  \quad r_{\Unit}: (M \reduce N) \to (N \reduce L) \to (M \reduce L)
-\]
-given by the transitivity of the reduction relation $\reduce$, and $t_{\Unit}$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{\lambda x.\, x}$ (by reflexivity).
-The empty assembly $\bot$ is a terminal object consisting of the empty type $\Empty$ and a relation $\Vdash_\bot : \Lambda_0 \to \Empty \to \Univ$ given by the elimination rule for the empty type.
-The universal properties (up to $\sim$) follow from the typical arguments. 
+\begin{example}[Terminal object]
+  The unit assembly $\top$ is a $\PP$-terminal object defined as $(\Unit, \Vdash_{\Unit}, r_{\Unit}, t_{\Unit})$ where $\Unit$ is the unit type,  
+  $\Vdash_{\Unit}$ a relation defined by
+  \[
+    M \Vdash_{\Unit} \star \defeq M \reduce \mathtt{\lambda x.\, x}, 
+    \quad r_{\Unit}: (M \reduce N) \to (N \reduce L) \to (M \reduce L)
+  \]
+  given by the transitivity of the reduction relation $\reduce$, and $t_{\Unit}$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{\lambda x.\, x}$ (by reflexivity).
+  The finality follows from the function extensionality.
+\end{example}
+
+It is straightforward but tedious to define the $\PP$-product of assemblies, so we leave this as an exercise to the reader. 
+\begin{example}[Strict initial object]
+The empty assembly $\bot$ is $\PP$-initial consisting of the empty type $\Empty$ and a relation $\Vdash_\bot : \Lambda_0 \to \Empty \to \Univ$ given by the elimination rule for the empty type.
 The other two components $r_\Empty$ and $t_\Empty$ are trivial.
-It is straightforward but tedious to define the product of assemblies, so we leave this as an exercise to the reader. 
+
+The strictness of $\bot$ follows from that in homotopy type theory $\eqv{\Empty}{X}$ for any type $X$ with a function $X \to \Empty$.
+\end{example}
 
 The construction of exponential $X \Rightarrow Y$ is a bit intriguing.
 With the definition of trackable maps, we may expect the exponential assembly $X \Rightarrow Y$ to consist of trackable maps.
 However the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier following Kavvos' definition~\cite{Kavvos2017c}.  
-\begin{example}
+\begin{example}[Exponentials]
   Given assemblies $X$ and $Y$, define
   \begin{align*}
     \barred{X \Rightarrow Y} & \defeq \sum_{f : |X| \to |Y|} \exists (F : \Lambda_1).\, \mathsf{Tracks}_{X, Y}(F, f) \equiv \sum_{f : |X| \to |Y|} \brck{\sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f) }
@@ -276,73 +297,93 @@ However the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely}
   \ltnote{show that $X\Rightarrow Y$ has the required universal property.}
 \end{example}
 
-To sum up, we have just showed that $\ASM(\Lambda)$ has the initial object, finite products, and exponentials.
+To sum up, we have just showed that $\ASM(\Lambda)$ has a strict initial object, finite products, and exponentials.
 That is, 
 \begin{corollary}
-  $\ASM(\Lambda)$ is a cartesian closed $\PP$-category.
+  $\ASM(\Lambda)$ is a cartesian closed $\PP$-category with an strict initial object.
 \end{corollary}
 \ltnote{shall we show that $\ASM(\Lambda)$ has a natural number object?}
 
 \section{Realisability semantics for provability}\label{sec:provability}
 
-In this section, we first introduce a comonadic exposure $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ of the $\PP$-category of assemblies which is different from the one defined by Kavvos~\cite[Section~9.1]{Kavvos2017b}.
-For example, the one by Kavvos preserves finite products including the terminal object~$\top$, but ours does not with good reason. 
-Most importantly, we are able to refute the completeness principle $A \to \boxtimes A$, understood as a quoting function from the computational perspective, while we did not find a way to refute using Kavvos' definition.
-Hitherto, we complete our cook's tour of the set-theoretic results based on a partial combinatory algebra in terms of homotopy type theory.
+In this section, we first introduce a comonadic exposure $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ of the $\PP$-category of assemblies which is different from the one $\boxtimes_K$ defined by Kavvos~\cite[Section~9.1]{Kavvos2017b}.
+For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not with good reason. 
+Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it using $\boxtimes_K$.
+Hitherto, we finally complete our cook's tour of the set-theoretic results based on a partial combinatory algebra in terms of homotopy type theory.
 
-Thereafter, we move to a variant of guarded type theories---Ticked Cubical Type Theroy~\cite{Mogelberg2019a}---and introduce an exposure-like construction $\Box$ to model Gödel-Löb axiom.
-This construction exploits Nakano's later modality so that we can express the intuitve meaning of $\Box X$ cleanly.
+Thereafter, we move to an extension of cubical type theory---Ticked Cubical Type Theroy~\cite{Mogelberg2019a}---and introduce an exposure-like construction $\Box$ to model Gödel-Löb axiom.
 \ltnote{can we use clocked type theroy to actually prove $\Box$ is an exposure?}
-We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$. 
-In the end, we prove that the deductive version of Gödel-Löb axiom, i.e.\ given a trackable map $f : \Box X \to X$ one is able to construct $\Box X$ using Nakano's guarded recursion on extensions and the Kleene's second recursion theorem on intensions.
-Then, the main result of this paper---the internalised version of Gödel-Löb axiom---follows routinely.
-
+This construction exploits Nakano's later modality so that we can express the intuitve meaning of $\Box X$ cleanly.
+We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
+Finally, we prove that the main result of this paper: given a trackable map $f : \Box X \to X$ one is able to construct $\top \to \Box X$ using Nakano's guarded recursion on extensions and the Kleene's second recursion theorem on intensions.
 
 \paragraph*{Comonadic exposure for $S4$ modality}
-As an assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions $x : \barred{X}$, it is now possible to bring out intension to the extensional level by pairing an inhabitant $x : \barred{X}$ with its realiser, i.e.\ $\barred{\boxtimes X} \defeq \sum_{M : \Lambda_0} \sum_{x : \barred{X}} \brck{ M \Vdash_X x }$
-as the carrier of $\boxtimes X$.
-The realisability relation is then defined by
+An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions on the level of extensions by pairing $x : \barred{X}$ with a term $M$ which \emph{merely} realises\footnote{%
+  We will discuss the mere realisability in~\Cref{sec:conclusion}.
+}
+$x$ as the carrier of $\boxtimes X$.
+A pair $(M, x)$ with $\star : \brck{M \Vdash_X x}$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.  
+Then, we argue that $(M, x, \star)$ shall be realised by terms which are $\beta$-equivalent to its Gödel encoding $\qquote{M}$ (instead of $M$ as proposed by Kavvos), since terms $N$ with $N \reduce \qquote{M}$ are really \emph{intensional} representations of $M$.
+In short, the carrier and the realisability relation are defined as
 \[
+  \barred{\boxtimes X} \defeq \sum_{M : \Lambda_0} \sum_{x : \barred{X}} \brck{M \Vdash x}
+  \quad\text{and}\quad
   N \Vdash_{\boxtimes X} (M, x, \star) \defeq N \reduce \qquote{M}
 \]
-where $\qquote{M}$ is the Gödel numbering of $M$. 
-To make the pair $(\barred{\boxtimes X}, \Vdash_{\boxtimes X})$ an assembly, it remains to give $r_{\boxtimes X}$ and $t_{\boxtimes X}$.
-The inhabitant $r_{\boxtimes X}$ is just given by the transitivity of $\reduce$.
-Also each $(M, x, \star)$ clearly has a realiser $\qquote{M}$.
-In short, $\boxtimes X \defeq (\barred{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly.
+respectively.
+It turns out that $\boxtimes X \defeq (\barred{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly where $r_{\boxtimes X}$ and $t_{\boxtimes X}$ are the transitivity and the reflexivity of $\reduce$.
 
 As for the mapping on morphisms, consider a trackable map $(f, F, \mathfrak{f})$ from $X$ to $Y$.
-By the definition of a trackable map, we have $F[M] \Vdash_Y f\,x$ whenever $M \Vdash x$.
-Therefore, 
+We now define $\boxtimes (f, F, \mathfrak{f}) \defeq (f^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)\colon \boxtimes X \to \boxtimes Y$ as follows.
+Recall that the propositional truncation $\brck{\blank}$ is functorial, so
 \[
-  \boxtimes f : (M, x, \star) \mapsto (F[M], f\,x, \star')
+  f^\boxtimes (M, x, \star) \defeq (F[M], f\,x, \brck{\mathfrak{f}\,M\,x}\,\star)
 \]
-defines a function from $\barred{\boxtimes X}$ to $\barred{\boxtimes Y}$ where $\star'$ is given by the recursion principle of the propositional truncation.
-It remains to give a tracker of $\boxtimes f$ such that $\boxtimes F[N] \reduce \qquote{F[M]}$ whenever $N \reduce \qquote{M}$. 
-At this point, recall from \Cref{sec:preliminaries} that we have a term $\mathtt{subst} : \Lambda_0$ such that $\mathtt{subst}_x\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M/\mathtt{x}]}$. 
-Hence, by defining $\boxtimes F$ as $\mathtt{subst}_{\mathtt{x}}\,\qquote{F}\,\mathtt{x}$, it follows that
-\[
+is a function from $\barred{\boxtimes X}$ to $\barred{\boxtimes Y}$.
+To give a tracker of $f^\boxtimes$, recall from \Cref{sec:preliminaries} that there is a term $\mathtt{subst}$ performing term substitution on Gödel numbers, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ since we have
+\begin{align*}
   \left(\mathtt{subst} \,\qquote{F}\,\mathtt{x}\right)[N/\mathtt{x}]
-  \equiv 
-  \mathtt{subst}\,\qquote{F}\,N
-  \reduce 
-  \mathtt{subst}\,\qquote{F}\,\qquote{M}
-  \reduce \qquote{F[M/\mathtt{x}]},
-\]
-as desired, which completes the definition of $\boxtimes\mathfrak{f} : \prod_{M : \Lambda_0} \prod_{x : \barred{X}}
-\left(N \Vdash_{\boxtimes X} x \to \boxtimes F[N]\Vdash_{\boxtimes Y} \boxtimes f\, x\right)$.
-Therefore, $\boxtimes(f, F, \mathfrak{f})$ defined by $(\boxtimes f, \boxtimes F, \boxtimes \mathfrak{f})$ is indeed a trackable map.
-\begin{theorem}[{cf.\, \cite[Theorem~11]{Kavvos2017b}}]
+  \equiv  {} & \mathtt{subst}\,\qquote{F}\,N \\
+  \reduce {} & \mathtt{subst}\,\qquote{F}\,\qquote{M} \\
+  \reduce {} & \qquote{F[M]} \Vdash_{\boxtimes Y} f^\boxtimes(M, x, \star)
+\end{align*}
+completing the definition of $\mathfrak{f}^\boxtimes$.
+In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
+\begin{theorem}[{cf.~\cite[Theorem~11]{Kavvos2017b}}]
   $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ is a comonadic exposure.
 \end{theorem}
 \begin{proof}[Proof sketch]
-  
+  We only sketch the proof of three less obvious statements here--the preservation of identities and the construction of natural transformations $\epsilon\colon \boxtimes \to \mathcal{I}_{\ASM(\Lambda)}$ and $\delta\colon \boxtimes \to \boxtimes\boxtimes$. 
+  To show that $\boxtimes$ preserves identities, we use that fact that the propositional truncation $\brck{\blank}$ is a functor which preserves identities and that $\pr_3$ is a third projection.
+  Then, it follows that $\brck{\pr_3\,M\,x} \equiv \brck{\id} = \id$ and thus $\id_{\barred{X}}^\boxtimes (M, x, \star) \equiv (\mathtt{x}[M], x, \brck{\pr_3\,M\,x}\,\star) \equiv \id_{\barred{\boxtimes X}}$.
+
+  For the families of maps $\boxtimes A \to A$ and $\boxtimes A \to \boxtimes \boxtimes A$ natural in $A$, recall from \Cref{sec:preliminaries} that there are terms $\Eval$ and $\Quote$ which evaluates a Gödel number to its representing term and computes the Gödel number $\qquote{N}$ of a given term~$N \equiv \qquote{M}$ in the form of Gödel number respectively. That is, 
+  \[
+    \mathtt{eval}\,\qquote{M} \reduce M
+    \quad\text{and}\quad
+    \mathtt{quote}\,\qquote{M} \reduce \qquote{\qquote{M}}.
+  \]
+It is now straightforward to define the required natural transformations between exposures.
 \end{proof}
 
 \ltnote{$\boxtimes$ is not cartesian and not product-preserving.}
+
+Another significant difference between $\boxtimes_K$ and $\boxtimes$ is that it is possible to refute the completeness principle $X \to \boxtimes X$ for the latter exposure.
 \begin{theorem}
-  There is no trackable map $q_A : A \to \Box A$ natural in $A$.
+  There is no natural transformation $q\colon  \mathcal{I}_{\ASM(\Lambda)} \to \boxtimes$.
 \end{theorem}
+We show the existence of such a natural transformation implies the existence of a quoting term $\mathsf{quote}'$ with $\mathsf{quote}'\,M \reduce \qquote{M}$ using naturality and the fact that $\Lambda_0$ itself has naturally an assembly structure (\Cref{ex:assembly-lambda}), but however $\Quote'$ cannot exist.
+\begin{proof}
+  Assume that such a family of maps $q_X\colon X \to \boxtimes X$ natural in $X$ exists.
+  Consider a term $M : \Lambda_0$ and the following commutative diagram (up to $\sim$)
+  \[
+    \xymatrix{
+      \top \ar[r]^{q_\top} \ar[d]_{\widehat{M}} & \boxtimes \ar[d]^{\boxtimes \widehat{M}} \top \\
+      \Lambda \ar[r]_{q_\Lambda} & \boxtimes \Lambda
+    }
+  \]
+  where $\widehat{M}$ is a trackable map defined as
+\end{proof}
 
 \paragraph*{Quasi-exposure for \texorpdfstring{$\mathsf{GL}$}{GL} modality}
 

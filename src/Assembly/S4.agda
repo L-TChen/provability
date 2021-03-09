@@ -10,6 +10,7 @@ open import Calculus.Untyped
   hiding (Z)
   
 open import Assembly.Base
+open import Assembly.Properties
 open import Assembly.Exposure
 
 private
@@ -98,52 +99,52 @@ module _ (Q : Quoting) where
         E : Λ₁ 
         E-↠ : ∀ M → E [ ⌜ M ⌝ ] -↠ M
 
-  -- quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
-  -- quoting-does-not-exist (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
-  --   where
-  --     qQ-at-Λ : Trackable Λ₀ₐ (□ Λ₀ₐ)
-  --     qQ-at-Λ = fun
+  quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
+  quoting-does-not-exist (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
+    where
+      qQ-at-Λ : Trackable Λ₀ₐ (□ Λ₀ₐ)
+      qQ-at-Λ = fun
 
-  --     qΛ : Λ₀ → Σ[ ▹M ꞉ ▹ Λ₀ ] Σ[ N ꞉ Λ₀ ] ▹[ α ] N -↠ ▹M α
-  --     qΛ = qQ-at-Λ .fst
+      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ M ꞉ Λ₀ ] N -↠ M
+      qΛ = qQ-at-Λ .fst
 
-  --     QΛ : Λ₁
-  --     QΛ = HasTracker.F (qQ-at-Λ .snd)
+      QΛ : Λ₁
+      QΛ = HasTracker.F (qQ-at-Λ .snd)
 
-  --     qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
-  --     qQ-at-⊤ = fun
+      qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
+      qQ-at-⊤ = fun
 
-  --     □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (next M , M , λ _ → -↠-refl)
-  --     □*→Λ-is-constant M x = begin
-  --       □map (*→Λ M) .fst x
-  --         ≡⟨ refl ⟩
-  --       next M , ↑₁ M [ _ ] , _
-  --         ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (next M , L , N)) (subst-rename-∅ _ M) {!!} ⟩
-  --       next M , M , (λ _ → -↠-refl) ∎
-  --       where open ≡-Reasoning
+      □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , M , -↠-refl)
+      □*→Λ-is-constant M x = begin
+        □map (*→Λ M) .fst x
+          ≡⟨ refl ⟩
+        ↑₁ M [ _ ] , M , _
+          ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (L , M , N)) (subst-rename-∅ _ M) {!!} ⟩
+        M , M , -↠-refl ∎
+        where open ≡-Reasoning
 
-  --     natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ Λ₀ₐ
-  --     natural-on-*→Λ M = naturality (*→Λ M)
+      natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ Λ₀ₐ
+      natural-on-*→Λ M = naturality (*→Λ M)
 
-  --     lem1 : (M : Λ₀) → qΛ M ≡ (next M , M , λ _ → -↠-refl)
-  --     lem1 M = begin
-  --       (qQ-at-Λ .fst) M
-  --         ≡⟨ refl ⟩
-  --       (qQ-at-Λ .fst) (*→Λ M .fst _)
-  --         ≡⟨ natural-on-*→Λ M _ ⟩
-  --       □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
-  --         ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
-  --       (next M , M , λ _ → -↠-refl) ∎
-  --       where open ≡-Reasoning
+      lem : (M : Λ₀) → qΛ M ≡ (M , M , -↠-refl)
+      lem M = begin
+        qΛ M
+          ≡⟨ refl ⟩
+        qΛ (*→Λ M .fst _)
+          ≡⟨ natural-on-*→Λ M _ ⟩
+        □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
+          ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
+        (M , M , -↠-refl) ∎
+        where open ≡-Reasoning
         
-  --     QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .snd .fst ⌝)
-  --     QΛ[M] =  HasTracker.F⫣f (qQ-at-Λ .snd) 
+      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
+      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
 
-  --     QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
-  --     QΛ-is-quoting M = begin
-  --       QΛ [ M ]
-  --         -↠⟨ lower (QΛ[M] -↠-refl) ⟩
-  --       ⌜ fst (snd (qΛ M)) ⌝
-  --         ≡[ i ]⟨ ⌜ fst (snd (lem1 M i) ) ⌝ ⟩
-  --       ⌜ M ⌝ ∎
-  --       where open -↠-Reasoning
+      QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
+      QΛ-is-quoting M = begin
+        QΛ [ M ]
+          -↠⟨ lower (QΛ[M] -↠-refl) ⟩
+        ⌜ qΛ M .fst ⌝
+        ≡[ i ]⟨ ⌜ lem M i .fst  ⌝ ⟩
+        ⌜ M ⌝ ∎
+        where open -↠-Reasoning
