@@ -2,3 +2,4 @@
 *.vtc
 library_fixed.bib
 *.agda#
+_build
