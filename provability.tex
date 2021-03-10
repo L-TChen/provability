@@ -2,7 +2,15 @@
 \usepackage{mathrsfs}
 \usepackage{mathtools}
 \usepackage[all]{xy}
+\usepackage{bussproofs}
 \usepackage{xspace}
+
+\usepackage{stmaryrd}
+\usepackage{ragged2e}
+\usepackage{varwidth}
+\newcommand{\den}[2][]{\(\left\llbracket\;\text{#2}\;\right\rrbracket^{#1}\)}
+
+\newcommand{\wraptext}[2][1in]{\begin{varwidth}{#1}{\RaggedRight#2}\end{varwidth}}
 
 % 
 \usepackage[draft,noinline,margin]{fixme}
@@ -135,6 +143,7 @@
 
 \section{Introduction}\label{sec:intro}
 \cite{Litak2014}
+\cite{Davies2001b}
 
 \paragraph*{Contributions}
 
@@ -152,7 +161,7 @@
 \subsection{Partial equivalence relation and \texorpdfstring{$\PP$}{P}-category}
 
 \section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
-In this section, we introcue the category of assemblies on $\lambda$-calculus and trackable maps enriched over $\PP$-sets.
+In this section, we introduce the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
 Note that this is not just a direct translation from the set-theoretic formulation to homotopy type theory.
 
 \paragraph*{Assembly}
@@ -169,12 +178,11 @@ Our definition below is, apart from being type-theoretic, not an instance of the
     \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right)
       \times \mathsf{isRightTotal}({\Vdash_X})
   \]
-  where 
-  \[
-    \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right) \defeq
-    \prod_{M N : \Lambda_0} \prod_{x : |X|} \left( \left(M \reduce N\right) \to N \Vdash x \to M \Vdash x \right)
-  \]
-  and $\mathsf{isRightTotal}(\Vdash_X) \defeq \forall (x : |X|).\, \exists (M : \Lambda_0).\, M \Vdash x$.
+  where
+  \begin{romanenumerate}
+    \item $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right)$ is defined as $\prod_{M N : \Lambda_0} \prod_{x : |X|} \left( \left(M \reduce N\right) \to N \Vdash x \to M \Vdash x \right) $, and 
+    \item $\mathsf{isRightTotal}(\Vdash_X)$ as $\forall (x : |X|).\, \exists (M : \Lambda_0).\, M \Vdash x$.
+  \end{romanenumerate}
 \end{definition}
 The required properties departs from the conventional definition. 
 First, we do not require the realisability relation $\Vdash$ to be a mere proposition (contrary to its topos-theoretic formulation~\cite{Birkedal2002a}).
@@ -208,12 +216,12 @@ Indeed, with functional extensionality which holds in homotopy type theory, any 
 \end{example}
 
 \paragraph*{Trackable map}%
-Classically, a trackable map is a function $f$ with the property that $f$ is \emph{tracked} by some $b$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f(x)$ where the $\cdot$ is the application operation of a partial combinatory algebra. In this case, $b$ is called the \emph{tracker} of $f$.
+Classically, a trackable map is a function $f$ with the property that $f$ is \emph{tracked} by some $b$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f\,x$ where the $\cdot$ is the application operation of a partial combinatory algebra. In this case, $b$ is called the \emph{tracker} of $f$.
 It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the semantics side we have to consider the tracker as part of structure instead of its mere existence.
 \ltnote{explain the difference between property and structure in \Cref{sec:preliminaries}}
 \begin{definition}\label{def:trackable}
-  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $f$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ with a free variable $\mathtt{x}$ such that $F[M/\mathtt{x}] \Vdash f(x)$ whenever $M \Vdash x$.
-  To put if formally, a trackable map is an inhabitant of $\Asm_1(X, Y) \defeq \sum_{f : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f)$ where
+  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $f$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ with a free variable $\mathtt{x}$ such that $F[M/\mathtt{x}] \Vdash f\,x$ whenever $M \Vdash x$.
+  In other words, a trackable map is an inhabitant of $\Asm_1(X, Y) \defeq \sum_{f : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f)$ where
   \[
     \mathsf{Tracks}_{X, Y}(F, f) \defeq \prod_{M : \Lambda_0} \prod_{x : |X|}
     \left( M \Vdash_X x \to F[M/\mathtt{x}] \Vdash_Y f\, x \right).
@@ -256,23 +264,28 @@ It is not hard to see that $\Asm(\Lambda)$ with the extensional equality $\sim$ 
 We now investigate some of its basic properties.
 
 \begin{example}[Terminal object]
-  The unit assembly $\top$ is a $\PP$-terminal object defined as $(\Unit, \Vdash_{\Unit}, r_{\Unit}, t_{\Unit})$ where $\Unit$ is the unit type,  
-  $\Vdash_{\Unit}$ a relation defined by
-  \[
-    M \Vdash_{\Unit} \star \defeq M \reduce \mathtt{\lambda x.\, x}, 
-    \quad r_{\Unit}: (M \reduce N) \to (N \reduce L) \to (M \reduce L)
-  \]
-  given by the transitivity of the reduction relation $\reduce$, and $t_{\Unit}$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{\lambda x.\, x}$ (by reflexivity).
+  The unit assembly $\top$ is a $\PP$-terminal object defined as $(\Unit, \Vdash_{\Unit}, r_{\Unit}, t_{\Unit})$ where 
+  \begin{romanenumerate}
+    \item $\Unit$ is the unit type,  
+    \item $\Vdash_{\Unit}$ a relation defined by $M \Vdash_{\Unit} \star \defeq M \reduce \mathtt{\lambda x.\, x}$, 
+    \item $\quad r_{\Unit}: (M \reduce N) \to (N \reduce L) \to (M \reduce L)$ given by the transitivity of the reduction relation $\reduce$,
+    \item and $t_{\Unit}$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{\lambda x.\, x}$ (by reflexivity).
+  \end{romanenumerate}
   The finality follows from the function extensionality.
 \end{example}
 
 It is straightforward but tedious to define the $\PP$-product of assemblies, so we leave this as an exercise to the reader. 
-\begin{example}[Strict initial object]
+\begin{example}[Initial object]
 The empty assembly $\bot$ is $\PP$-initial consisting of the empty type $\Empty$ and a relation $\Vdash_\bot : \Lambda_0 \to \Empty \to \Univ$ given by the elimination rule for the empty type.
 The other two components $r_\Empty$ and $t_\Empty$ are trivial.
-
-The strictness of $\bot$ follows from that in homotopy type theory $\eqv{\Empty}{X}$ for any type $X$ with a function $X \to \Empty$.
 \end{example}
+
+In addition, one can show that $\bot$ is even a \emph{strict} initial object. That is, 
+\begin{proposition}\label{prop:strict-initial}
+  Every trackable map $f$ from any assembly $X$ to $\bot$ is an isomorphism. 
+\end{proposition}
+The strictness of $\bot$ follows easily from that for any type $X$ with a function $X \to \Empty$ one (provably) has the equivalence $\eqv{\Empty}{X}$ in homotopy type theory.
+From the strictness of the initial object, no morphism from $\top$ to $\bot$ could exist, since $\top$ is not equivalent to $\bot$.
 
 The construction of exponential $X \Rightarrow Y$ is a bit intriguing.
 With the definition of trackable maps, we may expect the exponential assembly $X \Rightarrow Y$ to consist of trackable maps.
@@ -300,30 +313,30 @@ However the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely}
 To sum up, we have just showed that $\ASM(\Lambda)$ has a strict initial object, finite products, and exponentials.
 That is, 
 \begin{corollary}
-  $\ASM(\Lambda)$ is a cartesian closed $\PP$-category with an strict initial object.
+  $\ASM(\Lambda)$ is a cartesian closed $\PP$-category with a strict initial object.
 \end{corollary}
 \ltnote{shall we show that $\ASM(\Lambda)$ has a natural number object?}
 
-\section{Realisability semantics for provability}\label{sec:provability}
+\section{Realisability semantics for two modalities}\label{sec:provability}
 
-In this section, we first introduce a comonadic exposure $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ of the $\PP$-category of assemblies which is different from the one $\boxtimes_K$ defined by Kavvos~\cite[Section~9.1]{Kavvos2017b}.
+In this section, we first introduce a comonadic exposure $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ which models a $S4$ modality but different from the exposure $\boxtimes_K$ previously introduced~\cite[Section~9.1]{Kavvos2017b}.
 For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not with good reason. 
 Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it using $\boxtimes_K$.
 Hitherto, we finally complete our cook's tour of the previous set-theoretic results based on a partial combinatory algebra in homotopy type theory.
 
-Thereafter, we move to an extension of cubical type theory---Ticked Cubical Type Theroy~\cite{Mogelberg2019a}---and introduce an exposure-like construction $\Box$ to model Gödel-Löb axiom.
+Thereafter, we use an extension of cubical type theory---Ticked Cubical Type Theroy~\cite{Mogelberg2019a}---and introduce an exposure-like construction $\Box$ to model the provability modality.
 \ltnote{can we use clocked type theroy to actually prove $\Box$ is an exposure?}
 This construction exploits Nakano's later modality so that we can express the intuitve meaning of $\Box X$ cleanly.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
 Finally, we prove that the main result of this paper: given a trackable map $f : \Box X \to X$ one is able to construct $\top \to \Box X$ using Nakano's guarded recursion on extensions and the Kleene's second recursion theorem on intensions.
 
-\paragraph*{Comonadic exposure for $S4$ modality}
-An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions on the level of extensions by pairing $x : \barred{X}$ with a term $M$ which \emph{merely} realises\footnote{%
+\subsection{A comonadic exposure for \texorpdfstring{$\mathsf{S4}$}{S4} modality}
+An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \barred{X}$ with a term $M$ which \emph{merely} realises\footnote{%
   We will discuss the mere realisability in~\Cref{sec:conclusion}.
 }
 $x$ as the carrier of $\boxtimes X$.
 A pair $(M, x)$ with $\star : \brck{M \Vdash_X x}$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.  
-Then, we argue that $(M, x, \star)$ shall be realised by terms which are $\beta$-equivalent to its Gödel encoding $\qquote{M}$ (instead of $M$ as proposed by Kavvos), since terms $N$ with $N \reduce \qquote{M}$ are really \emph{intensional} representations of $M$.
+Thus, we argue that $(M, x, \star)$ shall be realised by terms which are $\beta$-equivalent to its Gödel encoding $\qquote{M}$ (instead of $M$ as proposed by Kavvos), since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.
 In short, the carrier and the realisability relation are defined as
 \[
   \barred{\boxtimes X} \defeq \sum_{M : \Lambda_0} \sum_{x : \barred{X}} \brck{M \Vdash x}
@@ -349,11 +362,17 @@ To give a tracker of $f^\boxtimes$, recall from \Cref{sec:preliminaries} that th
 \end{align*}
 completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
-\begin{theorem}[{cf.~\cite[Theorem~11]{Kavvos2017b}}]
-  $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ is a comonadic exposure.
+\begin{theorem}[{cf.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
+  $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ is a exposure.
+  Moreover, $\boxtimes$ has a comonadic structure given by families of trackable maps
+  \begin{romanenumerate}
+    \item the counit $\epsilon_A \colon \boxtimes X \to X$
+    \item the comultiplication $\delta_A \colon \boxtimes X \to \boxtimes \boxtimes X$
+  \end{romanenumerate}
+  natural in $X$. 
 \end{theorem}
 \begin{proof}[Proof sketch]
-  We only sketch the proof of three less obvious statements here--the preservation of identities and the construction of natural transformations $\epsilon\colon \boxtimes \to \mathcal{I}_{\ASM(\Lambda)}$ and $\delta\colon \boxtimes \to \boxtimes\boxtimes$. 
+  We only sketch the proof of three less obvious statements here---the preservation of identities and the construction of natural transformations $\epsilon\colon \boxtimes \to \mathcal{I}_{\ASM(\Lambda)}$ and $\delta\colon \boxtimes \to \boxtimes\boxtimes$. 
   To show that $\boxtimes$ preserves identities, we use that fact that the propositional truncation $\brck{\blank}$ is a functor which preserves identities and that $\pr_3$ is a third projection.
   Then, it follows that $\brck{\pr_3\,M\,x} \equiv \brck{\id} = \id$ and thus $\id_{\barred{X}}^\boxtimes (M, x, \star) \equiv (\mathtt{x}[M], x, \brck{\pr_3\,M\,x}\,\star) \equiv \id_{\barred{\boxtimes X}}$.
 
@@ -365,39 +384,102 @@ In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathf
   \]
 It is now straightforward to define the required natural transformations between exposures.
 \end{proof}
+In particular, the counit $\epsilon_X\colon \Box X \to X$ is understood as the evaluation of the intension $M$ to its extension~$x$, as justified by the its tracker~$\mathtt{eval}$. 
 
 \ltnote{$\boxtimes$ is not cartesian and not product-preserving.}
 
-Another significant difference between $\boxtimes_K$ and $\boxtimes$ is that it is possible to refute the completeness principle $X \to \boxtimes X$ for the latter exposure.
-\begin{theorem}
-  There is no natural transformation $q\colon  \mathcal{I}_{\ASM(\Lambda)} \to \boxtimes$.
+The following theorem is another significant difference between $\boxtimes_K$ and $\boxtimes$.\ltnote{can $\mathcal{I} \to \boxtimes_K$ be refutable?}
+\begin{theorem}\label{thm:S4-no-quoting}
+  There is no natural transformation $\eta\colon  \mathcal{I}_{\ASM(\Lambda)} \to \boxtimes$.
 \end{theorem}
-We show the existence of such a natural transformation implies the existence of a quoting term $\mathsf{quote}'$ with $\mathsf{quote}'\,M \reduce \qquote{M}$ using naturality and the fact that $\Lambda_0$ itself has naturally an assembly structure (\Cref{ex:assembly-lambda}), but however $\Quote'$ cannot exist.
+We show the existence of such a natural transformation implies the existence of a term $\mathsf{quote}'$ with $\mathsf{quote}'[M] \reduce \qquote{M}$ using naturality and the fact that $\Lambda_0$ itself has naturally an assembly structure (\Cref{ex:assembly-lambda}), but however $\Quote'$ cannot exist.
 \begin{proof}
-  Assume that such a family of maps $q_X\colon X \to \boxtimes X$ natural in $X$ exists.
-  Consider a term $M : \Lambda_0$ and the following commutative diagram (up to $\sim$)
+  Assume that such a family of maps $\eta_X\colon X \to \boxtimes X$ natural in $X$ exist.
+  Every closed term $M_0$ corresponds to a trackable map $\widehat{M_0} \defeq (\mathsf{c}_{M_0}, M_0, \mathfrak{M}_0) \colon \top \to \Lambda$ where $\mathsf{c}_{M_0}$ is the constant function with the value $M_0$ and $\mathfrak{M}_0$ is also the constant function with the value $\mathsf{refl}_{\twoheadrightarrow} M_0 : M_0 \reduce M_0$.
+  Consider the naturality of $\eta$
   \[
     \xymatrix{
-      \top \ar[r]^{q_\top} \ar[d]_{\widehat{M}} & \boxtimes \ar[d]^{\boxtimes \widehat{M}} \top \\
-      \Lambda \ar[r]_{q_\Lambda} & \boxtimes \Lambda
+      \top \ar[r]^{\eta_\top} \ar[d]_{\widehat{M_0}} & \boxtimes \ar[d]^{\boxtimes \widehat{M_0}} \top \\
+      \Lambda \ar[r]_{\eta_\Lambda} & \boxtimes \Lambda
     }
   \]
-  where $\widehat{M}$ is a trackable map defined as
+  which commutes up to $\sim$, namely, ${\eta_\Lambda \circ \widehat{M_0}} \sim {\boxtimes \widehat{M_0} \circ \eta_\top}$.
+  Note that $\boxtimes \widehat{M_0}$ maps arbitrary inhabitant of $\boxtimes \top$ to $(M_0, M_0, \bproj{\mathsf{refl}_{\twoheadrightarrow}M_0})$ so that $\bproj{\eta}$ must satisfy 
+\[
+  \bproj{\eta_\Lambda}\,M_0 \equiv \left(\bproj{\eta_\Lambda} \circ \widehat{M_0}\right)\,\star = \left(\boxtimes \widehat{M_0} \circ \eta_\top \right)\,\star \equiv (M_0, M_0, \bproj{\mathsf{refl}_{\twoheadrightarrow}M_0}).
+\]
+By assumption, $\eta_\Lambda$ is tracked by some term, say $\mathtt{quote}'$, such that $\mathtt{quote}'[N] \reduce \qquote{M}$ whenever $N \reduce M$.
+However, it implies that $\mathtt{quote}'[M] \reduce \qquote{M}$ for any $M$, a contraction.
 \end{proof}
 
-\paragraph*{Quasi-exposure for \texorpdfstring{$\mathsf{GL}$}{GL} modality}
+\begin{remark}\label{remark:S4-modality}
+Recall the modal type theory considered by Davies and Pfenning~\cite{Davies2001b} where a dual-context modal type theory is introduced to extend simple type theory with a $S4$ modality $\Box$, a construct $\mathtt{box}$, a $\mathtt{let}$-expression for boxed terms, and typing rules below.
+\[
+\begin{minipage}{.45\linewidth}
+  \begin{prooftree}
+    \AxiomC{$\Delta; \cdot \vdash E : A$}
+    \UnaryInfC{$\Delta; \Gamma \vdash \mathtt{box}\,E:\Box A$}
+  \end{prooftree}
+\end{minipage}%
+\begin{minipage}{0.45\linewidth}
+  \begin{prooftree}
+    \AxiomC{$\Delta; \Gamma \vdash E_1 : \Box A$}
+    \AxiomC{$\Delta, u : A; \Gamma \vdash E_2 : B$}
+  \BinaryInfC{$\Delta; \Gamma \vdash \mathtt{let}\,\mathtt{box}\, u = E_1\, \mathtt{in}\,E_2 : B$}
+  \end{prooftree}
+\end{minipage}
+\]
+Following \Cref{thm:S4-exposure,thm:S4-no-quoting}, we anticipate an interpretation of $\Box$ to justify the `omitted congruence rule` for the $\mathtt{box}$ construct~\cite[Section~2.5]{Davies2001b} and no quoting function $A \to \Box A$ for their system respectively.
+\end{remark}
 
-\begin{enumerate}
-  \item Show that there is no $\Box A \to A$ natural in $A$.
-  \item Show that $\Box (\Box A \to A) \to \Box A$ natural in $A$ exists.
-  \item Show that $A \to \bot$ implies that $A$ must be $\bot$.
-\end{enumerate}
+\subsection{An exposure for \texorpdfstring{$\mathsf{GL}$}{GL} modality}
+It is known that the Gödel-Löb axiom $\Box(\Box A \to A) \to \Box A$ is incompatible with the reflection principle $\Box A \to A$.
+Indeed, let $A$ be the falsity $\bot$ for both laws. Then, we have
+\[
+  \Box(\Box \bot \to \bot) \to \bot
+  \quad\text{and}\quad
+  \Box \bot \to \bot
+\]
+By the necessitation rule and modus ponens, $\Box (\Box \bot \to \bot)$ as well as $\bot$ are derivable.
+Yet, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the Gödel-Löb axiom.
+Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood also as the type of code of type~$A$ (cf.~\Cref{remark:S4-modality}) and as \emph{intensional recursion} respectively from the computational perspective~\cite{Kavvos2017b}, if one gives up logical consistency.
+This trade-off, however, is not possible in this semantics approach.
+
+To untie the knot but to retain the logical consistency and the intuition of $\Box A$ as $A$-typed code, we refine our informal understanding by their computation stages. 
+Considering the counit $\epsilon_X\colon \boxtimes X \to X$, it is possible to evaluate $(M, x, \star)$ because the code is already available for doing so.
+And, the provability reading of $\Box$ suggests that inhabitants of $\Box X$ are not available now but in the later stage.
+To express this idea cleanly, we work in an extension of homotopy type theory with the support of Nakano's later modality~\cite{Nakano2000}.
+
+\paragraph*{Digression: Ticked Cubical Type Theory}
 
 \cite{Mogelberg2019a,Veltri2020}
+
+\paragraph*{Back to \texorpdfstring{$\mathsf{GL}$}{GL}}
+
+Now we are able to formally introduce (the carrier of) the $\mathsf{GL}$ modality at $X$ as
+\[
+  \bproj{\Box X} \defeq \sum_{M : \Lambda_0} \sum_{x : {\rhd (\alpha : \mathbb{T}) \bproj{X}}} \rhd (\alpha : \mathbb{T}) .\, \brck{M \Vdash_X x [\alpha]}
+\]
+with the same realisability relation $\Vdash_{\Box X}$ defined by $N \Vdash_{\Box X} (M, x, \star) \defeq N \reduce \qquote{M}$. 
+
+
+\begin{theorem}\label{thm:GL-no-quoting}
+  There is no natural transformation $\eta\colon  \mathcal{I}_{\ASM(\Lambda)} \to \Box$.
+\end{theorem}
+
+\begin{theorem}\label{thm:GL-no-eval}
+  There is no natural transformation $\eta\colon \Box \to \mathcal{I}_{\ASM(\Lambda)}$.
+\end{theorem}
+
+\begin{theorem}\label{thm:GL-recursion}
+  For any trackable map $\Box X \to X$ there is an inhabitant of $\Box X$.
+\end{theorem}
+
 
 \section{Conclusion}\label{sec:conclusion}
 \paragraph*{Future work}
 \begin{enumerate}
+  \item \Cref{remark:S4-modality}, \cite{Davies2001b}, \cite{Kavvos2020}
   \item topos-theoretic arguments
   \item Mix with \cite{Kavvos2017b}
   \item Consistent version of \cite{Kavvos2017b}
@@ -408,8 +490,6 @@ We show the existence of such a natural transformation implies the existence of 
 %% Bibliography
 %%
 
-%% Please use bibtex, 
-
 \bibliographystyle{plainurl}% the mandatory bibstyle
 \bibliography{../../library_fixed}
 
@@ -417,29 +497,6 @@ We show the existence of such a natural transformation implies the existence of 
 
 
 %\section{environments}
-%
-%\begin{alphaenumerate}
-%\item \verb|\begin{alphaenumerate}...\end{alphaenumerate}|
-%\item \dots
-%\item \dots
-%\end{alphaenumerate}
-%
-%\begin{romanenumerate}
-%\item \verb|\begin{romanenumerate}...\end{romanenumerate}|
-%\item \dots
-%\item \dots
-%\end{romanenumerate}
-%
-%\begin{bracketenumerate}
-%\item \verb|\begin{bracketenumerate}...\end{bracketenumerate}|
-%\item \dots
-%\item \dots
-%\end{bracketenumerate}
-%
-%
-%\begin{note}\label{testenv-note}
-%Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-%\end{note}
 %
 %\begin{claim}\label{testenv-claim}
 %Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
