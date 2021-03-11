@@ -61,17 +61,21 @@ module Final (X : Asm 𝓤) where
   universality : Trackable X ⊤ₐ
   universality = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → lift -↠-refl
 
-{-
--- one has to prove that the identity does not dependent any choice of realisers.
-  separator : (f g : Trackable X Y)
-    → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x ꞉ ⊤ₐ →ₐ Y)
-    → f ∼ g ꞉ X →ₐ Y
-  separator f g fx=gx x = {!!}
--}
+
   global-element : (x : ⟨ X ⟩) → (M : Λ₀) → M ⊩ x
     → Trackable ⊤ₐ X
   global-element x M M⊩x = (λ _ → x) , (↑₁ M) , λ _ → ⊩-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
 
+  separator : (f g : Trackable X Y)
+    → isSet ⟨ Y ⟩
+    → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x ꞉ ⊤ₐ →ₐ Y)
+    → f ∼ g ꞉ X →ₐ Y
+  separator {Y = Y} f g YisSet fx=gx x = rec (YisSet _ _)
+    (λ {(M , M⊩x) → fx=gx (global-element x M M⊩x) tt*}) (X.⊩-right-total x)
+    where
+      module Y = AsmStr (str Y)
+      module X = AsmStr (str X)
+      
 *→Λ : (M : Λ₀) → Trackable ⊤ₐ Λ₀ₐ
 *→Λ M = Final.global-element Λ₀ₐ M M -↠-refl
 
