@@ -134,11 +134,11 @@
 \maketitle
 
 \begin{abstract}
-  In this paper, we give a positive answer to an open problem posed by Kavvos recently---is there a categorical interpretation of Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ which refutes the completeness principle~$A \to \Box A$?
+  In this paper, we give a positive answer to an open problem---is there a categorical interpretation of the Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ which refutes the completeness principle $A \to \Box A$?
   We consider the $\PP$-category $\ASM(\Lambda)$ of assemblies on untyped $\lambda$-calculus and trackable maps with an exposure-like construction $\Box\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$, internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
-  We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle but models the Gödel-Löb axiom only.
-  Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms \emph{modulo $\alpha$-equivalence only} given its provability reading but also their extensions. 
-  Apart from its own theoretical interest, following the intuitive interpretation of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
+  We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle but proves the Gödel-Löb axiom.
+  Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo $\alpha$-equivalence given its provability reading but also their extensions. 
+  Apart from its own theoretical interest, following the intuitive understanding of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -162,17 +162,19 @@
 
 \section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
 In this section, we introduce the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
-Note that this is not just a direct translation from its set-theoretic formulation to homotopy type theory.
+Assemblies are used to accommodate the information of how extensions are related to, or \emph{realised by}, intensions. Accordingly an appropriate notion of morphisms between assemblies is introduce to form a $\PP$-category, laying
+the technical foundation of our interpretation of modalities discussed in~\Cref{sec:provability}.
+
 
 \paragraph*{Assembly}
-Classically an assembly is a set $|X|$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ there exists some $a$ with $a \Vdash x$. We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $n \Vdash x$.
-The notion of assemblies is nowadays often defined on an (ordered) partial applicative structure satisfying combinatory completeness, i.e.\ an (ordered) partial combinatory algebra~\cite{Oosten2008}.
-Our definition below is, apart from being type-theoretic, not an instance of the general notion.
+An assembly on natural numbers is a set $|X|$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ there exists some $a$ with $a \Vdash x$. We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $n \Vdash x$.
+The notion of assemblies is nowadays often defined on an (ordered) partial applicative structure $(A, \cdot, \leq)$ satisfying combinatory completeness, i.e.\ an (ordered) partial combinatory algebra~\cite{Oosten2008}, OPCA for short.
+Our definition below is, apart from being type-theoretic, not an instance of the definition based on an OPCA.
 \begin{definition}\label{def:assembly}
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} type $|X| : \Univ$ and a \emph{realisability} relation ${\Vdash_X}$ from $\Lambda_0$ to $|X|$ such that
-  \emph{(a)} $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$;
-  \emph{(b)} every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$. 
-  To put it formally, an assembly is an inhabitant $(|X|, \Vdash_X, r_X, t_X)$ of
+  \emph{(a)} every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$;
+  \emph{(b)} $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$.
+  To put it formally, an assembly is a quadruple $(|X|, \Vdash_X, r_X, t_X)$ of type
   \[
     \Asm_0(\Lambda) \defeq \sum_{|X| : \Univ}\;\sum_{\mathord{\Vdash_X}:\Lambda_0 \to |X| \to \Univ} 
     \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right)
@@ -180,32 +182,31 @@ Our definition below is, apart from being type-theoretic, not an instance of the
   \]
   where
   \begin{romanenumerate}
-    \item $\mathsf{isRightTotal}(\Vdash_X)$ is a mere proposition defined as $\forall (x : |X|).\, \exists (M : \Lambda_0).\, M \Vdash x$, and
+    \item $\mathsf{isRightTotal}(\Vdash_X)$ is a proposition defined as $\forall (x : |X|).\, \exists (M : \Lambda_0).\, M \Vdash x$, and
 
     \item $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is defined as $\prod_{M N : \Lambda_0} \prod_{x : |X|} \left( \left(M \twoheadrightarrow_
 \beta N\right) \to N \Vdash x \to M \Vdash x \right) $.
   \end{romanenumerate}
 \end{definition}
-The required properties departs from the conventional definition. 
-First, we do not require the type $M \Vdash_X x$ to be a mere proposition (contrary to its topos-theoretic formulation~\cite{Birkedal2002a}).
+
+The required properties of \Cref{def:assembly} depart from the definition based on an OPCA as follows. 
+First, we do not require the type $M \Vdash_X x$ to be a proposition (contrary to its topos-theoretic formulation~\cite{Birkedal2002a}).
 Although this additional requirement simplifies many constructions later, it is not necessary to derive our main results.
 Second, as we would like to account for intensional equality in addition to extensional equality between terms,
 we cannot identify $\beta$-equivalent terms \emph{a priori}.
-As a result, the interaction with reduction is formulated as an additional property. 
-Our formulation is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
+As a result, the interaction with reduction $\reduce$ is formulated as an additional property of~$\Vdash$. 
+The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
 This formulation also agrees with the one on an ordered partial combinatory algebra~\cite[Section~2.3]{Hofstra2003}.
 Third, a plausible alternative to the right totality is
 \[
   \prod (x : |X|).\, \sum (M : \Lambda_0).\, M \Vdash x
 \]
 stating that each $x : |X|$ has an explicit choice of realisers.
-This is intuitively not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
+This is not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
 Indeed, with functional extensionality which holds in homotopy type theory, any inhabitant of the alternative formulation leads to a \emph{contradiction}~\cite{Troelstra1977}. \ltnote{check this}
 
 \begin{example}\label{ex:assembly-lambda}
-  A useful assembly which plays a significant role in~\Cref{sec:provability} is the type $\Lambda_0$ of closed terms itself with ${\reduce} : \Lambda_0 \to \Lambda_0 \to \Univ$ as its realisability relation.
-  Similarly, $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
-  
+  The type $\Lambda_0$ of closed terms with ${\reduce} : \Lambda_0 \to \Lambda_0 \to \Univ$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ which plays a significant role in \Cref{thm:S4-no-quoting} where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
 \end{example}
 
 \begin{example}
@@ -219,11 +220,12 @@ Indeed, with functional extensionality which holds in homotopy type theory, any 
 
 \paragraph*{Trackable map}%
 
-Classically, a trackable map is a function $f$ with the property that $f$ is \emph{tracked} by some $b$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f\,x$ where the $\cdot$ is the application operation of a partial combinatory algebra. In this case, $b$ is called the \emph{tracker} of $f$.
+Set-theoretically, a trackable map between assemblies on an OPCA $(A, \cdot, \leq)$ is a function $f$ \emph{tracked} by some $b \in A$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f\,x$.
+In this case, $b$ is called the \emph{tracker} of $f$.
 It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the semantics side we have to consider the tracker as part of structure instead of its mere existence.
 \ltnote{explain the difference between property and structure in \Cref{sec:preliminaries}}
 \begin{definition}\label{def:trackable}
-  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $\bproj{f}$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ with a free variable $\mathtt{x}$ such that $F[M/\mathtt{x}] \Vdash \bproj{f}\,x$ whenever $M \Vdash x$.
+  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $\bproj{f}$ from $|X|$ to $|Y|$ and a term $F$ with at most a free variable $\mathtt{x}$ such that $F[M/\mathtt{x}] \Vdash \bproj{f}\,x$ whenever $M \Vdash x$.
   In other words, a trackable map is an inhabitant of $\Asm_1(X, Y) \defeq \sum_{\bproj{f} : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, \bproj{f})$ where
   \[
     \mathsf{Tracks}_{X, Y}(F, \bproj{f}) \defeq \prod_{M : \Lambda_0} \prod_{x : |X|}
@@ -244,22 +246,23 @@ By definition, a trackable map $f$ actually consists of not only a function $\bp
 \end{example}
 
 Now we proceed with defining the composition of trackable maps. Consider the term substitution $(G, F)
-\mapsto G [ F ]$ and the path $p : G[F[M]] =_{\Lambda_0} G[F] [M]$.
+\mapsto G [ F ]$ thought as (intensional) function composition, since there is a path $p : G[F[M]] =_{\Lambda_0} G[F] [M]$ for any term $M$.
 Given $r : M \Vdash_X x$, the type of $\mathfrak{g}(\mathfrak{f}\,r)$ is $G[F[M]]$ and thus its transportation along $p$ has type $G[F][M]$.
 This defines an operation $\lambda M.\,\lambda x.\,\lambda r.\, \mathsf{transport}(p, \mathfrak{g}(\mathfrak{f}\,r))$.
 Then, it follows that the function composition and aforementioned operations amount to an operation $(g, f) \mapsto g \circ f$ of type
 \[
   \prod_{X, Y, Z : \Asm_0(\Lambda)} \Asm_1(Y, Z) \to \Asm_1(X, Y) \to \Asm_1(X, Z)
 \]
-for trackable maps. It is not hard to see that $f \circ \id = f$ and $\id \circ f = f$ hold propositionally.
+for trackable maps. It is not hard to see that $f \circ \id = f$ and $\id \circ f = f$.
 
 \begin{proposition}\label{prop:category-of-assemblies}
-  The type $\Asm_0(\Lambda)$ of assemblies and the type of trackable maps from $X$ to $Y$ for each $X$ and $Y$ of type $\Asm_0(\Lambda)$ with the composition $\circ$ for trackable maps and identities $\id$ form a category denoted by $\Asm(\Lambda)$.
+  The type $\Asm_0(\Lambda)$ of assemblies and the family of types $\Asm_1(X, Y)$ of trackable maps indexed by $X, Y$ with the composition $\circ$ for trackable maps and identities $\id$ form a category denoted by $\Asm(\Lambda)$.
 \end{proposition}
-We may also consider reductions $F_1 \reduce F_2$ between morphisms $(f_1, F_1, \mathfrak{f}_1)$
-and $(f_2, F_2, \mathfrak{f}_2)$ as two cells since $F_1 \reduce F_2$ implies $F_1[M] \reduce F_2[M]$.
-That is, we do have a $2$-category of assemblies in the spirit of Seely's $2$-categorical model~\cite{Seely1987}.
-This line of research is out of scope of this paper, so we refrain ourselves from further discussion. 
+
+%We may also consider reductions $F_1 \reduce F_2$ between morphisms $(f_1, F_1, \mathfrak{f}_1)$
+%and $(f_2, F_2, \mathfrak{f}_2)$ as two cells since $F_1 \reduce F_2$ implies $F_1[M] \reduce F_2[M]$.
+%That is, we do have a $2$-category of assemblies in the spirit of Seely's $2$-categorical model~\cite{Seely1987}.
+%This line of research is out of scope of this paper, so we refrain ourselves from further discussion. 
 
 
 \paragraph*{Extensional equality and \texorpdfstring{$\PP$}{P}-category of assemblies}
@@ -339,7 +342,7 @@ For example, $\boxtimes_K$ preserves finite products including the terminal obje
 Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it using $\boxtimes_K$.
 Hitherto, we complete our cook's tour of the previous set-theoretic results based on a partial combinatory algebra in homotopy type theory.
 
-Thereafter, we use an extension of cubical type theory---Ticked Cubical Type Theroy~\cite{Mogelberg2019a}---and introduce an exposure-like construction $\Box$ to model the provability modality.
+Thereafter, we use an extension of cubical type theory---Clocked Cubical Type Theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the provability modality.
 \ltnote{can we use clocked type theroy to actually prove $\Box$ is an exposure?}
 This construction exploits Nakano's later modality so that we can express the intuitve meaning of $\Box X$ cleanly.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
@@ -462,13 +465,13 @@ Yet, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposur
 Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood also as the type of code of type~$A$ (cf.~\Cref{remark:S4-modality}) and as \emph{intensional recursion} respectively from the computational perspective~\cite{Kavvos2017b}, if one is willing to give up consistency.
 This trade-off, however, is not possible in this semantics approach.
 
-To untie the knot but to retain the interpretation of $\Box A$ as $A$-typed code, we refine our interpretation with the notion of computation stages. 
+To untie the knot but to retain the interpretation of $\Box A$ as code of type~$A$, we refine our interpretation with the notion of computation stages. 
 Considering the counit $\epsilon_X\colon \boxtimes X \to X$, it is possible to evaluate $(M, x, \star)$ because the code is already available for doing so.
 And, the provability reading of $\Box$ suggests that inhabitants of $\Box X$ are not available now but in the later stage.
 To express this idea cleanly, we work in an extension of homotopy type theory with the support of Nakano's later modality~\cite{Nakano2000}.
 
 \paragraph*{Digression: Clocked Cubical Type Theory}
-
+\ltnote[inline,nomargin]{Introduce clocked cubical type theory here}
 \begin{lemma}\label{lem:proposition-closed-under-later}
   For every $A : \mathord{\rhd}\,\Univ$. If $\rhd (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then also $\mathsf{isProp}(\rhd(\alpha : \mathbb{T}).\,A[\alpha])$. 
 \end{lemma}
@@ -485,8 +488,8 @@ For any assembly $X$, the carrier of $\Box X$ and the realisability relation are
   \quad\text{and}\quad
   N \Vdash_{\Box X} (M, x, \star) \defeq N \reduce \qquote{M}
 \]
-where $\rhd (\alpha : \mathbb{T}) .\, \brck{M \Vdash_X x [\alpha]}$ is still a mere proposition by~\Cref{lem:proposition-closed-under-later} and the realisability relation is defined as the same as the comonadic exposure~$\boxtimes$.
-The only difference between $\bproj{\Box X}$ and $\bproj{\boxtimes X}$ is the extensional part which becomes $\rhd\bproj{X}$ so that the extension of $(M, x, \star)$ is available after a time step. 
+where $\rhd (\alpha : \mathbb{T}) .\, \brck{M \Vdash_X x [\alpha]}$ is a proposition by~\Cref{lem:proposition-closed-under-later} and the relation $\Vdash_{\Box X}$ is defined as the same as the comonadic exposure~$\boxtimes$.
+The only difference between carriers $\bproj{\Box X}$ and $\bproj{\boxtimes X}$ is the extensional part which becomes $\rhd\bproj{X}$ so that the extension of $(M, x, \star)$ is available after a time step. 
 Similarly, $\Box X \defeq (\bproj{\Box X}, \Vdash_{\Box X}, r_{\Box X}, t_{\Box X})$ is an assembly where $r_{\Box X}$ and $t_{\Box X}$ are given by the transitivity and the reflexivity of $\reduce$. 
 
 For any trackable map $f$ from $X$ to $Y$, also define $\Box f$ as the same as $\boxtimes f$ with the exception of the function $\bproj{\Box f}$ between carriers which are now involved with a later modality:
@@ -513,21 +516,21 @@ On the other hand, it is not possible to have a family of trackable maps $\epsil
 \end{theorem}
 \begin{proof}
   Assume that a natural transformation~$\epsilon$ exists, and in particular $\epsilon_\bot \colon \Box \bot \to \bot$. 
-  We will show that there exists $\mathsf{bang}\colon \rhd \Empty \to \Empty$ so that by guarded recursion $\Empty$ is derivable.
+  We will show that there is $\mathsf{bang}\colon \rhd \Empty \to \Empty$, so by guarded recursion $\mathsf{fix}\,\mathsf{bang} : \Empty$ is a contradiction.
   
-  First, let $x$ be an inhabitant of $\rhd \Empty$. We aim at constructing an inhabitant of
+  First, let $x$ be an inhabitant of $\rhd \Empty$. We aim at constructing an inhabitant $(M, x, \star_M)$ of
   \[
     \Box \bot \equiv \sum_{M : \Lambda_0} \sum_{x : {\rhd \Empty}} \rhd (\alpha : \mathbb{T}) .\, \brck{M \Vdash_\bot x [\alpha]}
   \]
-  so that the function $\bproj{\epsilon_\bot}$ from $\bproj{\Box \bot}$ to $\bproj{\bot} \equiv \Empty$ can be applied to derive $\Empty$.
-  For arbitrary closed term $M$, say $\mathtt{\lambda x.\, x}$, we can apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ after a time step $\alpha$, so 
+  so that the function $\bproj{\epsilon_\bot}$ from $\bproj{\Box \bot}$ to $\bproj{\bot} \equiv \Empty$ can be applied.
+  For arbitrary closed term $M$, say $\mathtt{\lambda x.\, x}$, we apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ after a time step, so 
   \[
     \star_M \defeq \lambda \alpha.\, \mathsf{rec}_{\Empty}\,\brck{M \Vdash_\bot x[\alpha]}\,x[\alpha]
   \]
   is an inhabitant of $\rhd (\alpha : \mathbb{T}) .\, \brck{M \Vdash_\bot x [\alpha]}$ and thus $(M, x, \star_M)$ is of type $\bproj{\Box \bot}$. 
 \end{proof}
 \begin{theorem}\label{thm:GL-recursion}
-  For any trackable map $\Box X \to X$ there is an inhabitant of $\Box X$.
+  For any trackable map $f\colon \Box X \to X$ there is a global element of $\Box X$.
 \end{theorem}
 
 
