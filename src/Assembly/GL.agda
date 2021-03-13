@@ -22,19 +22,19 @@ module _ (Q : Quoting) where
 
   □_ : Asm 𝓤 → Asm 𝓤
   □_ {𝓤} X = |□X| , _⊩_ , record
-    { ⊩-respects-↠ = λ {x} {x′} {y} → ⊩-respect-↠ {x} {x′} {y}
+    { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respect-↠ {x} {x′} {y}
     ; ⊩-right-total = ⊩-right-total
     }
     where
       module X = AsmStr (str X)
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ ⟨ X ⟩ ] ▹[ α ] (M X.⊩ ▹x α)
+      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ ⟨ X ⟩ ] ▹[ α ] ∥ M X.⊩ ▹x α ∥
       -- Can we remove truncation? If so, is □id still equal to id? 
       -- Ans. If we assume that ⫣ is a mere proposition, then ▹[ α ] (...) is also a mere proposition (▹isProp→isProp▹).
       -- Therefore, we don't need propositional truncation here.
 
       _⊩_ : (M : Λ₀) → |□X| → 𝓤 ̇
-      n̅ ⊩ (M , ▹x , ▹x⫣M)= Lift (n̅ -↠ ⌜ M ⌝)
+      n̅ ⊩ (M , _ , _)= Lift (n̅ -↠ ⌜ M ⌝)
 
       ⊩-respect-↠ : _⊩_ respects _-↠_ on-the-left
       ⊩-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
@@ -43,7 +43,7 @@ module _ (Q : Quoting) where
       ⊩-right-total (M , ▹x , M⫣x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
 
   □map₀ : Trackable X Y → ⟨ □ X ⟩ → ⟨ □ Y ⟩
-  □map₀ (f , F , F⊩f) (M , ▹x , M⊩x) = F [ M ] , ▹map f ▹x , λ α → F⊩f (M⊩x α)
+  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , ▹map f x , λ α → ∥-∥map F⊩f (M⊩x α)
 
   □map₁ : Λ₁ → Λ₁
   □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
@@ -64,7 +64,7 @@ module _ (Q : Quoting) where
         ⌜ F [ M ] ⌝ ∎)
 
   □id=id : (X : Asm 𝓤) → (x : ⟨ □ X ⟩) → □map₀ (id X) x ≡ x
-  □id=id X x =  refl
+  □id=id X (M , x , M⊩x) i = M , x , λ α → propTruncIsProp (∥-∥map (λ x → x) (M⊩x α)) (M⊩x α) i
 
   □-isExposure : IsExposure {𝓤} □_  □map
   □-isExposure = record
@@ -83,8 +83,6 @@ module _ (Q : Quoting) where
 
       postulate
         -- this is required to prove `□reflects∼`, but unfortunately we canno't have this verified in the model. 
-        ▹map-injective : {X Y : 𝓤 ̇} → (f g : X → Y) → ▹map f ≡ ▹map g → f ≡ g
-
         □reflects∼ : (f g : Trackable X Y)
           → □map f ∼ □map g ꞉ □ X →ₐ □ Y
           → f ∼ g ꞉ X →ₐ Y
@@ -111,7 +109,7 @@ module _ (Q : Quoting) where
       qQ-at-Λ : Trackable Λ₀ₐ (□ Λ₀ₐ)
       qQ-at-Λ = fun
 
-      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ ▹M ꞉ ▹ Λ₀ ] ▹[ α ] N -↠ ▹M α
+      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ ▹M ꞉ ▹ Λ₀ ] ▹[ α ] ∥ N -↠ ▹M α ∥
       qΛ = qQ-at-Λ .fst
 
       QΛ : Λ₁
@@ -120,19 +118,19 @@ module _ (Q : Quoting) where
       qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
       qQ-at-⊤ = fun
 
-      □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , next M , λ _ → -↠-refl)
+      □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , next M , λ _ → ∣ -↠-refl ∣)
       □*→Λ-is-constant M x = begin
         □map (*→Λ M) .fst x
           ≡⟨ refl ⟩
         ↑₁ M [ _ ] , next M , _
           ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (L , next M , N)) (subst-rename-∅ _ M) {!!} ⟩
-        M , next M , (λ _ → -↠-refl) ∎
+        M , next M , (λ α → ∣ -↠-refl ∣) ∎
         where open ≡-Reasoning
 
       natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ Λ₀ₐ
       natural-on-*→Λ M = naturality (*→Λ M)
 
-      lem : (M : Λ₀) → qΛ M ≡ (M , next M , λ _ → -↠-refl)
+      lem : (M : Λ₀) → qΛ M ≡ (M , next M , λ _ → ∣ -↠-refl ∣)
       lem M = begin
         qΛ M
           ≡⟨ refl ⟩
@@ -140,7 +138,7 @@ module _ (Q : Quoting) where
           ≡⟨ natural-on-*→Λ M _ ⟩
         □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
           ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
-        (M , next M , λ _ → -↠-refl) ∎
+        (M , next M , λ _ → ∣ -↠-refl ∣) ∎
         where open ≡-Reasoning
         
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
@@ -155,31 +153,22 @@ module _ (Q : Quoting) where
         ⌜ M ⌝ ∎
         where open -↠-Reasoning
 
-  GL₀ : {X : Asm 𝓤} → ⟨ □ (□ X ⇒ X) ⟩ → ⟨ □ X ⟩
-  GL₀ {X = X@(|X| , _⊩_ , ⊩-is-realisability)} (F , ▹f , ▹F⊩f) = F · ⌜ gfix F ⌝ , ▹Σ
-    (r λ α → ▹f α .fst , λ ▹M⊩x n̅-↠⌜M⌝ → ▹F⊩f α (lift n̅-↠⌜M⌝))
-      where
-        open IsRealisability ⊩-is-realisability
-        module □X   = AsmStr (str (□ X))
-        module □X⇒X = AsmStr (str (□ X ⇒ X))
-        r : ▹ (Σ[ f ꞉ (⟨ □ X ⟩ → ⟨ X ⟩) ]
-            ({n̅ M : Λ₀} {▹x : ▹ ⟨ X ⟩} (▹M⊩x : ▹[ α ] M ⊩ ▹x α) → n̅ -↠ ⌜ M ⌝ → (F · n̅) ⊩ f (M , ▹x , ▹M⊩x)))
-          → ▹ (Σ[ x ꞉ ⟨ X ⟩ ] (F · ⌜ gfix F ⌝) ⊩ x)
-        r ▹hyp α = fix λ ▹x →
-            f (gfix F , (λ β → ▹x β .fst) , λ β → ⊩-respects-↠ gfix-↠ (▹x β .snd)) ,
-            F⊩f (λ β → ⊩-respects-↠ gfix-↠ (▹x β .snd)) -↠-refl
-          where
-            f   = ▹hyp α .fst
-            F⊩f = ▹hyp α .snd
-
   GL : {X : Asm 𝓤}
     → Trackable (□ X) X
-    → ⟨ □ X ⟩
-  GL {X = X} (f , F , f⫣F) = F [ ⌜ gfix {!!} ⌝ ] , {!!}
+    → Trackable ⊤ₐ X
+  GL {X = X} (f , F , F⊩f) = (λ _ → r f′ .fst) , (↑₁ (F [ ⌜ gfix (ƛ F) ⌝ ])) ,
+    λ { (lift M-↠𝑰) → X.⊩-respects-↠
+      (↑₁ (F [ ⌜ gfix (ƛ F) ⌝ ]) [ _ ] ≡⟨ subst-rename-∅ _ _ ⟩ F [ ⌜ gfix (ƛ F) ⌝ ] ∎)
+      (r f′ .snd) }
     where
-      module X = AsmStr (str X)
-        
-
-  -- GL : Trackable (□ (□ X ⇒ X)) → □ X
-  -- GL = GL₀ , {!!} , {!!}
-  
+      open -↠-Reasoning
+      f′ = (f , λ _ n̅-↠⌜M⌝ → F⊩f (lift n̅-↠⌜M⌝))
+      module X  = AsmStr (str X)
+      module □X = AsmStr (str (□ X))
+      r : Σ[ f ꞉ (⟨ □ X ⟩ → ⟨ X ⟩) ]
+        ({n̅ M : Λ₀} {x : ▹ ⟨ X ⟩} (M⊩x : ▹[ α ] ∥ M X.⊩ x α ∥) → n̅ -↠ ⌜ M ⌝ → F [ n̅ ] X.⊩ f (M , x , M⊩x))
+        → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x
+      r (f , F⊩f) = fix λ x →
+        f (gfix (ƛ F) ,
+        (λ α → x α .fst) , λ α → ∣ X.⊩-respects-↠ (-↠-trans gfix-↠ (-→to-↠ β)) (x α .snd) ∣) ,
+        F⊩f (λ α → ∣ X.⊩-respects-↠ (-↠-trans gfix-↠ (-→to-↠ β)) (x α .snd) ∣) -↠-refl

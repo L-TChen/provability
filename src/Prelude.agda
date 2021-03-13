@@ -10,8 +10,7 @@ open import Cubical.Foundations.Everything       public
 open import Cubical.Relation.Nullary             public
   hiding (⟪_⟫)
 open import Cubical.HITs.PropositionalTruncation public
-  hiding (map)
-  renaming (elim to truncElim)
+  renaming (elim to truncElim; map to ∥-∥map)
 
 open import Cubical.Data.Sigma                     public
 open import Cubical.Data.Unit                      public
