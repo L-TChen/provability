@@ -28,7 +28,7 @@ module _ (Q : Quoting) where
     where
       module X = AsmStr (str X)
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ ⟨ X ⟩ ] ▹[ α ] ∥ M X.⊩ ▹x α ∥
+      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ k0 ⟨ X ⟩ ] ▹[ α ꞉ k0 ] ∥ M X.⊩ ▹x α ∥
       -- Can we remove truncation? If so, is □id still equal to id? 
       -- Ans. If we assume that ⫣ is a mere proposition, then ▹[ α ] (...) is also a mere proposition (▹isProp→isProp▹).
       -- Therefore, we don't need propositional truncation here.
@@ -91,7 +91,7 @@ module _ (Q : Quoting) where
   □-exposure = exposure □_ □map □-isExposure
 
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
-  bang : (⟨ □ ⊥ₐ {𝓤}⟩ → ⊥* {𝓤}) → ▹ ⊥* → ⊥*
+  bang : (⟨ □ ⊥ₐ {𝓤}⟩ → ⊥* {𝓤}) → ▹ k0 ⊥* → ⊥*
   bang eval⊥ ▹x = eval⊥ (𝑰 , ▹x , λ α → ⊥*-elim (▹x α))
 
   -- Theorem. Evaluation □ ⊥ → ⊥ does not exist.
@@ -109,7 +109,7 @@ module _ (Q : Quoting) where
       qQ-at-Λ : Trackable Λ₀ₐ (□ Λ₀ₐ)
       qQ-at-Λ = fun
 
-      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ ▹M ꞉ ▹ Λ₀ ] ▹[ α ] ∥ N -↠ ▹M α ∥
+      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ ▹M ꞉ ▹ k0 Λ₀ ] ▹[ α ꞉ k0 ] ∥ N -↠ ▹M α ∥
       qΛ = qQ-at-Λ .fst
 
       QΛ : Λ₁
@@ -157,16 +157,16 @@ module _ (Q : Quoting) where
     → Trackable (□ X) X
     → Trackable ⊤ₐ X
   GL {X = X} (f , F , F⊩f) = (λ _ → r f′ .fst) , (↑₁ (F [ ⌜ gfix (ƛ F) ⌝ ])) ,
-    λ { (lift M-↠𝑰) → X.⊩-respects-↠
+    λ _ → X.⊩-respects-↠
       (↑₁ (F [ ⌜ gfix (ƛ F) ⌝ ]) [ _ ] ≡⟨ subst-rename-∅ _ _ ⟩ F [ ⌜ gfix (ƛ F) ⌝ ] ∎)
-      (r f′ .snd) }
+      (r f′ .snd)
     where
       open -↠-Reasoning
       f′ = (f , λ _ n̅-↠⌜M⌝ → F⊩f (lift n̅-↠⌜M⌝))
       module X  = AsmStr (str X)
       module □X = AsmStr (str (□ X))
       r : Σ[ f ꞉ (⟨ □ X ⟩ → ⟨ X ⟩) ]
-        ({n̅ M : Λ₀} {x : ▹ ⟨ X ⟩} (M⊩x : ▹[ α ] ∥ M X.⊩ x α ∥) → n̅ -↠ ⌜ M ⌝ → F [ n̅ ] X.⊩ f (M , x , M⊩x))
+        ({n̅ M : Λ₀} {x : ▹ k0 ⟨ X ⟩} (M⊩x : ▹[ α ꞉ k0 ] ∥ M X.⊩ x α ∥) → n̅ -↠ ⌜ M ⌝ → F [ n̅ ] X.⊩ f (M , x , M⊩x))
         → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x
       r (f , F⊩f) = fix λ x →
         f (gfix (ƛ F) ,
