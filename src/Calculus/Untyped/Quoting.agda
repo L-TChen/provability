@@ -98,6 +98,17 @@ record Quoting : 𝓤₀ ̇ where
       F · ⌜ Wₘ · ⌜ Wₘ ⌝ ⌝ ∎
     where Wₘ = W F
 
+  gfix′ : Λ₁ → Λ₀
+  gfix′ F = gfix (ƛ F)
+
+  gfix′-↠ : gfix′ F -↠ F [ ⌜ gfix′ F ⌝ ]
+  gfix′-↠ {F = F} = begin
+    gfix′ F
+      -↠⟨ gfix-↠ ⟩
+    (ƛ F) · ⌜ gfix (ƛ F) ⌝ 
+      -→⟨ β ⟩
+    F [ ⌜ gfix′ F ⌝ ]
+      ∎
   -- -- ⊢ □ (□ A `→ A) `→ □ A
   -- igfix : (A : 𝕋) → Prog (nat `→ nat)
   -- igfix A = ƛ ↑ Diag · (↑ Ap · ↑ ⌜ U A ⌝ · # 0)

@@ -54,13 +54,12 @@ private
     ⊩-right-total : _⊩_ IsRightTotal
     ⊩-right-total _ = ∣ 𝑰 , lift -↠-refl ∣
     
-module Final (X : Asm 𝓤) where
+module Final {X : Asm 𝓤} where
   open AsmStr (str X)
   open -↠-Reasoning
   
   universality : Trackable X ⊤ₐ
   universality = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → lift -↠-refl
-
 
   global-element : (x : ⟨ X ⟩) → (M : Λ₀) → M ⊩ x
     → Trackable ⊤ₐ X
@@ -77,7 +76,7 @@ module Final (X : Asm 𝓤) where
       module X = AsmStr (str X)
       
 *→Λ : (M : Λ₀) → Trackable ⊤ₐ Λ₀ₐ
-*→Λ M = Final.global-element Λ₀ₐ M M -↠-refl
+*→Λ M = Final.global-element M M -↠-refl
 
 ------------------------------------------------------------------------------
 -- Initiality
