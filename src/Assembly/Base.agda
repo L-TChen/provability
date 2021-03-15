@@ -93,3 +93,6 @@ _∘_ : {X Y Z : Asm 𝓤}
 _∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ {_} {x} M⊩x →
   subst (Z._⊩ g (f x)) (∘-ssubst-ssubst G F _ ⁻¹) (G⊩g (F⊩f M⊩x))
     where module Z = AsmStr (str Z)
+
+AsmIso : (X Y : Asm 𝓤) → (Trackable X Y) → 𝓤 ̇
+AsmIso X Y f = ∃[ g ꞉ Trackable Y X ] (f ∘ g ∼ id Y ꞉ Y →ₐ Y) × (g ∘ f ∼ id X ꞉ X →ₐ X)

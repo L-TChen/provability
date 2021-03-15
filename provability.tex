@@ -138,7 +138,7 @@
   We consider the $\PP$-category $\ASM(\Lambda)$ of assemblies on untyped $\lambda$-calculus and trackable maps with an exposure-like construction $\Box\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$, internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
   We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle but proves the Gödel-Löb axiom.
   Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo $\alpha$-equivalence given its provability reading but also their extensions. 
-  Apart from its own theoretical interest, following the intuitive understanding of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion on the meta level in a logically consistent way.
+  Apart from its own theoretical interest, following the intuitive understanding of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion for typed code in a logically consistent way.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -156,8 +156,9 @@
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-\subsection{Gödel numbering in \texorpdfstring{$\lambda$}{λ}-calculus}
 \subsection{Homotopy type theory}
+\ltnote{(mere) proposition, set}
+\subsection{Gödel numbering in \texorpdfstring{$\lambda$}{λ}-calculus}
 \subsection{Partial equivalence relation and \texorpdfstring{$\PP$}{P}-category}
 
 \section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
@@ -168,8 +169,8 @@ the technical foundation of our interpretation of modalities discussed in~\Cref{
 
 \paragraph*{Assembly}
 An assembly on natural numbers is a set $|X|$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ there exists some $a$ with $a \Vdash x$. We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $n \Vdash x$.
-The notion of assemblies is nowadays often defined on an (ordered) partial applicative structure $(A, \cdot, \leq)$ satisfying combinatory completeness, i.e.\ an (ordered) partial combinatory algebra~\cite{Oosten2008}, OPCA for short.
-Our definition below is, apart from being type-theoretic, not an instance of the definition based on an OPCA.
+The notion of assemblies is nowadays often defined on a partial applicative structure $(A, \cdot)$ satisfying combinatory completeness, i.e.\ a partial combinatory algebra~\cite{Oosten2008}, PCA for short.
+Our definition below is, apart from being type-theoretic, not an instance of the definition based on a PCA.
 \begin{definition}\label{def:assembly}
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} type $|X| : \Univ$ and a \emph{realisability} relation ${\Vdash_X}$ from $\Lambda_0$ to $|X|$ such that
   \emph{(a)} every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$;
@@ -189,14 +190,14 @@ Our definition below is, apart from being type-theoretic, not an instance of the
   \end{romanenumerate}
 \end{definition}
 
-The required properties of \Cref{def:assembly} depart from the definition based on an OPCA as follows. 
+The required properties of \Cref{def:assembly} depart from the definition based on a PCA as follows. 
 First, we do not require the type $M \Vdash_X x$ to be a proposition (contrary to its topos-theoretic formulation~\cite{Birkedal2002a}).
 Although this additional requirement simplifies many constructions later, it is not necessary to derive our main results.
 Second, as we would like to account for intensional equality in addition to extensional equality between terms,
 we cannot identify $\beta$-equivalent terms \emph{a priori}.
 As a result, the interaction with reduction $\reduce$ is formulated as an additional property of~$\Vdash$. 
 The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
-This formulation also agrees with the one on an ordered partial combinatory algebra~\cite[Section~2.3]{Hofstra2003}.
+This formulation also agrees with the one on an ordered PCA~\cite[Section~2.3]{Hofstra2003}.
 Third, a plausible alternative to the right totality is
 \[
   \prod (x : |X|).\, \sum (M : \Lambda_0).\, M \Vdash x
@@ -220,8 +221,9 @@ Indeed, with functional extensionality which holds in homotopy type theory, any 
 
 \paragraph*{Trackable map}%
 
-Set-theoretically, a trackable map between assemblies on an OPCA $(A, \cdot, \leq)$ is a function $f$ \emph{tracked} by some $b \in A$ in the sense that $a \Vdash x$ implies $b \cdot a \Vdash f\,x$.
+Set-theoretically, a trackable map between assemblies on a PCA $(A, \cdot)$ is a function~$f$ \emph{merely} tracked by some $b \in A$ in the sense that there merely exists some $b$ such that $b \cdot a \Vdash f\,x$ whenever $a \Vdash x$.
 In this case, $b$ is called the \emph{tracker} of $f$.
+Equivalently, we may also say that $f$ is tracked by $b$.
 It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality on the semantics side we have to consider the tracker as part of structure instead of its mere existence.
 \ltnote{explain the difference between property and structure in \Cref{sec:preliminaries}}
 \begin{definition}\label{def:trackable}
@@ -240,7 +242,7 @@ By definition, a trackable map $f$ actually consists of not only a function $\bp
   \[
     \iid_X \defeq (\id_{|X|}, \mathtt{x}, \pr_3)
     \quad\text{where}\quad
-  \pr_3 \defeq \lambda M.\,\lambda x.\,\lambda r.\, r : \prod_{M : \Lambda_0} \prod_{x : |X|} \left( M \Vdash_X x \to M  \Vdash_X x  \right)
+  \pr_3 \defeq \lambda M\,x\,r.\, r : \prod_{M : \Lambda_0} \prod_{x : |X|} \left( M \Vdash_X x \to M  \Vdash_X x  \right)
   \]
   since $\mathtt{x}[M]$ is judgementally equal to $M$.
 \end{example}
@@ -282,8 +284,26 @@ We now investigate some of its basic properties.
   The finality follows from the function extensionality.
 \end{example}
 
-In the set-theoretic category of assemblies, the terminal object is a \emph{separator} (or called generator~\cite{MacLane1994}) in the sense that two trackable maps $f, g \colon X \to Y$ are distinct only if there exists some $x \colon \top \to X$ such that $f\circ x \neq g \circ x$.
-As for the type-theoretic formulation, the general case is rather subtle, so we prove a special case as follows.
+In the setting based on a PCA, every element $x$ of (the carrier of) an assembly $X$ corresponds to a trackable map from $\top$ to $X$, i.e.\ a \emph{global element} of $X$, defined as
+\[
+  f(\star) = x
+  \quad\text{merely tracked by}\quad
+  \mathsf{k}\cdot a 
+\]
+where $a$ is a realiser of $x$ (whose mere existence is given the right totality) and $\mathsf{k}$ is the first projection.
+Therefore, the terminal object is a \emph{separator} (or called generator~\cite{MacLane1994}) in the sense that two trackable maps $f, g \colon X \to Y$ are distinct only if there exists some $x \colon \top \to X$ such that $f\circ x \neq g \circ x$.
+
+However, as the tracker~$F$ is part of a trackable map $(\bproj{f}, F, \mathfrak{f})$ in this type-theoretic setting, we cannot construct a global element for any inhabitant $x : \bproj{X}$ without further information.
+Accordingly, we strengthen the assumption to define a global element. 
+\begin{lemma}\label{lem:global-elemnt}
+  For every assembly $X$, every inhabitant $x_0 : \bproj{X}$ with a realiser $M_0$ and its witness $r_0 : M \Vdash_X x$ of realisability gives rise to a global element of $X$:
+  \[
+    (\mathsf{c}_{x_0}, M_0, \lambda M\,x\,r.\, r_0)
+  \]
+  where $\mathsf{c}$ is the constant function with the value $x_0$.
+\end{lemma}
+
+On the other hand, if the carrier of a codomain $Y$ does not have non-trivial higher paths, then global elements are sufficient to separate distinct maps.
 \begin{proposition}
   Every pair of trackable maps $f_1, f_2 : X \to Y$ where the carrier $\bproj{Y}$ is a set are extensionally equal if $f_1 \circ x \sim f_2 \circ x$ for every global element $x$ from $\top$ to $X$. 
 \end{proposition}
@@ -350,10 +370,7 @@ Finally, we establish the main technical result of this paper: given a trackable
 Then, the categorical form of the Gödel-Löb axiom in $\ASM(\Lambda)$ follows easily.
 
 \subsection{A comonadic exposure for \texorpdfstring{$\mathsf{S4}$}{S4} modality}
-An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \barred{X}$ with a term $M$ which \emph{merely} realises\footnote{%
-  We will discuss the mere realisability in~\Cref{sec:conclusion}.
-}
-$x$ as the carrier of $\boxtimes X$.
+An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \barred{X}$ with a term $M$ which merely realises $x$ as the carrier of $\boxtimes X$.
 A pair $(M, x)$ with $\star : \brck{M \Vdash_X x}$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.  
 Thus, we argue that $(M, x, \star)$ shall be realised by terms which are $\beta$-equivalent to its Gödel encoding $\qquote{M}$ (instead of $M$ as proposed by Kavvos), since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.
 In short, the carrier and the realisability relation are defined as
@@ -465,19 +482,22 @@ Yet, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposur
 Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood also as the type of code of type~$A$ (cf.~\Cref{remark:S4-modality}) and as \emph{intensional recursion} respectively from the computational perspective~\cite{Kavvos2017b}, if one is willing to give up consistency.
 This trade-off, however, is not possible in this semantics approach.
 
-To untie the knot but to retain the interpretation of $\Box A$ as code of type~$A$, we refine our interpretation with the notion of computation stages. 
+To untie the knot but to retain the interpretation of $\Box A$ as code of type~$A$, we refine our interpretation with the notion of \emph{computation stages}. 
 Considering the counit $\epsilon_X\colon \boxtimes X \to X$, it is possible to evaluate $(M, x, \star)$ because the code is already available for doing so.
 And, the provability reading of $\Box$ suggests that inhabitants of $\Box X$ are not available now but in the later stage.
 To express this idea cleanly, we work in an extension of homotopy type theory with the support of Nakano's later modality~\cite{Nakano2000}.
 
 \paragraph*{Digression: Clocked Cubical Type Theory}
 \ltnote[inline,nomargin]{Introduce clocked cubical type theory here}
+\begin{definition}[Clocked-indexed exposure]
+  
+\end{definition}
 \begin{lemma}\label{lem:proposition-closed-under-later}
   For every $A : \mathord{\rhd}\,\Univ$. If $\rhd (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then also $\mathsf{isProp}(\rhd(\alpha : \mathbb{T}).\,A[\alpha])$. 
 \end{lemma}
 
 \begin{lemma}\label{lem:later-identity}
-  $\rhd f = \rhd g$ implies $f = g$. 
+  $\left(\forall \kappa.\, \rhd^\kappa f = \rhd^\kappa g\right)$ implies $f = g$. 
 \end{lemma}
 \paragraph*{Back to \texorpdfstring{$\mathsf{GL}$}{GL}}
 
@@ -489,7 +509,7 @@ For any assembly $X$, the carrier of $\Box X$ and the realisability relation are
   N \Vdash_{\Box X} (M, x, \star) \defeq N \reduce \qquote{M}
 \]
 where $\rhd (\alpha : \mathbb{T}) .\, \brck{M \Vdash_X x [\alpha]}$ is a proposition by~\Cref{lem:proposition-closed-under-later} and the relation $\Vdash_{\Box X}$ is defined as the same as the comonadic exposure~$\boxtimes$.
-The only difference between carriers $\bproj{\Box X}$ and $\bproj{\boxtimes X}$ is the extensional part which becomes $\rhd\bproj{X}$ so that the extension of $(M, x, \star)$ is available after a time step. 
+The only difference between carriers $\bproj{\Box X}$ and $\bproj{\boxtimes X}$ is the extensional part which becomes $\rhd\bproj{X}$ so that the extension of $(M, x, \star)$ is available in the next stage but not earlier.
 Similarly, $\Box X \defeq (\bproj{\Box X}, \Vdash_{\Box X}, r_{\Box X}, t_{\Box X})$ is an assembly where $r_{\Box X}$ and $t_{\Box X}$ are given by the transitivity and the reflexivity of $\reduce$. 
 
 For any trackable map $f$ from $X$ to $Y$, also define $\Box f$ as the same as $\boxtimes f$ with the exception of the function $\bproj{\Box f}$ between carriers which are now involved with a later modality:
@@ -499,9 +519,9 @@ For any trackable map $f$ from $X$ to $Y$, also define $\Box f$ as the same as $
 where $(\rhd f\, x)[\alpha]$ is judgementally equal to $f(x[\alpha])$, and $\rhd \bproj{f} : \rhd\bproj{X} \to \rhd\bproj{Y}$ is given by the functoriality of $\mathord{\rhd}\colon \Univ \to \Univ$.
 The very same argument for $\boxtimes f$ shows that $\Box f$ is indeed a trackable map from $\bproj{\Box X}$ to $\bproj{\Box Y}$.
 
-It is straightforward to show that $\Box$ is an exposure by \Cref{lem:later-identity}.
+It is straightforward to show that $\Box$ is a clocked-exposure by \Cref{lem:later-identity}.
 \begin{theorem}\label{thm:GL-exposure}
-  $\Box \colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ is an exposure.
+  $\Box \colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ is a clocked-exposure.
 \end{theorem}
 
 Similar to~\Cref{thm:S4-no-quoting}, we can refute the existence of a family of trackable maps $\eta_X\colon X \to \Box X$ natural in $X$ by the non-existence of the term $\mathsf{quote}'$ noted in~\Cref{sec:preliminaries}.
@@ -529,21 +549,31 @@ On the other hand, it is not possible to have a family of trackable maps $\epsil
   \]
   is an inhabitant of $\rhd (\alpha : \mathbb{T}) .\, \brck{M \Vdash_\bot x [\alpha]}$ and thus $(M, x, \star_M)$ is of type $\bproj{\Box \bot}$. 
 \end{proof}
-\begin{theorem}\label{thm:GL-recursion}
-  For any trackable map $f\colon \Box X \to X$ there is a global element of $\Box X$.
+
+The payoff for disallowing (run-time) evaluation is to be able to apply guarded recursion for typed code
+which is tracked by the fixpoint operator from Kleene's second recursion theorem. From the logical perspective, it is exactly the Gödel-Löb axiom.
+
+\begin{theorem}[{Guarded recursion for $\Box A$}]\label{thm:GL-recursion}
+  For arbitrary map $f \colon \Box X \to X$ tracked by some $F$, there exists a global element of $\Box X$ tracked by $F[ \qquote{\mathsf{fix}(\lambda \mathtt{x}.\,F)}/\mathtt{x} ]$.
 \end{theorem}
+The construction of the global element essentially has two parts: one apply the guarded recursion for the later modality and the Kleene's second recursion theorem on the extensional and the intensional parts of $(\bproj{f}, F, \mathfrak{f})$ respectively. Then, we use the fact $\bproj{f}$ is tracked by $F$ and $\mathsf{fix}\,F$ reduces to $F [ \qquote{\mathsf{fix}(\lambda \mathtt{x}.\, F}) / \mathtt{x} ]$ to conclude the theorem.
+\begin{proof}
+  Let $f$ be a trackable map from $\Box X$ to $X$.
+  Assume an inhabitant $x^{\rhd}$ of type $\rhd \sum_{x : \bproj{X}} F [ \qquote{ \mathsf{fix}\,(\lambda \mathtt{x}.\, F) } / \mathtt{x} ] \Vdash x$.
+  
+  Therefore, by \Cref{lem:global-elemnt}, the inhabitant of $\sum_{x : \bproj{X}} F[ \qquote{\mathsf{fix}\,(\lambda \mathtt{x}.\, F)} / \mathtt{x} ] \Vdash_X x$ gives rise to a global element of $X$ as desired.
+\end{proof}
 
-
+\begin{corollary}[Gödel-Löb axiom]
+  
+\end{corollary}
 \section{Conclusion}\label{sec:conclusion}
 \paragraph*{Future work}
 \begin{enumerate}
   \item \Cref{remark:S4-modality}, \cite{Davies2001b}, \cite{Kavvos2020}
-  \item topos-theoretic arguments
-  \item Mix with \cite{Kavvos2017b}
-  \item Consistent version of \cite{Kavvos2017b}
+  \item Consistent version of \cite{Kavvos2017a}
   \item Compare this with \cite{Shamkanov2014} and \cite{Shamkanov2016a}.
 \end{enumerate}
-\cite{Davies2001b}
 %%
 %% Bibliography
 %%

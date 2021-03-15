@@ -127,5 +127,5 @@ instance
   DecEqBool : DecEq Bool
   _≟_ ⦃ DecEqBool ⦄ = Cubical.Data.Bool._≟_
 
-strict-initial : {X : 𝓤 ̇} → (X → ⊥) → X ≃ ⊥
+strict-initial : {X : 𝓤 ̇} → (X → ⊥* {𝓤}) → X ≃ (⊥* {𝓤})
 strict-initial f = f , record { equiv-proof = λ { () } }

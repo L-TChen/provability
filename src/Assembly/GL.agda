@@ -157,19 +157,15 @@ module _ (Q : Quoting) where
   GL : {X : Asm 𝓤}
     → Trackable (□ k X) X
     → Trackable ⊤ₐ X
-  GL {k = k} {X} (f , F , F⊩f) = (λ _ → r f′ .fst) , (↑₁ (F [ ⌜ gfix (ƛ F) ⌝ ])) ,
-    λ _ → X.⊩-respects-↠
-      (↑₁ (F [ ⌜ gfix (ƛ F) ⌝ ]) [ _ ] ≡⟨ subst-rename-∅ _ _ ⟩ F [ ⌜ gfix (ƛ F) ⌝ ] ∎)
-      (r f′ .snd)
+  GL {k = k} {X} (f , F , F⊩f) = Final.global-element X (y .fst) (F [ ⌜ gfix (ƛ F) ⌝ ]) (y .snd)
     where
       open -↠-Reasoning
-      f′ = (f , λ _ n̅-↠⌜M⌝ → F⊩f (lift n̅-↠⌜M⌝))
       module X  = AsmStr (str X)
       module □X = AsmStr (str (□ k X))
-      r : Σ[ f ꞉ (⟨ □ k X ⟩ → ⟨ X ⟩) ]
-        ({n̅ M : Λ₀} {x : ▹ k ⟨ X ⟩} (M⊩x : ▹[ α ꞉ k ] ∥ M X.⊩ x α ∥) → n̅ -↠ ⌜ M ⌝ → F [ n̅ ] X.⊩ f (M , x , M⊩x))
-        → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x
-      r (f , F⊩f) = fix λ x →
-        f (gfix (ƛ F) ,
-        (λ α → x α .fst) , λ α → ∣ X.⊩-respects-↠ (-↠-trans gfix-↠ (-→to-↠ β)) (x α .snd) ∣) ,
-        F⊩f (λ α → ∣ X.⊩-respects-↠ (-↠-trans gfix-↠ (-→to-↠ β)) (x α .snd) ∣) -↠-refl
+
+      f′ : (▹ k (Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x))→ Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x
+      f′ hyp = f (gfix (ƛ F) , (λ α → hyp α . fst) , λ α → ∣ X.⊩-respects-↠ (-↠-trans gfix-↠ (-→to-↠ β)) (hyp α .snd) ∣) ,
+        F⊩f (lift -↠-refl)
+
+      y : Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x
+      y = fix f′

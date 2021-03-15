@@ -100,6 +100,12 @@ module Final (X : Asm 𝓤) where
 module Initial (X : Asm 𝓤) where 
   universality : Trackable ⊥ₐ X
   universality = ⊥*-elim , 0 , (λ { {x = ()} })
+
+  strict : (f : Trackable X ⊥ₐ) → AsmIso X ⊥ₐ f
+  strict (f , F , F⊩f) = ∣ universality , (λ ()) , (λ x → ⊥*-elim (transport ⊥=X x)) ∣
+    where
+      ⊥=X : ⟨ X ⟩ ≡ ⊥*
+      ⊥=X = ua (strict-initial f)
     
 ------------------------------------------------------------------------------
 -- Product

@@ -99,6 +99,9 @@ module _ (Q : Quoting) where
         E : Λ₁ 
         E-↠ : ∀ M → E [ ⌜ M ⌝ ] -↠ M
 
+  eval′ : NaturalTransformation {𝓤} □-exposure Id
+  eval′ = eval , λ f x → refl
+
   quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
   quoting-does-not-exist (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
     where
