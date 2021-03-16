@@ -415,7 +415,7 @@ In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathf
 \begin{proof}[Proof sketch]
   We only sketch the proof of three less obvious statements here---the preservation of identities and the construction of natural transformations $\epsilon\colon \boxtimes \to \mathcal{I}_{\ASM(\Lambda)}$ and $\delta\colon \boxtimes \to \boxtimes\boxtimes$. 
   To show that $\boxtimes$ preserves identities, we use that fact that the propositional truncation $\brck{\blank}$ is a functor which preserves identities and that $\pr_3$ is a third projection.
-  Then, it follows that $\brck{\pr_3\,M\,x} \equiv \brck{\id} = \id$ and thus $\id_{\barred{X}}^\boxtimes (M, x, \star) \equiv (\mathtt{x}[M], x, \brck{\pr_3\,M\,x}\,\star) \equiv \id_{\barred{\boxtimes X}}$.
+  Then, it follows that $\brck{\pr_3\,M\,x} \equiv \brck{\id} = \id$ and thus $\id_{\barred{X}}^\boxtimes (M, x, \star) \equiv (\mathtt{x}[M], x, \brck{\pr_3\,M\,x}\,\star) \equiv \id_{\barred{\boxtimes X}}(M, x, \star)$.
 
   For the families of maps $\boxtimes A \to A$ and $\boxtimes A \to \boxtimes \boxtimes A$ natural in $A$, recall from \Cref{sec:preliminaries} that there are terms $\Eval$ and $\Quote$ which evaluates a Gödel number to its representing term and computes the Gödel number $\qquote{N}$ of a given term~$N \equiv \qquote{M}$ in the form of Gödel number respectively. That is, 
   \[
@@ -423,6 +423,7 @@ In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathf
     \quad\text{and}\quad
     \mathtt{quote}\,\qquote{M} \reduce \qquote{\qquote{M}}.
   \]
+Use these terms as trackers for $\boxtimes A \to A$ and $\boxtimes A \to \boxtimes \boxtimes A$ respectively.
 It is now straightforward to define the required natural transformations between exposures.
 \end{proof}
 In particular, the counit $\epsilon_X\colon \Box X \to X$ is understood as the evaluation of the intension $M$ to its extension~$x$, as justified by the its tracker~$\mathtt{eval}$. 
