@@ -134,10 +134,10 @@
 \maketitle
 
 \begin{abstract}
-  In this paper, we give a positive answer to an open problem---is there a categorical interpretation of the Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ which refutes the completeness principle $A \to \Box A$?
+  In this paper, we give a positive answer to a recent open problem---is there a categorical interpretation of the Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ which refutes the completeness principle $A \to \Box A$?
   We consider the $\PP$-category $\ASM(\Lambda)$ of assemblies on untyped $\lambda$-calculus and trackable maps with an exposure-like construction $\Box\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$, internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
   We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle but proves the Gödel-Löb axiom.
-  Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo $\alpha$-equivalence given its provability reading but also their extensions. 
+  Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo $\alpha$-equivalence given its provability reading but also their extensions enriched with the notion of time steps. 
   Apart from its own theoretical interest, following the intuitive understanding of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion for typed code in a logically consistent way.
 \end{abstract}
 
@@ -151,25 +151,29 @@
 
 \paragraph*{Related work}
 \cite{Visser2019,Beklemishev2006}
-\cite{Kavvos2017,Kavvos2020}
+\cite{Kavvos2020}
 \cite{Shamkanov2014,Shamkanov2016a}
 
 \section{Preliminaries}\label{sec:preliminaries}
 
 \subsection{Homotopy type theory}
 \ltnote{(mere) proposition, set, structure vs.\ property}
+\cite{hottbook}
+
 \subsection{Second recursion theorem in \texorpdfstring{$\lambda$}{λ}-calculus}
-\begin{theorem}[Second Recursion Theorem]
+\begin{theorem}[{Second Recursion Theorem~\cite[Theorem~6.5.9]{Barendregt1984a}}]
   
 \end{theorem}
 \begin{corollary}\label{coro:variant-of-SRT}
   
 \end{corollary}
+
 \subsection{Partial equivalence relation and \texorpdfstring{$\PP$}{P}-category}
+\cite{Cubric1998a,Kavvos2017b}
 
 \section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
 In this section, we introduce the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
-Assemblies are used to accommodate the information of how extensions are related to, or \emph{realised by}, intensions. Accordingly an appropriate notion of morphisms between assemblies is introduce to form a $\PP$-category, laying
+Assemblies are used to accommodate the information of how extensions are related to, or \emph{realised by}, intensions. Accordingly an appropriate notion of morphisms between assemblies is introduced to form a $\PP$-category, laying
 the technical foundation of our interpretation of modalities discussed in~\Cref{sec:provability}.
 
 
@@ -201,14 +205,14 @@ Although this additional requirement simplifies many constructions later, it is 
 Second, as we would like to account for intensional equality in addition to extensional equality between terms,
 we cannot identify $\beta$-equivalent terms \emph{a priori}.
 As a result, the interaction with reduction $\reduce$ is formulated as an additional property of~$\Vdash$. 
-The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
+%The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
 This formulation also agrees with the one on an ordered PCA~\cite[Section~2.3]{Hofstra2003}.
 Third, a plausible alternative to the right totality is
 \[
   \prod (x : |X|).\, \sum (M : \Lambda_0).\, M \Vdash x
 \]
 stating that each $x : |X|$ has an explicit choice of realisers.
-This is not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
+%This is not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
 Indeed, with functional extensionality which holds in homotopy type theory, any inhabitant of the alternative formulation leads to a \emph{contradiction}~\cite{Troelstra1977}. \ltnote{check this}
 
 \begin{example}\label{ex:assembly-lambda}
@@ -298,7 +302,7 @@ Accordingly, in~$\ASM(\Lambda)$, as the tracker~$F$ is part of a trackable map $
   Let $X$ be an assembly. Then the following statements hold:
   \begin{enumerate}
     \item Every inhabitant $x_0 : \bproj{X}$ corresponds to a merely trackable map from $\top$ to $X$.
-    \item Every triple of $x_0 : \bproj{X}$, $M : \Lambda_0$, and $r_0 : M \Vdash_X x$ corresponds to a global element of $X$, i.e.\ a trackable map from $\top$ to $X$.
+    \item Every pair of $x_0 : \bproj{X}$ and $M : \Lambda_0$ with $r_0 : M \Vdash_X x$ defines a global element of $X$, i.e.\ a trackable map from $\top$ to $X$.
   \end{enumerate}
 \end{lemma}
 
@@ -328,7 +332,7 @@ From the strictness of the initial object, no morphism from $\top$ to $\bot$ cou
 
 The construction of exponential $X \Rightarrow Y$ is a bit intriguing.
 With the definition of trackable maps, we may expect the exponential assembly $X \Rightarrow Y$ to consist of trackable maps.
-However, the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier~\cite{Kavvos2017c}, since the carrier is meant to be the type of extensions of trackable maps.
+However, the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier~\cite{Kavvos2017b}, since the carrier is meant to be the type of extensions of trackable maps.
 \begin{example}[Exponential]
   Given assemblies $X$ and $Y$, define
   \begin{align*}
@@ -364,10 +368,11 @@ Most importantly, we are able to refute the completeness principle $X \to \boxti
 Hitherto, we complete our cook's tour of the previous set-theoretic results based on a partial combinatory algebra in homotopy type theory.
 
 Thereafter, we use an extension of cubical type theory---Clocked Cubical Type Theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the provability modality.
-This construction exploits Nakano's later modality so that we can express the intuitve meaning of $\Box X$ cleanly.
+This construction exploits Nakano's later modality so that the intuitive meaning of $\Box X$ can be expressed cleanly.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
-Finally, we establish the main technical result of this paper: given a trackable map $f : \Box X \to X$ one is able to construct an inhabitant of $\Box X$.
-Then, the categorical form of the Gödel-Löb axiom in $\ASM(\Lambda)$ follows easily.
+Finally, we establish one of the main contribution of this paper: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$F[\qquote{\mathsf{fix}\,F}]$
+where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
+Then, the categorical form of the Gödel-Löb axiom in $\ASM(\Lambda)$ follows.
 
 \subsection{A comonadic exposure for \texorpdfstring{$\mathsf{S4}$}{S4} modality}
 An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \barred{X}$ with a term $M$ which merely realises $x$ as the carrier of $\boxtimes X$.
@@ -508,8 +513,6 @@ To express this idea cleanly, we work in an extension of homotopy type theory wi
   \]
 \end{corollary}
 
-\begin{definition}[Clocked exposure]
-\end{definition}
 \begin{lemma}\label{lem:later-sum}
   For $A : \Univ$ and $B : A \to \Univ$, we have an equivalence
   \[
@@ -523,6 +526,10 @@ To express this idea cleanly, we work in an extension of homotopy type theory wi
 \begin{lemma}\label{lem:later-identity}
   $\left(\forall \kappa.\, \rhd^\kappa f = \rhd^\kappa g\right)$ implies $f = g$. 
 \end{lemma}
+
+\begin{definition}[Clocked exposure]
+\end{definition}
+
 \paragraph*{Back to \texorpdfstring{$\mathsf{GL}$}{GL}}
 
 Now we introduce the clocked exposure $\Box^\kappa \colon \ASM(\Lambda) \to \ASM(\Lambda)$ modelling the $\mathsf{GL}$ modality as follows. 
@@ -584,8 +591,8 @@ From the logical perspective, it is the deductive form of Gödel-Löb axiom.
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
   For arbitrary map $f \colon \Box^\kappa X \to X$ tracked by some $F$, there exists a global element of $\Box^\kappa X$ tracked by $F[ \qquote{\mathsf{fix}\,F} ]$.
 \end{theorem}
-Recall the Second Recursion Theorem (\Cref{coro:variant-of-SRT}) every term $F : \Lambda_1$ has a fixpoint  $\mathsf{fix}\,F$ such that $\mathsf{fix}\,F \reduce F [ \qquote{\mathsf{fix}\,F} ]$.
-The theorem follows from the Löb induction and the fact that $\mathsf{fix}\,F$ is a fixpoint of $F$.
+This theorem follows from the Löb induction and the fact that $\mathsf{fix}\,F$ is a fixpoint of $F$
+where $\mathsf{fix}\,F$ is given the Second Recursion Theorem (\Cref{coro:variant-of-SRT}) that every term $F : \Lambda_1$ has a fixpoint  $\mathsf{fix}\,F$ such that $\mathsf{fix}\,F \reduce F [ \qquote{\mathsf{fix}\,F} ]$.
 
 \begin{proof}
   Let $f$ be a trackable map from $\Box^\kappa X$ to $X$.
@@ -621,12 +628,9 @@ The theorem follows from the Löb induction and the fact that $\mathsf{fix}\,F$ 
   \item Discussion on the relation between $\boxtimes$, $\Box^\kappa$, and $\forall \kappa.\, \Box^\kappa$ and perhaps a type theory of \cite{Goris2009}.
   \item Justification logic: Compare this with \cite{Shamkanov2014} and \cite{Shamkanov2016a}.
 \end{enumerate}
-%%
-%% Bibliography
-%%
 
 \bibliographystyle{plainurl}% the mandatory bibstyle
-\bibliography{../../library_fixed}
+\bibliography{ref}
 
 \appendix
 
