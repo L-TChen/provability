@@ -72,6 +72,7 @@ _⊛_ : ▹ k ((a : A) → B a)
   → Σ (▹ k A) λ ▹x → ▹[ α ꞉ k ] B (▹x α)
 ▹Σ f = (λ α → fst (f α)) , λ α → snd (f α)
 
+
 ▹-extensionality : {A : I → 𝓤 ̇} {x : ▹ k (A i0)} {y : ▹ k (A i1)}
   → ▹[ α ꞉ k ] PathP A (x α) (y α) → PathP (λ i → ▹ k (A i)) x y
 ▹-extensionality p i α = p α i

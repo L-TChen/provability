@@ -196,7 +196,7 @@ _⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
 
-      X⇒Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∃[ F ꞉ Λ₁ ] Tracks X Y F f
+      X⇒Y = MerelyTrackable X Y
 
       _⊩_ : Λ₀ → X⇒Y → 𝓤 ̇
       F ⊩ (f , _) = {M : Λ₀} {x : ⟨ X ⟩} → M X.⊩ x → F · M Y.⊩ f x

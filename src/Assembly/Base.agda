@@ -54,6 +54,8 @@ record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
 Trackable : (X Y : Asm 𝓤) → 𝓤 ̇
 Trackable X Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] HasTracker X Y f
  
+MerelyTrackable : (X Y : Asm 𝓤) → 𝓤 ̇
+MerelyTrackable X Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f ∥
 ------------------------------------------------------------------------------
 -- Extensional equality between morphisms
 
