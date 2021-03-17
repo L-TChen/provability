@@ -37,8 +37,9 @@ record Quoting : 𝓤₀ ̇ where
     Num   : Λ₀
     Num-↠ : Num · ⌜ M ⌝ -↠ ⌜ ⌜ M ⌝ ⌝
 
-    reduce   : Λ₀
-    reduce-↠ : reduce · ⌜ (ƛ M) · N ⌝ -↠ ⌜ M [ N ] ⌝ 
+    Eval : Λ₁
+    Eval-↠ : Eval [ ⌜ M ⌝ ] -↠ M
+
   open -↠-Reasoning
 
   I·I≠I : 𝑰 · 𝑰 ≢ 𝑰

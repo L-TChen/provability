@@ -89,15 +89,12 @@ module _ (Q : Quoting) where
   □-exposure = exposure □_ □map □-isExposure
 
   eval : Trackable (□ X) X
-  eval {X = X} = (λ x → fst (snd x)) , E ,
+  eval {X = X} = (λ x → fst (snd x)) , Eval ,
     λ { {N} {M , x , M⊩x} N-↠⌜M⌝ →
-      X.⊩-respects-↠ (reduce-ssubst E (lower N-↠⌜M⌝)) ((X.⊩-respects-↠ (E-↠ M) M⊩x)) }
+      X.⊩-respects-↠ (reduce-ssubst Eval (lower N-↠⌜M⌝)) ((X.⊩-respects-↠ Eval-↠ M⊩x)) }
     where
       module X  = AsmStr (str X)
       module □X = AsmStr (str (□ X))
-      postulate
-        E : Λ₁ 
-        E-↠ : ∀ M → E [ ⌜ M ⌝ ] -↠ M
 
   eval′ : NaturalTransformation {𝓤} □-exposure Id
   eval′ = eval , λ f x → refl
