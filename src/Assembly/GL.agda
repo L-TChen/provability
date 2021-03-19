@@ -163,7 +163,7 @@ module _ (Q : Quoting) where
 
       f′ : (▹ k (Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x))
         → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
-      f′ hyp = f (gfix′ F , (λ α → hyp α . fst) , λ α → ∣ X.⊩-respects-↠ gfix′-↠ (hyp α .snd) ∣) ,
+      f′ hyp = f (gfix′ F , (λ α → hyp α .fst) , λ α → ∣ X.⊩-respects-↠ gfix′-↠ (hyp α .snd) ∣) ,
         F⊩f (lift -↠-refl)
 
       fixf : Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
@@ -172,3 +172,19 @@ module _ (Q : Quoting) where
       x = fixf .fst
       r = fixf .snd
 
+
+  IGL : (X : Asm 𝓤)
+    → Trackable (□ k (□ k X ⇒ X)) (□ k X)
+  IGL {k = k} X = irec , ↑₁ Sub · {!!} · (↑₁ ⌜ gfix {!0!} ⌝) , λ {G} {g} r → lift {!!}
+    where
+      module X  = AsmStr (str X)
+      module □X = AsmStr (str (□ k X))
+
+      irec : ⟨ □ k (□ k X ⇒ X) ⟩ → ⟨ □ k X ⟩
+      irec (F , f , F⊩f) = F · ⌜ gfix F ⌝  , ▹Σ y
+        where
+          y : ▹ k (Σ[ x ꞉ ⟨ X ⟩ ] ∥ F · ⌜ gfix F ⌝ X.⊩ x ∥) 
+          y α = fix λ hyp →
+            f α .fst (gfix F , (λ α → hyp α .fst) ,
+              λ α → rec propTruncIsProp (λ r → ∣ X.⊩-respects-↠ gfix-↠ r ∣) (hyp α .snd)) ,
+            rec propTruncIsProp (λ r → ∣ r (lift -↠-refl) ∣) (F⊩f α)

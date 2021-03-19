@@ -40,9 +40,8 @@ private
 -- Finality
 ⊤ₐ : Asm 𝓤
 ⊤ₐ = Unit* , _⊩_ , record
-  { ⊩-respects-↠  = ⊩-respects-↠ -- λ { M-↠M′ M′-↠ƛ0 → rec propTruncIsProp (λ { (lift r) → ∣ lift (-↠-trans M-↠M′ r) ∣ }) M′-↠ƛ0 } 
-  ; ⊩-right-total = ⊩-right-total -- λ _ → ∣ 𝑰 , ∣ lift -↠-refl ∣ ∣
-  -- ; ⫣-isProp     = λ _ _ → propTruncIsProp 
+  { ⊩-respects-↠  = ⊩-respects-↠
+  ; ⊩-right-total = ⊩-right-total
   }
   where
     _⊩_ : Λ₀ → Unit* {𝓤} → 𝓤 ̇
@@ -84,7 +83,6 @@ module Final {X : Asm 𝓤} where
 ⊥ₐ = ⊥* , _⊩_ , record
   { ⊩-respects-↠  = ⊩-respects-↠ 
   ; ⊩-right-total = ⊩-right-total
---  ; ⫣-isProp     = λ ()
   }
   where
     _⊩_ : Λ₀ → ⊥* {𝓤} → 𝓤 ̇
@@ -215,9 +213,10 @@ module Exponential (X Y : Asm 𝓤) where
   module Y = AsmStr (str Y)
   X⇒Y = X ⇒ Y
   module X⇒Y = AsmStr (str X⇒Y)
-
+  open -↠-Reasoning
+      
   postulate
-    uncurry : Trackable (Z ×ₐ X) Y → Trackable Z (X ⇒ Y)
+    uncurry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
     eval : Trackable (X⇒Y ×ₐ X) Y
     {-
       uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp

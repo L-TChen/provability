@@ -88,6 +88,22 @@ module _ (Q : Quoting) where
   □-exposure : Exposure 𝓤
   □-exposure = exposure □_ □map □-isExposure
 
+  forgetful : {X : Asm 𝓤₀} → Trackable (□ X) (□ Λ₀ₐ)
+  forgetful = (λ { (M , _ , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)
+
+  Λ-map : Trackable X Y → Trackable Λ₀ₐ Λ₀ₐ
+  Λ-map (f , F , F⊩f) = F [_] , F , λ {M} {N} r → reduce-ssubst F r
+
+  Λ-exposure : Exposure 𝓤₀
+  Λ-exposure = exposure (λ _ → Λ₀ₐ) Λ-map (record
+    { preserve-id   = λ _ _ → refl
+    ; preserve-comp = λ { (_ , F , _) (_ , G , _) M → ∘-ssubst-ssubst G F M}
+    ; reflects-∼    = λ { (f , F , _) (g , G , _) F=G x → {!!} }
+    })
+
+  forgetful′ : NaturalTransformation {𝓤₀} □-exposure {!!}
+  forgetful′ = {!!}
+
   eval : Trackable (□ X) X
   eval {X = X} = (λ x → fst (snd x)) , Eval ,
     λ { {N} {M , x , M⊩x} N-↠⌜M⌝ →
