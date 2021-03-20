@@ -29,10 +29,7 @@ module _ (Q : Quoting) where
     where
       module X = AsmStr (str X)
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ k ⟨ X ⟩ ] ▹[ α ꞉ k ] ∥ M X.⊩ ▹x α ∥
-      -- Can we remove truncation? If so, is □id still equal to id? 
-      -- Ans. If we assume that ⫣ is a mere proposition, then ▹[ α ] (...) is also a mere proposition (▹isProp→isProp▹).
-      -- Therefore, we don't need propositional truncation here.
+      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ k ⟨ X ⟩ ] ▹[ α ꞉ k ] M X.⊩ ▹x α
 
       _⊩_ : (M : Λ₀) → |□X| → 𝓤 ̇
       n̅ ⊩ (M , _ , _)= Lift (n̅ -↠ ⌜ M ⌝)
@@ -44,7 +41,7 @@ module _ (Q : Quoting) where
       ⊩-right-total (M , ▹x , M⫣x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
 
   □map₀ : Trackable X Y → ⟨ □ k X ⟩ → ⟨ □ k Y ⟩
-  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , ▹map f x , λ α → ∥-∥map F⊩f (M⊩x α)
+  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , ▹map f x , λ α → F⊩f (M⊩x α) -- λ α → ∥-∥map F⊩f (M⊩x α)
 
   □map₁ : Λ₁ → Λ₁
   □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
@@ -65,7 +62,14 @@ module _ (Q : Quoting) where
         ⌜ F [ M ] ⌝ ∎)
 
   □id=id : (X : Asm 𝓤) → (x : ⟨ □ k X ⟩) → □map₀ (id X) x ≡ x
-  □id=id X (M , x , M⊩x) i = M , x , λ α → propTruncIsProp (∥-∥map (λ x → x) (M⊩x α)) (M⊩x α) i
+  □id=id X (M , x , M⊩x) i = M , x , M⊩x -- propTruncIsProp (∥-∥map (λ x → x) (M⊩x α)) (M⊩x α) i
+
+  □gf=□g□f : (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ □ k X ⟩) → □map₀ (g ∘ f) x ≡ □map₀ g (□map₀ f x)
+  □gf=□g□f {Z = Z} (f , F , F⊩f) (g , G , G⊩g) (M , x , r) i = G[F[M]]=G[F][M] i , ▹map g (▹map f x) , λ α →
+    transport-filler (cong (Z._⊩ (▹map g (▹map f x) α)) (G[F[M]]=G[F][M] ⁻¹)) (G⊩g (F⊩f (r α))) (~ i)
+    where
+      module Z = AsmStr (str Z)
+      G[F[M]]=G[F][M] = ∘-ssubst-ssubst G F M
 
   □-isExposure : IsExposure {𝓤} (□ k)  □map
   □-isExposure = record
@@ -75,18 +79,16 @@ module _ (Q : Quoting) where
     }
     where 
       postulate
-      -- Use cubical argument to prove this.
-        □gf=□g□f : (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ □ k X ⟩) → □map₀ (g ∘ f) x ≡ □map₀ g (□map₀ f x)
-        ↑ₗ-injective : {Γ Δ : Cxt} {A : 𝕋} {M N : Δ ⊢ A} → ↑ₗ_ {Δ} {_} {Γ} M ≡ ↑ₗ N → M ≡ N
-
-      □F=□G→F=G : (F G : Λ₁) → □map₁ F ≡ □map₁ G → F ≡ G
-      □F=□G→F=G F G □F=□G = ⌜⌝-injective (↑ₗ-injective (decode (encode □F=□G .fst .snd)))
-
-      postulate
         -- this is required to prove `□reflects∼`, but unfortunately we canno't have this verified in the model. 
         □reflects∼ : (f g : Trackable X Y)
           → (∀ k → □map f ∼ □map g ꞉ □ k X →ₐ □ k Y)
           → f ∼ g ꞉ X →ₐ Y
+
+  □F=□G→F=G : (F G : Λ₁) → □map₁ F ≡ □map₁ G → F ≡ G
+  □F=□G→F=G F G □F=□G = ⌜⌝-injective (↑ₗ-injective (decode (encode □F=□G .fst .snd)))
+    where
+      postulate
+        ↑ₗ-injective : {Γ Δ : Cxt} {A : 𝕋} {M N : Δ ⊢ A} → ↑ₗ_ {Δ} {_} {Γ} M ≡ ↑ₗ N → M ≡ N
 
   □-exposure : (k : Cl) → Exposure 𝓤
   □-exposure k = exposure (□ k) □map □-isExposure
@@ -110,41 +112,33 @@ module _ (Q : Quoting) where
       qQ-at-Λ : Trackable Λ₀ₐ (□ k Λ₀ₐ)
       qQ-at-Λ = fun
 
-      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ ▹M ꞉ ▹ k Λ₀ ] ▹[ α ꞉ k ] ∥ N -↠ ▹M α ∥
       qΛ = qQ-at-Λ .fst
-
-      QΛ : Λ₁
       QΛ = HasTracker.F (qQ-at-Λ .snd)
 
       qQ-at-⊤ : Trackable ⊤ₐ (□ k ⊤ₐ)
       qQ-at-⊤ = fun
-
-      □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , next M , λ _ → ∣ -↠-refl ∣)
-      □*→Λ-is-constant M x = begin
-        □map (*→Λ M) .fst x
-          ≡⟨ refl ⟩
-        ↑₁ M [ _ ] , next M , _
-          ≡⟨ cong₂ {C = λ _ _ → ⟨ □ k Λ₀ₐ ⟩} (λ L N → (L , next M , N)) (subst-rename-∅ _ M) {!!} ⟩
-        M , next M , (λ α → ∣ -↠-refl ∣) ∎
-        where open ≡-Reasoning
-
-      natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ k Λ₀ₐ
-      natural-on-*→Λ M = naturality (*→Λ M)
-
-      lem : (M : Λ₀) → qΛ M ≡ (M , next M , λ _ → ∣ -↠-refl ∣)
-      lem M = begin
-        qΛ M
-          ≡⟨ refl ⟩
-        qΛ (*→Λ M .fst _)
-          ≡⟨ natural-on-*→Λ M _ ⟩
-        □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
-          ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
-        (M , next M , λ _ → ∣ -↠-refl ∣) ∎
-        where open ≡-Reasoning
         
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
 
+      lem : (M : Λ₀) → qΛ M ≡ (M , next M , _)
+      lem M = begin
+        qΛ M
+          ≡⟨ refl ⟩
+        qΛ (*→Λ M .fst _)
+          ≡⟨ naturality (*→Λ M) _ ⟩
+        □map (*→Λ M) .fst (qQ-at-⊤ .fst tt*)
+          ≡⟨ refl ⟩
+        ↑₁ M [ _ ]  , next M , (λ α → s α)
+          ≡[ i ]⟨ subst-rename-∅ _ M i , next M , transport-filler (cong (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M)) s i ⟩
+        M , next M , subst (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M) s ∎
+        where
+          open ≡-Reasoning
+          open HasTracker (*→Λ M .snd)
+          f : Unit* → ⟨ □ k ⊤ₐ ⟩
+          f = qQ-at-⊤ .fst
+          s = ▹map F⊩f (f tt* .snd .snd)
+     
       QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
       QΛ-is-quoting M = begin
         QΛ [ M ]
@@ -163,7 +157,7 @@ module _ (Q : Quoting) where
 
       f′ : (▹ k (Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x))
         → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
-      f′ hyp = f (gfix′ F , (λ α → hyp α .fst) , λ α → ∣ X.⊩-respects-↠ gfix′-↠ (hyp α .snd) ∣) ,
+      f′ hyp = f (gfix′ F , (λ α → hyp α .fst) , λ α → X.⊩-respects-↠ gfix′-↠ (hyp α .snd)) ,
         F⊩f (lift -↠-refl)
 
       fixf : Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
@@ -173,18 +167,18 @@ module _ (Q : Quoting) where
       r = fixf .snd
 
 
-  IGL : (X : Asm 𝓤)
-    → Trackable (□ k (□ k X ⇒ X)) (□ k X)
-  IGL {k = k} X = irec , ↑₁ Sub · {!!} · (↑₁ ⌜ gfix {!0!} ⌝) , λ {G} {g} r → lift {!!}
-    where
-      module X  = AsmStr (str X)
-      module □X = AsmStr (str (□ k X))
+  -- IGL : (X : Asm 𝓤)
+  --   → Trackable (□ k (□ k X ⇒ X)) (□ k X)
+  -- IGL {k = k} X = irec , ↑₁ Sub · {!!} · (↑₁ ⌜ gfix {!0!} ⌝) , λ {G} {g} r → lift {!!}
+  --   where
+  --     module X  = AsmStr (str X)
+  --     module □X = AsmStr (str (□ k X))
 
-      irec : ⟨ □ k (□ k X ⇒ X) ⟩ → ⟨ □ k X ⟩
-      irec (F , f , F⊩f) = F · ⌜ gfix F ⌝  , ▹Σ y
-        where
-          y : ▹ k (Σ[ x ꞉ ⟨ X ⟩ ] ∥ F · ⌜ gfix F ⌝ X.⊩ x ∥) 
-          y α = fix λ hyp →
-            f α .fst (gfix F , (λ α → hyp α .fst) ,
-              λ α → rec propTruncIsProp (λ r → ∣ X.⊩-respects-↠ gfix-↠ r ∣) (hyp α .snd)) ,
-            rec propTruncIsProp (λ r → ∣ r (lift -↠-refl) ∣) (F⊩f α)
+  --     irec : ⟨ □ k (□ k X ⇒ X) ⟩ → ⟨ □ k X ⟩
+  --     irec (F , f , F⊩f) = F · ⌜ gfix F ⌝  , ▹Σ y
+  --       where
+  --         y : ▹ k (Σ[ x ꞉ ⟨ X ⟩ ] ∥ F · ⌜ gfix F ⌝ X.⊩ x ∥) 
+  --         y α = fix λ hyp →
+  --           f α .fst (gfix F , (λ α → hyp α .fst) ,
+  --             λ α → rec propTruncIsProp (λ r → ∣ X.⊩-respects-↠ gfix-↠ r ∣) (hyp α .snd)) ,
+  --           rec propTruncIsProp (λ r → ∣ r (lift -↠-refl) ∣) (F⊩f α)

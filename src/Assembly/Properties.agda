@@ -18,13 +18,13 @@ private
 ∇ X = X , (λ _ _ → Unit*) , record
   { ⊩-respects-↠ = λ _ _ → tt*
   ; ⊩-right-total = λ _ → ∣ 𝑰 , tt* ∣
---  ; ⫣-isProp     = λ _ _ → isPropUnit*
   }
 
 ℕₐ : Asm₀
 ℕₐ = ℕ , _⊩_ , record
   { ⊩-respects-↠  = -↠-trans
-  ; ⊩-right-total = λ n → ∣ 𝒄 n , -↠-refl ∣ }
+  ; ⊩-right-total = λ n → ∣ 𝒄 n , -↠-refl ∣
+  }
   where
     _⊩_ : Λ₀ → ℕ → 𝓤₀ ̇
     M ⊩ n = M -↠ 𝒄 n
