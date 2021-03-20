@@ -28,9 +28,7 @@ module _ (Q : Quoting) where
     where
       |□X| : 𝓤 ̇
       |□X| = Σ[ M ꞉ Λ₀ ] Σ[ x ꞉ |X| ] M ⊩ x
-      -- Can we remove truncation? If so, is □id still equal to id? 
-      -- Ans. If we assume that ⫣ is a mere proposition, then ▹[ α ] (...) is also a mere proposition (▹isProp→isProp▹).
-      -- Therefore, we don't need propositional truncation here.
+      -- Can we remove truncation? Yes.
 
       _⊩□X_ : (M : Λ₀) → |□X| → 𝓤 ̇
       n̅ ⊩□X (M , _ , _) = Lift (n̅ -↠ ⌜ M ⌝)
@@ -88,22 +86,6 @@ module _ (Q : Quoting) where
   □-exposure : Exposure 𝓤
   □-exposure = exposure □_ □map □-isExposure
 
-  forgetful : {X : Asm 𝓤₀} → Trackable (□ X) (□ Λ₀ₐ)
-  forgetful = (λ { (M , _ , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)
-
-  Λ-map : Trackable X Y → Trackable Λ₀ₐ Λ₀ₐ
-  Λ-map (f , F , F⊩f) = F [_] , F , λ {M} {N} r → reduce-ssubst F r
-
-  Λ-exposure : Exposure 𝓤₀
-  Λ-exposure = exposure (λ _ → Λ₀ₐ) Λ-map (record
-    { preserve-id   = λ _ _ → refl
-    ; preserve-comp = λ { (_ , F , _) (_ , G , _) M → ∘-ssubst-ssubst G F M}
-    ; reflects-∼    = λ { (f , F , _) (g , G , _) F=G x → {!!} }
-    })
-
-  forgetful′ : NaturalTransformation {𝓤₀} □-exposure {!!}
-  forgetful′ = {!!}
-
   eval : Trackable (□ X) X
   eval {X = X} = (λ x → fst (snd x)) , Eval ,
     λ { {N} {M , x , M⊩x} N-↠⌜M⌝ →
@@ -129,38 +111,35 @@ module _ (Q : Quoting) where
 
       qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
       qQ-at-⊤ = fun
-
-      □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , M , -↠-refl)
-      □*→Λ-is-constant M x = begin
-        □map (*→Λ M) .fst x
-          ≡⟨ refl ⟩
-        ↑₁ M [ _ ] , M , _
-          ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (L , M , N)) (subst-rename-∅ _ M) {!!} ⟩
-        M , M , -↠-refl ∎
-        where open ≡-Reasoning
+      
+      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
+      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
 
       natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ Λ₀ₐ
       natural-on-*→Λ M = naturality (*→Λ M)
 
-      lem : (M : Λ₀) → qΛ M ≡ (M , M , -↠-refl)
-      lem M = begin
-        qΛ M
-          ≡⟨ refl ⟩
-        qΛ (*→Λ M .fst _)
-          ≡⟨ natural-on-*→Λ M _ ⟩
-        □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
-          ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
-        (M , M , -↠-refl) ∎
-        where open ≡-Reasoning
-        
-      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
-      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
-
       QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
-      QΛ-is-quoting M = begin
+      QΛ-is-quoting M = let open -↠-Reasoning in begin
         QΛ [ M ]
           -↠⟨ lower (QΛ[M] -↠-refl) ⟩
         ⌜ qΛ M .fst ⌝
         ≡[ i ]⟨ ⌜ lem M i .fst  ⌝ ⟩
         ⌜ M ⌝ ∎
-        where open -↠-Reasoning
+        where
+          module □Λ = AsmStr (str (□ Λ₀ₐ))
+
+          lem : (M : Λ₀) → qΛ M ≡ (M , M , _)
+          lem M = let
+            open ≡-Reasoning
+            s = HasTracker.F⊩f (snd (*→Λ M)) (snd (snd (qQ-at-⊤ .fst tt*))) in begin
+            qΛ M
+              ≡⟨ natural-on-*→Λ M _ ⟩
+            (↑₁ M [ _ ] , M , s) 
+              ≡[ i ]⟨ (subst-rename-∅ _ M) i , M , (transport-filler (cong (_-↠ M) (subst-rename-∅ _ M)) s) i ⟩ 
+            (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎
+
+  forgetful : {X : Asm 𝓤₀} → Trackable (□ X) (□ Λ₀ₐ)
+  forgetful = (λ { (M , _ , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)
+
+  Λ-map : Trackable X Y → Trackable Λ₀ₐ Λ₀ₐ
+  Λ-map (f , F , F⊩f) = F [_] , F , λ {M} {N} r → reduce-ssubst F r
