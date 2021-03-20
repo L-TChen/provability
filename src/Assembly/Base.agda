@@ -11,8 +11,9 @@ record IsRealisability {X : 𝓤 ̇} (_⊩_ : Λ₀ → X → 𝓤 ̇) : 𝓤 ̇
   field
     ⊩-respects-↠  : _⊩_ respects _-↠_ on-the-left
     ⊩-right-total : _⊩_ IsRightTotal
-    -- ⊩-isProp     : Π[ M ꞉ Λ₀ ] Π[ x ꞉ X ] isProp (M ⊩ x)
+    ⊩-isProp      : Π[ M ꞉ Λ₀ ] Π[ x ꞉ X ] isProp (M ⊩ x)
     -- ⊩-isProp is useful when defining □, but however it does not seem necessary to define ASM?
+    -- it is necessary to define ⊠ X → X if ⊠ X consists of truncated witness of realisability.
 
 record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   constructor _,_

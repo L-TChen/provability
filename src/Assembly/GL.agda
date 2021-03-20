@@ -120,13 +120,16 @@ module _ (Q : Quoting) where
       qQ-at-⊤ = fun
 
       □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , next M , λ _ → ∣ -↠-refl ∣)
-      □*→Λ-is-constant M x = begin
-        □map (*→Λ M) .fst x
+      □*→Λ-is-constant M₀ y@(M , x , r) = begin
+        □map (*→Λ M₀) .fst y
           ≡⟨ refl ⟩
-        ↑₁ M [ _ ] , next M , _
-          ≡⟨ cong₂ {C = λ _ _ → ⟨ □ k Λ₀ₐ ⟩} (λ L N → (L , next M , N)) (subst-rename-∅ _ M) {!!} ⟩
-        M , next M , (λ α → ∣ -↠-refl ∣) ∎
-        where open ≡-Reasoning
+        ↑₁ M₀ [ M ] , next M₀ , (λ α → ∥-∥map F⊩f (r α))
+          ≡⟨ cong₂ {C = λ _ _ → ⟨ □ k Λ₀ₐ ⟩} (λ L N → (L , next M₀ , N)) (subst-rename-∅ _ M₀) {!!} ⟩
+        M₀ , next M₀ , (λ α → ∣ -↠-refl ∣) ∎
+        where
+          open ≡-Reasoning
+          open HasTracker (*→Λ M₀ .snd)
+
 
       natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ k Λ₀ₐ
       natural-on-*→Λ M = naturality (*→Λ M)

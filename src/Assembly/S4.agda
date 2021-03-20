@@ -22,12 +22,13 @@ module _ (Q : Quoting) where
 
   □_ : Asm 𝓤 → Asm 𝓤
   □_ {𝓤} (|X| , _⊩_ , ⊩-is-realisability) = |□X| , _⊩□X_ , record
-    { ⊩-respects-↠ = λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}
+    { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩□X-respect-↠ {x} {x′} {y}
     ; ⊩-right-total = ⊩□X-right-total
+    ; ⊩-isProp      = {!!}
     }
     where
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ x ꞉ |X| ] M ⊩ x
+      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ x ꞉ |X| ] ∥ M ⊩ x ∥
       -- Can we remove truncation? If so, is □id still equal to id? 
       -- Ans. If we assume that ⫣ is a mere proposition, then ▹[ α ] (...) is also a mere proposition (▹isProp→isProp▹).
       -- Therefore, we don't need propositional truncation here.
@@ -42,7 +43,7 @@ module _ (Q : Quoting) where
       ⊩□X-right-total (M , _ , M⫣x) = ∣ ⌜ M ⌝ , lift (⌜ M ⌝ _-↠_.∎) ∣
 
   □map₀ : Trackable X Y → ⟨ □ X ⟩ → ⟨ □ Y ⟩
-  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , f x , F⊩f M⊩x
+  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , f x , ∥-∥map F⊩f M⊩x
 
   □map₁ : Λ₁ → Λ₁
   □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
@@ -63,7 +64,7 @@ module _ (Q : Quoting) where
         ⌜ F [ M ] ⌝ ∎)
 
   □id=id : (X : Asm 𝓤) → (x : ⟨ □ X ⟩) → □map₀ (id X) x ≡ x
-  □id=id X x = refl
+  □id=id X (M , x , r) i = M , x , propTruncIsProp (∥-∥map (λ x → x) r) r i
 
   □-isExposure : IsExposure {𝓤} □_  □map
   □-isExposure = record
@@ -89,25 +90,11 @@ module _ (Q : Quoting) where
   □-exposure = exposure □_ □map □-isExposure
 
   forgetful : {X : Asm 𝓤₀} → Trackable (□ X) (□ Λ₀ₐ)
-  forgetful = (λ { (M , _ , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)
-
-  Λ-map : Trackable X Y → Trackable Λ₀ₐ Λ₀ₐ
-  Λ-map (f , F , F⊩f) = F [_] , F , λ {M} {N} r → reduce-ssubst F r
-
-  Λ-exposure : Exposure 𝓤₀
-  Λ-exposure = exposure (λ _ → Λ₀ₐ) Λ-map (record
-    { preserve-id   = λ _ _ → refl
-    ; preserve-comp = λ { (_ , F , _) (_ , G , _) M → ∘-ssubst-ssubst G F M}
-    ; reflects-∼    = λ { (f , F , _) (g , G , _) F=G x → {!!} }
-    })
-
-  forgetful′ : NaturalTransformation {𝓤₀} □-exposure {!!}
-  forgetful′ = {!!}
+  forgetful = (λ { (M , _ , r) → M , M , ∣ ∣ -↠-refl ∣ ∣}), 0 , λ r → r
 
   eval : Trackable (□ X) X
-  eval {X = X} = (λ x → fst (snd x)) , Eval ,
-    λ { {N} {M , x , M⊩x} N-↠⌜M⌝ →
-      X.⊩-respects-↠ (reduce-ssubst Eval (lower N-↠⌜M⌝)) ((X.⊩-respects-↠ Eval-↠ M⊩x)) }
+  eval {X = X} = (λ x → fst (snd x)) , Eval , λ { {N} {M , x , r} (lift N-↠⌜M⌝) →
+    X.⊩-respects-↠ (reduce-ssubst Eval N-↠⌜M⌝) (rec (X.⊩-isProp _ _) (λ s → X.⊩-respects-↠ Eval-↠ s) r) }
     where
       module X  = AsmStr (str X)
       module □X = AsmStr (str (□ X))
@@ -115,52 +102,56 @@ module _ (Q : Quoting) where
   eval′ : NaturalTransformation {𝓤} □-exposure Id
   eval′ = eval , λ f x → refl
 
-  quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
-  quoting-does-not-exist (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
-    where
-      qQ-at-Λ : Trackable Λ₀ₐ (□ Λ₀ₐ)
-      qQ-at-Λ = fun
+  -- quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
+  -- quoting-does-not-exist (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
+  --   where
+  --     qQ-at-Λ : Trackable Λ₀ₐ (□ Λ₀ₐ)
+  --     qQ-at-Λ = fun
 
-      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ M ꞉ Λ₀ ] N -↠ M
-      qΛ = qQ-at-Λ .fst
+  --     qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ M ꞉ Λ₀ ] N -↠ M
+  --     qΛ = qQ-at-Λ .fst
 
-      QΛ : Λ₁
-      QΛ = HasTracker.F (qQ-at-Λ .snd)
+  --     QΛ : Λ₁
+  --     QΛ = HasTracker.F (qQ-at-Λ .snd)
 
-      qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
-      qQ-at-⊤ = fun
+  --     qQ-at-⊤ : Trackable ⊤ₐ (□ ⊤ₐ)
+  --     qQ-at-⊤ = fun
 
-      □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , M , -↠-refl)
-      □*→Λ-is-constant M x = begin
-        □map (*→Λ M) .fst x
-          ≡⟨ refl ⟩
-        ↑₁ M [ _ ] , M , _
-          ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (L , M , N)) (subst-rename-∅ _ M) {!!} ⟩
-        M , M , -↠-refl ∎
-        where open ≡-Reasoning
+  --     □*→Λ-is-constant : ∀ (M : Λ₀) x → □map (*→Λ M) .fst x ≡ (M , M , -↠-refl)
+  --     □*→Λ-is-constant M bx@(N , x , r) = begin
+  --       □map (*→Λ M) .fst bx
+  --         ≡⟨ refl ⟩
+  --       ↑₁ M [ N ] , M , F⊩f r
+  --         ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (L , M , N)) (subst-rename-∅ _ M) {!!} ⟩
+  --       ↑₁ M [ N ] , M , F⊩f r
+  --         ≡⟨ cong₂ {C = λ _ _ → ⟨ □ Λ₀ₐ ⟩} (λ L N → (L , M , N)) (subst-rename-∅ _ M) {!!} ⟩
+  --       M , M , -↠-refl ∎
+  --       where
+  --         open ≡-Reasoning
+  --         open HasTracker (*→Λ M .snd)
 
-      natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ Λ₀ₐ
-      natural-on-*→Λ M = naturality (*→Λ M)
+  --     natural-on-*→Λ : (M : Λ₀) → qQ-at-Λ ∘ *→Λ M ∼ □map (*→Λ M) ∘ qQ-at-⊤ ꞉ ⊤ₐ →ₐ □ Λ₀ₐ
+  --     natural-on-*→Λ M = naturality (*→Λ M)
 
-      lem : (M : Λ₀) → qΛ M ≡ (M , M , -↠-refl)
-      lem M = begin
-        qΛ M
-          ≡⟨ refl ⟩
-        qΛ (*→Λ M .fst _)
-          ≡⟨ natural-on-*→Λ M _ ⟩
-        □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
-          ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
-        (M , M , -↠-refl) ∎
-        where open ≡-Reasoning
+  --     lem : (M : Λ₀) → qΛ M ≡ (M , M , -↠-refl)
+  --     lem M = begin
+  --       qΛ M
+  --         ≡⟨ refl ⟩
+  --       qΛ (*→Λ M .fst _)
+  --         ≡⟨ natural-on-*→Λ M _ ⟩
+  --       □map (*→Λ M) .fst (qQ-at-⊤ .fst _)
+  --         ≡⟨ □*→Λ-is-constant M (qQ-at-⊤ .fst _) ⟩
+  --       (M , M , -↠-refl) ∎
+  --       where open ≡-Reasoning
         
-      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
-      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
+  --     QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
+  --     QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
 
-      QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
-      QΛ-is-quoting M = begin
-        QΛ [ M ]
-          -↠⟨ lower (QΛ[M] -↠-refl) ⟩
-        ⌜ qΛ M .fst ⌝
-        ≡[ i ]⟨ ⌜ lem M i .fst  ⌝ ⟩
-        ⌜ M ⌝ ∎
-        where open -↠-Reasoning
+  --     QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
+  --     QΛ-is-quoting M = begin
+  --       QΛ [ M ]
+  --         -↠⟨ lower (QΛ[M] -↠-refl) ⟩
+  --       ⌜ qΛ M .fst ⌝
+  --       ≡[ i ]⟨ ⌜ lem M i .fst  ⌝ ⟩
+  --       ⌜ M ⌝ ∎
+  --       where open -↠-Reasoning
