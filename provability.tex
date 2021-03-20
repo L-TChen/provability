@@ -463,7 +463,8 @@ Then, consider $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$ and $\mathtt{I}\,\mat
 We have $\mathtt{Q}\,(\mathtt{I}\,\mathtt{I}) \reduce \qquote{\mathtt{I}\,\mathtt{I}}$ by assumption but also $\mathtt{Q}\,(\mathtt{I}\,\mathtt{I}) \reduce \mathtt{Q}\,\mathtt{I}\reduce \qquote{I}$.
 Hence, by confluence and the assumption that $\qquote{M}$ is normal, it follows that $\qquote{I\,I} \equiv_\alpha \qquote{I}$ and thus $\mathtt{I\,I} \equiv_\alpha \mathtt{I}$, a contradiction.
 
-Apart from the well-known Kleene's Recursion Theorem, a lesser known theorem works for \emph{code}.
+Contrary to the well-known Kleene's first recursion theorem, his second recursion theorem which works for \emph{code} is lesser known but more interesting.
+
 \begin{theorem}[Second Recursion Theorem]
   Every term $F$ in untyped $\lambda$-calculus has a term $M$ with $M \reduce F\,\qquote{M}$.
 \end{theorem}
@@ -739,30 +740,25 @@ We are also able to justify that the absence of quoting function with our defini
 We use a variant of guarded type theories to define the modality~$\Box$ satisfying the Gödel-Löb axiom and its deductive form---the intensional recursion~\cite{Kavvos2017b}---with a notion of computation stages.
 This {\GL} modality then answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020}.
 
-\paragraph*{Future work}
+\subsection{Future work}
 The semantics of intensionality is largely an unexplored area.
 In the following, we sketch a few immediate questions emerged while working on this paper.
 
-\begin{enumerate}
-  \item As we have two intensional modalities for the same $\PP$-category~$\ASM(\Lambda)$, one of obvious questions is to find out how these two modalities are related.
-  It is clear that there is a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know much else about their relationship.
-  In the context of provability/justification logic, a step taken by Goris~\cite{Goris2009}, where {\SFour} and {\GL} modalities are discussed in a Hilbert-style system, seems relevant to this question.
+As we have two intensional modalities for the same $\PP$-category~$\ASM(\Lambda)$, one of obvious questions is to find out how these two modalities are related.
+It is clear that there is a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know much else about their relationship.
+In the context of provability/justification logic, a step taken by Goris~\cite{Goris2009}, where {\SFour} and {\GL} modalities are discussed in a Hilbert-style system, seems relevant to this question.
 
-  \item From the type-theoretic perspective, it is obviously unsatisfactory to have semantics without syntax.
+From the type-theoretic perspective, it is obviously unsatisfactory to have semantics without syntax.
 We would like to describe a bi-modal type theory enriched with $\boxtimes$ and $\Box$ based on modal type theories given by Davies and Pfenning~\cite{Davies2001b} and by Kavvos~\cite{Kavvos2017b,Kavvos2020} along with suitable typing rules and operational semantics relating these two modalities hinted by Goris \emph{op.\ cit}.
-  Following the intuition that $\boxtimes A$ and $\Box A$ are assemblies of $A$-typed code, we expect that this framework can be used to guide the design of language constructs for metaprogramming, an area full of engineering fixes with little mathematical understanding.
+Following the intuition that $\boxtimes A$ and $\Box A$ are assemblies of $A$-typed code, we expect that this framework can be used to guide the design of language constructs for metaprogramming, an area full of engineering fixes with little mathematical understanding.
 
-  \item From the perspective of logic, our work also sheds a new light on provability logic.
+From the perspective of logic, our work also sheds a new light on provability logic.
 In the field of provability logic, {\SFour} is referred as the modal logic of \emph{explicit} proofs and {\GL} as the modal logic of \emph{implicit} proofs with Kripke semantics.
 It is observed by Shamkanov~\cite{Shamkanov2014,Shamkanov2016a} that the {\GL} modality can be realised by circular proofs.
-  To compare his result with ours, we conjecture that Shamkanov's result is a special case where the quoting function~$\qquote{\cdot}$ is just the identity function with the use of the Second Recursion Theorem replaced by the First Recursion Theorem and $\lambda$-terms interpreted as Böhm trees.
+To compare his result with ours, we conjecture that Shamkanov's result is a special case where the quoting function~$\qquote{\cdot}$ is just the identity function with the use of the Second Recursion Theorem replaced by the First Recursion Theorem and $\lambda$-terms interpreted as Böhm trees.
 
-  \item Finally, since one of the main applications of guarded type theory is exactly to give program semantics involving step-indexing~\cite{Birkedal2012}, it might be useful to develop category theory internal to guarded type theory in full detail.
-    We expect such a categorical framework would be useful to describe what staged computation is or more generally what metaprogramming is from an abstract point of view.
-
-\end{enumerate}
-
-
+Finally, since one of the main applications of guarded type theory is exactly to give program semantics involving step-indexing~\cite{Birkedal2012}, it might be useful to develop category theory internal to guarded type theory in full detail.
+  We expect such a categorical framework would be useful to describe what staged computation is or more generally what metaprogramming is from an abstract point of view.
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
 %As a sanity check, we may further ask the type $\mathsf{Code}$ of \emph{untyped} code and a polymorphic function from $\boxtimes A$ to $\mathsf{Code}$ forgetting what a typed code denotes. 
