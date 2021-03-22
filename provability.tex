@@ -160,10 +160,24 @@ In this paper, we use homotopy type theory, HoTT for short, as the foundation of
 \cite{Shamkanov2014,Shamkanov2016a}
 
 \section{Preliminaries}\label{sec:preliminaries}
+This work is based on $\lambda$-calculus~\cite{Barendregt1984a}, basic homotopy type theory~\cite{hottbook}, and $\PP$-categories~\cite{Cubric1998a}, which will be recalled in the rest of this section.
+
+\subsection{\texorpdfstring{$\lambda$}{λ}-calculus}
+We only fix notations for $\lambda$-calculus.
+Terms are denoted informally by
+\[
+  M \defeq \mathtt{x} \mid M\,N \mid \lambda \mathtt{x}.\, M
+\]
+where $\mathtt{x}$ is in the typewriter font.
+The type of terms of at most $n$ many free variables in $\lambda$-calculus is denoted by $\Lambda_n$.
+In particular, $\Lambda_0$ is the type of closed terms, $\Lambda_1$ the type of open terms with at most one free variable, and so on.
+Using the de Bruijn representation, 
+$\alpha$-equivalent terms are already identified, so the $\alpha$-equivalence $=_\alpha$ coincides with the identity type $=_\Lambda$ in homotopy type theory (or the path type in a cubical type theory).
+The reduction relation is denoted by $\reduce$ with type $\Lambda \to \Lambda \to \Univ$.
 
 \subsection{Homotopy type theory}
-In this section, we fix notations and highlight its difference with set-theoretic foundations relevant to this paper.
-Most of, if not all, materials are standard and presented in the HoTT Book~\cite{hottbook}, so the reader comfortable with HoTT should feel free to skip this section.
+In the following we highlight the main difference between set theory and homotopy type theory.
+Most of, if not all, materials are standard and presented in the HoTT Book, so the reader comfortable with HoTT should feel free to skip this section.
 \ltnote{(mere) proposition, set, structure vs.\ property}
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
@@ -226,8 +240,8 @@ Likewise, we have a notion of \emph{comonadic exposures} as exposures $Q$ with t
 Note that the definition of comonadic exposures by Kavvos~\cite{Kavvos2017b} requires additionally that $Q$ is cartesian and product-preserving.
 We will revisit this difference in~\Cref{sec:provability}.
 
-Finally, there is a caveat regarding the actual type-theoretic formulation.
-Even though we choose HoTT as the foundation, we do not require the carrier of a $\PP$-set to be a set ($0$-type) and the relation $\sim$ proof-irrelevant ($-1$-type). 
+Here is a caveat regarding the type-theoretic formulation.
+Although we choose HoTT as the foundation, we do not require the carrier $X$ to be a set ($0$-type) and $\sim$ a mere relation. 
 
 \section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
 
@@ -543,6 +557,7 @@ We show the existence of such a natural transformation implies the existence of 
 \begin{proof}
   Assume that such a family of maps $\eta_X\colon X \to \boxtimes X$ natural in $X$ exist.
   Every closed term $M_0$ corresponds to a trackable map $\widehat{M_0} \defeq (\mathsf{c}_{M_0}, M_0, \mathfrak{M}_0) \colon \top \to \Lambda$ where $\mathsf{c}_{M_0}$ is the constant function with the value $M_0$ and $\mathfrak{M}_0$ is also the constant function with the value $\mathsf{refl}_{\twoheadrightarrow} M_0 : M_0 \reduce M_0$.
+  \ltnote{it does not have to be a constant function}
   Consider the naturality of $\eta$
   \[
     \xymatrix{
