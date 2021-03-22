@@ -49,7 +49,7 @@
 %
 \newcommand{\Tree}{\mathcal{S}}
 \newcommand{\later}{\mathord{\blacktriangleright}}
-\newcommand{\laterp}{\mathord{\vartriangleright}}
+\newcommand{\laterp}{\mathord{\triangleright}}
 \newcommand{\PER}{\mathbf{PER}}
 \newcommand{\Nat}{\mathbb{N}}
 \newcommand{\PP}{\mathscr{P}}
@@ -195,8 +195,9 @@ A $\PP$-category has two kinds of equalities for morphisms---the underlying iden
 For example, this additional equality reflects the fact that $\alpha$-equivalent terms are $\beta$-equivalent but not the converse.
 For categorical semantics where terms are interpreted as morphisms, an interpretation in a $\PP$-category is possible to discriminate these two kinds of identities, enabling us to model intensionality.
 
-Next we recall the notion of exposures.
-In short, an exposure is a $\PP$-functor which does not preserve but \emph{reflects} $\sim$-equality in the following sense.
+We recall the notion of exposures.
+An exposure is like a $\PP$-functor but it does not preserve $\sim$-equality.
+Instead, it is faithful with respect to~$\sim$ in the following sense.
 \begin{definition}
   Given $\PP$-categories $\mathscr{C}$ and $\mathscr{D}$, an \emph{exposure} $Q\colon \mathscr{C} \looparrowright \mathscr{D}$ consists of \emph{(a)} a mapping $Q$ from objects $X$ of $\mathscr{C}$ to objects~$QX$ of $\mathscr{D}$ \emph{(b)} and from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Qf\colon QX \to QY$ satisfying following properties
   \begin{romanenumerate}
@@ -205,6 +206,7 @@ In short, an exposure is a $\PP$-functor which does not preserve but \emph{refle
     \item $f \sim g$ whenever $Qf \sim Qg$ for any two well-defined morphisms $f, g\colon X \to Y$. 
   \end{romanenumerate}
 \end{definition}
+
 
 The \emph{identity exposure} $\mathcal{I}$ maps every object to itself as well as morphisms.
 Composing two exposures in the usual way clearly gives us an exposure. 
@@ -220,12 +222,9 @@ We also need a proper notion of morphisms between exposures below.
   \]
   commutes up to the extensional equality~$\sim$.
 \end{definition}
-Likewise, we have a notion of \emph{comonadic exposures}\footnote{%
-  The definition of comonadic exposures $Q$ by Kavvos~\cite{Kavvos2017b} requires additionally that $Q$ is cartesian and product-preserving.
-  We will revisit this issue in~\Cref{sec:provability}.
-}
-as exposures $Q$ with transformations $\epsilon\colon Q \to \mathcal{I}$ and $\delta\colon Q \to Q^2$ satisfying the associative law and the unit laws up to~$\sim$.
-
+Likewise, we have a notion of \emph{comonadic exposures} as exposures $Q$ with transformations $\epsilon\colon Q \to \mathcal{I}$ and $\delta\colon Q \to Q^2$ satisfying the associative law and the unit laws up to~$\sim$.
+Note that the definition of comonadic exposures by Kavvos~\cite{Kavvos2017b} requires additionally that $Q$ is cartesian and product-preserving.
+We will revisit this difference in~\Cref{sec:provability}.
 
 Finally, there is a caveat regarding the actual type-theoretic formulation.
 Even though we choose HoTT as the foundation, we do not require the carrier of a $\PP$-set to be a set ($0$-type) and the relation $\sim$ proof-irrelevant ($-1$-type). 
@@ -463,7 +462,7 @@ Then, consider $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$ and $\mathtt{I}\,\mat
 We have $\mathtt{Q}\,(\mathtt{I}\,\mathtt{I}) \reduce \qquote{\mathtt{I}\,\mathtt{I}}$ by assumption but also $\mathtt{Q}\,(\mathtt{I}\,\mathtt{I}) \reduce \mathtt{Q}\,\mathtt{I}\reduce \qquote{I}$.
 Hence, by confluence and the assumption that $\qquote{M}$ is normal, it follows that $\qquote{I\,I} \equiv_\alpha \qquote{I}$ and thus $\mathtt{I\,I} \equiv_\alpha \mathtt{I}$, a contradiction.
 
-Contrary to the well-known Kleene's first recursion theorem, his second recursion theorem which works for \emph{code} is lesser known but more interesting.
+Contrary to the well-known Kleene's first recursion theorem, his second recursion theorem which works for \emph{code} is lesser known but far more interesting .
 
 \begin{theorem}[Second Recursion Theorem]
   Every term $F$ in untyped $\lambda$-calculus has a term $M$ with $M \reduce F\,\qquote{M}$.
@@ -476,23 +475,22 @@ If $F$ is in the form of abstraction, the above theorem boils down to the follow
 \end{corollary}
 
 \subsection{A comonadic exposure for \texorpdfstring{\SFour}{S4} modality}
-An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \bproj{X}$ with a term $M$ which merely realises $x$ as the carrier of $\boxtimes X$.
-A pair $(M, x)$ with $\star : \brck{M \Vdash_X x}$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.  
-Thus, we argue that $(M, x, \star)$ shall be realised by terms which are $\beta$-equivalent to its code $\qquote{M}$ (instead of $M$ as proposed by Kavvos~\cite{Kavvos2017b}), since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.
+An assembly $X$ records the interplay between intensions, i.e.\ untyped $\lambda$-terms, and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \bproj{X}$ with a term $M$ which realises $x$ as the carrier of $\boxtimes X$.
+A pair $(M, x, r)$ with $r : M \Vdash_X x$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.
+Thus, we argue that $(M, x, r)$ shall be realised by terms which are $\beta$-equivalent to its code $\qquote{M}$ (instead of $M$ as proposed by Kavvos~\cite{Kavvos2017b}), since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.
 In short, the carrier and the realisability relation are defined as
 \[
-  \bproj{\boxtimes X} \defeq \sum_{M : \Lambda_0} \sum_{x : \bproj{X}} \brck{M \Vdash x}
+  \bproj{\boxtimes X} \defeq \sum_{M : \Lambda_0} \sum_{x : \bproj{X}} M \Vdash x
   \quad\text{and}\quad
-  N \Vdash_{\boxtimes X} (M, x, \star) \defeq N \reduce \qquote{M}
+  N \Vdash_{\boxtimes X} (M, x, r) \defeq N \reduce \qquote{M}
 \]
 respectively.
 It turns out that $\boxtimes X \defeq (\bproj{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly where $r_{\boxtimes X}$ and $t_{\boxtimes X}$ are the transitivity and the reflexivity of $\reduce$.
 
 As for the mapping on morphisms, consider any trackable map $f$ from $X$ to $Y$.
 We define $\boxtimes f \defeq (\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)\colon \boxtimes X \to \boxtimes Y$ as follows.
-Recall that the propositional truncation $\brck{\blank}$ is functorial, so
 \[
-  \bproj{f}^\boxtimes (M, x, \star) \defeq (F[M], \bproj{f}\,x, \brck{\mathfrak{f}\,M\,x}\,\star)
+  \bproj{f}^\boxtimes (M, x, \star) \defeq (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r)
 \]
 is a function from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes Y}$.
 To give a tracker of $f^\boxtimes$, recall that there is a term $\mathtt{subst}$ performing term substitution on codes, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ by
@@ -504,7 +502,9 @@ To give a tracker of $f^\boxtimes$, recall that there is a term $\mathtt{subst}$
 \end{align*}
 completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
+
 \begin{theorem}[{cf.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
+  \ltnote{this theorem works for $n$-types, but not for arbitrary types (yet)}
   $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ is an exposure.
   Moreover, $\boxtimes$ has a comonadic structure given by families of trackable maps
   \begin{romanenumerate}
@@ -514,9 +514,11 @@ In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathf
   natural in $X$. 
 \end{theorem}
 \begin{proof}[Proof sketch]
-  We only sketch the proof of three less obvious statements here---the preservation of identities and the construction of natural transformations $\epsilon\colon \boxtimes \to \mathcal{I}_{\ASM(\Lambda)}$ and $\delta\colon \boxtimes \to \boxtimes\boxtimes$. 
-  To show that $\boxtimes$ preserves identities, we use that fact that the propositional truncation $\brck{\blank}$ is a functor which preserves identities and that $\pr_3$ is a third projection.
-  Then, it follows that $\brck{\pr_3\,M\,x} \equiv \brck{\id} = \id$ and thus $\id_{\bproj{X}}^\boxtimes (M, x, \star) \equiv (\mathtt{x}[M], x, \brck{\pr_3\,M\,x}\,\star) \equiv \id_{\bproj{\boxtimes X}}(M, x, \star)$.
+  We only sketch some parts of the proof.
+  For example, to see that $\boxtimes$ preserves identities, we observe that
+\[
+  \id_{\bproj{X}}^\boxtimes (M, x, r) \equiv (\mathtt{x}[M], x, \pr_3\,M\,x\,r) \equiv (M, x, r) \equiv \id_{\bproj{\boxtimes X}}(M, x, r).
+\]
 
   For the families of maps $\boxtimes X \to X$ and $\boxtimes X \to \boxtimes \boxtimes X$ natural in $X$, recall that there are terms $\mathtt{eval}$ and $\mathtt{quote}$ which evaluates a code to its representing term and computes the code $\qquote{N}$ of a given term~$N \equiv \qquote{M}$ in the form of code respectively. That is, 
   \[
@@ -600,50 +602,56 @@ To express this idea cleanly, we work in an extension of HoTT with the support o
 
 \subsubsection{Digression: Clocked Cubical Type Theory}
 \ltnote[inline,nomargin]{Introduce clocked cubical type theory here}
-\begin{lemma}
-  \[
-    \eqv{\rhd \sum_{x : A} B\,x}{\sum_{x : \rhd A} \rhd (\alpha : \kappa).\,B\,(x[\alpha])}
-  \]
-\end{lemma}
-
-\begin{corollary}[Löb induction on $\sum$-types]\label{coro:lob-induction-sum}
-  \[
-    \sum_{x : \rhd A} \rhd (\alpha : \kappa).\,B\,(x[\alpha]) \to \sum_{x : A} B\,x
-  \]
-  implies 
-  \[
-    \sum_{x : A} B\,x
-  \]
-\end{corollary}
 
 \begin{lemma}\label{lem:later-sum}
-  For $A : \Univ$ and $B : A \to \Univ$, we have an equivalence
+  For $A : \Univ$ and $B : A \to \Univ$, there is an equivalence
   \[
-    \eqv{\rhd^\kappa\sum_{x : A} B\,x}{\sum_{x : \rhd^\kappa A} \rhd (\alpha : \kappa).\, B (x [\alpha])}.
+    \eqv{\laterp^\kappa \sum_{x : A} B\,x}{\sum_{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B (x [\alpha])}.
   \]
+  between $\Sigma$-types.
 \end{lemma}
-\begin{lemma}\label{lem:proposition-closed-under-later}
-  For every $A : \mathord{\rhd}\,\Univ$ if $\rhd (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then $\rhd(\alpha : \mathbb{T}).\,A[\alpha]$ is also a proposition. 
-\end{lemma}
+\ltnote{Use the definition of bi-invertible equivalences}
+
+\begin{corollary} \label{coro:lob-induction-sum}
+  Suppose that the type $\sum_{x : \laterp A} \laterp (\alpha : \kappa).\,B\,(x[\alpha]) \to \sum_{x : A} B\,x$ is inhabited.
+  Then $\sum_{x : A} B\,x$ is inhabited.
+\end{corollary}
+\begin{proof}
+  It follows from the Löb induction and \Cref{lem:later-sum} with univalence.
+\end{proof}
 
 \begin{lemma}\label{lem:later-identity}
-  $\left(\forall \kappa.\, \rhd^\kappa f = \rhd^\kappa g\right)$ implies $f = g$. 
+  Let $f, g : \sum_{x : A} B\,x$ be dependent functions.
+  Then $f = g$ whenever $\laterp^\kappa f = \laterp^\kappa g$ for any $\kappa$. 
 \end{lemma}
 
+Inspired by~\Cref{lem:later-identity}, we introduce the notion of clocked exposures which are like exposures but indexed by clocks~$\kappa$.
+
 \begin{definition}[Clocked exposure]
+  Given $\PP$-categories $\mathscr{C}$ and $\mathscr{D}$, a \emph{clocked exposure} $Q\colon \mathscr{C} \looparrowright \mathscr{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathscr{C}$ to objects~$Q^\kappa X$ of $\mathscr{D}$ \emph{(b)} and for each clock $\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
+  \begin{romanenumerate}
+    \item $Q^\kappa \iid_X \sim \iid_{QX}$,
+    \item $Q^\kappa (g \circ f) \sim Q^\kappa g \circ Q^\kappa f$, and
+    \item $f \sim g$ whenever $Q^\kappa f \sim Q^\kappa g$ for any clock $\kappa$ and for any two well-defined morphisms $f, g\colon X \to Y$. 
+  \end{romanenumerate}
 \end{definition}
+
+
+%\begin{lemma}\label{lem:proposition-closed-under-later}
+%  For every $A : \mathord{\laterp}\,\Univ$ if $\laterp (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then $\laterp(\alpha : \mathbb{T}).\,A[\alpha]$ is also a proposition. 
+%\end{lemma}
 
 \subsubsection{Back to \texorpdfstring{$\mathsf{GL}$}{GL}}
 
 Now we introduce the clocked exposure $\Box^\kappa \colon \ASM(\Lambda) \to \ASM(\Lambda)$ indexed by clocks~$\kappa$ modelling the $\mathsf{GL}$ modality as follows. 
 For any assembly $X$, the carrier of $\Box^\kappa X$ and the realisability relation are now defined as
 \[
-  \bproj{\Box^\kappa X} \defeq \sum_{M : \Lambda_0} \sum_{x : {\rhd^\kappa \bproj{X}}} \rhd (\alpha : \kappa) .\, \brck{M \Vdash_X x [\alpha]}
+  \bproj{\Box^\kappa X} \defeq \sum_{M : \Lambda_0} \sum_{x : {\laterp^\kappa \bproj{X}}} \laterp (\alpha : \kappa) .\, M \Vdash_X x [\alpha]
   \quad\text{and}\quad
   N \Vdash_{\Box^\kappa X} (M, x, \star) \defeq N \reduce \qquote{M}
 \]
-where $\rhd (\alpha : \kappa) .\, \brck{M \Vdash_X x [\alpha]}$ is a proposition by~\Cref{lem:proposition-closed-under-later} and the relation $\Vdash_{\Box^\kappa X}$ is defined as the same as the comonadic exposure~$\boxtimes$.
-The only difference between carriers $\bproj{\Box^\kappa X}$ and $\bproj{\boxtimes X}$ is the extensional part which becomes $\rhd^\kappa \bproj{X}$ so that the extension of $(M, x, \star)$ is available in the next stage but not earlier (within the clock $\kappa$).
+where $\Vdash_{\Box^\kappa X}$ is defined as the same as the comonadic exposure~$\boxtimes$.
+The only difference between carriers $\bproj{\Box^\kappa X}$ and $\bproj{\boxtimes X}$ is the extensional part which becomes $\laterp^\kappa \bproj{X}$ so that the extension of $(M, x, r)$ is available in the next stage but not earlier (within the clock $\kappa$).
 Similarly, $\Box^\kappa X \defeq (\bproj{\Box^\kappa X}, \Vdash_{\Box^\kappa X}, r_{\Box^\kappa X}, t_{\Box^\kappa X})$ is an assembly where $r_{\Box^\kappa X}$ and $t_{\Box^\kappa X}$ are given by the transitivity and the reflexivity of $\reduce$. 
 
 %\begin{notation*}
@@ -652,15 +660,15 @@ Similarly, $\Box^\kappa X \defeq (\bproj{\Box^\kappa X}, \Vdash_{\Box^\kappa X},
 
 For any trackable map $f$ from $X$ to $Y$, also define $\Box f$ as the same as $\boxtimes f$ with the exception of the function $\bproj{\Box f}$ between carriers which are now involved with a later modality:
 \[
-  \bproj{\Box^\kappa f}(M, x, \star) \defeq (F[M], \rhd^\kappa \bproj{f}\, x, \lambda \alpha.\, \brck{\mathfrak{f}\,M\,x[\alpha]}\,{\star}[\alpha])
+  \bproj{\Box^\kappa f}(M, x, r) \defeq (F[M], \laterp^\kappa \bproj{f}\, x, \lambda \alpha.\, \mathfrak{f}\,M\,(x[\alpha])\,(r[\alpha]))
 \]
-where $(\rhd^\kappa f\, x)[\alpha]$ is judgementally equal to $f(x[\alpha])$, and $\rhd^\kappa \bproj{f} : \rhd^\kappa \bproj{X} \to \rhd^\kappa \bproj{Y}$ is given by the functoriality of the later modality~$\mathord{\rhd}^\kappa$.
+where $(\laterp^\kappa f\, x)[\alpha]$ is judgementally equal to $f(x[\alpha])$, and $\laterp^\kappa \bproj{f} : \laterp^\kappa \bproj{X} \to \laterp^\kappa \bproj{Y}$ is given by the functoriality of the later modality~$\mathord{\laterp}^\kappa$.
 The very same argument for $\boxtimes f$ shows that $\Box^\kappa f$ is indeed a trackable map from $\bproj{\Box^\kappa X}$ to $\bproj{\Box^\kappa Y}$.
 
+\ltnote{again, it is an exposure for $n$-types~\cite{Kraus2015}}
 It is straightforward to show that $\Box^\kappa$ is a clocked-exposure by \Cref{lem:later-identity}.
 \begin{theorem}\label{thm:GL-exposure}
   $\Box^\kappa \colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ is a clocked exposure.
-  \ltnote{$\Box^\kappa$ does not reflect~$\sim$ since we need $\mathtt{force}\colon (\forall \kappa.\, \rhd^\kappa A) \to (\forall \kappa.\, A)$.}
 \end{theorem}
 
 Similar to~\Cref{thm:S4-no-quoting}, we can refute the existence of a family of trackable maps $\eta_X\colon X \to \Box X$ natural in $X$ by the non-existence of the term $\mathtt{Q}$ with $\mathtt{Q}\,M \reduce \qquote{M}$ for any arbitrary term $M$.
@@ -675,21 +683,21 @@ On the other hand, it is not possible to have a family of trackable maps $\epsil
 \end{theorem}
 \begin{proof}
   Assume such a natural transformation~$\epsilon$. In particular, consider $\epsilon_\bot \colon \Box^\kappa \bot \to \bot$. 
-  We will show that there is $\mathsf{bang}\colon \rhd \Empty \to \Empty$, so by guarded recursion $\mathsf{fix}\,\mathsf{bang} : \Empty$ is a contradiction.
+  We will show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by guarded recursion $\mathsf{fix}\,\mathsf{bang} : \Empty$ is a contradiction.
   
-  First, let $x$ be an inhabitant of $\rhd \Empty$. We aim at constructing an inhabitant $(M, x, \star_M)$ of
+  First, let $x$ be an inhabitant of $\laterp \Empty$. We construct an inhabitant $(M, x, r)$ of
   \[
-    \Box^\kappa \bot \equiv \sum_{M : \Lambda_0} \sum_{x : {\rhd \Empty}} \rhd (\alpha : \kappa) .\, \brck{M \Vdash_\bot x [\alpha]}
+    \Box^\kappa \bot \equiv \sum_{M : \Lambda_0} \sum_{x : {\laterp \Empty}} \laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]
   \]
   so that the function $\bproj{\epsilon_\bot}$ from $\bproj{\Box^\kappa \bot}$ to $\bproj{\bot} \equiv \Empty$ can be applied.
   For arbitrary closed term $M$, say $\mathtt{\lambda x.\, x}$, we apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ after a time step, so 
   \[
-    \star_M \defeq \lambda \alpha.\, \mathsf{rec}_{\Empty}\,\brck{M \Vdash_\bot x[\alpha]}\,x[\alpha]
+    r \defeq \lambda \alpha.\, \mathsf{rec}_{\Empty}\,(M \Vdash_\bot x[\alpha])\,x[\alpha]
   \]
-  is an inhabitant of $\rhd (\alpha : \kappa) .\, \brck{M \Vdash_\bot x [\alpha]}$ and thus $(M, x, \star_M)$ is of type $\bproj{\Box^\kappa \bot}$. 
+  is an inhabitant of $\laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]$ and thus $(M, x, r)$ is of type $\bproj{\Box^\kappa \bot}$. 
 \end{proof}
 
-The payoff for disallowing (run-time) evaluation is to be able to adopt guarded recursion for typed code.
+The pay-off for disallowing evaluation is to be able to adopt guarded recursion for typed code.
 From the logical perspective, it is the deductive form of Gödel-Löb axiom.
 
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
@@ -703,13 +711,13 @@ given the Second Recursion Theorem (\Cref{coro:variant-of-SRT}).
   We prove this statement by Löb induction on a $\sum$-type (\Cref{coro:lob-induction-sum}). 
   That is, assuming 
   \[
-    x : \rhd \bproj{X}
+    x : \laterp \bproj{X}
     \quad\text{and}\quad
-    r : \rhd (\alpha : \kappa).\, F[ \qquote{\mathsf{fix}\,F} ] \Vdash x [\alpha]
+    r : \laterp (\alpha : \kappa).\, F[ \qquote{\mathsf{fix}\,F} ] \Vdash x [\alpha]
   \]
   we derive an inhabitant $y : \bproj{X}$ realised by $F[\qquote{\mathsf{fix}\,F}]$ as follows:
   \begin{enumerate}
-    \item First, we have $r' : \rhd (\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x [\alpha]$ since the realisability relation $\Vdash$ respects reductions and $\mathsf{fix}\,F$ reduces to $F[\qquote{\mathsf{fix}\,F}]$. 
+    \item First, we have $r' : \laterp (\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x [\alpha]$ since the realisability relation $\Vdash$ respects reductions and $\mathsf{fix}\,F$ reduces to $F[\qquote{\mathsf{fix}\,F}]$. 
     \item Choose $y$ to be $\bproj{f}(\mathsf{fix}\,F, x, r')$ so that we derive
       \[
         s \defeq \mathfrak{f} (\mathsf{refl}_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\qquote{\mathsf{fix}\,F}] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
@@ -730,35 +738,23 @@ The deductive form of Gödel-Löb axiom can be internalised as follows.
 
 \section{Conclusion}\label{sec:conclusion}
 We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus as the foundation of categorical semantics for intensionality in homotopy type theory. 
-The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which is usually not exposed in ordinary categories, since computationally equivalent terms are mostly identified on the semantics side \emph{a priori}.
+The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which are not exposed in ordinary categories, since computationally equivalent terms are mostly identified on the semantics side \emph{a priori}.
 The situation is likely caused by the confusion between the concept of \emph{denotation} and that of \emph{extension}.
-Following the inspiring works by Kavvos we demonstrated further by the definition of~$\boxtimes$ that they are not the same mathematical objects.
+Following the inspiring works by Kavvos we demonstrated further that they are not the same mathematical objects.
 
 Based on the framework established in~\Cref{sec:assemblies}, we subsequently modelled two intensional modalities $\boxtimes$ and $\Box$ satisfying the {\SFour} axiom and the {\GL} axiom respectively to justify the effectiveness of the framework.
-As we discussed in \Cref{remark:difference-boxtimes}, $\boxtimes \Nat$ is not $\PP$-isomorphic to $\Nat$ in our case, so what have we modelled is more intensional than what Kavvos has modelled. 
-We are also able to justify that the absence of quoting function with our definition, so from the logical perspective $A$ and $\boxtimes A$ are not equivalent for any $A$.
+As we discussed in \Cref{remark:difference-boxtimes} also by \Cref{thm:S4-no-quoting}, results here are not just replicates of the set-theoretic results in homotopy type theory. 
 We use a variant of guarded type theories to define the modality~$\Box$ satisfying the Gödel-Löb axiom and its deductive form---the intensional recursion~\cite{Kavvos2017b}---with a notion of computation stages.
-This {\GL} modality then answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020}.
+This {\GL} modality then answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contribution of this paper.
 
-\subsection{Future work}
-The semantics of intensionality is largely an unexplored area.
-In the following, we sketch a few immediate questions emerged while working on this paper.
+\paragraph*{Future work}
+As we have two apparently related exposures, one obvious question is how these two exposures are connected.
+There is clearly a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know else much.
 
-As we have two intensional modalities for the same $\PP$-category~$\ASM(\Lambda)$, one of obvious questions is to find out how these two modalities are related.
-It is clear that there is a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know much else about their relationship.
-In the context of provability/justification logic, a step taken by Goris~\cite{Goris2009}, where {\SFour} and {\GL} modalities are discussed in a Hilbert-style system, seems relevant to this question.
+The classical {\SFour} and {\GL} modalities and their connection laws are studied in Hilbert-style logic by Goris~\cite{Goris2009} with Kripke semantics in the context of provability logic.
+Accordingly, we would like to describe a type theory enriched with modalities $\boxtimes$ and $\Box$ unifying modal type theories considered by Davies and Pfenning~\cite{Davies2001b} and by Kavvos~\cite{Kavvos2017b,Kavvos2020} while maintaining consistency.
+Following the intuition that $\boxtimes A$ and $\Box A$ are assemblies of $A$-typed code, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely to automata proofs in a principled way.
 
-From the type-theoretic perspective, it is obviously unsatisfactory to have semantics without syntax.
-We would like to describe a bi-modal type theory enriched with $\boxtimes$ and $\Box$ based on modal type theories given by Davies and Pfenning~\cite{Davies2001b} and by Kavvos~\cite{Kavvos2017b,Kavvos2020} along with suitable typing rules and operational semantics relating these two modalities hinted by Goris \emph{op.\ cit}.
-Following the intuition that $\boxtimes A$ and $\Box A$ are assemblies of $A$-typed code, we expect that this framework can be used to guide the design of language constructs for metaprogramming, an area full of engineering fixes with little mathematical understanding.
-
-From the perspective of logic, our work also sheds a new light on provability logic.
-In the field of provability logic, {\SFour} is referred as the modal logic of \emph{explicit} proofs and {\GL} as the modal logic of \emph{implicit} proofs with Kripke semantics.
-It is observed by Shamkanov~\cite{Shamkanov2014,Shamkanov2016a} that the {\GL} modality can be realised by circular proofs.
-To compare his result with ours, we conjecture that Shamkanov's result is a special case where the quoting function~$\qquote{\cdot}$ is just the identity function with the use of the Second Recursion Theorem replaced by the First Recursion Theorem and $\lambda$-terms interpreted as Böhm trees.
-
-Finally, since one of the main applications of guarded type theory is exactly to give program semantics involving step-indexing~\cite{Birkedal2012}, it might be useful to develop category theory internal to guarded type theory in full detail.
-  We expect such a categorical framework would be useful to describe what staged computation is or more generally what metaprogramming is from an abstract point of view.
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
 %As a sanity check, we may further ask the type $\mathsf{Code}$ of \emph{untyped} code and a polymorphic function from $\boxtimes A$ to $\mathsf{Code}$ forgetting what a typed code denotes. 
@@ -773,6 +769,7 @@ Finally, since one of the main applications of guarded type theory is exactly to
 
 \appendix
 
+\section{Clocked Cubical Type Theory}
 
 %\section{environments}
 %
