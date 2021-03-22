@@ -46,8 +46,8 @@ module _ (Q : Quoting) where
   □map₁ : Λ₁ → Λ₁
   □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
 
-  □map : Trackable X Y → Trackable (□ k X) (□ k Y)
-  □map {𝓤} {X} {Y} Ff@(f , F , f⫣F) = □map₀ Ff , □map₁ F , 
+  □map : (k : Cl) → Trackable X Y → Trackable (□ k X) (□ k Y)
+  □map {𝓤} {X} {Y} _ Ff@(f , F , f⫣F) = □map₀ Ff , □map₁ F , 
     λ {M} {x} → □F⊩□f {_} {M} {x}
     where
       open -↠-Reasoning
@@ -71,18 +71,22 @@ module _ (Q : Quoting) where
       module Z = AsmStr (str Z)
       G[F[M]]=G[F][M] = ∘-ssubst-ssubst G F M
 
-  □-isExposure : IsExposure {𝓤} (□ k)  □map
+  □reflects∼ : (f g : Trackable X Y)
+    → isSet ⟨ Y ⟩
+    → ((k : Cl) → □map k f ∼ □map k g ꞉ □ k X →ₐ □ k Y)
+    → f ∼ g ꞉ X →ₐ Y
+  □reflects∼ {X = X} (f , F , F⊩f) (g , G , G⊩g) YisSet □f∼□g x = rec (YisSet _ _)
+    (λ { (M , r) → {!!} }) -- (λ { (M , M⊩x) → cong (λ x → {!!}) (□f∼□g k0 (M , next x , (λ α → M⊩x))) })
+    (X.⊩-right-total x)
+    where
+      module X = AsmStr (str X)
+
+  □-isExposure : IsExposure {𝓤} (□ k) (□map k)
   □-isExposure = record
     { preserve-id   = □id=id
     ; preserve-comp = □gf=□g□f
-    ; reflects-∼    = {!!} -- □reflects∼
+    ; reflects-∼    = {!!}
     }
-    where 
-      postulate
-        -- this is required to prove `□reflects∼`, but unfortunately we canno't have this verified in the model. 
-        □reflects∼ : (f g : Trackable X Y)
-          → (∀ k → □map f ∼ □map g ꞉ □ k X →ₐ □ k Y)
-          → f ∼ g ꞉ X →ₐ Y
 
   □F=□G→F=G : (F G : Λ₁) → □map₁ F ≡ □map₁ G → F ≡ G
   □F=□G→F=G F G □F=□G = ⌜⌝-injective (↑ₗ-injective (decode (encode □F=□G .fst .snd)))
@@ -91,7 +95,7 @@ module _ (Q : Quoting) where
         ↑ₗ-injective : {Γ Δ : Cxt} {A : 𝕋} {M N : Δ ⊢ A} → ↑ₗ_ {Δ} {_} {Γ} M ≡ ↑ₗ N → M ≡ N
 
   □-exposure : (k : Cl) → Exposure 𝓤
-  □-exposure k = exposure (□ k) □map □-isExposure
+  □-exposure k = exposure (□ k) (□map k) □-isExposure
 
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ k (⊥ₐ {𝓤}) ⟩ → ⊥* {𝓤}) → ▹ k ⊥* → ⊥*
@@ -101,11 +105,9 @@ module _ (Q : Quoting) where
   eval-does-not-exist : Trackable {𝓤} (□ k ⊥ₐ) ⊥ₐ → ⊥*
   eval-does-not-exist (e , hasTracker) = fix (bang e)
 
-  -- Lemma: □ sends constant maps to constant maps
-  -- The proof is clear.x
   -- Theorem: There is no natural transformation q : I ⇒ □.
   -- Proof sketch: By naturality, qΛ is determined by its component at the terminal object ⊤ₐ. 
-  -- 
+  
   quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id (□-exposure k)) → ⊥
   quoting-does-not-exist {k = k} (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
     where
@@ -117,7 +119,7 @@ module _ (Q : Quoting) where
 
       qQ-at-⊤ : Trackable ⊤ₐ (□ k ⊤ₐ)
       qQ-at-⊤ = fun
-        
+     
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
 
@@ -127,7 +129,7 @@ module _ (Q : Quoting) where
           ≡⟨ refl ⟩
         qΛ (*→Λ M .fst _)
           ≡⟨ naturality (*→Λ M) _ ⟩
-        □map (*→Λ M) .fst (qQ-at-⊤ .fst tt*)
+        □map k (*→Λ M) .fst (qQ-at-⊤ .fst tt*)
           ≡⟨ refl ⟩
         ↑₁ M [ _ ]  , next M , (λ α → s α)
           ≡[ i ]⟨ subst-rename-∅ _ M i , next M , transport-filler (cong (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M)) s i ⟩
@@ -138,7 +140,7 @@ module _ (Q : Quoting) where
           f : Unit* → ⟨ □ k ⊤ₐ ⟩
           f = qQ-at-⊤ .fst
           s = ▹map F⊩f (f tt* .snd .snd)
-     
+  
       QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
       QΛ-is-quoting M = begin
         QΛ [ M ]
@@ -151,21 +153,16 @@ module _ (Q : Quoting) where
   GL : {X : Asm 𝓤}
     → Trackable (□ k X) X
     → Trackable ⊤ₐ X
-  GL {k = k} {X} (f , F , F⊩f) = Final.global-element x (F [ ⌜ gfix′ F ⌝ ]) r
+  GL {k = k} {X} (f , F , F⊩f) = Final.global-element (fixf .fst) (F [ ⌜ gfix′ F ⌝ ]) (fixf .snd)
     where
       module X  = AsmStr (str X)
 
-      f′ : (▹ k (Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x))
+      f′ : Σ[ x ꞉ ▹ k ⟨ X ⟩ ] ▹[ α ꞉ k ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x α
         → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
-      f′ hyp = f (gfix′ F , (λ α → hyp α .fst) , λ α → X.⊩-respects-↠ gfix′-↠ (hyp α .snd)) ,
-        F⊩f (lift -↠-refl)
+      f′ (x , r) = f (gfix′ F , x , λ α → X.⊩-respects-↠ gfix′-↠ (r α)) , F⊩f (lift -↠-refl)
 
       fixf : Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
-      fixf = fix f′
-
-      x = fixf .fst
-      r = fixf .snd
-
+      fixf = fixΣ f′
 
   -- IGL : (X : Asm 𝓤)
   --   → Trackable (□ k (□ k X ⇒ X)) (□ k X)
