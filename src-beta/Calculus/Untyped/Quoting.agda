@@ -14,12 +14,13 @@ open import Calculus.Untyped.Confluence
 
 private
   variable
-    m n l : ℕ
-    L M N F : Λ n
+    Γ Δ   : Cxt
+    A B C : 𝕋
+    L M N F : Γ ⊢ A
 
 record Quoting : 𝓤₀ ̇ where
   field
-    ⌜_⌝          : Λ n → Λ₀
+    ⌜_⌝          : Γ ⊢ ⋆ → Λ₀
 
     -- ⌜-⌝ reflects equality
     ⌜⌝-injective : ⌜ M ⌝ ≡ ⌜ N ⌝ → M ≡ N

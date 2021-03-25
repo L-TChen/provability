@@ -14,16 +14,17 @@ open -↠-Reasoning
 
 private
   variable
-    m n l        : ℕ
-    M N L M′ N′ M₁ M₂ N₁ N₂ : Λ n
+    Γ Δ          : Cxt
+    A B C        : 𝕋
+    M N L M′ N′ M₁ M₂ N₁ N₂ : Γ ⊢ A
 
 ------------------------------------------------------------------------------
 -- Parallel reduction, see
 -- M. Takahashi, “Parallel Reductions in λ-Calculus,” Inf. Comput., vol. 118, no. 1, pp. 120–127, 1995.
 
 infix 3 _⇛_
-data _⇛_  {n : ℕ} : Λ n → Λ n → 𝓤₀ ̇ where
-  pvar : {x : Fin n}
+data _⇛_  {Γ : Cxt} : Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
+  pvar : {x : A ∈ Γ}
     → `  x ⇛ ` x
   pabs
     : M ⇛ M′
@@ -49,12 +50,12 @@ module ⇛-Reasoning where
   infix  2 _⇛*_
   infixr 2 _⇛⟨_⟩_
 
-  data _⇛*_ : Λ n → Λ n → 𝓤₀ ̇ where
-    _∎ : (M : Λ n)
+  data _⇛*_ : Γ ⊢ A → Γ ⊢ A → 𝓤₀ ̇ where
+    _∎ : (M : Γ ⊢ A)
         --------
       → M ⇛* M
     _⇛⟨_⟩_
-      : (L : Λ n)
+      : (L : Γ ⊢ A)
       → L ⇛ M
       → M ⇛* N
         ---------
@@ -108,7 +109,7 @@ par-refl {M = _ · _} = papp par-refl par-refl
 ⇛*⊆-↠ (L ⇛⟨ p ⟩ ps) = L -↠⟨ ⇛⊆-↠ p ⟩ ⇛*⊆-↠ ps
 
 par-rename
-  : {ρ : Rename m n}
+  : {ρ : Rename Γ Δ}
   → M ⇛ M′
   → rename ρ M ⇛ rename ρ M′
 par-rename pvar             = pvar
@@ -118,18 +119,18 @@ par-rename {Γ} {Δ} {ρ = ρ} (pbeta {M} {N} {M′} {N′} M⇛M′ N⇛N′) =
   let G = pbeta (par-rename {ρ = ext ρ} M⇛M′) (par-rename {ρ = ρ} N⇛N′)
   in  subst (λ L → rename ρ ((ƛ M) · M′) ⇛ L) (rename-ssubst {Γ} {Δ} ρ N N′) G
 
-Par-Subst : Subst m n → Subst m n → Set
-Par-Subst {m} {n} σ σ′ = {x : Fin m} → σ x ⇛ σ′ x
+Par-Subst : Subst Γ Δ → Subst Γ Δ → Set
+Par-Subst {Γ} {Δ} σ σ′ = ∀{A} {x : A ∈ Γ} → σ x ⇛ σ′ x
 
 par-subst-exts
-  : {σ σ′ : Subst m n}
+  : {σ σ′ : Subst Γ Δ}
   → (Par-Subst σ σ′)
-  → Par-Subst (exts {m} {n} σ) (exts σ′)
-par-subst-exts s {x = fzero}  = pvar
-par-subst-exts s {x = fsuc x} = par-rename s
+  → ∀ {A} → Par-Subst (exts {Γ} {Δ} {A} σ) (exts σ′)
+par-subst-exts s {x = Z _} = pvar
+par-subst-exts s {x = S x} = par-rename s
 
 par-subst
-  : {σ τ : Subst m n}
+  : {σ τ : Subst Γ Δ}
   → Par-Subst σ τ
   → M ⇛ M′
   → M ⟪ σ ⟫ ⇛ M′ ⟪ τ ⟫
@@ -137,10 +138,10 @@ par-subst σ⇛τ pvar             = σ⇛τ
 par-subst σ⇛τ (papp M⇛M′ N⇛N′) =
   papp (par-subst σ⇛τ M⇛M′) (par-subst σ⇛τ N⇛N′)
 par-subst σ⇛τ (pabs M⇛M′) =
-  pabs (par-subst (λ {x} → par-subst-exts σ⇛τ {x = x}) M⇛M′)
+  pabs (par-subst (λ {A} {x} → par-subst-exts σ⇛τ {x = x}) M⇛M′)
 par-subst {σ = σ} {τ} σ⇛τ (pbeta {M} {M′} {N} {N′ = N′} M⇛M′ N⇛N′) =
   let G = pbeta (par-subst {M = _} {σ = exts σ} {τ = exts τ}
-            (λ {x} → par-subst-exts σ⇛τ {x = x}) M⇛M′)
+            (λ{A}{x} → par-subst-exts σ⇛τ {x = x}) M⇛M′)
             (par-subst {σ = σ} σ⇛τ N⇛N′)
   in subst (λ L → (ƛ M ⟪ exts σ ⟫) · N ⟪ σ ⟫ ⇛ L) (subst-ssubst τ M′ N′) G
 
@@ -148,17 +149,17 @@ sub-par
   : M ⇛ M′
   → N ⇛ N′
   → M [ N ] ⇛ M′ [ N′ ]
-sub-par {m} {M} {M′} {N} {N′} M⇛M′ N⇛N′ =
+sub-par {⋆} {Γ} {⋆} {M} {M′} {N} {N′} M⇛M′ N⇛N′ =
   par-subst {σ = subst-zero N} {τ = subst-zero N′} σ⇛σ′ M⇛M′
   where
-    σ⇛σ′ : {x : Fin (suc m)} → subst-zero N x ⇛ subst-zero N′ x
-    σ⇛σ′ {x = fzero}  = N⇛N′
-    σ⇛σ′ {x = fsuc _} = pvar
+    σ⇛σ′ : {x : A ∈ ⋆ , Γ} → subst-zero N x ⇛ subst-zero N′ x
+    σ⇛σ′ {⋆} {x = Z p} = N⇛N′
+    σ⇛σ′ {⋆} {x = S x} = pvar
 ------------------------------------------------------------------------------
 -- Confluence
 
 private
-  _⁺ : Λ n → Λ n
+  _⁺ : Γ ⊢ A → Γ ⊢ A
   (` x) ⁺       =  ` x
   (ƛ M) ⁺       = ƛ (M ⁺)
   ((ƛ M) · N) ⁺ = M ⁺ [ N ⁺ ]
@@ -179,7 +180,7 @@ private
     : M ⇛ N
     → M ⇛* N′
       ------------------------------------
-    → Σ[ L ∈ Λ n ] (N ⇛* L)  ×  (N′ ⇛ L)
+    → Σ[ L ∈ Γ ⊢ A ] (N ⇛* L)  ×  (N′ ⇛ L)
   strip mn (M ∎) = ( _ , _ ∎ , mn)
   strip mn (M ⇛⟨ mm' ⟩ m'n')
     with strip (par-triangle mm') m'n'
@@ -190,9 +191,9 @@ private
     : L ⇛* M
     → L ⇛* M′
       ------------------------------------
-    → Σ[ N ∈ Λ n ] (M ⇛* N) × (M′ ⇛* N)
-  par-confluence {Γ} {L} {.L} {N} (L ∎) L⇛*N = N , L⇛*N , N ∎
-  par-confluence {Γ} {L} {M₁′} {M₂} (L ⇛⟨ L⇛M₁ ⟩ M₁⇛*M₁′) L⇛*M₂ with strip L⇛M₁ L⇛*M₂
+    → Σ[ N ∈ Γ ⊢ A ] (M ⇛* N) × (M′ ⇛* N)
+  par-confluence {Γ} {A} {L} {.L} {N} (L ∎) L⇛*N = N , L⇛*N , N ∎
+  par-confluence {Γ} {A} {L} {M₁′} {M₂} (L ⇛⟨ L⇛M₁ ⟩ M₁⇛*M₁′) L⇛*M₂ with strip L⇛M₁ L⇛*M₂
   ... | N , M₁⇛*N , M₂⇛N with par-confluence M₁⇛*M₁′ M₁⇛*N
   ... | N′ , M₁′⇛*N′ , N⇛*N′ = N′ , M₁′⇛*N′ , (M₂ ⇛⟨ M₂⇛N ⟩ N⇛*N′)
 
@@ -200,7 +201,7 @@ confluence
   : L -↠ M
   → L -↠ M′
     -----------------------------------
-  → Σ[ N ∈ Λ n ] (M -↠ N) × (M′ -↠ N)
+  → Σ[ N ∈ Γ ⊢ A ] (M -↠ N) × (M′ -↠ N)
 confluence L↠M₁ L↠M₂
     with par-confluence (-↠⊆⇛* L↠M₁) (-↠⊆⇛* L↠M₂)
 ... | N , M₁⇛N , M₂⇛N = N , ⇛*⊆-↠ M₁⇛N , ⇛*⊆-↠ M₂⇛N

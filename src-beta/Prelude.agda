@@ -22,9 +22,6 @@ open import Cubical.Data.Nat                       public
   using (ℕ; zero; suc; _+_; _∸_; fromNatℕ)
 open import Cubical.Data.Nat.Order.Recursive as ℕₚ public
   using (_≤_; _<_)
-open import Cubical.Data.FinData                   public
-  using (Fin)
-  renaming (zero to fzero; suc to fsuc)
 
 open import Universes public
 
@@ -101,7 +98,6 @@ strₛ = snd ∘ snd
 setStr→typStr : {S : 𝓤 ̇ → 𝓥 ̇}
   → SetWithStr 𝓤 S → TypeWithStr 𝓤 S
 setStr→typStr (X , XisSet , S) = X , S
-
 ------------------------------------------------------------------------------
 -- 
 
@@ -126,9 +122,6 @@ suc m ≤? suc n = m ≤? n
 strict-initial : {X : 𝓤 ̇} → (X → ⊥* {𝓤}) → X ≃ (⊥* {𝓤})
 strict-initial f = f , record { equiv-proof = λ { () } }
 
-------------------------------------------------------------------------------
--- Encode-decode method, decidable equality 
-
 record Code (A : 𝓤 ̇) :  𝓤 ⁺ ̇ where
   field
     code   : A → A → 𝓤 ̇
@@ -139,69 +132,16 @@ record Code (A : 𝓤 ̇) :  𝓤 ⁺ ̇ where
   encode {a = a} a=b = transport (cong (code a) a=b) (r a)
 open Code ⦃ ... ⦄ public
 
-{-# DISPLAY Code.code x y = code x y  #-}
-{-# DISPLAY Code.r x      = r x       #-}
-{-# DISPLAY Code.decode c = decode c  #-}
-{-# DISPLAY Code.encode p = encode p  #-}
-
 record DecEq (A : 𝓤 ̇) : 𝓤 ̇ where
   field
     _≟_ : (x y : A) → Dec (x ≡ y)
-
   ≟→isSet : isSet A
   ≟→isSet = Discrete→isSet _≟_
 open DecEq ⦃ ... ⦄ public
 
-private
-  codeℕ : (m n : ℕ) → 𝓤₀ ̇
-  codeℕ zero    zero    = Unit
-  codeℕ (suc m) (suc n) = codeℕ m n
-  codeℕ zero    (suc n) = ⊥
-  codeℕ (suc m) zero    = ⊥
-
-  rℕ : (n : ℕ) → codeℕ n n
-  rℕ zero    = tt
-  rℕ (suc n) = rℕ n
-
-  decodeℕ : {m n : ℕ}
-    → (codeℕ m n) → m ≡ n
-  decodeℕ {zero}  {zero}  r = refl
-  decodeℕ {suc m} {suc n} r = cong suc (decodeℕ r)
-
-instance
-  Codeℕ : Code ℕ
-  Codeℕ = record { code = codeℕ ; r = rℕ ; decode = decodeℕ }
-
-private
-  codeFin : (i j : Fin n) → 𝓤₀ ̇
-  codeFin fzero    fzero    = Unit
-  codeFin (fsuc i) (fsuc j) = codeFin i j
-  codeFin fzero    (fsuc _) = ⊥
-  codeFin (fsuc _) fzero    = ⊥
-
-  rFin : (i : Fin n) → codeFin i i
-  rFin {n} fzero = tt
-  rFin (fsuc i)  = rFin i
-
-  decodeFin : {i j : Fin n} 
-    → (r : codeFin i j)
-    → i ≡ j
-  decodeFin {.(suc _)} {fzero}  {fzero}  _ = refl
-  decodeFin {.(suc _)} {fsuc i} {fsuc j} r = cong fsuc (decodeFin r)
-
-instance
-  CodeFin : Code (Fin n)
-  CodeFin = record { code = codeFin ; r = rFin ; decode = decodeFin }
-  
 instance
   DecEqUnit : DecEq Unit
   DecEqUnit = record { _≟_ = λ {tt tt → yes refl} }
 
   DecEqBool : DecEq Bool
   _≟_ ⦃ DecEqBool ⦄ = Cubical.Data.Bool._≟_
-
-  DecEqℕ : DecEq ℕ
-  _≟_ ⦃ DecEqℕ ⦄ = Cubical.Data.Nat.discreteℕ 
-
-  DecEqFin : DecEq (Fin n)
-  _≟_ ⦃ DecEqFin ⦄ = Cubical.Data.FinData.discreteFin

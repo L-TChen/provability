@@ -5,12 +5,13 @@ module Assembly.Properties where
 open import Prelude as 𝓤
   hiding (_∘_; id; uncurry)
 open import Calculus.Untyped as Λ
+  hiding (Z; `⟨_,_⟩)
 
 open import Assembly.Base
 
 private
   variable
-    X Y Z : Asm 𝓤
+    X Y Z : ASM 𝓤
     x y z : ⟨ X ⟩
 
 ∘-id : {f : Trackable X Y} → f ∘ (id X) ≡ f

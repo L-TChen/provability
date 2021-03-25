@@ -8,18 +8,19 @@ open import Calculus.Untyped.Base
 
 private
   variable
-    m n l          : ℕ
-    M N L M′ N′ L′ : Λ n
+    A B C          : 𝕋
+    Γ Δ Ξ          : Cxt
+    M N L M′ N′ L′ : Γ ⊢ A
 
 infix  8  ′_
 ------------------------------------------------------------------------------
 -- Normal terms
 
-data Neutral {n : ℕ} : Λ n → 𝓤₀ ̇
-data Normal  {n : ℕ} : Λ n → 𝓤₀ ̇
+data Neutral {Γ : Cxt} : Γ ⊢ A → 𝓤₀ ̇
+data Normal  {Γ : Cxt} : Γ ⊢ A → 𝓤₀ ̇
 
-data Neutral {n} where
-  `_  : (x : Fin n)
+data Neutral {Γ} where
+  `_  : (x : A ∈ Γ)
       -------------
     → Neutral (` x)
   _·_
@@ -38,6 +39,12 @@ data Normal where
       ------------
     → Normal (ƛ N)
 
+instance
+  fromNatNormal : {n : ℕ} → ⦃ n∈Γ : True (suc n ≤? length Γ) ⦄
+    → HasFromNat (Neutral {Γ} (HasFromNat.fromNat fromNat∈ n))
+  HasFromNat.Constraint fromNatNormal _ = Unit
+  HasFromNat.fromNat    (fromNatNormal {Γ} {n} ⦃ n∈Γ ⦄) _ = ` count {Γ} {n} (toWitness n∈Γ)
+
 neutral-does-not-reduce : Neutral M → M -→ N → ⊥
 normal-does-not-reduce  : Normal M → M -→ N → ⊥
 
@@ -47,11 +54,10 @@ neutral-does-not-reduce (M · N) (ξᵣ M-→N) = normal-does-not-reduce N M-→
 
 normal-does-not-reduce (′ M) M-→N     = neutral-does-not-reduce M M-→N
 normal-does-not-reduce (ƛ M) (ζ M-→N) = normal-does-not-reduce M M-→N
-
 ------------------------------------------------------------------------------
 -- Progress theorem i.e. one-step evaluator
 
-data Progress (M : Λ n) : 𝓤₀ ̇ where
+data Progress (M : Γ ⊢ A) : 𝓤₀ ̇ where
   step
     : M -→ N
       ----------
@@ -61,7 +67,7 @@ data Progress (M : Λ n) : 𝓤₀ ̇ where
     : Normal M
     → Progress M
 
-progress : (M : Λ n) → Progress M
+progress : (M : Γ ⊢ A) → Progress M
 progress (` x)                                 =  done (′ ` x )
 progress (ƛ N)  with  progress N
 ... | step N—→N′                               =  step (ζ N—→N′)
