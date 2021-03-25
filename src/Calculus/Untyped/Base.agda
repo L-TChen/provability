@@ -181,44 +181,36 @@ data _-→_ {n : ℕ} : (M N : Λ n) → 𝓤₀ ̇ where
     → L · M -→ L · M′
 
 private
-  code→ : {M M′ N N′ : Λ n} → (r : M -→ N) (s : M′ -→ N′) → 𝓤₀ ̇
-  code→ {_} {M} {M′} {N} {N′} β β = code M M′ × code N N′
+  code→ : {M N N′ : Λ n} → (r : M -→ N) (s : M -→ N′) → 𝓤₀ ̇
+  code→ {_} {M} {N} {N′} β β = code N N′
   code→ (ζ r)   (ζ s)  = code→ r s
-  code→ (ξₗ {M = M₁} r) (ξₗ {M = M₂} s) = code M₁ M₂ × code→ r s
-  code→ (ξᵣ {L = L₁} r) (ξᵣ {L = L₂} s) = code L₁ L₂ × code→ r s
+  code→ (ξₗ r) (ξₗ  s) = code→ r s
+  code→ (ξᵣ {L = L₁} r) (ξᵣ {L = L₂} s) = code→ r s
   code→ β       _      = ⊥
-  code→ (ζ r₁)  _      = ⊥
   code→ (ξₗ r)  _      = ⊥
   code→ (ξᵣ r₁) _      = ⊥
 
-  toCodeΛ₁ : {M M′ N N′ : Λ n} (r : M -→ N) (s : M′ -→ N′) → code→ r s → code M M′
-  toCodeΛ₁ β      β      (c₁ , _)  = c₁
-  toCodeΛ₁ (ζ r ) (ζ s ) c         = toCodeΛ₁ r s c
-  toCodeΛ₁ (ξₗ r) (ξₗ s) (c₁ , c₂) = toCodeΛ₁ r s c₂ , c₁ 
-  toCodeΛ₁ (ξᵣ r) (ξᵣ s) (c₁ , c₂) = c₁ , toCodeΛ₁ r s c₂
-
-  toCodeΛ₂ : {M M′ N N′ : Λ n} (r : M -→ N) (s : M′ -→ N′) → code→ r s → code N N′
-  toCodeΛ₂ β      β      (_ , c₂)  = c₂
-  toCodeΛ₂ (ζ r)  (ζ s)  c         = toCodeΛ₂ r s c
-  toCodeΛ₂ (ξₗ r) (ξₗ s) (c₁ , c₂) = toCodeΛ₂ r s c₂ , c₁
-  toCodeΛ₂ (ξᵣ r) (ξᵣ s) (c₁ , c₂) = c₁ , toCodeΛ₂ r s c₂
+  toCodeΛ : {M N N′ : Λ n} (r : M -→ N) (s : M -→ N′) → code→ r s → code N N′
+  toCodeΛ β      β      c          = c
+  toCodeΛ (ζ r)  (ζ s)  c          = toCodeΛ r s c
+  toCodeΛ (ξₗ {M = M} r′) (ξₗ s) c = toCodeΛ r′ s c , r M
+  toCodeΛ (ξᵣ {L = L} r′) (ξᵣ s) c = r L , toCodeΛ r′ s c -- c₁ , toCodeΛ r s c₂
 
   r→ : (red : M -→ N) → code→ red red
-  r→ {_} {M} {N} β        = r M , r N
-  r→             (ζ red)  = r→ red
-  r→ {M = _ · M} (ξₗ red) = r M , r→ red
-  r→ {M = L · _} (ξᵣ red) = r L , r→ red
-
-{- TODO: Show that M -→ N is discrete
-  decode→ : {M M′ N N′ : Λ n} {r : M -→ N} {s : M′ -→ N′} → (c : code→ r s)
-    → PathP (λ i → (decode {a = M} {b = M′} (toCodeΛ₁ r s c) i) -→ (decode {a = N} {b = N′} (toCodeΛ₂ r s c) i))
-      r s
-  decode→ {r = β {M₁} {N₁}} {β {M₂} {N₂}} ((c₁ , c₂) , c₃) = {!!}
-  -- β {M = decode {a = M₁} {M₂} c₁ i} {decode {a = N₁} {N₂} c₂ i}
-  decode→ {r = ζ r}  {ζ s}  c         i = ζ (decode→ {r = r} {s = s} c i)
-  decode→ {r = ξₗ r} {ξₗ s} (c₁ , c₂) i = ξₗ (decode→ {r = r} {s = s} c₂ i)
-  decode→ {r = ξᵣ r} {ξᵣ s} (c₁ , c₂) i = ξᵣ (decode→ {r = r} {s = s} c₂ i)
+  r→ (β {M} {N}) = r (M [ N ])
+  r→ (ζ red)     = r→ red
+  r→ (ξₗ red)    = r→ red
+  r→ (ξᵣ red)    = r→ red
+{-
+-- TODO: Show that M -→ N is discrete
+  decode→ : {M N N′ : Λ n} {r : M -→ N} {s : M -→ N′} → (c : code→ r s)
+    → PathP (λ i → M -→ (decode {_} {_} {N} (toCodeΛ r s c) i)) r s
+  decode→ {r = β}     {β}    c = {!!}
+  decode→ {r = ζ r}  {ζ s}  c i = ζ (decode→ {r = r} c i) 
+  decode→ {r = ξₗ r} {ξₗ s} c = {!!}
+  decode→ {r = ξᵣ r} {ξᵣ s} c = {!!}
 -}
+  
 ------------------------------------------------------------------------------
 -- Multi-step beta-reduction
 
