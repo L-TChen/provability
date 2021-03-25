@@ -34,19 +34,30 @@ record Quoting : 𝓤₀ ̇ where
     Sub-↠ : Sub · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M [ N ] ⌝
 
     -- ⊢ □ A `→ □ (□ A)
-    Num   : Λ₀
-    Num-↠ : Num · ⌜ M ⌝ -↠ ⌜ ⌜ M ⌝ ⌝
+    Quote   : Λ₁
+    Quote-↠ : Quote [ ⌜ M ⌝ ] -↠ ⌜ ⌜ M ⌝ ⌝
 
     Eval : Λ₁
     Eval-↠ : Eval [ ⌜ M ⌝ ] -↠ M
 
   open -↠-Reasoning
+  -- ⊢ □ A `→ □ (□ A)
+  Num : Λ₀
+  Num = ƛ Quote
+
+  Num-↠ : Num · ⌜ M ⌝ -↠ ⌜ ⌜ M ⌝ ⌝
+  Num-↠ {M = M} = begin
+    Num · ⌜ M ⌝
+      -→⟨ β ⟩
+    Quote [ ⌜ M ⌝ ]
+      -↠⟨ Quote-↠ ⟩
+    ⌜ ⌜ M ⌝ ⌝ ∎
 
   I·I≠I : 𝑰 · 𝑰 ≢ 𝑰
   I·I≠I = encode
 
-  quoting-not-definable : ¬ (Σ[ Q ꞉ Λ₁ ] Π[ M ꞉ Λ₀ ] Q [ M ] -↠ ⌜ M ⌝ )
-  quoting-not-definable (Q , QM-↠⌜M⌝) = I·I≠I (⌜⌝-injective (Normal⇒Path ⌜⌝-normal ⌜⌝-normal (QM-↠⌜M⌝ (𝑰 · 𝑰)) QII-↠⌜I⌝))
+  quoting′-not-definable : ¬ (Σ[ Q ꞉ Λ₁ ] Π[ M ꞉ Λ₀ ] Q [ M ] -↠ ⌜ M ⌝ )
+  quoting′-not-definable (Q , QM-↠⌜M⌝) = I·I≠I (⌜⌝-injective (Normal⇒Path ⌜⌝-normal ⌜⌝-normal (QM-↠⌜M⌝ (𝑰 · 𝑰)) QII-↠⌜I⌝))
     where
       QII-↠⌜I⌝ : Q [ 𝑰 · 𝑰 ] -↠ ⌜ 𝑰 ⌝
       QII-↠⌜I⌝ = begin

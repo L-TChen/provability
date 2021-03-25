@@ -15,12 +15,12 @@ open import Assembly.Exposure
 
 private
   variable
-    X Y Z : Asm 𝓤
+    X Y Z : ASM 𝓤
 
 module _ (Q : Quoting) where
   open Quoting Q
 
-  ⊠_ : Asm 𝓤 → Asm 𝓤
+  ⊠_ : ASM 𝓤 → ASM 𝓤
   ⊠_ {𝓤} (|X| , _⊩_ , ⊩-is-realisability) = |⊠X| , _⊩⊠X_ , record
     { ⊩-respects-↠ = λ {x} {x′} {y} → ⊩⊠X-respect-↠ {x} {x′} {y}
     ; ⊩-right-total = ⊩⊠X-right-total
@@ -60,7 +60,7 @@ module _ (Q : Quoting) where
           -↠⟨ Sub-↠ ⟩
         ⌜ F [ M ] ⌝ ∎)
 
-  ⊠id=id : (X : Asm 𝓤) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (id X) x ≡ x
+  ⊠id=id : (X : ASM 𝓤) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (id X) x ≡ x
   ⊠id=id X x = refl
 
   ⊠gf=⊠g⊠f : (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (g ∘ f) x ≡ ⊠map₀ g (⊠map₀ f x)
@@ -104,26 +104,38 @@ module _ (Q : Quoting) where
       module X  = AsmStr (str X)
       module ⊠X = AsmStr (str (⊠ X))
 
-  eval′ : NaturalTransformation {𝓤} ⊠-exposure Id
-  eval′ = eval , λ f x → refl
+  eval-nat : NaturalTransformation {𝓤} ⊠-exposure Id
+  eval-nat = eval , λ f x → refl
 
-  quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id ⊠-exposure) → ⊥
-  quoting-does-not-exist (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
+  quoting : Trackable (⊠ X) (⊠ ⊠ X)
+  quoting {X = X} = (λ { y@(M , x , r) → ⌜ M ⌝ , y , lift -↠-refl }) , Quote , λ where
+    {N} {M , x , r} (lift N-↠⌜M⌝) → lift (begin
+      Quote [ N ]
+        -↠⟨ reduce-ssubst Quote N-↠⌜M⌝ ⟩
+      Quote [ ⌜ M ⌝ ]
+        -↠⟨ Quote-↠ ⟩
+      ⌜ ⌜ M ⌝ ⌝ ∎)
+      where
+        open -↠-Reasoning
+        module ⊠X  = AsmStr (str (⊠ X))
+        module ⊠⊠X = AsmStr (str (⊠ ⊠ X))
+
+  quoting′-does-not-exist : (q : NaturalTransformation {𝓤₀} Id ⊠-exposure) → ⊥
+  quoting′-does-not-exist (fun , naturality) = quoting′-not-definable (QΛ , QΛ-is-quoting)
     where
-      qQ-at-Λ : Trackable Λ₀ₐ (⊠ Λ₀ₐ)
-      qQ-at-Λ = fun
+      q-at-Λ : Trackable Λ₀ₐ (⊠ Λ₀ₐ)
+      q-at-Λ = fun
 
       qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ M ꞉ Λ₀ ] N -↠ M
-      qΛ = qQ-at-Λ .fst
+      qΛ = q-at-Λ .fst
 
-      QΛ : Λ₁
-      QΛ = HasTracker.F (qQ-at-Λ .snd)
+      QΛ = HasTracker.F (q-at-Λ .snd)
 
       qQ-at-⊤ : Trackable ⊤ₐ (⊠ ⊤ₐ)
       qQ-at-⊤ = fun
       
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
-      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
+      QΛ[M] = HasTracker.F⊩f (q-at-Λ .snd) 
 
       QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
       QΛ-is-quoting M = let open -↠-Reasoning in begin
@@ -144,7 +156,7 @@ module _ (Q : Quoting) where
                 ≡[ i ]⟨ subst-rename-∅ _ M i , M , transport-filler (cong (_-↠ M) (subst-rename-∅ _ M)) s i ⟩ 
               (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎
 
-  forgetful : {X : Asm 𝓤₀} → Trackable (⊠ X) (⊠ Λ₀ₐ)
+  forgetful : {X : ASM 𝓤₀} → Trackable (⊠ X) (⊠ Λ₀ₐ)
   forgetful = (λ { (M , _ , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)
 
   Λ-map : Trackable X Y → Trackable Λ₀ₐ Λ₀ₐ

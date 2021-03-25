@@ -11,16 +11,55 @@ open import Assembly.Base
 
 private
   variable
-    X Y Z : Asm 𝓤
+    X Y Z : ASM 𝓤
     x y z : ⟨ X ⟩
 
-∇_ : (X : 𝓤 ̇) → Asm 𝓤
+∘-id : {f : Trackable X Y} → f ∘ (id X) ≡ f
+∘-id {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , Fx=F i , λ {M} {x} r → lem {M} {x} r i
+  where
+    module X = AsmStr (str X)
+    module Y = AsmStr (str Y)
+    Fx=F : (F ∘′ 0) ≡ F 
+    Fx=F = ∘′-id-right F
+
+    postulate
+      lem : {M : Λ₀} {x : ⟨ X ⟩} (r : M X.⊩ x)
+        → PathP (λ i → Fx=F i [ M ] Y.⊩ f x) (subst (Y._⊩ (f x)) (∘-ssubst-ssubst F 0 M ⁻¹) (F⊩f r)) (F⊩f r) 
+
+id-∘ : {f : Trackable X Y} → id Y ∘ f ≡ f
+id-∘ {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , F , λ {M} {x} r → lem {M} {x} r i
+  where
+    module X = AsmStr (str X)
+    module Y = AsmStr (str Y)
+    xF=F : 0 ∘′ F ≡ F
+    xF=F = refl
+
+    postulate
+      lem : {M : Λ₀} {x : ⟨ X ⟩} (r : M X.⊩ x)
+        → Path (F [ M ] Y.⊩ f x) (subst (Y._⊩ (f x)) (∘-ssubst-ssubst 0 F M ⁻¹) (F⊩f r)) (F⊩f r) 
+
+{-
+∘-ass : {A : ASM (universe-of ⟨ X ⟩)} {f : Trackable X Y} {g : Trackable Y Z} {h : Trackable Z A}
+  → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
+∘-ass {X = X} {Y = Y} {Z = Z} {A = A} {f = f , F , F⊩f} {g , G , G⊩g} {h , H , H⊩h} i = (λ x → h (g (f x))) , ∘′-assoc H G F i ,
+  λ r → lem r i
+  where
+    module X = AsmStr (str X)
+    module Y = AsmStr (str Y)
+    module Z = AsmStr (str Z)
+    module A = AsmStr (str A)
+    lem : {M : Λ₀} {x : ⟨ X ⟩} (r : M X.⊩ x)
+      → PathP (λ i → ∘′-assoc H G F i [ M ] A.⊩ h (g (f x))) {!!} {!!} -- (H⊩h (G⊩g (F⊩f r)))
+    lem = {!!}
+-}
+
+∇_ : (X : 𝓤 ̇) → ASM 𝓤
 ∇ X = X , (λ _ _ → Unit*) , record
   { ⊩-respects-↠ = λ _ _ → tt*
   ; ⊩-right-total = λ _ → ∣ 𝑰 , tt* ∣
   }
 
-ℕₐ : Asm₀
+ℕₐ : ASM₀
 ℕₐ = ℕ , _⊩_ , record
   { ⊩-respects-↠  = -↠-trans
   ; ⊩-right-total = λ n → ∣ 𝒄 n , -↠-refl ∣
@@ -30,7 +69,7 @@ private
     M ⊩ n = M -↠ 𝒄 n
 
 -- Proposition: The set Λ₀ of lambda terms is equipped with an assembly structure.
-Λ₀ₐ : Asm 𝓤₀
+Λ₀ₐ : ASM 𝓤₀
 Λ₀ₐ = Λ₀ , (λ M N → M -↠ N) , record
   { ⊩-respects-↠  = -↠-trans
   ; ⊩-right-total = λ M → ∣ M , -↠-refl ∣
@@ -38,7 +77,7 @@ private
 
 ------------------------------------------------------------------------------
 -- Finality
-⊤ₐ : Asm 𝓤
+⊤ₐ : ASM 𝓤
 ⊤ₐ = Unit* , _⊩_ , record
   { ⊩-respects-↠  = ⊩-respects-↠
   ; ⊩-right-total = ⊩-right-total
@@ -53,7 +92,7 @@ private
     ⊩-right-total : _⊩_ IsRightTotal
     ⊩-right-total _ = ∣ 𝑰 , lift -↠-refl ∣
     
-module Final {X : Asm 𝓤} where
+module Final {X : ASM 𝓤} where
   open AsmStr (str X)
   open -↠-Reasoning
   
@@ -79,7 +118,7 @@ module Final {X : Asm 𝓤} where
 
 ------------------------------------------------------------------------------
 -- Initiality
-⊥ₐ : Asm 𝓤
+⊥ₐ : ASM 𝓤
 ⊥ₐ = ⊥* , _⊩_ , record
   { ⊩-respects-↠  = ⊩-respects-↠ 
   ; ⊩-right-total = ⊩-right-total
@@ -94,7 +133,7 @@ module Final {X : Asm 𝓤} where
     ⊩-right-total : _⊩_ IsRightTotal
     ⊩-right-total ()
 
-module Initial (X : Asm 𝓤) where 
+module Initial (X : ASM 𝓤) where 
   universality : Trackable ⊥ₐ X
   universality = ⊥*-elim , 0 , (λ { {x = ()} })
 
@@ -106,7 +145,7 @@ module Initial (X : Asm 𝓤) where
     
 ------------------------------------------------------------------------------
 -- Product
-_×ₐ_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
+_×ₐ_ : ASM 𝓤 → ASM 𝓤 → ASM 𝓤
 _×ₐ_ {𝓤} X Y = ⟨ X ⟩ × ⟨ Y ⟩ , _⊩_ , record
   { ⊩-respects-↠  = ⊩-respect-↠
   ; ⊩-right-total = ⊩-right-total  }
@@ -129,7 +168,7 @@ _×ₐ_ {𝓤} X Y = ⟨ X ⟩ × ⟨ Y ⟩ , _⊩_ , record
       (λ { (M , M⊩x) (N , N⊩y) → ∣ Λ.`⟨ M , N ⟩ , M , β-projₗ , M⊩x , N , β-projᵣ , N⊩y ∣ })
       (X.⊩-right-total x) (Y.⊩-right-total y)
 
-module Product (X Y : Asm 𝓤) where
+module Product (X Y : ASM 𝓤) where
   module X = AsmStr (str X)
   module Y = AsmStr (str Y)
 
@@ -149,7 +188,7 @@ module Product (X Y : Asm 𝓤) where
       F⊩projᵣ : Tracks X×Y Y (0 · ↑₁ 𝑭) snd
       F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⫣y) = Y.⊩-respects-↠ π₂L-↠N N⫣y
       
-  `⟨_,_⟩ : {Z : Asm 𝓤}
+  `⟨_,_⟩ : {Z : ASM 𝓤}
     → Trackable Z X → Trackable Z Y → Trackable Z (X ×ₐ Y)
   `⟨_,_⟩ {Z = Z} (f , F , F⊩f) (g , G , G⊩g) = h , H , H⊩h 
     where
@@ -185,7 +224,7 @@ module Product (X Y : Asm 𝓤) where
 -- Exponential object
 infixr 15 _⇒_
 
-_⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
+_⇒_ : ASM 𝓤 → ASM 𝓤 → ASM 𝓤
 _⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
   { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respects-↠ {x} {x′} {y}
   ; ⊩-right-total = ⊩-right-total }
@@ -208,7 +247,7 @@ _⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
           ((ƛ F) · M -→⟨ β ⟩ F [ M ] ∎) (F⊩f M⊩x)) ∣})
         ∃F⊩f
         
-module Exponential (X Y : Asm 𝓤) where
+module Exponential (X Y : ASM 𝓤) where
   module X = AsmStr (str X)
   module Y = AsmStr (str Y)
   X⇒Y = X ⇒ Y
@@ -216,7 +255,7 @@ module Exponential (X Y : Asm 𝓤) where
   open -↠-Reasoning
       
   postulate
-    uncurry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
+    uncurry : {Z : ASM 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
     eval : Trackable (X⇒Y ×ₐ X) Y
     {-
       uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp

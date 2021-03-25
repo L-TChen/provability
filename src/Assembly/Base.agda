@@ -23,7 +23,7 @@ record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
   infix 6 _⊩_
 
 Asm : (𝓤 : Level) → 𝓤 ⁺ ̇
-Asm 𝓤 = TypeWithStr 𝓤 AsmStr
+Asm 𝓤 = SetWithStr 𝓤 AsmStr
 
 Asm₀ : 𝓤₁ ̇
 Asm₀ = Asm 𝓤₀
@@ -36,16 +36,15 @@ Tracks : (X Y : Asm 𝓤)
 Tracks X Y F f = {M : Λ₀} {x : ⟨ X ⟩}
   →       M X.⊩ x
   → F [ M ] Y.⊩ f x
-  -- TODO: Clarify if this needs to be ∥ ... ∥
   where
-    module X = AsmStr (str X)
-    module Y = AsmStr (str Y)
+    module X = AsmStr (strₛ X)
+    module Y = AsmStr (strₛ Y)
 
 record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
   constructor _,_
 
-  module X = AsmStr (str X)
-  module Y = AsmStr (str Y)
+  module X = AsmStr (strₛ X)
+  module Y = AsmStr (strₛ Y)
 
   field
     F   : Λ₁
@@ -53,7 +52,7 @@ record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
 
 Trackable : (X Y : Asm 𝓤) → 𝓤 ̇
 Trackable X Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] HasTracker X Y f
- 
+
 MerelyTrackable : (X Y : Asm 𝓤) → 𝓤 ̇
 MerelyTrackable X Y = Σ[ f ꞉ (⟨ X ⟩ → ⟨ Y ⟩) ] ∥ HasTracker X Y f ∥
 ------------------------------------------------------------------------------
@@ -89,12 +88,11 @@ id X = 𝓤.id , 0 , 𝓤.id
 
 infixr 9 _∘_
 
--- TODO: Clarify this definition.
 _∘_ : {X Y Z : Asm 𝓤}
   → Trackable Y Z → Trackable X Y → Trackable X Z
 _∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ {_} {x} M⊩x →
   subst (Z._⊩ g (f x)) (∘-ssubst-ssubst G F _ ⁻¹) (G⊩g (F⊩f M⊩x))
-    where module Z = AsmStr (str Z)
+    where module Z = AsmStr (strₛ Z)
 
 AsmIso : (X Y : Asm 𝓤) → (Trackable X Y) → 𝓤 ̇
 AsmIso X Y f = ∃[ g ꞉ Trackable Y X ] (f ∘ g ∼ id Y ꞉ Y →ₐ Y) × (g ∘ f ∼ id X ꞉ X →ₐ X)

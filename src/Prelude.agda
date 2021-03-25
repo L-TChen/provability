@@ -85,6 +85,22 @@ _IsLeftTotal {𝓤} {𝓥} {A} {B} _≈_ = (x : A) → ∃[ y ꞉ B ] (x ≈ y)
 id : A → A
 id x = x
 
+------------------------------------------------------------------------------
+-- 
+
+SetWithStr : (𝓤 : Universe) → (𝓤 ̇ → 𝓥 ̇) → 𝓥 ⊔ 𝓤 ⁺ ̇
+SetWithStr 𝓤 S = Σ[ X ꞉ 𝓤 ̇ ] Σ[ is-set ꞉ isSet X ] S X
+
+strₛ : {S : 𝓤 ̇ → 𝓥 ̇}
+  → (A : SetWithStr 𝓤 S) → S (fst A)
+strₛ = snd ∘ snd
+
+setStr→typStr : {S : 𝓤 ̇ → 𝓥 ̇}
+  → SetWithStr 𝓤 S → TypeWithStr 𝓤 S
+setStr→typStr (X , XisSet , S) = X , S
+------------------------------------------------------------------------------
+-- 
+
 module ≡-Reasoning where
   open import Cubical.Foundations.Prelude public
     using (_≡⟨_⟩_; ≡⟨⟩-syntax; _∎)
@@ -102,6 +118,9 @@ _≤?_ : (m n : ℕ) → Dec (m ≤ n)
 zero  ≤? _     = yes tt
 suc m ≤? zero  = no λ ()
 suc m ≤? suc n = m ≤? n
+
+strict-initial : {X : 𝓤 ̇} → (X → ⊥* {𝓤}) → X ≃ (⊥* {𝓤})
+strict-initial f = f , record { equiv-proof = λ { () } }
 
 record Code (A : 𝓤 ̇) :  𝓤 ⁺ ̇ where
   field
@@ -126,6 +145,3 @@ instance
 
   DecEqBool : DecEq Bool
   _≟_ ⦃ DecEqBool ⦄ = Cubical.Data.Bool._≟_
-
-strict-initial : {X : 𝓤 ̇} → (X → ⊥* {𝓤}) → X ≃ (⊥* {𝓤})
-strict-initial f = f , record { equiv-proof = λ { () } }

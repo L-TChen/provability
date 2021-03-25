@@ -11,7 +11,7 @@ open import Calculus.Untyped
   
 open import Assembly.Base
 open import Assembly.Properties
-open import Assembly.Exposure
+open import Assembly.ClockedExposure
 
 private
   variable
@@ -76,12 +76,12 @@ module _ (Q : Quoting) where
     → ((k : Cl) → □map k f ∼ □map k g ꞉ □ k X →ₐ □ k Y)
     → f ∼ g ꞉ X →ₐ Y
   □reflects∼ {X = X} (f , F , F⊩f) (g , G , G⊩g) YisSet □f∼□g x = rec (YisSet _ _)
-    (λ { (M , r) → {!!} }) -- (λ { (M , M⊩x) → cong (λ x → {!!}) (□f∼□g k0 (M , next x , (λ α → M⊩x))) })
+    (λ { (M , r) → {!!} }) 
     (X.⊩-right-total x)
     where
       module X = AsmStr (str X)
 
-  □-isExposure : IsExposure {𝓤} (□ k) (□map k)
+  □-isExposure : IsCloExpo {𝓤} □ □map
   □-isExposure = record
     { preserve-id   = □id=id
     ; preserve-comp = □gf=□g□f
@@ -94,8 +94,8 @@ module _ (Q : Quoting) where
       postulate
         ↑ₗ-injective : {Γ Δ : Cxt} {A : 𝕋} {M N : Δ ⊢ A} → ↑ₗ_ {Δ} {_} {Γ} M ≡ ↑ₗ N → M ≡ N
 
-  □-exposure : (k : Cl) → Exposure 𝓤
-  □-exposure k = exposure (□ k) (□map k) □-isExposure
+  □-exposure : CloExpo 𝓤
+  □-exposure = exposure □ □map □-isExposure
 
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ k (⊥ₐ {𝓤}) ⟩ → ⊥* {𝓤}) → ▹ k ⊥* → ⊥*
@@ -108,28 +108,28 @@ module _ (Q : Quoting) where
   -- Theorem: There is no natural transformation q : I ⇒ □.
   -- Proof sketch: By naturality, qΛ is determined by its component at the terminal object ⊤ₐ. 
   
-  quoting-does-not-exist : (q : NaturalTransformation {𝓤₀} Id (□-exposure k)) → ⊥
-  quoting-does-not-exist {k = k} (fun , naturality) = quoting-not-definable (QΛ , QΛ-is-quoting)
+  quoting-does-not-exist : Cl → (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
+  quoting-does-not-exist k′ (fun , naturality) = quoting-not-definable (QΛ k′ , QΛ-is-quoting k′)
     where
-      qQ-at-Λ : Trackable Λ₀ₐ (□ k Λ₀ₐ)
-      qQ-at-Λ = fun
+      qQ-at-Λ : (k : Cl) → Trackable Λ₀ₐ (□ k Λ₀ₐ)
+      qQ-at-Λ k = fun k
 
-      qΛ = qQ-at-Λ .fst
-      QΛ = HasTracker.F (qQ-at-Λ .snd)
+      qΛ = λ (k : Cl) → qQ-at-Λ k .fst
+      QΛ = λ (k : Cl) → HasTracker.F (qQ-at-Λ k .snd)
 
-      qQ-at-⊤ : Trackable ⊤ₐ (□ k ⊤ₐ)
-      qQ-at-⊤ = fun
+      qQ-at-⊤ : (k : Cl) → Trackable ⊤ₐ (□ k ⊤ₐ)
+      qQ-at-⊤ k = fun k
      
-      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
-      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ .snd) 
+      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ k [ N ] -↠ ⌜ qΛ k M .fst ⌝)
+      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ _ .snd) 
 
-      lem : (M : Λ₀) → qΛ M ≡ (M , next M , _)
-      lem M = begin
-        qΛ M
+      lem : (k : Cl) → (M : Λ₀) → qΛ k M ≡ (M , next M , _)
+      lem k M = begin
+        qΛ k M
           ≡⟨ refl ⟩
-        qΛ (*→Λ M .fst _)
-          ≡⟨ naturality (*→Λ M) _ ⟩
-        □map k (*→Λ M) .fst (qQ-at-⊤ .fst tt*)
+        qΛ k (*→Λ M .fst _)
+          ≡⟨ naturality k (*→Λ M) _ ⟩
+        □map k (*→Λ M) .fst (qQ-at-⊤ k .fst tt*)
           ≡⟨ refl ⟩
         ↑₁ M [ _ ]  , next M , (λ α → s α)
           ≡[ i ]⟨ subst-rename-∅ _ M i , next M , transport-filler (cong (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M)) s i ⟩
@@ -138,15 +138,16 @@ module _ (Q : Quoting) where
           open ≡-Reasoning
           open HasTracker (*→Λ M .snd)
           f : Unit* → ⟨ □ k ⊤ₐ ⟩
-          f = qQ-at-⊤ .fst
+          f = qQ-at-⊤ k .fst
           s = ▹map F⊩f (f tt* .snd .snd)
   
-      QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
-      QΛ-is-quoting M = begin
-        QΛ [ M ]
+      QΛ-is-quoting : (k : Cl)
+        → (M : Λ₀) → QΛ k [ M ] -↠ ⌜ M ⌝
+      QΛ-is-quoting k M = begin
+        QΛ k [ M ]
           -↠⟨ lower (QΛ[M] -↠-refl) ⟩
-        ⌜ qΛ M .fst ⌝
-        ≡[ i ]⟨ ⌜ lem M i .fst  ⌝ ⟩
+        ⌜ qΛ k M .fst ⌝
+        ≡[ i ]⟨ ⌜ lem k M i .fst  ⌝ ⟩
         ⌜ M ⌝ ∎
         where open -↠-Reasoning
 

@@ -12,13 +12,13 @@ open import Assembly.Properties
 
 private
   variable
-    X Y Z : Asm 𝓤
+    X Y Z : ASM 𝓤
 ------------------------------------------------------------------------------
 -- Endo-exposure
 
-record IsExposure (Q : Asm 𝓤 → Asm 𝓤) (map : {X Y : Asm 𝓤} → Trackable X Y → Trackable (Q X) (Q Y)) : 𝓤 ⁺ ̇ where 
+record IsExposure (Q : ASM 𝓤 → ASM 𝓤) (map : {X Y : ASM 𝓤} → Trackable X Y → Trackable (Q X) (Q Y)) : 𝓤 ⁺ ̇ where 
   field
-    preserve-id   : (X : Asm 𝓤)
+    preserve-id   : (X : ASM 𝓤)
       → map (id X) ∼ id (Q X) ꞉ Q X →ₐ Q X
     preserve-comp : (f : Trackable X Y) (g : Trackable Y Z)
       → map (g ∘ f) ∼ map g ∘ map f ꞉ Q X →ₐ Q Z
@@ -29,13 +29,14 @@ record IsExposure (Q : Asm 𝓤 → Asm 𝓤) (map : {X Y : Asm 𝓤} → Tracka
 record Exposure (𝓤 : Universe) : 𝓤 ⁺ ̇ where
   constructor exposure
   field
-    obj        : Asm 𝓤 → Asm 𝓤
-    map        : {X Y : Asm 𝓤} → Trackable X Y → Trackable (obj X) (obj Y)
+    obj        : ASM 𝓤 → ASM 𝓤
+    map        : {X Y : ASM 𝓤} → Trackable X Y → Trackable (obj X) (obj Y)
     isExposure : IsExposure obj map
 open Exposure
 
-Naturality : (P Q : Exposure 𝓤) → ({X : Asm 𝓤} → Trackable (P .obj X) (Q .obj X)) → 𝓤 ⁺ ̇
-Naturality {𝓤} P Q fun = {X Y : Asm 𝓤} → (f : Trackable X Y) → fun ∘ P .map f ∼ Q .map f ∘ fun ꞉ P .obj X →ₐ Q .obj Y
+
+Naturality : (P Q : Exposure 𝓤) → ({X : ASM 𝓤} → Trackable (P .obj X) (Q .obj X)) → 𝓤 ⁺ ̇
+Naturality {𝓤} P Q fun = {X Y : ASM 𝓤} → (f : Trackable X Y) → fun ∘ P .map f ∼ Q .map f ∘ fun ꞉ P .obj X →ₐ Q .obj Y
 
 record NaturalTransformation (P Q : Exposure 𝓤) : 𝓤 ⁺ ̇ where
   constructor _,_
@@ -49,3 +50,4 @@ Id = exposure (λ X → X) (λ f → f) record
   ; preserve-comp = λ f g x → refl
   ; reflects-∼    = λ _ _ x → x
   }
+
