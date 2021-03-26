@@ -12,7 +12,7 @@ module Prims where
 open Prims renaming (primLockUniv to LockU) public
 
 infixl 4 _⊛_
-infixr -1 ▹-syntax
+infixr -2 ▹-syntax
 
 postulate
   Cl   : 𝓤₀ ̇
