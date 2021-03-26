@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --no-import-sorts #-}
 
 module Prelude where
 
@@ -6,7 +6,7 @@ open import Agda.Builtin.FromNat                 public
   renaming (Number to HasFromNat)
 
 open import Cubical.Foundations.Everything       public
-  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax; ⋆)
+  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax; ⋆; ⟨_⟩; str)
 open import Cubical.Relation.Nullary             public
   hiding (⟪_⟫)
 open import Cubical.HITs.PropositionalTruncation public
@@ -19,25 +19,22 @@ open import Cubical.Data.Empty                     public
 open import Cubical.Data.Bool                      public
   hiding (_≟_)
 open import Cubical.Data.Nat                       public
-  using (ℕ; zero; suc; _+_; _∸_; fromNatℕ)
+  using (ℕ; zero; suc; _+_; _∸_; fromNatℕ; isSetℕ)
 open import Cubical.Data.Nat.Order.Recursive as ℕₚ public
   using (_≤_; _<_)
 open import Cubical.Data.FinData                   public
   using (Fin)
   renaming (zero to fzero; suc to fsuc)
 
-open import Universes public
+open import Prelude.Universes public
+open import Prelude.Notations public
+open import Prelude.Instances public
+
 
 private
   variable
     A B C : 𝓤 ̇
     n m   : ℕ
-
-infixr -1 Π Σ′ ∃′ _➝_
-
-infix 4 _≢_
-_≢_ : {A : 𝓤 ̇} → A → A → 𝓤 ̇
-x ≢ y = x ≡ y → ⊥
 
 ∥_∥* : 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
 ∥_∥* {𝓥 = 𝓥} X = ∥ Lift {j = 𝓥} X ∥
@@ -47,24 +44,8 @@ x ≢ y = x ≡ y → ⊥
 
 pattern ∣_∣* x = ∣ lift x ∣
 
-------------------------------------------------------------------------
--- Π x ꞉ A , Σ a ꞉ A , ∃ a ꞉ A notation in Type Theory
-
-syntax Π  {A = A} (λ x → b) = Π[ x ꞉ A ] b
-syntax Σ′ {A = A} (λ x → b) = Σ[ x ꞉ A ] b
-syntax ∃′ {A = A} (λ x → b) = ∃[ x ꞉ A ] b
-
-Π : (B : A → 𝓥 ̇) → (universe-of A) ⊔ 𝓥 ̇
-Π {A = A} B = (x : A) → B x
-
-Σ′ : (B : A → 𝓥 ̇) → (universe-of A) ⊔ 𝓥 ̇
-Σ′ {A = A} B = Σ A B
-
-∃′ : (B : A → 𝓥 ̇) → (universe-of A) ⊔ 𝓥 ̇
-∃′ {A = A} B = ∥ Σ A B ∥
-
-_➝_ : 𝓤 ̇ → 𝓥 ̇ → 𝓤 ⊔ 𝓥 ̇
-A ➝ B = A → B
+isSet→ : {A : 𝓤 ̇} {B : 𝓥 ̇} → isSet B → isSet (A → B)
+isSet→ pB = isSetΠ λ _ → pB
 
 ------------------------------------------------------------------------------
 -- Some properties about relation
@@ -82,25 +63,61 @@ _IsRightTotal {𝓤} {𝓥} {A} {B} _≈_ = (y : B) → ∃[ x ꞉ A ] (x ≈ y)
 
 _IsLeftTotal : {A : 𝓤 ̇} {B : 𝓥 ̇} (_≈_ : A → B → 𝓤 ⊔ 𝓥 ̇) → 𝓤 ⊔ 𝓥 ̇
 _IsLeftTotal {𝓤} {𝓥} {A} {B} _≈_ = (x : A) → ∃[ y ꞉ B ] (x ≈ y)
+
 ------------------------------------------------------------------------
 -- Some simple functions
 
 id : A → A
-id x = x
+id = λ x → x
 
 ------------------------------------------------------------------------------
 -- 
 
-SetWithStr : (𝓤 : Universe) → (𝓤 ̇ → 𝓥 ̇) → 𝓥 ⊔ 𝓤 ⁺ ̇
-SetWithStr 𝓤 S = Σ[ X ꞉ 𝓤 ̇ ] Σ[ is-set ꞉ isSet X ] S X
+instance
+  hSet→Type : Coercion (hSet 𝓤) (𝓤 ̇)
+  hSet→Type = record { ⟨_⟩ = fst }
 
-strₛ : {S : 𝓤 ̇ → 𝓥 ̇}
-  → (A : SetWithStr 𝓤 S) → S (fst A)
-strₛ = snd ∘ snd
+  hProp→Type : Coercion (hProp 𝓤) (𝓤 ̇)
+  hProp→Type = record { ⟨_⟩ = fst }
+  
+  TypeStr→Type : {S : 𝓤 ̇ → 𝓥 ̇} → Coercion (TypeWithStr 𝓤 S) (𝓤 ̇)
+  TypeStr→Type = record { ⟨_⟩ = fst }
 
-setStr→typStr : {S : 𝓤 ̇ → 𝓥 ̇}
-  → SetWithStr 𝓤 S → TypeWithStr 𝓤 S
-setStr→typStr (X , XisSet , S) = X , S
+------------------------------------------------------------------------------
+-- 
+
+record SetWithStr (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) : 𝓥 ⊔ 𝓤 ⁺ ̇ where
+  constructor _,_
+  field
+    carrier   : hSet 𝓤
+    structure : S ⟨ carrier ⟩
+
+  toTypeStr : TypeWithStr 𝓤 S
+  toTypeStr = ⟨ carrier ⟩ , structure
+
+  _is-set : isSet ⟨ carrier ⟩
+  _is-set = carrier .snd
+
+open SetWithStr public
+  renaming (structure to str)
+
+module _ {S : 𝓤 ̇ → 𝓥 ̇} where
+  instance
+    SetStr→Type : Coercion (SetWithStr 𝓤 S) (𝓤 ̇)
+    ⟨_⟩ ⦃ SetStr→Type ⦄ (carrier , _) = ⟨ carrier ⟩
+
+--    SetStr→TypeStr : Coercion (SetWithStr 𝓤 S) (TypeWithStr 𝓤 S)
+--    ⟨_⟩ ⦃ SetStr→TypeStr ⦄ (carrier , str) = ⟨ carrier ⟩ , str
+
+Rel : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
+Rel {𝓤} {𝓥} A B = A → B → (𝓤 ⊔ 𝓥) ̇ 
+
+MRel : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
+MRel {𝓤} {𝓥} A B = Σ[ R ꞉ A ➝ B ➝ (𝓤 ⊔ 𝓥) ̇ ] ((x : A) (y : B) → isProp (R x y))
+
+instance
+  MRel→Rel : Coercion (MRel A B) (Rel A B)
+  MRel→Rel = record { ⟨_⟩ = fst }
 
 ------------------------------------------------------------------------------
 -- 
@@ -144,14 +161,6 @@ open Code ⦃ ... ⦄ public
 {-# DISPLAY Code.decode c = decode c  #-}
 {-# DISPLAY Code.encode p = encode p  #-}
 
-record DecEq (A : 𝓤 ̇) : 𝓤 ̇ where
-  field
-    _≟_ : (x y : A) → Dec (x ≡ y)
-
-  ≟→isSet : isSet A
-  ≟→isSet = Discrete→isSet _≟_
-open DecEq ⦃ ... ⦄ public
-
 private
   codeℕ : (m n : ℕ) → 𝓤₀ ̇
   codeℕ zero    zero    = Unit
@@ -194,14 +203,14 @@ instance
   CodeFin = record { code = codeFin ; r = rFin ; decode = decodeFin }
   
 instance
-  DecEqUnit : DecEq Unit
-  DecEqUnit = record { _≟_ = λ {tt tt → yes refl} }
+  IsDiscreteUnit : IsDiscrete Unit
+  IsDiscreteUnit = record { _≟_ = λ {tt tt → yes refl} }
 
-  DecEqBool : DecEq Bool
-  _≟_ ⦃ DecEqBool ⦄ = Cubical.Data.Bool._≟_
+  IsDiscreteBool : IsDiscrete Bool
+  _≟_ ⦃ IsDiscreteBool ⦄ = Cubical.Data.Bool._≟_
 
-  DecEqℕ : DecEq ℕ
-  _≟_ ⦃ DecEqℕ ⦄ = Cubical.Data.Nat.discreteℕ 
+  IsDiscreteℕ : IsDiscrete ℕ
+  _≟_ ⦃ IsDiscreteℕ ⦄ = Cubical.Data.Nat.discreteℕ 
 
-  DecEqFin : DecEq (Fin n)
-  _≟_ ⦃ DecEqFin ⦄ = Cubical.Data.FinData.discreteFin
+  IsDiscreteFin : IsDiscrete (Fin n)
+  _≟_ ⦃ IsDiscreteFin ⦄ = Cubical.Data.FinData.discreteFin
