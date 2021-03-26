@@ -5,13 +5,13 @@ module Assembly.Properties where
 open import Prelude as 𝓤
   hiding (_∘_; id; uncurry)
 open import Calculus.Untyped as Λ
+  hiding (`⟨_,_⟩)
 
 open import Assembly.Base
 
 private
   variable
     X Y Z : Asm 𝓤
-    x y z : ⟨ X ⟩
 
 ∘-id : {f : Trackable X Y} → f ∘ (id X) ≡ f
 ∘-id {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , Fx=F i , λ {M} {x} r → lem {M} {x} r i
@@ -52,34 +52,38 @@ id-∘ {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , F , λ {M} {x} r → lem
     lem = {!!}
 -}
 
-∇_ : (X : 𝓤 ̇) → ASM 𝓤
+∇_ : (X : hSet 𝓤) → Asm 𝓤
 ∇ X = X , (λ _ _ → Unit*) , record
-  { ⊩-respects-↠ = λ _ _ → tt*
+  { ⊩-respects-↠  = λ _ _ → tt*
   ; ⊩-right-total = λ _ → ∣ 𝑰 , tt* ∣
+  ; ⊩-isSet       = isProp→isSet isPropUnit*
   }
 
-ℕₐ : ASM₀
-ℕₐ = ℕ , _⊩_ , record
+ℕₐ : Asm₀
+ℕₐ = (ℕ , isSetℕ) , _⊩_ , record
   { ⊩-respects-↠  = -↠-trans
   ; ⊩-right-total = λ n → ∣ 𝒄 n , -↠-refl ∣
+  ; ⊩-isSet       = -↠isSet 
   }
   where
     _⊩_ : Λ₀ → ℕ → 𝓤₀ ̇
     M ⊩ n = M -↠ 𝒄 n
 
 -- Proposition: The set Λ₀ of lambda terms is equipped with an assembly structure.
-Λ₀ₐ : ASM 𝓤₀
-Λ₀ₐ = Λ₀ , (λ M N → M -↠ N) , record
+Λ₀ₐ : Asm 𝓤₀
+Λ₀ₐ = (Λ₀ , ≟→isSet) , (λ M N → M -↠ N) , record
   { ⊩-respects-↠  = -↠-trans
   ; ⊩-right-total = λ M → ∣ M , -↠-refl ∣
+  ; ⊩-isSet       = -↠isSet 
   }
 
 ------------------------------------------------------------------------------
 -- Finality
-⊤ₐ : ASM 𝓤
-⊤ₐ = Unit* , _⊩_ , record
+⊤ₐ : Asm 𝓤
+⊤ₐ = (Unit* , isProp→isSet isPropUnit*) , _⊩_ , record
   { ⊩-respects-↠  = ⊩-respects-↠
   ; ⊩-right-total = ⊩-right-total
+  ; ⊩-isSet       = isOfHLevelLift 2 -↠isSet 
   }
   where
     _⊩_ : Λ₀ → Unit* {𝓤} → 𝓤 ̇
@@ -91,23 +95,23 @@ id-∘ {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , F , λ {M} {x} r → lem
     ⊩-right-total : _⊩_ IsRightTotal
     ⊩-right-total _ = ∣ 𝑰 , lift -↠-refl ∣
     
-module Final {X : ASM 𝓤} where
+module Final {X : Asm 𝓤} where
   open AsmStr (str X)
   open -↠-Reasoning
-  
+
   universality : Trackable X ⊤ₐ
   universality = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → lift -↠-refl
 
-  global-element : (x : ⟨ X ⟩) → (M : Λ₀) → M ⊩ x
+  global-element : (M : Λ₀) → (x : ⟨ X ⟩) → M ⊩ x
     → Trackable ⊤ₐ X
-  global-element x M M⊩x = (λ _ → x) , (↑₁ M) , λ _ → ⊩-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
+  global-element M x M⊩x = (λ _ → x) , (↑₁ M) , λ _ → ⊩-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
 
   separator : (f g : Trackable X Y)
-    → isSet ⟨ Y ⟩
-    → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x ꞉ ⊤ₐ →ₐ Y)
-    → f ∼ g ꞉ X →ₐ Y
-  separator {Y = Y} f g YisSet fx=gx x = rec (YisSet _ _)
-    (λ {(M , M⊩x) → fx=gx (global-element x M M⊩x) tt*}) (X.⊩-right-total x)
+    → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x)
+    → f ∼ g
+  separator {Y = Y} f g fx=gx x = rec
+    ((Y is-set) (⟨ f ⟩ x) (⟨ g ⟩ x)) (λ { (M , r) → fx=gx (global-element M x r) _ })
+    (X.⊩-right-total x)
     where
       module Y = AsmStr (str Y)
       module X = AsmStr (str X)
@@ -117,10 +121,11 @@ module Final {X : ASM 𝓤} where
 
 ------------------------------------------------------------------------------
 -- Initiality
-⊥ₐ : ASM 𝓤
-⊥ₐ = ⊥* , _⊩_ , record
+⊥ₐ : Asm 𝓤
+⊥ₐ = (⊥* , λ ()) , _⊩_ , record
   { ⊩-respects-↠  = ⊩-respects-↠ 
   ; ⊩-right-total = ⊩-right-total
+  ; ⊩-isSet       = λ { {_} {()} } 
   }
   where
     _⊩_ : Λ₀ → ⊥* {𝓤} → 𝓤 ̇
@@ -128,11 +133,11 @@ module Final {X : ASM 𝓤} where
 
     ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
     ⊩-respects-↠ {y = ()}
-    
+ 
     ⊩-right-total : _⊩_ IsRightTotal
     ⊩-right-total ()
 
-module Initial (X : ASM 𝓤) where 
+module Initial (X : Asm 𝓤) where 
   universality : Trackable ⊥ₐ X
   universality = ⊥*-elim , 0 , (λ { {x = ()} })
 
@@ -144,30 +149,34 @@ module Initial (X : ASM 𝓤) where
     
 ------------------------------------------------------------------------------
 -- Product
-_×ₐ_ : ASM 𝓤 → ASM 𝓤 → ASM 𝓤
-_×ₐ_ {𝓤} X Y = ⟨ X ⟩ × ⟨ Y ⟩ , _⊩_ , record
+_×ₐ_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
+_×ₐ_ {𝓤} X Y = (⟨ X ⟩ × ⟨ Y ⟩ , isSet× (X is-set) (Y is-set) ) , _⊩_ , record
   { ⊩-respects-↠  = ⊩-respect-↠
-  ; ⊩-right-total = ⊩-right-total  }
+  ; ⊩-right-total = ⊩-right-total
+  ; ⊩-isSet       = isSet×
+    (isSetΣ ≟→isSet λ _ → isSet× -↠isSet X.⊩-isSet)
+    (isSetΣ ≟→isSet λ _ → isSet× -↠isSet Y.⊩-isSet)
+  }
   where
     module X = AsmStr (str X)
     module Y = AsmStr (str Y)
 
     _⊩_ : Λ₀ → ⟨ X ⟩ × ⟨ Y ⟩ → 𝓤 ̇
     L ⊩ (x , y) =
-       Σ[ M ꞉ Λ₀ ] `projₗ L -↠ M × M X.⊩ x ×
+      (Σ[ M ꞉ Λ₀ ] `projₗ L -↠ M × M X.⊩ x) ×
       (Σ[ N ꞉ Λ₀ ] `projᵣ L -↠ N × N Y.⊩ y)
 
     ⊩-respect-↠   : _⊩_ respects _-↠_ on-the-left
-    ⊩-respect-↠ L-↠L′ (M , proj₁L-↠M , x⊩M , N , projᵣL-↠N , y⊩N) =
-      M , -↠-trans (·ₗ-cong L-↠L′) proj₁L-↠M , x⊩M ,
-      N , -↠-trans (·ₗ-cong L-↠L′) projᵣL-↠N , y⊩N
+    ⊩-respect-↠ L-↠L′ ((M , proj₁L-↠M , x⊩M) , (N , projᵣL-↠N , y⊩N)) =
+      (M , -↠-trans (·ₗ-cong L-↠L′) proj₁L-↠M , x⊩M) ,
+      (N , -↠-trans (·ₗ-cong L-↠L′) projᵣL-↠N , y⊩N)
 
     ⊩-right-total : _⊩_ IsRightTotal
     ⊩-right-total (x , y) = rec2 propTruncIsProp
-      (λ { (M , M⊩x) (N , N⊩y) → ∣ Λ.`⟨ M , N ⟩ , M , β-projₗ , M⊩x , N , β-projᵣ , N⊩y ∣ })
+      (λ { (M , M⊩x) (N , N⊩y) → ∣ Λ.`⟨ M , N ⟩ , (M , β-projₗ , M⊩x) , N , β-projᵣ , N⊩y ∣ })
       (X.⊩-right-total x) (Y.⊩-right-total y)
 
-module Product (X Y : ASM 𝓤) where
+module Product (X Y : Asm 𝓤) where
   module X = AsmStr (str X)
   module Y = AsmStr (str Y)
 
@@ -179,15 +188,15 @@ module Product (X Y : ASM 𝓤) where
   projₗ = (λ {(x , y) → x}) , 0 · ↑₁ 𝑻 , F⊩projₗ
     where
       F⊩projₗ : Tracks X×Y X (0 · ↑₁ 𝑻) fst
-      F⊩projₗ (_ , πₗL-↠M , M⫣x , _ , _ , _) = X.⊩-respects-↠ πₗL-↠M M⫣x
+      F⊩projₗ ((_ , πₗL-↠M , M⫣x) , _) = X.⊩-respects-↠ πₗL-↠M M⫣x
 
   projᵣ : Trackable X×Y Y
   projᵣ = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⊩projᵣ
     where
       F⊩projᵣ : Tracks X×Y Y (0 · ↑₁ 𝑭) snd
-      F⊩projᵣ (_ , _ , _ , _ , π₂L-↠N , N⫣y) = Y.⊩-respects-↠ π₂L-↠N N⫣y
+      F⊩projᵣ (_ , _ , π₂L-↠N , N⫣y) = Y.⊩-respects-↠ π₂L-↠N N⫣y
       
-  `⟨_,_⟩ : {Z : ASM 𝓤}
+  `⟨_,_⟩ : {Z : Asm 𝓤}
     → Trackable Z X → Trackable Z Y → Trackable Z (X ×ₐ Y)
   `⟨_,_⟩ {Z = Z} (f , F , F⊩f) (g , G , G⊩g) = h , H , H⊩h 
     where
@@ -200,7 +209,7 @@ module Product (X Y : ASM 𝓤) where
       H = Λ.`⟨ F , G ⟩
 
       H⊩h : Tracks Z (X ×ₐ Y) H h
-      H⊩h {L} {z} L⊩z = F [ L ] , lem₁ , F⊩f L⊩z , G [ L ] , lem₂ , G⊩g L⊩z
+      H⊩h {L} {z} L⊩z = (F [ L ] , lem₁ , F⊩f L⊩z) , G [ L ] , lem₂ , G⊩g L⊩z
         where
           lem₁ = begin
             `projₗ (H [ L ])
@@ -223,19 +232,25 @@ module Product (X Y : ASM 𝓤) where
 -- Exponential object
 infixr 15 _⇒_
 
-_⇒_ : ASM 𝓤 → ASM 𝓤 → ASM 𝓤
-_⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
+_⇒_ : Asm 𝓤 → Asm 𝓤 → Asm 𝓤
+_⇒_ {𝓤} X Y = (X⇒Y , X⇒YisProp) , _⊩_ , record
   { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respects-↠ {x} {x′} {y}
-  ; ⊩-right-total = ⊩-right-total }
+  ; ⊩-right-total = ⊩-right-total
+  ; ⊩-isSet       = λ {F} {f} → ⊩isSet {F} {f}
+  }
     where
       open -↠-Reasoning
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
 
       X⇒Y = MerelyTrackable X Y
+      X⇒YisProp = isSetΣ (isSetΠ (λ _ → Y is-set)) λ _ → isProp→isSet propTruncIsProp
 
       _⊩_ : Λ₀ → X⇒Y → 𝓤 ̇
-      F ⊩ (f , _) = {M : Λ₀} {x : ⟨ X ⟩} → M X.⊩ x → F · M Y.⊩ f x
+      F ⊩ (f , _) = {M : Λ₀} {x : ⟨ X ⟩} → M X.⊩ x → (F · M Y.⊩ f x)
+
+      postulate
+        ⊩isSet : {F : Λ₀} {f : X⇒Y} → isSet (F ⊩ f)
 
       ⊩-respects-↠ : _⊩_ respects _-↠_ on-the-left
       ⊩-respects-↠ {G} {F} G-↠F F⊩f M⊩x = Y.⊩-respects-↠ (·ₗ-cong G-↠F) (F⊩f M⊩x)
@@ -246,7 +261,7 @@ _⇒_ {𝓤} X Y = X⇒Y , _⊩_ , record
           ((ƛ F) · M -→⟨ β ⟩ F [ M ] ∎) (F⊩f M⊩x)) ∣})
         ∃F⊩f
         
-module Exponential (X Y : ASM 𝓤) where
+module Exponential (X Y : Asm 𝓤) where
   module X = AsmStr (str X)
   module Y = AsmStr (str Y)
   X⇒Y = X ⇒ Y
@@ -254,7 +269,7 @@ module Exponential (X Y : ASM 𝓤) where
   open -↠-Reasoning
       
   postulate
-    uncurry : {Z : ASM 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
+    uncurry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
     eval : Trackable (X⇒Y ×ₐ X) Y
     {-
       uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp
