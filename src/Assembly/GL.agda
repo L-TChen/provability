@@ -24,7 +24,7 @@ module _ (Q : Quoting) where
   □ {𝓤} k X@((|X| , XisSet) , _ , _) = (|□X| , isSet□X) , _⊩_ , record
     { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respect-↠ {x} {x′} {y}
     ; ⊩-right-total = ⊩-right-total
-    ; ⊩-isSet       = {!!} 
+    ; ⊩-isSet       = isOfHLevelLift 2 -↠isSet 
     }
     where
       module X = AsmStr (str X)
