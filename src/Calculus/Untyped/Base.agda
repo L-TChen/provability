@@ -5,7 +5,6 @@ module Calculus.Untyped.Base where
 open import Prelude
   hiding (_∘_)
 
-
 infixr 8 ƛ_
 infixl 10 _·_
 
@@ -17,10 +16,12 @@ infixl 11 _[_] _⟪_⟫
 data Λ (n : ℕ) : 𝓤₀ ̇ where
   `_ : (x : Fin n) → Λ n
 
-  ƛ_ : (L : Λ (suc n))
-    → Λ n
+  ƛ_ : Λ (suc n)
+     → Λ n
 
-  _·_ : (M N : Λ n) → Λ n
+  _·_
+    : (M N : Λ n)
+    → Λ n
 
 private
   variable
@@ -29,6 +30,7 @@ private
 
 Λ₀ = Λ 0
 Λ₁ = Λ 1
+Λ₂ = Λ 2
 
 count : {n i : ℕ}
   → (p : i < n) → Fin n
@@ -89,9 +91,8 @@ private
   (_ · _) ≟Λ (ƛ _)    = no encode
 
 instance
-  DecEqΛ : DecEq (Λ n)
-  _≟_ ⦃ DecEqΛ ⦄ = _≟Λ_
-
+  ΛisDiscrete : IsDiscrete (Λ n)
+  _≟_ ⦃ ΛisDiscrete ⦄ = _≟Λ_
 ------------------------------------------------------------------------------
 -- Variable renaming
 
@@ -182,30 +183,31 @@ data _-→_ {n : ℕ} : (M N : Λ n) → 𝓤₀ ̇ where
 
 private
   code→ : {M N N′ : Λ n} → (r : M -→ N) (s : M -→ N′) → 𝓤₀ ̇
-  code→ {_} {M} {N} {N′} β β = code N N′
-  code→ (ζ r)   (ζ s)  = code→ r s
-  code→ (ξₗ r) (ξₗ  s) = code→ r s
-  code→ (ξᵣ {L = L₁} r) (ξᵣ {L = L₂} s) = code→ r s
-  code→ β       _      = ⊥
-  code→ (ξₗ r)  _      = ⊥
-  code→ (ξᵣ r₁) _      = ⊥
+  code→ β      β      = Unit
+  code→ (ζ r)  (ζ s)  = code→ r s
+  code→ (ξₗ r) (ξₗ s) = code→ r s
+  code→ (ξᵣ r) (ξᵣ s) = code→ r s
+  code→ β       _     = ⊥
+  code→ (ξₗ r)  _     = ⊥
+  code→ (ξᵣ r₁) _     = ⊥
 
   toCodeΛ : {M N N′ : Λ n} (r : M -→ N) (s : M -→ N′) → code→ r s → code N N′
-  toCodeΛ β      β      c          = c
-  toCodeΛ (ζ r)  (ζ s)  c          = toCodeΛ r s c
+  toCodeΛ (β {L} {M})     β      c = r (L [ M ]) 
+  toCodeΛ (ζ r)           (ζ s)  c = toCodeΛ r s c
   toCodeΛ (ξₗ {M = M} r′) (ξₗ s) c = toCodeΛ r′ s c , r M
-  toCodeΛ (ξᵣ {L = L} r′) (ξᵣ s) c = r L , toCodeΛ r′ s c -- c₁ , toCodeΛ r s c₂
+  toCodeΛ (ξᵣ {L = L} r′) (ξᵣ s) c = r L , toCodeΛ r′ s c
 
-  r→ : (red : M -→ N) → code→ red red
-  r→ (β {M} {N}) = r (M [ N ])
+  r→ : (r : M -→ N) → code→ r r
+  r→ (β {M} {N}) = tt
   r→ (ζ red)     = r→ red
   r→ (ξₗ red)    = r→ red
   r→ (ξᵣ red)    = r→ red
+
 {-
 -- TODO: Show that M -→ N is discrete
   decode→ : {M N N′ : Λ n} {r : M -→ N} {s : M -→ N′} → (c : code→ r s)
     → PathP (λ i → M -→ (decode {_} {_} {N} (toCodeΛ r s c) i)) r s
-  decode→ {r = β}     {β}    c = {!!}
+  decode→ {r = β {L} {M}} {β} tt = {!!}
   decode→ {r = ζ r}  {ζ s}  c i = ζ (decode→ {r = r} c i) 
   decode→ {r = ξₗ r} {ξₗ s} c = {!!}
   decode→ {r = ξᵣ r} {ξᵣ s} c = {!!}
@@ -304,5 +306,11 @@ module -↠-Reasoning where
     _ · _
       -↠⟨ ·ᵣ-cong N-↠N′ ⟩
     _ · _ ∎
+
+  
 open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠; ·-cong; ·ₗ-cong; ·ᵣ-cong) public
+
+postulate
+  -→isSet : isSet (M -→ N)
+  -↠isSet : isSet (M -↠ N)
 

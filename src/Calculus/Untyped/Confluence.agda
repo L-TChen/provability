@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical #-}
+{-# OPTIONS --without-K --cubical --no-import-sorts #-}
 
 module Calculus.Untyped.Confluence where
 
@@ -118,7 +118,7 @@ par-rename {Γ} {Δ} {ρ = ρ} (pbeta {M} {N} {M′} {N′} M⇛M′ N⇛N′) =
   let G = pbeta (par-rename {ρ = ext ρ} M⇛M′) (par-rename {ρ = ρ} N⇛N′)
   in  subst (λ L → rename ρ ((ƛ M) · M′) ⇛ L) (rename-ssubst {Γ} {Δ} ρ N N′) G
 
-Par-Subst : Subst m n → Subst m n → Set
+Par-Subst : Subst m n → Subst m n → 𝓤₀ ̇
 Par-Subst {m} {n} σ σ′ = {x : Fin m} → σ x ⇛ σ′ x
 
 par-subst-exts
