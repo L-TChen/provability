@@ -82,11 +82,6 @@ _⊛_ : ▹ k ((a : A) → B a)
   → ▹[ α ꞉ k ] PathP A (x α) (y α) → PathP (λ i → ▹ k (A i)) x y
 ▹-extensionality p i α = p α i
 
-▹isProp→isProp▹ : {A : ▹ k (𝓤 ̇)}
-  → ▹[ α ꞉ k ] isProp (A α)
-  → isProp (▹[ α ꞉ k ] (A α))
-▹isProp→isProp▹ p x y = λ i α → p α (x α) (y α) i
-
 fix : (▹ k A → A) → A
 fix f = f (dfix f)
 
@@ -122,8 +117,22 @@ fixΣ {𝓤} {k} {A} {B} f = f (dfixΣ f)
         V                                        v
        f x -----------------------------------> g x
 -}
-▹-is-faithful₁ : {A B : 𝓤 ̇} → (f g : A → B)
+
+▹-is-faithful : {A B : 𝓤 ̇} → (f g : A → B)
   → (p : ∀ k → Path (▹ k A → ▹ k B) (▹map f) (▹map g))
-  → ∀ k → (x : A)
-  → force (λ _ _ → f x) k ≡ force (λ _ _ → g x) k
-▹-is-faithful₁ f g p k x i = force (λ k α → p k i (next x) α) k  
+  → (k : Cl) → (x : A)
+  → f x ≡ g x
+▹-is-faithful f g p k x i = hcomp (λ j → λ { (i = i0) → delay-force (λ k → f x) k j
+                                           ; (i = i1) → delay-force (λ _ → g x) k j})
+  (force (λ k α → p k i (next x) α) k)
+
+▹isContr→isContr▹ : {A : ▹ k (𝓤 ̇)}
+  → ▹[ α ꞉ k ] isContr (A α)
+  → isContr (▹[ α ꞉ k ] (A α))
+▹isContr→isContr▹ p = (λ α → p α .fst) , λ y i α → p α .snd (y α) i
+
+▹isProp→isProp▹ : {A : ▹ k (𝓤 ̇)}
+  → ▹[ α ꞉ k ] isProp (A α)
+  → isProp (▹[ α ꞉ k ] (A α))
+▹isProp→isProp▹ p x y = λ i α → p α (x α) (y α) i
+
