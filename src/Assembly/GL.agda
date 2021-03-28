@@ -33,7 +33,7 @@ module _ (Q : Quoting) where
       -- Can we remove truncation? Yes.
       
       isSet□X : isSet |□X|
-      isSet□X = isSetΣ ≟→isSet λ _ → isSetΣ {!!} (λ _ → {!!}) -- isSetΣ (Discrete→isSet _≟_) λ M → isSetΣ XisSet λ _ → X.⊩-isSet
+      isSet□X = isSetΣ ≟→isSet λ _ → isSetΣ (▹isSet→isSet▹ (λ _ → X is-set)) (λ _ → ▹isSet→isSet▹ (λ α → X.⊩-isSet))
 
       _⊩_ : (M : Λ₀) → |□X| → 𝓤 ̇
       n̅ ⊩ (M , _ , _)= Lift (n̅ -↠ ⌜ M ⌝)
