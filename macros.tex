@@ -133,17 +133,15 @@
     \fi \raise\qqArgHgt\hbox{$\ulcorner$} \box\qqBoxA %
     \raise\qqArgHgt\hbox{$\urcorner$}}
 %
-\newcommand{\Tree}{\mathcal{S}}
-\newcommand{\later}{\mathord{\blacktriangleright}}
-\newcommand{\laterp}{\mathord{\triangleright}}
-\newcommand{\PER}{\mathbf{PER}}
-\newcommand{\Nat}{\mathbb{N}}
-\newcommand{\PP}{\mathscr{P}}
+\newcommand{\later}{\ensuremath{\mathord{\blacktriangleright}}\xspace}
+\newcommand{\laterp}{\ensuremath{\mathord{\triangleright}}\xspace}
+\newcommand{\Nat}{\ensuremath{\mathbb{N}}\xspace}
+\newcommand{\PP}{\ensuremath{\mathscr{P}}\xspace}
 %\newcommand{\Asm}{\mathbf{Asm}}
-\newcommand{\Asm}{\mathsf{Asm}}
-\newcommand{\ASM}{\mathsf{ASM}}
+\newcommand{\Asm}{\ensuremath{\mathsf{Asm}}\xspace}
+\newcommand{\ASM}{\ensuremath{\mathsf{ASM}}\xspace}
 \newcommand{\defeq}{\vcentcolon\equiv} 
-\newcommand{\Univ}{\mathcal{U}}
+\newcommand{\Univ}{\ensuremath{\mathcal{U}}\xspace}
 \newcommand{\comp}{\circ}
 \newcommand{\transport}{\mathsf{transport}}
 \newcommand{\blank}{{-}}
@@ -151,20 +149,20 @@
 %%% Identity functions %%%
 \newcommand{\idfunc}[1][]{\ensuremath{\mathsf{id}_{#1}}\xspace}
 
-\newcommand{\iid}{\mathit{id}}
-\newcommand{\Unit}{\mathbf{1}}
-\newcommand{\Empty}{\mathbf{0}}
-\newcommand{\pr}{\mathsf{pr}}
+\newcommand{\iid}{\ensuremath{\mathit{id}}\xspace}
+\newcommand{\Unit}{\ensuremath{\mathbf{1}}\xspace}
+\newcommand{\Empty}{\ensuremath{\mathbf{0}}\xspace}
+\newcommand{\pr}{\ensuremath{\mathsf{pr}}\xspace}
 
-\newcommand{\SFour}{\textbf{S4}}
-\newcommand{\GL}{\textbf{GL}}
+\newcommand{\SFour}{\textbf{S4}\xspace}
+\newcommand{\GL}{\textbf{GL}\xspace}
 
-\newcommand{\Quote}{\mathtt{quote}}
-\newcommand{\Eval}{\mathtt{eval}}
-\newcommand{\Subst}{\mathtt{subst}}
+\newcommand{\Quote}{\ensuremath{\mathtt{quote}}\xspace}
+\newcommand{\Eval}{\ensuremath{\mathtt{eval}}\xspace}
+\newcommand{\Subst}{\ensuremath{\mathtt{subst}}\xspace}
 
 \DeclareRobustCommand\longtwoheadrightarrow{\relbar\joinrel\twoheadrightarrow}
-\newcommand{\reduce}{\longtwoheadrightarrow_{\beta}}
+\newcommand{\reduce}{\ensuremath{\mathrel{\longtwoheadrightarrow_{\beta}}}}
 \newcommand{\onereduce}{\longrightarrow_{\beta}}
 
 \newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
