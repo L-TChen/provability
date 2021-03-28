@@ -136,3 +136,8 @@ fixΣ {𝓤} {k} {A} {B} f = f (dfixΣ f)
   → isProp (▹[ α ꞉ k ] (A α))
 ▹isProp→isProp▹ p x y = λ i α → p α (x α) (y α) i
 
+▹isSet→isSet▹ : {A : ▹ k (𝓤 ̇)}
+  → ▹[ α ꞉ k ] isSet (A α)
+  → isSet (▹[ α ꞉ k ] (A α))
+▹isSet→isSet▹ hyp x y p q i j α =
+  hyp α (x α) (y α) (λ j → p j α) (λ j → q j α) i j
