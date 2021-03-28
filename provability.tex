@@ -21,7 +21,7 @@
 \theoremstyle{plain}
 \newtheorem*{notation*}{Notation}
 
-\title{Realising Intensional {\SFour} and {\GL} Modalities} 
+\title{Realising Intensional \SFour and \GL Modalities} 
 \author{Liang-Ting Chen}%
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://l-tchen.github.io}}%
   {liang.ting.chen.tw@gmail.com}%
@@ -384,12 +384,12 @@ Moreover, since sets are closed under $\sum$-types and $\prod$-types, these cons
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
 
-In this section, we first introduce a comonadic exposure $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ which models a $S4$ modality but subtly different from the exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
+In this section, we first introduce a comonadic exposure $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ which models a \SFour modality but subtly different from the exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
 For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not. 
 Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it using $\boxtimes_K$.
 Hitherto, we complete our cook's tour of the previous set-theoretic results (based on a partial combinatory algebra, though) in HoTT.
 
-Thereafter, we use an extension of cubical type theory with the support of Nakano's later modality---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the {\GL} modality.
+Thereafter, we use an extension of cubical type theory with the support of Nakano's later modality---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the \GL modality.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
 Finally, we establish one of the main contribution of this paper: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$F[\qquote{\mathsf{fix}\,F}]$
 where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
@@ -557,7 +557,7 @@ However, it implies that $\mathtt{quote}'[M] \reduce \qquote{M}$ for any $M$, a 
 
 
 \begin{remark}\label{remark:S4-modality}
-  Recall that the modal type theory considered by Davies and Pfenning~\cite{Davies2001b} is a dual-context simple type theory extended with a {\SFour} modality $\Box$, a construct $\mathtt{box}$, a $\mathtt{let}$-expression for boxed terms, and typing rules below.
+  Recall that the modal type theory considered by Davies and Pfenning~\cite{Davies2001b} is a dual-context simple type theory extended with a \SFour modality $\Box$, a construct $\mathtt{box}$, a $\mathtt{let}$-expression for boxed terms, and typing rules below.
 \[
 \begin{minipage}{.47\linewidth}
   \begin{prooftree}
@@ -633,9 +633,9 @@ Inspired by~\Cref{lem:later-identity}, we introduce the notion of clocked exposu
 %  For every $A : \mathord{\laterp}\,\Univ$ if $\laterp (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then $\laterp(\alpha : \mathbb{T}).\,A[\alpha]$ is also a proposition. 
 %\end{lemma}
 
-\subsubsection{Back to \texorpdfstring{$\mathsf{GL}$}{GL}}
+\subsubsection{Back to \texorpdfstring{\GL}{GL}}
 
-Now we introduce the clocked exposure $\Box^\kappa \colon \ASM(\Lambda) \to \ASM(\Lambda)$ modelling the $\mathsf{GL}$ modality as follows. 
+Now we introduce the clocked exposure $\Box^\kappa \colon \ASM(\Lambda) \to \ASM(\Lambda)$ modelling the \GL modality as follows. 
 For any assembly $X$, the carrier of $\Box^\kappa X$ and the realisability relation are now defined as
 \[
   \bproj{\Box^\kappa X} \defeq \sm{M : \Lambda_0}{x : {\laterp^\kappa \bproj{X}}} \laterp (\alpha : \kappa) .\, M \Vdash_X x [\alpha]
@@ -735,22 +735,23 @@ We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus a
 The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which are not exposed in ordinary categories, since computationally equivalent terms are mostly identified on the semantics side \emph{a priori}.
 The situation is likely caused by the confusion between the concept of \emph{denotation} and that of \emph{extension}.
 
-Based on the framework established in~\Cref{sec:assemblies}, we modelled two intensional modalities $\boxtimes$ and $\Box$ satisfying the {\SFour} axiom and the {\GL} axiom respectively.
-The development of the {\SFour} modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{remark:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
-As for the {\GL} modality, we use the clocked cubical type theory to define with a notion of computation stages.
+Based on the framework established in~\Cref{sec:assemblies}, we modelled two intensional modalities $\boxtimes$ and $\Box$ satisfying the \SFour axiom and the \GL axiom respectively.
+The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{remark:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
+As for the \GL modality, we use the clocked cubical type theory to define with a notion of computation stages.
 We then show that it satisfies the Gödel-Löb axiom and its deductive form---the intensional recursion~\cite{Kavvos2017b}.
-This {\GL} modality then answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contribution of this paper.
+This \GL modality then answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contribution of this paper.
 From the aspect of the design of programming languages, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely for tactic programming in a principled way.
 
 \paragraph*{Future work}
 We list a number of problems emerged during working on this paper.
 
 First, as we have two apparently related exposures, one immediate question is how these two exposures are connected.  There is clearly a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know else much.
-The classical {\SFour} and {\GL} modalities and their connection laws are studied in Hilbert-style logic by Goris~\cite{Goris2009} with Kripke semantics in the context of provability logic.
-Accordingly, we would like to describe a type theory enriched with modalities $\boxtimes$ and $\Box$ unifying modal type theories considered by Davies and Pfenning~\cite{Davies2001b} and by Kavvos~\cite{Kavvos2017b,Kavvos2020} while maintaining consistency.
+The classical \SFour and \GL modalities and their connection laws are studied in Hilbert-style logic by Goris~\cite{Goris2009} with Kripke semantics in the context of provability logic.
+Accordingly, we would like to describe a type theory enriched with modalities $\boxtimes$ and $\Box$ unifying modal type theories considered by Davies and Pfenning~\cite{Davies2001b}, Pfenning~\cite{Pfenning2002a}, and by Kavvos~\cite{Kavvos2017b,Kavvos2020} while maintaining consistency.
 
-
-
+Second, inhabitants of $\Box^\kappa X$ are not accessible until the next stage. In order to arrive the next stage one needs a way to $\mathtt{force}$ them. 
+This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2017a}.
+This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
 
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
