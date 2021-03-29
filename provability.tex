@@ -77,7 +77,7 @@
   \ltnote{not super happy with the abstract; rewrite it}
   In this paper, we give a positive answer to a recent open problem---is there a categorical interpretation of the Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ which refutes the completeness principle $A \to \Box A$?
 
-  We consider the $\PP$-category $\ASM(\Lambda)$ of assemblies on untyped $\lambda$-calculus and trackable maps with an exposure-like construction $\Box\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$, internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
+  We consider the $\PP$-category $\Asm(\Lambda)$ of assemblies on untyped $\lambda$-calculus and trackable maps with an exposure-like construction $\Box\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$, internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
   We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle but proves the Gödel-Löb axiom.
   Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo $\alpha$-equivalence given its provability reading but also their extensions enriched with a notion of computation stages. 
 
@@ -107,7 +107,7 @@ Most of, if not all, materials are standard, so the reader comfortable with the 
 
 \subsection{Homotopy type theory}
 We highlight the main difference between set theory and homotopy type theory.
-\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers}
+\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU}
 \begin{theorem}[Hedberg]
   If $X$ has decidable quality, then $X$ is a set.
 \end{theorem}
@@ -119,11 +119,11 @@ Terms are defined informally by
   M \defeq \mathtt{x} \mid M\,N \mid \lambda \mathtt{x}.\, M
 \]
 where variables $\mathtt{x}$ are in the typewriter font.
-The type of terms is denoted by $\Lambda$ and the type of terms of at most $n$ many free variables by $\Lambda_n$.
+$\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms of at most $n$ many free variables.
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
-We write $F[M]$ instead of $F[M/\mathtt{x}]$ for $F : \Lambda_1$ if there is no danger of confusion since $F$ has at most one free variable.
 Using the de Bruijn representation, $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence $=_\alpha$ coincides with the identity type $=_\Lambda$ in homotopy type theory by definition.
-The reduction relation is denoted by $\reduce$ with type $\Lambda \to \Lambda \to \Univ$.
+Hence, for $F : \Lambda_1$ we just write $F[M]$ instead of $F[M/\mathtt{x}]$ if there is no danger of confusion.
+The reduction relation is denoted by $\reduce$ with type $\Lambda \to \Lambda \to \UU$.
 
 The type $\Lambda$ of terms and the type $M \reduce N$ of reductions between two given terms clearly have decidable equality, so they are sets. 
 
@@ -183,11 +183,11 @@ Composing two exposures in the usual way clearly gives us an exposure.
 %  \]
 %  commutes up to the extensional equality~$\sim$.
 %\end{definition}
-We may further define the notion of natural transformations for exposure and comonadic exposures as introduced by Kavvos~\cite{Kavvos2017b}.
-However, in our setting, we would have to adopt the \emph{oplax} version instead where the naturality does not holds strictly but with respect to $\reduce$.
+We may further define the notion of natural transformations for exposure and comonadic exposures as introduced by Kavvos~\cite{Kavvos2017b} to formulate \SFour modality.
+However, in our framework, we would have to adopt the \emph{oplax} version instead where the naturality does not holds strictly but with respect to $\reduce$.
 We will revisit this issue in~\Cref{sec:provability}.
 
-\section{\texorpdfstring{$\PP$}{P}-category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
+\section{\texorpdfstring{$\PP$}{P}-Category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
 
 In this section, we introduce the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
 Assemblies are used to accommodate the information of how extensions are related to, or \emph{realised by}, intensions. Accordingly an appropriate notion of morphisms between assemblies is introduced to form a $\PP$-category, laying
@@ -200,12 +200,12 @@ We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $a \Vd
 The notion of assemblies is nowadays often defined on a partial applicative structure $(A, \cdot)$ satisfying combinatory completeness, i.e.\ a partial combinatory algebra~\cite{Oosten2008}, PCA for short.
 Our definition below is, apart from being type-theoretic, not an instance of the definition based on a PCA.
 \begin{definition}\label{def:assembly}
-  An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} type $|X| : \Univ$ and a \emph{realisability} relation ${\Vdash_X}$ from $\Lambda_0$ to $|X|$ such that
+  An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} set $|X| : \setU$ and a family ${\Vdash_X}$ of sets indexed by $\Lambda_0$ to $|X|$ as its \emph{realisability relation} such that
   \emph{(a)} every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$;
   \emph{(b)} $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$.
   That is, an assembly is a quadruple $(|X|, \Vdash_X, r_X, t_X)$ of type
   \[
-    \ASM_0(\Lambda) \defeq \sm{\bproj{X} : {\Univ}}{\mathord{\Vdash_X}:\Lambda_0 \to |X| \to \Univ} 
+    \Asm_0(\Lambda) \defeq \sm{\bproj{X} : {\setU}}{\mathord{\Vdash_X}:\Lambda_0 \to |X| \to \setU} 
     \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right)
       \times \mathsf{isRightTotal}({\Vdash_X})
   \]
@@ -215,8 +215,6 @@ Our definition below is, apart from being type-theoretic, not an instance of the
     \mathsf{isRightTotal}(\Vdash_X) & \defeq \fall{x : |X|}\exis{M : \Lambda_0} M \Vdash x
     \label{def:right-total}
   \end{align}
-  A \emph{set-theoretic assembly} is an assembly $X$ whose carrier $\bproj{X}$ is a set and $M \Vdash_X x$ is a relation for any $M$ and $x$.
-  The type of set-theoretic assemblies is denoted by $\Asm_0(\Lambda)$. 
 \end{definition}
 
 The required properties of \Cref{def:assembly} depart from the definition based on a PCA as follows. 
@@ -252,15 +250,14 @@ A morphism between assemblies on a PCA $(A, \cdot)$ is typically defined as a fu
 In this case, $b$ is called the \emph{tracker} of $f$, or equivalently, $f$ is said to be \emph{tracked} by $b$.
 It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality we have to consider the tracker as part of structure instead of its mere existence.
 \begin{definition}\label{def:trackable}
-  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $\bproj{f}$ from $|X|$ to $|Y|$ and a term $F$ with at most a free variable $\mathtt{x}$ such that $F[M/\mathtt{x}] \Vdash \bproj{f}\,x$ whenever $M \Vdash x$.
-  In other words, the type of trackable maps is $\ASM_1(X, Y) \defeq \sum_{\bproj{f} : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, \bproj{f})$ where
+  Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $\bproj{f}$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ such that $F[M] \Vdash \bproj{f}\,x$ if $M \Vdash x$.
+  In other words, the type $\Asm_1(X, Y)$ of trackable maps is $\sum_{\bproj{f} : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, \bproj{f})$ where
   \[
     \mathsf{Tracks}_{X, Y}(F, \bproj{f}) \defeq \prd{M : \Lambda_0}{x : |X|}
-    \left(M \Vdash_X x\right) \to \left(F[M/\mathtt{x}] \Vdash_Y \bproj{f}\, x\right).
+    \left(M \Vdash_X x\right) \to \left(F[M] \Vdash_Y \bproj{f}\, x\right).
   \]
   A \emph{merely trackable map} is an inhabitant of $\sm{\bproj{f} : |X| \to |Y|} \exis{F : \Lambda_1}\mathsf{Tracks}_{X, Y}(F, \bproj{f})$. 
 \end{definition}
-Denote by $\Asm_1(X, Y)$ if $X$ and $Y$ are set-theoretic.
 
 By definition, a trackable map $f$ consists of not only a function $\bproj{f}$ between carriers but also its tracker $F$ and a transformation $\mathfrak{f}$ for realisability.
 
@@ -278,11 +275,11 @@ Then, the term substitution $(G, F) \mapsto G [ F ]$ can be thought as (intensio
 Given any $r : M \Vdash_X x$, the inhabitant $\mathfrak{g}(\mathfrak{f}\,r)$ is of type $G[F[M]]$ and its transportation along $p$ is of type $G[F][M]$, defining a function $\lambda M\,x\,r.\, \mathsf{transport}(p, \mathfrak{g}(\mathfrak{f}\,r))$.
 Therefore, the above discussion amounts to an operation $(g, f) \mapsto g \circ f$ of type
 \[
-  \ASM_1(Y, Z) \to \ASM_1(X, Y) \to \ASM_1(X, Z).
+  \Asm_1(Y, Z) \to \Asm_1(X, Y) \to \Asm_1(X, Z).
 \]
 
 Then, it is not hard but tedious and laborious to prove that the assemblies and trackable map form an ordinary category.
-As we are only concerned about $\PP$-categories, we do not elaborate details here.
+However, as we are only concerned about $\PP$-categories, we do not elaborate details here.
 
 %\begin{proposition}\label{prop:category-of-assemblies}
 %  The type $\ASM_0(\Lambda)$ of assemblies and the family of types $\ASM_1(X, Y)$ of trackable maps form a category.
@@ -297,9 +294,8 @@ As we are only concerned about $\PP$-categories, we do not elaborate details her
 
 Now define the partial equivalence relation $\sim$ referred as the extensional equality on trackable maps by $f_1 \sim f_2$ if $\bproj{f_1} = \bproj{f_2}$. We say that $f_1$ and $f_2$ are \emph{extensionally equal} if $f_1 \sim f_2$.
 \begin{proposition}
-  The type $\ASM_0$ of assemblies and the family of types $\ASM_1(X, Y)$ for any two assemblies $X$ and $Y$ with the extensional equality form a $\PP$-category~$\ASM(\Lambda)$.
+  The type $\Asm_0$ of assemblies and the family of types $\Asm_1(X, Y)$ for any two assemblies $X$ and $Y$ with the extensional equality form a $\PP$-category~$\Asm(\Lambda)$.
 \end{proposition}
-In addition, we denote by $\Asm(\Lambda)$ the $\PP$-category of assemblies whose carrier is a set and the realisability relation $\Vdash$ is a mere relation.
 
 We now investigate some of its basic properties.
 
@@ -316,7 +312,7 @@ We now investigate some of its basic properties.
 
 Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$.
 Moreover, distinct merely trackable maps can be separated by global elements in the category of assemblies and merely trackable maps. 
-In $\ASM(\Lambda)$ where the trackers are part of trackable maps, we can construct a global element for any inhabitant $x : \bproj{X}$ if we know how $x$ is realised. 
+In $\Asm(\Lambda)$ where the trackers are part of trackable maps, we can construct a global element for any inhabitant $x : \bproj{X}$ if we know how $x$ is realised. 
 \begin{lemma}\label{lem:global-elemnt}
   Let $X$ be an assembly. Then the following statements hold:
   \begin{enumerate}
@@ -325,11 +321,12 @@ In $\ASM(\Lambda)$ where the trackers are part of trackable maps, we can constru
   \end{enumerate}
 \end{lemma}
 
-One may expect that the terminal object $\top$ in~$\ASM(\Lambda)$ should still be a separator up to~$\sim$ in the sense that $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
-However, due to the existence of non-trivial higher paths, the general case is a rather subtle issue~\cite{Kraus2015}. 
-Nevertheless, it is indeed the case as expected if the codomain of a trackable map is a set. 
+As expected, the terminal object $\top$ in~$\ASM(\Lambda)$ is a separator up to~$\sim$ in the sense that $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
+This property relies on the fact that the carrier $\bproj{X}$ is a set.
 \begin{proposition}
-  Every pair of trackable maps $f_1, f_2 : X \to Y$ with the carrier of $Y$ a set are extensionally equal if $f_1 \circ x \sim f_2 \circ x$ for every global element $x$ to $X$. 
+  Let $f_1, f_2 : X \to Y$ be two trackable maps. Then, 
+  $f_1$ is extensionally equal to $f_2$ if
+  $f_1 \circ x \sim f_2 \circ x$ for every global element $x$ to $X$ 
 \end{proposition}
 \begin{proof}[Proof sketch]
   By function extensionality, it suffices to define a trackable map $(\mathsf{c}_x, M_x, \mathfrak{M}_x)$ from $\top$ to $X$ for any inhabitant $x : \bproj{X}$, where $\mathsf{c}_x(\star) = x$.
@@ -342,7 +339,7 @@ Nevertheless, it is indeed the case as expected if the codomain of a trackable m
 
 It is straightforward but tedious to define the $\PP$-product of assemblies, so we leave this as an exercise to the reader. 
 \begin{example}[Initial object]
-The empty assembly $\bot$ is $\PP$-initial consisting of the empty type $\Empty$ and a relation $\Vdash_\bot : \Lambda_0 \to \Empty \to \Univ$ given by the elimination rule for the empty type.
+The empty assembly $\bot$ is $\PP$-initial consisting of the empty type $\Empty$ and a relation $\Vdash_\bot : \Lambda_0 \to \Empty \to \setU$ given by the elimination rule for the empty type.
 The other two components $r_\Empty$ and $t_\Empty$ are trivial.
 \end{example}
 
@@ -375,16 +372,15 @@ However, the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely
   \ltnote{show that $X \Rightarrow Y$ has the required universal property formally.}
 \end{example}
 
-To sum up, we have just showed that $\ASM(\Lambda)$ has a strict initial object, finite products, and exponentials.
-Moreover, since sets are closed under $\sum$-types and $\prod$-types, these constructions carry over to~$\Asm(\Lambda)$.
+To sum up, we have just showed that $\Asm(\Lambda)$ has a strict initial object, finite products, and exponentials.
 \begin{corollary}
-  $\ASM(\Lambda)$ is cartesian closed $\PP$-category with a strict initial object.
+  $\Asm(\Lambda)$ is cartesian closed $\PP$-category with a strict initial object.
 \end{corollary}
-\ltnote{shall we show that $\ASM(\Lambda)$ has a natural number object?}
+\ltnote{shall we show that $\Asm(\Lambda)$ has a natural number object?}
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
 
-In this section, we first introduce a comonadic exposure $\boxtimes\colon \ASM(\Lambda) \looparrowright \ASM(\Lambda)$ which models a \SFour modality but subtly different from the exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
+In this section, we first introduce a comonadic exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models a \SFour modality but subtly different from the exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
 For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not. 
 Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it using $\boxtimes_K$.
 Hitherto, we complete our cook's tour of the previous set-theoretic results (based on a partial combinatory algebra, though) in HoTT.
@@ -393,7 +389,7 @@ Thereafter, we use an extension of cubical type theory with the support of Nakan
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
 Finally, we establish one of the main contribution of this paper: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$F[\qquote{\mathsf{fix}\,F}]$
 where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
-The categorical form of the Gödel-Löb axiom in $\ASM(\Lambda)$ follows.
+The categorical form of the Gödel-Löb axiom in $\Asm(\Lambda)$ follows.
 
 \subsection{A recap: Gödel encoding and the Second Recursion Theorem}\label{subsec:godel}
 Before entering into the main topic of this section, we review the Second Recursion Theorem in $\lambda$-calculus.
@@ -597,7 +593,7 @@ To express this idea cleanly, we work in an extension of HoTT with the support o
 \ltnote[inline,nomargin]{Introduce clocked cubical type theory here}
 
 \begin{lemma}\label{lem:later-sum}
-  For $A : \Univ$ and $B : A \to \Univ$, there is an equivalence
+  For $A : \UU$ and $B : A \to \UU$, there is an equivalence
   \[
     \eqv{\laterp^\kappa \sm{x : A} B\,x}{\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B (x [\alpha])}.
   \]
@@ -630,12 +626,12 @@ Inspired by~\Cref{lem:later-identity}, we introduce the notion of clocked exposu
 \end{definition}
 
 %\begin{lemma}\label{lem:proposition-closed-under-later}
-%  For every $A : \mathord{\laterp}\,\Univ$ if $\laterp (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then $\laterp(\alpha : \mathbb{T}).\,A[\alpha]$ is also a proposition. 
+%  For every $A : \mathord{\laterp}\,\UU$ if $\laterp (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then $\laterp(\alpha : \mathbb{T}).\,A[\alpha]$ is also a proposition. 
 %\end{lemma}
 
 \subsubsection{Back to \texorpdfstring{\GL}{GL}}
 
-Now we introduce the clocked exposure $\Box^\kappa \colon \ASM(\Lambda) \to \ASM(\Lambda)$ modelling the \GL modality as follows. 
+Now we introduce the clocked exposure $\Box^\kappa \colon \Asm(\Lambda) \to \Asm(\Lambda)$ modelling the \GL modality as follows. 
 For any assembly $X$, the carrier of $\Box^\kappa X$ and the realisability relation are now defined as
 \[
   \bproj{\Box^\kappa X} \defeq \sm{M : \Lambda_0}{x : {\laterp^\kappa \bproj{X}}} \laterp (\alpha : \kappa) .\, M \Vdash_X x [\alpha]
@@ -657,7 +653,6 @@ For any trackable map $f$ from $X$ to $Y$, also define $\Box f$ as the same as $
 where $(\laterp^\kappa f\, x)[\alpha]$ is judgementally equal to $f(x[\alpha])$, and $\laterp^\kappa \bproj{f} : \laterp^\kappa \bproj{X} \to \laterp^\kappa \bproj{Y}$ is given by the functoriality of the later modality~$\mathord{\laterp}^\kappa$.
 The very same argument for $\boxtimes f$ shows that $\Box^\kappa f$ is indeed a trackable map from $\bproj{\Box^\kappa X}$ to $\bproj{\Box^\kappa Y}$.
 
-\ltnote{again, it is an exposure for $n$-types~\cite{Kraus2015}}
 It is straightforward to show that $\Box^\kappa$ is a clocked exposure by \Cref{lem:later-identity}.
 \begin{theorem}\label{thm:GL-exposure}
   $\Box^\kappa \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is a clocked exposure.
