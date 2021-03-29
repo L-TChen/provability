@@ -122,9 +122,11 @@ fixΣ {𝓤} {k} {A} {B} f = f (dfixΣ f)
   → (p : ∀ k → Path (▹ k A → ▹ k B) (▹map f) (▹map g))
   → (k : Cl) → (x : A)
   → f x ≡ g x
-▹-is-faithful f g p k x i = hcomp (λ j → λ { (i = i0) → delay-force (λ k → f x) k j
-                                           ; (i = i1) → delay-force (λ _ → g x) k j})
-  (force (λ k α → p k i (next x) α) k)
+▹-is-faithful {𝓤} {A} {B} f g p k x i = comp (λ _ → B) sq (force (λ k α → p k i (next x) α) k) 
+  where
+    sq : I → Partial (~ i ∨ i) B 
+    sq j (i = i0) = delay-force (λ _ → f x) k j
+    sq j (i = i1) = delay-force (λ _ → g x) k j
 
 ▹isContr→isContr▹ : {A : ▹ k (𝓤 ̇)}
   → ▹[ α ꞉ k ] isContr (A α)

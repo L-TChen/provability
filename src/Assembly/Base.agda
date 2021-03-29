@@ -59,10 +59,6 @@ Trackable X Y = Σ[ f ꞉ ⟨ X ⟩ ➝ ⟨ Y ⟩ ] HasTracker X Y f
 MerelyTrackable : (X Y : Asm 𝓤) → 𝓤 ̇
 MerelyTrackable X Y = Σ[ f ꞉ ⟨ X ⟩ ➝ ⟨ Y ⟩ ] ∥ HasTracker X Y f ∥
 
-instance
-  trackable→fun : Coercion (Trackable X Y) (⟨ X ⟩ → ⟨ Y ⟩)
-  trackable→fun = record { ⟨_⟩ = fst }
-
 ------------------------------------------------------------------------------
 -- Extensional equality between morphisms
 

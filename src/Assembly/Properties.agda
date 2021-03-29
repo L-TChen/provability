@@ -110,7 +110,7 @@ module Final {X : Asm 𝓤} where
     → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x)
     → f ∼ g
   separator {Y = Y} f g fx=gx x = rec
-    ((Y is-set) (⟨ f ⟩ x) (⟨ g ⟩ x)) (λ { (M , r) → fx=gx (global-element M x r) _ })
+    ((Y is-set) (f .fst x) (g .fst x)) (λ { (M , r) → fx=gx (global-element M x r) _ })
     (X.⊩-right-total x)
     where
       module Y = AsmStr (str Y)

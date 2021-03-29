@@ -6,7 +6,7 @@ open import Agda.Builtin.FromNat                 public
   renaming (Number to HasFromNat)
 
 open import Cubical.Foundations.Everything       public
-  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax; ⋆; ⟨_⟩; str)
+  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax; ⋆; ⟨_⟩; str; prop)
 open import Cubical.Relation.Nullary             public
   hiding (⟪_⟫)
 open import Cubical.HITs.PropositionalTruncation public
@@ -27,14 +27,37 @@ open import Cubical.Data.FinData                   public
   renaming (zero to fzero; suc to fsuc)
 
 open import Prelude.Universes public
-open import Prelude.Notations public
-open import Prelude.Instances public
-
 
 private
   variable
     A B C : 𝓤 ̇
     n m   : ℕ
+
+infix  4  _≢_
+infixr -1 _➝_
+infixr -2 Π Σ′ ∃′ 
+
+_≢_ : {A : 𝓤 ̇} → A → A → 𝓤 ̇
+x ≢ y = x ≡ y → ⊥
+
+------------------------------------------------------------------------
+-- Π x ꞉ A , Σ a ꞉ A , ∃ a ꞉ A notation in Type Theory
+
+syntax Π  {A = A} (λ x → b) = Π[ x ꞉ A ] b
+syntax Σ′ {A = A} (λ x → b) = Σ[ x ꞉ A ] b
+syntax ∃′ {A = A} (λ x → b) = ∃[ x ꞉ A ] b
+
+Π : (B : A → 𝓥 ̇) → (universe-of A) ⊔ 𝓥 ̇
+Π {A = A} B = (x : A) → B x
+
+Σ′ : (B : A → 𝓥 ̇) → (universe-of A) ⊔ 𝓥 ̇
+Σ′ {A = A} B = Σ A B
+
+∃′ : (B : A → 𝓥 ̇) → (universe-of A) ⊔ 𝓥 ̇
+∃′ {A = A} B = ∥ Σ A B ∥
+
+_➝_ : 𝓤 ̇ → 𝓥 ̇ → 𝓤 ⊔ 𝓥 ̇
+A ➝ B = A → B
 
 ∥_∥* : 𝓤 ̇ → 𝓤 ⊔ 𝓥 ̇
 ∥_∥* {𝓥 = 𝓥} X = ∥ Lift {j = 𝓥} X ∥
@@ -73,51 +96,25 @@ id = λ x → x
 ------------------------------------------------------------------------------
 -- 
 
-instance
-  hSet→Type : Coercion (hSet 𝓤) (𝓤 ̇)
-  hSet→Type = record { ⟨_⟩ = fst }
+SetWithStr : (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) → 𝓥 ⊔ 𝓤 ⁺ ̇
+SetWithStr 𝓤 S = Σ[ X ꞉ hSet 𝓤 ] S (fst X)
 
-  hProp→Type : Coercion (hProp 𝓤) (𝓤 ̇)
-  hProp→Type = record { ⟨_⟩ = fst }
-  
-  TypeStr→Type : {S : 𝓤 ̇ → 𝓥 ̇} → Coercion (TypeWithStr 𝓤 S) (𝓤 ̇)
-  TypeStr→Type = record { ⟨_⟩ = fst }
+⟨_⟩ : {S : 𝓤 ̇ → 𝓥 ̇} → SetWithStr 𝓤 S → 𝓤 ̇
+⟨ (X , _) , _ ⟩ = X
 
-------------------------------------------------------------------------------
--- 
+str : {S : 𝓤 ̇ → 𝓥 ̇} → (X : SetWithStr 𝓤 S) → S ⟨ X ⟩
+str (X , s) = s
 
-record SetWithStr (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) : 𝓥 ⊔ 𝓤 ⁺ ̇ where
-  constructor _,_
-  field
-    carrier   : hSet 𝓤
-    structure : S ⟨ carrier ⟩
+_is-set : {S : 𝓤 ̇ → 𝓥 ̇}
+  → (X : SetWithStr 𝓤 S) → isSet ⟨ X ⟩
+((_ , p) , _) is-set = p
 
-  toTypeStr : TypeWithStr 𝓤 S
-  toTypeStr = ⟨ carrier ⟩ , structure
-
-  _is-set : isSet ⟨ carrier ⟩
-  _is-set = carrier .snd
-
-open SetWithStr public
-  renaming (structure to str)
-
-module _ {S : 𝓤 ̇ → 𝓥 ̇} where
-  instance
-    SetStr→Type : Coercion (SetWithStr 𝓤 S) (𝓤 ̇)
-    ⟨_⟩ ⦃ SetStr→Type ⦄ (carrier , _) = ⟨ carrier ⟩
-
---    SetStr→TypeStr : Coercion (SetWithStr 𝓤 S) (TypeWithStr 𝓤 S)
---    ⟨_⟩ ⦃ SetStr→TypeStr ⦄ (carrier , str) = ⟨ carrier ⟩ , str
 
 Rel : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
 Rel {𝓤} {𝓥} A B = A → B → (𝓤 ⊔ 𝓥) ̇ 
 
 MRel : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
 MRel {𝓤} {𝓥} A B = Σ[ R ꞉ A ➝ B ➝ (𝓤 ⊔ 𝓥) ̇ ] ((x : A) (y : B) → isProp (R x y))
-
-instance
-  MRel→Rel : Coercion (MRel A B) (Rel A B)
-  MRel→Rel = record { ⟨_⟩ = fst }
 
 ------------------------------------------------------------------------------
 -- 
@@ -201,6 +198,16 @@ private
 instance
   CodeFin : Code (Fin n)
   CodeFin = record { code = codeFin ; r = rFin ; decode = decodeFin }
+  
+record IsDiscrete (A : 𝓤 ̇) : 𝓤 ̇ where
+  field
+    _≟_ : (x y : A) → Dec (x ≡ y)
+
+  ≟→isSet : isSet A
+  ≟→isSet = Discrete→isSet _≟_
+open IsDiscrete ⦃ ... ⦄ public
+
+{-# DISPLAY IsDiscrete._≟_ x y = x ≟ y #-}
   
 instance
   IsDiscreteUnit : IsDiscrete Unit
