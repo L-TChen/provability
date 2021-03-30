@@ -12,6 +12,10 @@ open import Assembly.Base
 open import Assembly.Properties
 open import Assembly.Exposure
 
+private
+  variable
+    X Y Z : Asm 𝓤
+    
 module _ (Q : Quoting) where
   open Quoting Q
 
@@ -95,10 +99,21 @@ module _ (Q : Quoting) where
       postulate ↑ₗ-injective : ∀ {m n} {M N : Λ n} → ↑ₗ_ {n} {m} M ≡ ↑ₗ N → M ≡ N
      -} 
 
-  ⊤→⊠⊤ : Trackable ⊤ₐ (⊠ ⊤ₐ)
-  ⊤→⊠⊤ = (λ _ → (𝑰 , tt* , lift -↠-refl)) , (↑₁ ⌜ 𝑰 ⌝) , (λ { (lift M-↠𝑰) → lift {!!} })
+  ⊤→⊠⊤ : Trackable (⊤ₐ {𝓤}) (⊠ ⊤ₐ)
+  ⊤→⊠⊤ = (λ _ → (𝑰 , tt* , lift -↠-refl)) , (↑₁ ⌜ 𝑰 ⌝) , λ { (lift M-↠𝑰) → lift (begin
+    (↑₁ ⌜ 𝑰 ⌝) [ _ ]
+      ≡⟨ subst-rename-∅ _ _ ⟩
+    ⌜ 𝑰 ⌝ ∎) }
     where
       open -↠-Reasoning
+{-
+  ⊠X×Y→⊠X×⊠Y : Trackable (⊠ (X ×ₐ Y)) (⊠ X ×ₐ ⊠ Y)
+  ⊠X×Y→⊠X×⊠Y {X = X} {Y} = (λ { (M , (x , y) , (r , s)) → (`projₗ M , x , X.⊩-respects-↠ (r .snd .fst) (r .snd .snd)) , `projᵣ M , y , Y.⊩-respects-↠ (s .snd .fst) (s .snd .snd) }) ,
+    ({!!} , λ { (lift M-↠⌜N⌝) → ({!!} , ({!!} , lift {!!})) , {!!} } )
+    where
+      module X  = AsmStr (str X)
+      module Y  = AsmStr (str Y)
+-}
 
   eval : {X : Asm 𝓤} → Trackable (⊠ X) X
   eval {X = X} = (λ x → fst (snd x)) , Eval ,

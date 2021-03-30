@@ -26,8 +26,8 @@ record Quoting : 𝓤₀ ̇ where
     ⌜⌝-normal    : Normal ⌜ M ⌝
 
     -- ⊢ □ (A → B) ⇒ □ A ⇒ □ B
-    Ap    : Λ₀
-    Ap-↠  : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M · N ⌝
+    App    : Λ 2
+    App-↠  : App ⟪ exts (subst-zero ⌜ M ⌝) ⟫ [ ⌜ N ⌝ ] -↠ ⌜ M · N ⌝
     -- Sub : Λ₀
     Sub   : Λ₀
     Sub-↠ : Sub · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M [ N ] ⌝
@@ -41,6 +41,18 @@ record Quoting : 𝓤₀ ̇ where
 
   open -↠-Reasoning
   -- ⊢ □ A `→ □ (□ A)
+  Ap : Λ₀
+  Ap = ƛ ƛ App
+  Ap-↠ : Ap · ⌜ M ⌝ · ⌜ N ⌝ -↠ ⌜ M · N ⌝
+  Ap-↠ {_} {M} {N} = begin
+    Ap · ⌜ M ⌝ · ⌜ N ⌝
+      -→⟨ ξₗ β ⟩
+    (ƛ App) [ ⌜ M ⌝ ] · ⌜ N ⌝
+      -→⟨ β ⟩
+    App ⟪ exts (subst-zero ⌜ M ⌝) ⟫ [ ⌜ N ⌝ ]
+      -↠⟨ App-↠ ⟩
+    ⌜ M · N ⌝ ∎ 
+
   Num : Λ₀
   Num = ƛ Quote
 
