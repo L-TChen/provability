@@ -108,6 +108,7 @@ Most of, if not all, materials are standard, so the reader comfortable with the 
 \subsection{Homotopy type theory}
 We highlight the main difference between set theory and homotopy type theory.
 \ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU}
+\ltnote{function extensionality}
 \begin{theorem}[Hedberg]
   If $X$ has decidable quality, then $X$ is a set.
 \end{theorem}
@@ -121,14 +122,13 @@ Terms are defined informally by
 where variables $\mathtt{x}$ are in the typewriter font.
 $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms of at most $n$ many free variables.
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
-Using the de Bruijn representation, $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence $=_\alpha$ coincides with the identity type $=_\Lambda$ in homotopy type theory by definition.
+By using the de Bruijn representation $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence $=_\alpha$ coincides with the identity type $=_\Lambda$ by construction.
 Hence, for $F : \Lambda_1$ we just write $F[M]$ instead of $F[M/\mathtt{x}]$ if there is no danger of confusion.
-The reduction relation is denoted by $\reduce$ with type $\Lambda \to \Lambda \to \UU$.
-
-The type $\Lambda$ of terms and the type $M \reduce N$ of reductions between two given terms clearly have decidable equality, so they are sets. 
+The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of witnesses such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
+Note that the type $\Lambda$ of terms has decidable equality as well as $M \reduce N$, so they are sets. 
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
-Instead of ordinary categories, we choose to work with $\PP$-categories which are pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} to study normalisation in typed $\lambda$-calculus.
+Instead of ordinary categories, we work with $\PP$-categories which are pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} to study normalisation in typed $\lambda$-calculus.
 Its use is advocated by Kavvos~\cite{Kavvos2017b} who introduced a functor-like concept called \emph{exposure} exemplified by the Second Recursion Theorem and more in the realm of computability theory.
 
 We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph{op.\ cit.} as follows.
@@ -153,14 +153,14 @@ It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed categor
 \end{definition}
 
 A $\PP$-category has two kinds of equalities for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$ where the former is considered as the \emph{very intensional equality} and the latter as the \emph{extensional equality}. 
-For example, this additional equality reflects the fact that $\alpha$-equivalent terms are $\beta$-equivalent but not the converse.
-For categorical semantics where terms are interpreted as morphisms, an interpretation in a $\PP$-category is possible to discriminate these two kinds of identities, enabling us to model intensionality.
+This additional equality~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not the converse.
+For categorical semantics where terms are interpreted as morphisms, an interpretation into a $\PP$-category is possible to discriminate these two kinds of identities, enabling us to model intensionality.
 
 We recall the notion of exposures.
 An exposure is like a $\PP$-functor but it does not preserve $\sim$-equality.
 Instead, it is faithful with respect to~$\sim$ in the following sense.
 \begin{definition}
-  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, an \emph{exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ from objects $X$ of $\mathbf{C}$ to objects~$QX$ of $\mathbf{D}$ \emph{(b)} and from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Qf\colon QX \to QY$ satisfying following properties
+  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, an \emph{exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ from objects $X$ of $\mathbf{C}$ to objects~$QX$ of $\mathbf{D}$ and \emph{(b)} from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Qf\colon QX \to QY$ satisfying following properties
   \begin{romanenumerate}
     \item $Q\iid_X \sim \iid_{QX}$,
     \item $Q(g \circ f) \sim Qg \circ Qf$, and
@@ -226,9 +226,9 @@ Second, a plausible alternative to the right totality~\eqref{def:right-total} is
 \[
   \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
 \]
-stating that each $x : |X|$ has an explicit choice of realisers.
+stating that each $x : |X|$ has a choice of realisers.
 %This is not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
-However, with functional extensionality which holds in HoTT, any inhabitant of the alternative formulation leads to a \emph{contradiction}~\cite{Troelstra1977}. \ltnote{prove it formally}
+However, with functional extensionality, any inhabitant of the alternative formulation leads to a \emph{contradiction}~\cite{Troelstra1977}. \ltnote{prove it formally}
 
 \begin{example}\label{ex:assembly-lambda}
   The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
@@ -383,7 +383,7 @@ To sum up, we have just showed that $\Asm(\Lambda)$ has a strict initial object,
 In this section, we first introduce a comonadic exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models a \SFour modality but subtly different from the exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
 For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not. 
 Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it using $\boxtimes_K$.
-Hitherto, we complete our cook's tour of the previous set-theoretic results (based on a partial combinatory algebra, though) in HoTT.
+Hitherto, we complete our cook's tour of the previous results (based on a partial combinatory algebra, though) in HoTT.
 
 Thereafter, we use an extension of cubical type theory with the support of Nakano's later modality---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the \GL modality.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
@@ -429,7 +429,7 @@ Contrary to the well-known Kleene's first recursion theorem, his second recursio
   In particular, if $F : \Lambda_1$, then there is $\mathsf{fix}\,F$ with $\mathsf{fix}\,F \reduce F[\qquote{\mathsf{fix}\,F}]$.
 \end{theorem}
 
-\subsection{A comonadic exposure for \texorpdfstring{\SFour}{S4} modality}
+\subsection{An exposure for \texorpdfstring{\SFour}{S4} modality}
 An assembly $X$ records the interplay between intensions (i.e.\ terms) and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \bproj{X}$ with a term $M$ which realises $x$ as the carrier of $\boxtimes X$.
 A pair $(M, x, r)$ with $r : M \Vdash_X x$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.
 Thus, we argue that $(M, x, r)$ shall be realised by terms which are $\beta$-equivalent to its code $\qquote{M}$ (instead of $M$ as proposed by Kavvos~\cite{Kavvos2017b}), since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.
@@ -455,10 +455,10 @@ To give a tracker of $f^\boxtimes$, recall that there is a term $\mathtt{subst}$
   \reduce {} & \qquote{F[M]} \Vdash_{\boxtimes Y} f^\boxtimes(M, x, r)
 \end{align*}
 completing the definition of $\mathfrak{f}^\boxtimes$.
-In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
+In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
 
 \begin{theorem}[{cf.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
-  $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is an exposure of set-theoretic assemblies.
+  $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is an exposure of assemblies.
   Moreover, there are trackable maps 
   \begin{romanenumerate}
     \item $\epsilon_X : \boxtimes X \to X$ 
@@ -474,14 +474,14 @@ In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathf
   \idfunc[\bproj{X}]^\boxtimes (M, x, r) \equiv (\mathtt{x}[M], x, \pr_3\,M\,x\,r) \equiv (M, x, r) \equiv \idfunc[\bproj{\boxtimes X}](M, x, r).
 \]
   To show that $\boxtimes$ reflects the extensional equality, let $f$ and $g$ be trackable maps from $X$ to $Y$.
-  By assumption the path type $\bproj{f}\,x =_Y \bproj{g}\,x$ is a proposition, we can apply
-  the recursion principle of propositional truncation to define a map
+  By assumption the path type $\bproj{f}\,x =_Y \bproj{g}\,x$ is a proposition and there merely exists $(M ,r) : \sm{M : \Lambda_0} M \Vdash_X x$, we can apply
+  the recursion principle of propositional truncation to prove
   \[
-    \prd{x : \bproj{X}} \exis{M : \Lambda_0}\left(M \Vdash_X x\right) \to \bproj{f}\,x =_Y \bproj{g}\,x
+    \boxtimes f(M, x, r) = (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r)
+    = (G[M], \bproj{g}\,x, \mathfrak{g}\,M\,x\,r) = \boxtimes g (M, x, r). 
   \]
-  Since every inhabitant $x : \bproj{X}$ merely has a realiser~$M$, we have 
-  $\prd{x : \bproj{X}} \to \left(\bproj{f}\,x =_Y \bproj{g}\,x\right)$.
-  Thus by function extensionality it follows that $\left(\bproj{f} =_{\bproj{X} \to \bproj{Y}} \bproj{g}\right) \equiv f \sim g$.
+  Therefore, we have $\prd{x : \bproj{X}} \to \left(\bproj{f}\,x =_Y \bproj{g}\,x\right)$.
+  By function extensionality it then follows that $\left(\bproj{f} =_{\bproj{X} \to \bproj{Y}} \bproj{g}\right) \equiv f \sim g$.
 
   For the families of maps $\boxtimes X \to X$ and $\boxtimes X \to \boxtimes \boxtimes X$ for each $X$, recall that there are terms $\mathtt{eval}$ and $\mathtt{quote}$ which evaluates a code to its representing term and computes the code $\qquote{N}$ of a given term~$N \equiv \qquote{M}$ in the form of code respectively. That is, 
   \[
@@ -492,8 +492,18 @@ In short, $\boxtimes(f, F, \mathfrak{f}) \defeq(f^\boxtimes, F^\boxtimes, \mathf
 Use these terms as trackers for $\boxtimes X \to X$ and $\boxtimes X \to \boxtimes \boxtimes X$ respectively.
 They are now straightforward to define.
 \end{proof}
+
+\begin{remark}
+
+  \ltnote{discuss K axioms here}
+
+  In terms of our $\boxtimes$, there are countably many representations for $\star : \Unit$ in $\boxtimes \top$, so clearly $\boxtimes \top$ is not $\PP$-isomorphic to $\top$. 
+
+  Also, $\boxtimes (X \times Y)$ is not $\PP$-isomorphic to $\boxtimes X \times \boxtimes Y$ by the same reason.
+
 In particular, the map $\epsilon_X\colon \boxtimes X \to X$ is understood as the evaluation of the intension $M$ to its extension~$x$, as justified by the its tracker~$\mathtt{eval}$.
-One may expect that $(\boxtimes, \epsilon, \delta)$ forms a comonadic exposure, but unfortunately $\delta_X$ is not even natural in~$X$.
+One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\epsilon$ and $\delta$ are natural up to~$\sim$ satisfying comonad laws.
+Unfortunately $\delta_X$ is not even natural in~$X$.
 Indeed, observer that for each trackable map $f\colon X \to Y$ the inhabitant 
 \[
   \boxtimes \boxtimes f (\delta_X(M, x, r))
@@ -507,8 +517,9 @@ of type $\boxtimes \boxtimes Y$ is not equal to
 where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$. 
 Yet we may consider the reduction relation $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$ as a partial order, then we have $\boxtimes \boxtimes f \circ \delta_X \leq \delta_Y \circ \boxtimes f$.
 That is, $\delta$ is a \emph{lax natural transformation} up to $\sim$.
-A complete theory on categories enriched not by $\PP$-sets but \emph{partially ordered $\PP$-sets} is beyond the scope of this paper, so we refrain ourselves from further discussion.
+\end{remark}
 
+The above remark suggests a theory on categories enriched not by $\PP$-sets but \emph{partially ordered $\PP$-sets} which is beyond the scope of this paper, so we refrain ourselves from further discussion.
 
 \begin{remark} \label{remark:difference-boxtimes}
 \ltnote{$\boxtimes$ is not cartesian and not product-preserving. Moreover $\boxtimes_K \Nat$ is not isomorphic ot $\Nat$.}
@@ -519,9 +530,9 @@ A complete theory on categories enriched not by $\PP$-sets but \emph{partially o
     N \Vdash_{\boxtimes X} (M, x) \defeq N = M
   \]
   without the Gödel encoding. 
-  It does not only give rise to an exposure but actually a comonadic exposure where $\epsilon$ and $\delta$ are natural up to~$\sim$.
+  It gives rise to not only an exposure but also a comonadic exposure.
   Moreover $\boxtimes_K$ preserves finite products including the terminal object $\top$. 
-  However, although there are countably many representations for $\star : \Unit$ in $\boxtimes \top$, they are all identified in~$\boxtimes_K \top$ so that $\boxtimes_K \top$ is indistinguishable from $\top$. 
+
 \end{remark}
 
 The following theorem is another difference between $\boxtimes_K$ and $\boxtimes$.
@@ -738,8 +749,6 @@ This \GL modality then answers the question following Theorem~5.38 in the work o
 From the aspect of the design of programming languages, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely for tactic programming in a principled way.
 
 \paragraph*{Future work}
-We list a number of problems emerged during working on this paper.
-
 First, as we have two apparently related exposures, one immediate question is how these two exposures are connected.  There is clearly a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know else much.
 The classical \SFour and \GL modalities and their connection laws are studied in Hilbert-style logic by Goris~\cite{Goris2009} with Kripke semantics in the context of provability logic.
 Accordingly, we would like to describe a type theory enriched with modalities $\boxtimes$ and $\Box$ unifying modal type theories considered by Davies and Pfenning~\cite{Davies2001b}, Pfenning~\cite{Pfenning2002a}, and by Kavvos~\cite{Kavvos2017b,Kavvos2020} while maintaining consistency.
@@ -748,6 +757,8 @@ Second, inhabitants of $\Box^\kappa X$ are not accessible until the next stage. 
 This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2017a}.
 This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
 
+Finally, categories internal to clocked type theory seem worth further investigation.
+It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract replacement of the step-indexing technique.
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
 %As a sanity check, we may further ask the type $\mathsf{Code}$ of \emph{untyped} code and a polymorphic function from $\boxtimes A$ to $\mathsf{Code}$ forgetting what a typed code denotes. 

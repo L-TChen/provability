@@ -24,7 +24,7 @@ record IsCloExpo (Q : Cl → Asm 𝓤 → Asm 𝓤) (map : {X Y : Asm 𝓤} → 
       → map k (g ∘ f) ∼ map k g ∘ map k f
     reflects-∼    : (f g : Trackable X Y)
       → (∀ k → map k f ∼ map k g)
-      →       f ∼ g    
+      → (k : Cl) →   f ∼ g    
 
 record CloExpo (𝓤 : Universe) : 𝓤 ⁺ ̇ where
   constructor exposure

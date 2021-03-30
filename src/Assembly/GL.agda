@@ -45,7 +45,7 @@ module _ (Q : Quoting) where
       ⊩-right-total (M , ▹x , M⫣x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
 
   □map₀ : Trackable X Y → ⟨ □ k X ⟩ → ⟨ □ k Y ⟩
-  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , ▹map f x , λ α → F⊩f (M⊩x α) -- λ α → ∥-∥map F⊩f (M⊩x α)
+  □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , ▹map f x , λ α → F⊩f (M⊩x α) 
 
   □map₁ : Λ₁ → Λ₁
   □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
@@ -77,10 +77,10 @@ module _ (Q : Quoting) where
 
   □reflects∼ : {X Y : Asm 𝓤} (f g : Trackable X Y)
     → ((k : Cl) → □map k f ∼ □map k g)
-    → f ∼ g
-  □reflects∼ {𝓤} {X} {Y} (f , F , F⊩f) (g , G , G⊩g) □f∼□g x = rec ((Y is-set) _ _)
-    (λ { (M , r) → {!!} }) 
-    (X.⊩-right-total x)
+    → (k : Cl) → f ∼ g
+  □reflects∼ {𝓤} {X} {Y} (f , F , F⊩f) (g , G , G⊩g) □f∼□g k x = rec ((Y is-set) _ _)
+    (λ { (M , r) → ▹x=▹y→x=y  (λ k → cong (λ x → fst (snd x)) (□f∼□g k (M , next x , next r))) k })
+    (X.⊩-right-total x) 
     where
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)

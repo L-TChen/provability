@@ -5,7 +5,7 @@ module Calculus.Untyped.Base where
 open import Prelude
   hiding (_∘_)
 
-infixr 8 ƛ_
+infixr 8  ƛ_
 infixl 10 _·_
 
 infixl 11 _[_] _⟪_⟫
@@ -83,12 +83,12 @@ private
   ... | yes p | yes q = yes (decode (encode p , encode q))
   ... | yes p | no ¬q = no λ M=N → ¬q (decode (encode M=N .snd))
   ... | no ¬p | q     = no λ M=N → ¬p (decode (encode M=N .fst))
-  (` _)   ≟Λ (ƛ _)    = no encode
-  (` _)   ≟Λ (_ · _)  = no encode
-  (ƛ _)   ≟Λ (` _)    = no encode
-  (ƛ _)   ≟Λ (_ · _)  = no encode
-  (_ · _) ≟Λ (` _)    = no encode
-  (_ · _) ≟Λ (ƛ _)    = no encode
+  (` _)     ≟Λ (ƛ _)    = no encode
+  (` _)     ≟Λ (_ · _)  = no encode
+  (ƛ _)     ≟Λ (` _)    = no encode
+  (ƛ _)     ≟Λ (_ · _)  = no encode
+  (_ · _)   ≟Λ (` _)    = no encode
+  (_ · _)   ≟Λ (ƛ _)    = no encode
 
 instance
   ΛisDiscrete : IsDiscrete (Λ n)

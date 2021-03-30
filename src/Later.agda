@@ -118,11 +118,19 @@ fixΣ {𝓤} {k} {A} {B} f = f (dfixΣ f)
        f x -----------------------------------> g x
 -}
 
+▹x=▹y→x=y : {x y : A}
+  → ((k : Cl) → next {k = k} x ≡ next y)
+  → (k : Cl) → x ≡ y
+▹x=▹y→x=y {A = A} {x} {y} ▹x=▹y k i = comp (λ _ → A) (λ j → λ 
+  { (i = i0) → delay-force (λ _ → x) k j
+  ; (i = i1) → delay-force (λ _ → y) k j
+  })
+  (force (λ k → ▹x=▹y k i) k )
+
 ▹-is-faithful : {A B : 𝓤 ̇} → (f g : A → B)
   → (p : ∀ k → Path (▹ k A → ▹ k B) (▹map f) (▹map g))
-  → (k : Cl) → (x : A)
-  → f x ≡ g x
-▹-is-faithful {𝓤} {A} {B} f g p k x i = comp (λ _ → B) sq (force (λ k α → p k i (next x) α) k) 
+  → (k : Cl) → f ≡ g
+▹-is-faithful {𝓤} {A} {B} f g p k i x = comp (λ _ → B) sq (force (λ k α → p k i (next x) α) k) 
   where
     sq : I → Partial (~ i ∨ i) B 
     sq j (i = i0) = delay-force (λ _ → f x) k j

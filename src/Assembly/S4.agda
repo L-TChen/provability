@@ -92,12 +92,11 @@ module _ (Q : Quoting) where
 
   ⊠-exposure : Exposure 𝓤
   ⊠-exposure = exposure ⊠_ ⊠map ⊠-isExposure
- {- 
+  
   ⊠F=⊠G→F=G : (F G : Λ₁) → ⊠map₁ F ≡ ⊠map₁ G → F ≡ G
   ⊠F=⊠G→F=G F G ⊠F=⊠G = ⌜⌝-injective (↑ₗ-injective (decode (encode ⊠F=⊠G .fst .snd)))
     where
       postulate ↑ₗ-injective : ∀ {m n} {M N : Λ n} → ↑ₗ_ {n} {m} M ≡ ↑ₗ N → M ≡ N
-     -} 
 
   ⊤→⊠⊤ : Trackable (⊤ₐ {𝓤}) (⊠ ⊤ₐ)
   ⊤→⊠⊤ = (λ _ → (𝑰 , tt* , lift -↠-refl)) , (↑₁ ⌜ 𝑰 ⌝) , λ { (lift M-↠𝑰) → lift (begin
