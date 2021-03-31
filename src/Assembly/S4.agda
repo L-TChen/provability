@@ -4,7 +4,6 @@ module Assembly.S4 where
 
 open import Prelude           as 𝓤
   hiding (id; _∘_; Sub)
-open import Later
 
 open import Calculus.Untyped
   
@@ -15,7 +14,7 @@ open import Assembly.Exposure
 private
   variable
     X Y Z : Asm 𝓤
-    
+
 module _ (Q : Quoting) where
   open Quoting Q
 
@@ -39,7 +38,7 @@ module _ (Q : Quoting) where
 
       ⊩⊠X-respect-↠ : _⊩⊠X_ respects _-↠_ on-the-left
       ⊩⊠X-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
-      
+   
       ⊩⊠X-right-total :  _⊩⊠X_ IsRightTotal
       ⊩⊠X-right-total (M , _ , M⫣x) = ∣ ⌜ M ⌝ , lift (⌜ M ⌝ _-↠_.∎) ∣
 
@@ -105,14 +104,42 @@ module _ (Q : Quoting) where
     ⌜ 𝑰 ⌝ ∎) }
     where
       open -↠-Reasoning
-{-
-  ⊠X×Y→⊠X×⊠Y : Trackable (⊠ (X ×ₐ Y)) (⊠ X ×ₐ ⊠ Y)
-  ⊠X×Y→⊠X×⊠Y {X = X} {Y} = (λ { (M , (x , y) , (r , s)) → (`projₗ M , x , X.⊩-respects-↠ (r .snd .fst) (r .snd .snd)) , `projᵣ M , y , Y.⊩-respects-↠ (s .snd .fst) (s .snd .snd) }) ,
-    ({!!} , λ { (lift M-↠⌜N⌝) → ({!!} , ({!!} , lift {!!})) , {!!} } )
+
+  ⊠X×Y→⊠X : {X Y : Asm 𝓤} → Trackable (⊠ (X ×ₐ Y)) (⊠ X)
+  ⊠X×Y→⊠X {𝓤} {X} {Y} = (λ { (L , (x , _) , ((M , red , r) , _)) → ( (ƛ 0 · ↑₁ 𝑻) · L , x , X.⊩-respects-↠ (begin
+    (ƛ 0 · ↑₁ 𝑻) · L
+      -→⟨ β ⟩
+    L · ↑₁ 𝑻 [ L ]
+      -↠⟨ red ⟩
+    M ∎) r) }) ,
+    ↑₁ Ap · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑻 ⌝ · 0   , (λ { {M}  {L , _} r → lift (begin
+    ↑₁ Ap [ M ] · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑻  ⌝ [ M ] · M
+      ≡⟨ cong₂ (λ L N → L · N · M) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ ƛ 0 · ↑₁ 𝑻 ⌝) ⟩
+    Ap · ⌜ ƛ 0 · ↑₁ 𝑻 ⌝ · M
+      -↠⟨ ·ᵣ-cong (lower r) ⟩
+    Ap · ⌜ ƛ 0 · ↑₁ 𝑻 ⌝ · ⌜ _ ⌝
+      -↠⟨ Ap-↠ ⟩
+    ⌜ (ƛ 0 · ↑₁ 𝑻) · L ⌝ ∎ )})
     where
-      module X  = AsmStr (str X)
-      module Y  = AsmStr (str Y)
--}
+      open -↠-Reasoning
+      module X = AsmStr (str X)
+      module Y = AsmStr (str Y)
+
+  ⊠X×Y→⊠Y : {X Y : Asm 𝓤} → Trackable (⊠ (X ×ₐ Y)) (⊠ Y)
+  ⊠X×Y→⊠Y {𝓤} {X} {Y} = (λ { (L , (_ , y) , (_ , (N , red , s))) → ( (ƛ 0 · ↑₁ 𝑭) · L , y , Y.⊩-respects-↠ (begin
+    (ƛ 0 · ↑₁ 𝑭) · L -→⟨ β ⟩ L · ↑₁ 𝑭 [ L ] -↠⟨ red ⟩ N ∎) s) }) ,
+    ↑₁ Ap · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑭 ⌝ · 0   , (λ { {M}  {L , _} r → lift (begin
+    ↑₁ Ap [ M ] · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑭  ⌝ [ M ] · M
+      ≡⟨ cong₂ (λ L N → L · N · M) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ ƛ 0 · ↑₁ 𝑭 ⌝) ⟩
+    Ap · ⌜ ƛ 0 · ↑₁ 𝑭 ⌝ · M
+      -↠⟨ ·ᵣ-cong (lower r) ⟩
+    Ap · ⌜ ƛ 0 · ↑₁ 𝑭 ⌝ · ⌜ _ ⌝
+      -↠⟨ Ap-↠ ⟩
+    ⌜ (ƛ 0 · ↑₁ 𝑭) · L ⌝ ∎ )})
+    where
+      open -↠-Reasoning
+      module X = AsmStr (str X)
+      module Y = AsmStr (str Y)
 
   eval : {X : Asm 𝓤} → Trackable (⊠ X) X
   eval {X = X} = (λ x → fst (snd x)) , Eval ,
@@ -122,7 +149,7 @@ module _ (Q : Quoting) where
       module X  = AsmStr (str X)
       module ⊠X = AsmStr (str (⊠ X))
 
-  eval-nat : NaturalTransformation {𝓤} ⊠-exposure Id
+  eval-nat : {𝓤 : Universe} → NaturalTransformation {𝓤} ⊠-exposure Id
   eval-nat = eval , λ f x → refl
 
   quoting : {X : Asm 𝓤} → Trackable (⊠ X) (⊠ ⊠ X)
@@ -151,7 +178,7 @@ module _ (Q : Quoting) where
 
       qQ-at-⊤ : Trackable ⊤ₐ (⊠ ⊤ₐ)
       qQ-at-⊤ = fun
-   
+
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (q-at-Λ .snd) 
 
@@ -188,6 +215,6 @@ module _ (Q : Quoting) where
         -↠⟨ ·ᵣ-cong M-↠N ⟩
       Sub · ⌜ F ⌝ · ⌜ N ⌝
         -↠⟨ Sub-↠ ⟩
-      ⌜ F [ N ] ⌝ ∎) } -- F [_] , F , λ {M} {N} r → reduce-ssubst F r
+      ⌜ F [ N ] ⌝ ∎) }
       where
         open -↠-Reasoning

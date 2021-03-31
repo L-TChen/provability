@@ -158,13 +158,14 @@ module _ (Q : Quoting) where
   GL : {X : Asm 𝓤}
     → Trackable (□ k X) X
     → Trackable ⊤ₐ X
-  GL {k = k} {X} (f , F , F⊩f) = Final.global-element (F [ ⌜ gfix′ F ⌝ ]) (fixf .fst) (fixf .snd) 
+  GL {k = k} {X} (f , F , F⊩f) = Final.global-element (F [ ⌜ gfix′ F ⌝ ]) (fixf .fst) (fixf .snd)
     where
       module X  = AsmStr (str X)
 
       f′ : Σ[ x ꞉ ▹ k ⟨ X ⟩ ] ▹[ α ꞉ k ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x α
         → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
       f′ (x , r) = f (gfix′ F , x , λ α → X.⊩-respects-↠ gfix′-↠ (r α)) , F⊩f (lift -↠-refl)
+      -- f (gfix′ F , x , λ α → X.⊩-respects-↠ gfix′-↠ (r α)) , F⊩f (lift -↠-refl)
 
       fixf : Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
       fixf = fixΣ f′

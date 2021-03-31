@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical --guarded  #-}
+{-# OPTIONS --without-K --cubical  --no-import-sorts --guarded  #-}
 
 -- Most of definitions are from LaterPrims.agda
 
@@ -88,7 +88,7 @@ fix f = f (dfix f)
 fix-path : (f : ▹ k A → A) → fix f ≡ f (next (fix f))
 fix-path f i = f (pfix f i)
 
-delay : {A : Cl → Set} → (∀ k → A k) → ∀ k → ▹ k (A k)
+delay : {A : Cl → 𝓤 ̇} → (∀ k → A k) → ∀ k → ▹ k (A k)
 delay a k _ = a k
 
 ▹Σ≃Σ▹ : BiInvEquiv (▹[ α ꞉ k ] Σ[ a ꞉ A ] B a) (Σ[ x ꞉ ▹ k A ] ▹[ α ꞉ k ] B (x α))

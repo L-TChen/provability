@@ -30,14 +30,11 @@ record Exposure (𝓤 : Universe) : 𝓤 ⁺ ̇ where
     isExposure : IsExposure obj map
 open Exposure
 
-Naturality : (P Q : Exposure 𝓤) → ({X : Asm 𝓤} → Trackable (P .obj X) (Q .obj X)) → 𝓤 ⁺ ̇
-Naturality {𝓤} P Q fun = {X Y : Asm 𝓤} → (f : Trackable X Y) → fun ∘ P .map f ∼ Q .map f ∘ fun
-
 record NaturalTransformation (P Q : Exposure 𝓤) : 𝓤 ⁺ ̇ where
   constructor _,_
   field
     fun        : {X : Asm 𝓤} → Trackable (P .obj X) (Q .obj X) 
-    naturality : Naturality P Q fun
+    naturality : {X Y : Asm 𝓤} → (f : Trackable X Y) → (fun {Y}) ∘ P .map f ∼ Q .map f ∘ (fun {X})
 
 Id : Exposure 𝓤
 Id = exposure (λ X → X) (λ f → f) record
@@ -45,4 +42,3 @@ Id = exposure (λ X → X) (λ f → f) record
   ; preserve-comp = λ f g x → refl
   ; reflects-∼    = λ _ _ x → x
   }
-
