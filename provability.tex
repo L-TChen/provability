@@ -107,8 +107,7 @@ Most of, if not all, materials are standard, so the reader comfortable with the 
 
 \subsection{Homotopy type theory}
 We highlight the main difference between set theory and homotopy type theory.
-\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU}
-\ltnote{function extensionality}
+\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality}
 \begin{theorem}[Hedberg]
   If $X$ has decidable quality, then $X$ is a set.
 \end{theorem}
@@ -124,12 +123,12 @@ $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms of at most
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
 By using the de Bruijn representation $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence $=_\alpha$ coincides with the identity type $=_\Lambda$ by construction.
 Hence, for $F : \Lambda_1$ we just write $F[M]$ instead of $F[M/\mathtt{x}]$ if there is no danger of confusion.
-The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of witnesses such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
+The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
 Note that the type $\Lambda$ of terms has decidable equality as well as $M \reduce N$, so they are sets. 
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
-Instead of ordinary categories, we work with $\PP$-categories which are pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} to study normalisation in typed $\lambda$-calculus.
-Its use is advocated by Kavvos~\cite{Kavvos2017b} who introduced a functor-like concept called \emph{exposure} exemplified by the Second Recursion Theorem and more in the realm of computability theory.
+Instead of ordinary categories, we work with $\PP$-categories as pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} to study normalisation in typed $\lambda$-calculus.
+Its use is lately advocated by Kavvos~\cite{Kavvos2017b} who introduced a functor-like concept called \emph{exposure} exemplified by the Second Recursion Theorem and more in the realm of computability theory.
 
 We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph{op.\ cit.} as follows.
 \begin{definition}
@@ -139,7 +138,7 @@ We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph
   An element $x \in X$ is \emph{well-defined} (with respect to $\sim$) if $x \sim x$.
 \end{definition}
 The identity function $\idfunc[X] : X \to X$ is a $\PP$-function.
-The composite of two $\PP$-functions (by function composition) is again a $\PP$-function.
+The composite of two $\PP$-functions by function composition is a $\PP$-function.
 It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed category~$\PP\text{-}\mathbf{Set}$, so by enriched category theory~\cite{Kelly1982} we have a notion of categories enriched by $\PP$-sets below.
 
 \begin{definition}[{\cite[Definition~2.4]{Cubric1998a}}]
@@ -184,7 +183,7 @@ Composing two exposures in the usual way clearly gives us an exposure.
 %  commutes up to the extensional equality~$\sim$.
 %\end{definition}
 We may further define the notion of natural transformations for exposure and comonadic exposures as introduced by Kavvos~\cite{Kavvos2017b} to formulate \SFour modality.
-However, in our framework, we would have to adopt the \emph{oplax} version instead where the naturality does not holds strictly but with respect to $\reduce$.
+However, in our framework, we would have to adopt the \emph{oplax} version instead where the naturality only holds up to $\reduce$.
 We will revisit this issue in~\Cref{sec:provability}.
 
 \section{\texorpdfstring{$\PP$}{P}-Category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
@@ -195,40 +194,40 @@ the technical foundation for~\Cref{sec:provability}.
 
 
 \subsection{Assembly}
-An assembly on natural numbers is a set $\bproj{X}$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ in $\bproj{X}$ there exists some $a$ with $a \Vdash x$.
+Traditionally, an assembly on natural numbers is a set $\bproj{X}$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ in $\bproj{X}$ there exists some $a$ with $a \Vdash x$.
 We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $a \Vdash x$.
 The notion of assemblies is nowadays often defined on a partial applicative structure $(A, \cdot)$ satisfying combinatory completeness, i.e.\ a partial combinatory algebra~\cite{Oosten2008}, PCA for short.
 Our definition below is, apart from being type-theoretic, not an instance of the definition based on a PCA.
 \begin{definition}\label{def:assembly}
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} set $|X| : \setU$ and a family ${\Vdash_X}$ of sets indexed by $\Lambda_0$ to $|X|$ as its \emph{realisability relation} such that
-  \emph{(a)} every $x : |X|$ merely has a term $M : \Lambda_0$ with $M \Vdash_X x$;
+  \emph{(a)} there is merely a realiser $M : \Lambda_0$ of every $x : \bproj{X}$, and
   \emph{(b)} $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$.
   That is, an assembly is a quadruple $(|X|, \Vdash_X, r_X, t_X)$ of type
   \[
     \Asm_0(\Lambda) \defeq \sm{\bproj{X} : {\setU}}{\mathord{\Vdash_X}:\Lambda_0 \to |X| \to \setU} 
-    \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\reduce}\right)
-      \times \mathsf{isRightTotal}({\Vdash_X})
+      \mathsf{Respects}\left(\Vdash_X, \mathord{\twoheadrightarrow_\beta}\right)
+      \times \mathsf{RightTotal}({\Vdash_X})
   \]
   where
   \begin{align}
-    \left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right) & \defeq\prd{M N : \Lambda_0}{x : |X|} \left(M \twoheadrightarrow_ \beta N\right) \to \left(N \Vdash x\right) \to \left(M \Vdash x\right) \label{def:respect-reduction} \\      
-    \mathsf{isRightTotal}(\Vdash_X) & \defeq \fall{x : |X|}\exis{M : \Lambda_0} M \Vdash x
+    \mathsf{Respects}\left(\mathord{\Vdash_X}, \mathord{\twoheadrightarrow_\beta}\right) & \defeq\prd{M N : \Lambda_0}{x : |X|} \left(M \twoheadrightarrow_ \beta N\right) \to \left(N \Vdash x\right) \to \left(M \Vdash x\right) \label{def:respect-reduction} \\      
+    \mathsf{RightTotal}(\Vdash_X) & \defeq \fall{x : |X|}\exis{M : \Lambda_0} M \Vdash x
     \label{def:right-total}
   \end{align}
 \end{definition}
 
 The required properties of \Cref{def:assembly} depart from the definition based on a PCA as follows. 
 First, as we would like to account for intensional equality in addition to extensional equality between terms,
-we cannot identify $\beta$-equivalent terms \emph{a priori}.
+$\beta$-equivalent terms cannot be identified \emph{a priori}.
 As a result, the interaction with reduction $\reduce$ is formulated as~\eqref{def:respect-reduction} in line with the definition on an ordered PCA~\cite[Section~2.3]{Hofstra2003}.
 %The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
 Second, a plausible alternative to the right totality~\eqref{def:right-total} is
-\[
+\begin{equation}\label{eq:alternative-right-totality}
   \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
-\]
+\end{equation}
 stating that each $x : |X|$ has a choice of realisers.
 %This is not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
-However, with functional extensionality, any inhabitant of the alternative formulation leads to a \emph{contradiction}~\cite{Troelstra1977}. \ltnote{prove it formally}
+However, with functional extensionality, any inhabitant of~\eqref{eq:alternative-right-totality} leads to a contradiction~\cite{Troelstra1977}. \ltnote{prove it formally}
 
 \begin{example}\label{ex:assembly-lambda}
   The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
@@ -236,19 +235,19 @@ However, with functional extensionality, any inhabitant of the alternative formu
 \end{example}
 
 \begin{example}
-  The assembly $(\Nat, \Vdash_\Nat, r_{\Nat}, t_{\Nat})$ of natural numbers is also important but not in this paper.
-  Nevertheless, we define a realisability relation $\Vdash_{\Nat}$ for natural numbers by
+  Every natural number $n : \Nat$ is realised by its Church numeral~$\mathtt{c}_n$. That is,
+  the type $\Nat$ of natural numbers with the realisability relation $\Vdash_{\Nat}$ defined by
   \[
     \left(M \Vdash_\Nat n\right) \defeq \left(M \reduce \mathtt{c}_n\right)
   \]
-  where $\mathtt{c}_n$ is the Church numeral of $n : \Nat$. The definitions of $r_\Nat$ and $t_\Nat$ are similar to those of~\Cref{ex:assembly-lambda}.  
+  is an assembly where $r_\Nat$ and $t_\Nat$ are similar to those of~\Cref{ex:assembly-lambda}.  
 \end{example}
 
 \subsection{Trackable map}%
 
-A morphism between assemblies on a PCA $(A, \cdot)$ is typically defined as a function~$f$ merely tracked by some $b \in A$ in the sense that there merely exists some $b$ such that $b \cdot a \Vdash f\,x$ whenever $a \Vdash x$.
-In this case, $b$ is called the \emph{tracker} of $f$, or equivalently, $f$ is said to be \emph{tracked} by $b$.
-It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality we have to consider the tracker as part of structure instead of its mere existence.
+A morphism between assemblies on a PCA $(A, \cdot)$ is defined as a function~$f$ merely \emph{tracked by} some $b \in A$ in the sense that there merely exists some $b$ such that $b \cdot a \Vdash f\,x$ whenever $a \Vdash x$.
+In this case, $b$ is called the \emph{tracker} of $f$.
+It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality the tracker should be considered as part of the structure instead of a property.
 \begin{definition}\label{def:trackable}
   Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $\bproj{f}$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ such that $F[M] \Vdash \bproj{f}\,x$ if $M \Vdash x$.
   In other words, the type $\Asm_1(X, Y)$ of trackable maps is $\sum_{\bproj{f} : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, \bproj{f})$ where
@@ -271,9 +270,9 @@ By definition, a trackable map $f$ consists of not only a function $\bproj{f}$ b
 \end{example}
 
 Now we proceed with defining the composition of trackable maps. Let $f\colon X \to Y$ and $g\colon Y \to Z$ be trackable maps.
-Then, the term substitution $(G, F) \mapsto G [ F ]$ can be thought as (intensional) function composition, since there is a path $p : G[F[M]] =_{\Lambda_0} G[F] [M]$ for any term $M$.
-Given any $r : M \Vdash_X x$, the inhabitant $\mathfrak{g}(\mathfrak{f}\,r)$ is of type $G[F[M]]$ and its transportation along $p$ is of type $G[F][M]$, defining a function $\lambda M\,x\,r.\, \mathsf{transport}(p, \mathfrak{g}(\mathfrak{f}\,r))$.
-Therefore, the above discussion amounts to an operation $(g, f) \mapsto g \circ f$ of type
+Then, the term substitution $(G, F) \mapsto G [ F ]$ can be thought as (intensional) function composition, since $G[F[M]] =_{\Lambda_0} G[F] [M]$ holds for any term $M$.
+Given any $r : M \Vdash_X x$, the inhabitant $\mathfrak{g}(\mathfrak{f}\,r)$ is of type $G[F[M]]$ and its transportation along any witness $p : G[F[M]] =_{\Lambda_0} G[F][M]$ is of type $G[F][M]$, defining a function $\lambda M\,x\,r.\, \mathsf{transport}(p, \mathfrak{g}(\mathfrak{f}\,r))$.
+Therefore, the above discussion amounts to defining an operation $(g, f) \mapsto g \circ f$ of type
 \[
   \Asm_1(Y, Z) \to \Asm_1(X, Y) \to \Asm_1(X, Z).
 \]
@@ -311,8 +310,8 @@ We now investigate some of its basic properties.
 \end{example}
 
 Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$.
-Moreover, distinct merely trackable maps can be separated by global elements in the category of assemblies and merely trackable maps. 
-In $\Asm(\Lambda)$ where the trackers are part of trackable maps, we can construct a global element for any inhabitant $x : \bproj{X}$ if we know how $x$ is realised. 
+Moreover, distinct merely trackable maps can be separated by global elements in the ordinary category of assemblies and merely trackable maps. 
+In $\Asm(\Lambda)$ where trackers are part of trackable maps, a global element can be constructed for any pair of inhabitant $x : \bproj{X}$ and its realiser.
 \begin{lemma}\label{lem:global-elemnt}
   Let $X$ be an assembly. Then the following statements hold:
   \begin{enumerate}
@@ -322,7 +321,7 @@ In $\Asm(\Lambda)$ where the trackers are part of trackable maps, we can constru
 \end{lemma}
 
 As expected, the terminal object $\top$ in~$\ASM(\Lambda)$ is a separator up to~$\sim$ in the sense that $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
-This property relies on the fact that the carrier $\bproj{X}$ is a set.
+This property relies on the property that the carrier $\bproj{X}$ is a set.
 \begin{proposition}
   Let $f_1, f_2 : X \to Y$ be two trackable maps. Then, 
   $f_1$ is extensionally equal to $f_2$ if
@@ -352,7 +351,7 @@ From the strictness of the initial object, no morphism from $\top$ to $\bot$ cou
 
 The construction of exponential $X \Rightarrow Y$ is a bit intriguing.
 With the definition of trackable maps, we may expect the exponential assembly $X \Rightarrow Y$ to consist of trackable maps.
-However, the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier~\cite{Kavvos2017b}, since the carrier is meant to be the type of extensions of trackable maps.
+However, the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier, since the carrier is meant to be the type of extensions of trackable maps.
 \begin{example}[Exponential]
   Given assemblies $X$ and $Y$, define
   \begin{align*}
@@ -380,16 +379,16 @@ To sum up, we have just showed that $\Asm(\Lambda)$ has a strict initial object,
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
 
-In this section, we first introduce a comonadic exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models a \SFour modality but subtly different from the exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
+In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models a \SFour modality but subtly different from the comonadic exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
 For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not. 
-Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it using $\boxtimes_K$.
-Hitherto, we complete our cook's tour of the previous results (based on a partial combinatory algebra, though) in HoTT.
+Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it with $\boxtimes_K$.
+Hitherto, we have reformulated and refined the previous results (based on a partial combinatory algebra, though) in HoTT.
 
-Thereafter, we use an extension of cubical type theory with the support of Nakano's later modality---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the \GL modality.
+Thereafter, we use an extension of cubical type theory with Löb induction---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the \GL modality.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
 Finally, we establish one of the main contribution of this paper: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$F[\qquote{\mathsf{fix}\,F}]$
 where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
-The categorical form of the Gödel-Löb axiom in $\Asm(\Lambda)$ follows.
+That is exactly the deductive form of the Gödel-Löb axiom in $\Asm(\Lambda)$.
 
 \subsection{A recap: Gödel encoding and the Second Recursion Theorem}\label{subsec:godel}
 Before entering into the main topic of this section, we review the Second Recursion Theorem in $\lambda$-calculus.
@@ -443,11 +442,11 @@ respectively.
 It turns out that $\boxtimes X \defeq (\bproj{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly where $r_{\boxtimes X}$ and $t_{\boxtimes X}$ are the transitivity and the reflexivity of $\reduce$.
 
 As for the mapping on morphisms, consider any trackable map $f$ from $X$ to $Y$ and define $\boxtimes f \defeq (\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)\colon \boxtimes X \to \boxtimes Y$ as follows.
+First define a function from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes Y}$ by
 \[
-  \bproj{f}^\boxtimes (M, x, r) \defeq (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r)
+  \bproj{f}^\boxtimes\colon (M, x, r) \mapsto (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r).
 \]
-is a function from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes Y}$.
-To give a tracker of $f^\boxtimes$, recall that there is a term $\mathtt{subst}$ performing term substitution on codes, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ by
+To give a tracker of $f^\boxtimes$ recall that there is a term $\mathtt{subst}$ performing term substitution on codes, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ by
 \begin{align*}
   \left(\mathtt{subst} \,\qquote{F}\,\mathtt{x}\right)[N/\mathtt{x}]
   \equiv  {} & \mathtt{subst}\,\qquote{F}\,N \\
@@ -724,15 +723,6 @@ given by the Second Recursion Theorem.
   \end{enumerate}
   By \Cref{lem:global-elemnt}, the pair $y$ and $s$ give rise to a global element of $X$, concluding our proof.
 \end{proof}
-
-The deductive form of Gödel-Löb axiom can be internalised as follows.
-\begin{theorem}[Gödel-Löb axiom]
-  There is a family of maps from $\Box (\Box X \Rightarrow X)$ to $\Box X$ natural in $X$.
-\end{theorem}
-\begin{proof}
-  \ltnote{it should follow from the cartesian closedness}
-\end{proof}
-
 
 \section{Conclusion}\label{sec:conclusion}
 
