@@ -11,7 +11,7 @@ record IsRealisability {X : 𝓤 ̇} (_⊩_ : Λ₀ → X → 𝓤 ̇) : 𝓤 ̇
     ⊩-respects-↠  : _⊩_ respects _-↠_ on-the-left
     ⊩-right-total : _⊩_ IsRightTotal
     ⊩-isSet       : ∀ {M x} → isSet (M ⊩ x)
-    -- ⊩-isProp     : Π[ M ꞉ Λ₀ ] Π[ x ꞉ X ] isProp (M ⊩ x)
+    -- ⊩-isProp     : Π[ M ∶ Λ₀ ] Π[ x ∶ X ] isProp (M ⊩ x)
     -- ⊩-isProp is useful when defining □, but however it does not seem necessary to define ASM?
 
 record AsmStr (X : 𝓤 ̇) : 𝓤 ⁺ ̇ where
@@ -51,13 +51,13 @@ record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
     F⊩f : Tracks X Y F f
 
 --HasTracker : (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
---HasTracker X Y f = Σ[ F ꞉ Λ₁ ] Tracks X Y F f
+--HasTracker X Y f = Σ[ F ∶ Λ₁ ] Tracks X Y F f
 
 Trackable : (X Y : Asm 𝓤) → 𝓤 ̇
-Trackable X Y = Σ[ f ꞉ ⟨ X ⟩ ➝ ⟨ Y ⟩ ] HasTracker X Y f
+Trackable X Y = Σ[ f ∶ ⟨ X ⟩ ➝ ⟨ Y ⟩ ] HasTracker X Y f
 
 MerelyTrackable : (X Y : Asm 𝓤) → 𝓤 ̇
-MerelyTrackable X Y = Σ[ f ꞉ ⟨ X ⟩ ➝ ⟨ Y ⟩ ] ∥ HasTracker X Y f ∥
+MerelyTrackable X Y = Σ[ f ∶ ⟨ X ⟩ ➝ ⟨ Y ⟩ ] ∥ HasTracker X Y f ∥
 
 ------------------------------------------------------------------------------
 -- Extensional equality between morphisms
@@ -106,4 +106,4 @@ _∘_ {Z = Z} (g , G , G⊩g) (f , F , F⊩f) = g 𝓤.∘ f , (G ∘′ F) , λ
     where module Z = AsmStr (str Z)
 
 AsmIso : (X Y : Asm 𝓤) → (Trackable X Y) → 𝓤 ̇
-AsmIso X Y f = ∃[ g ꞉ Trackable Y X ] (∼-eq Y Y (f ∘ g) (id Y)) × (∼-eq X X (g ∘ f) (id X))
+AsmIso X Y f = ∃[ g ∶ Trackable Y X ] (∼-eq Y Y (f ∘ g) (id Y)) × (∼-eq X X (g ∘ f) (id X))

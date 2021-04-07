@@ -29,7 +29,7 @@ module _ (Q : Quoting) where
     where
       module X = AsmStr (str X)
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ꞉ Λ₀ ] Σ[ ▹x ꞉ ▹ k ⟨ X ⟩ ] ▹[ α ꞉ k ] M X.⊩ ▹x α
+      |□X| = Σ[ M ∶ Λ₀ ] Σ[ ▹x ∶ ▹ k ⟨ X ⟩ ] ▹[ α ∶ k ] M X.⊩ ▹x α
       -- Can we remove truncation? Yes.
       
       isSet□X : isSet |□X|
@@ -112,63 +112,63 @@ module _ (Q : Quoting) where
   -- Theorem: There is no natural transformation q : I ⇒ □.
   -- Proof sketch: By naturality, qΛ is determined by its component at the terminal object ⊤ₐ. 
   
-  quoting-does-not-exist : Cl → (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
-  quoting-does-not-exist k′ (fun , naturality) = quoting′-not-definable (QΛ k′ , QΛ-is-quoting k′)
-    where
-      qQ-at-Λ : (k : Cl) → Trackable Λ₀ₐ (□ k Λ₀ₐ)
-      qQ-at-Λ k = fun k
+--  quoting-does-not-exist : Cl → (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
+--  quoting-does-not-exist k′ (fun , naturality) = quoting′-not-definable (QΛ k′ , QΛ-is-quoting k′)
+--    where
+--      qQ-at-Λ : (k : Cl) → Trackable Λ₀ₐ (□ k Λ₀ₐ)
+--      qQ-at-Λ k = fun k
+--
+--      qΛ = λ (k : Cl) → qQ-at-Λ k .fst
+--      QΛ = λ (k : Cl) → HasTracker.F (qQ-at-Λ k .snd)
+--
+--      qQ-at-⊤ : (k : Cl) → Trackable ⊤ₐ (□ k ⊤ₐ)
+--      qQ-at-⊤ k = fun k
+--     
+--      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ k [ N ] -↠ ⌜ qΛ k M .fst ⌝)
+--      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ _ .snd) 
+--
+--      lem : (k : Cl) → (M : Λ₀) → qΛ k M ≡ (M , next M , _)
+--      lem k M = begin
+--        qΛ k M
+--          ≡⟨ refl ⟩
+--        qΛ k (*→Λ M .fst _)
+--          ≡⟨ naturality k (*→Λ M) _ ⟩
+--        □map k (*→Λ M) .fst (qQ-at-⊤ k .fst tt*)
+--          ≡⟨ refl ⟩
+--        ↑₁ M [ _ ]  , next M , (λ α → s α)
+--          ≡[ i ]⟨ subst-rename-∅ _ M i , next M , transport-filler (cong (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M)) s i ⟩
+--        M , next M , subst (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M) s ∎
+--        where
+--          open ≡-Reasoning
+--          open HasTracker (*→Λ M .snd)
+--          f : Unit* → ⟨ □ k ⊤ₐ ⟩
+--          f = qQ-at-⊤ k .fst
+--          s = ▹map F⊩f (f tt* .snd .snd)
+--  
+--      QΛ-is-quoting : (k : Cl)
+--        → (M : Λ₀) → QΛ k [ M ] -↠ ⌜ M ⌝
+--      QΛ-is-quoting k M = begin
+--        QΛ k [ M ]
+--          -↠⟨ lower (QΛ[M] -↠-refl) ⟩
+--        ⌜ qΛ k M .fst ⌝
+--        ≡[ i ]⟨ ⌜ lem k M i .fst  ⌝ ⟩
+--        ⌜ M ⌝ ∎
+--        where open -↠-Reasoning
 
-      qΛ = λ (k : Cl) → qQ-at-Λ k .fst
-      QΛ = λ (k : Cl) → HasTracker.F (qQ-at-Λ k .snd)
-
-      qQ-at-⊤ : (k : Cl) → Trackable ⊤ₐ (□ k ⊤ₐ)
-      qQ-at-⊤ k = fun k
-     
-      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ k [ N ] -↠ ⌜ qΛ k M .fst ⌝)
-      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ _ .snd) 
-
-      lem : (k : Cl) → (M : Λ₀) → qΛ k M ≡ (M , next M , _)
-      lem k M = begin
-        qΛ k M
-          ≡⟨ refl ⟩
-        qΛ k (*→Λ M .fst _)
-          ≡⟨ naturality k (*→Λ M) _ ⟩
-        □map k (*→Λ M) .fst (qQ-at-⊤ k .fst tt*)
-          ≡⟨ refl ⟩
-        ↑₁ M [ _ ]  , next M , (λ α → s α)
-          ≡[ i ]⟨ subst-rename-∅ _ M i , next M , transport-filler (cong (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M)) s i ⟩
-        M , next M , subst (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M) s ∎
-        where
-          open ≡-Reasoning
-          open HasTracker (*→Λ M .snd)
-          f : Unit* → ⟨ □ k ⊤ₐ ⟩
-          f = qQ-at-⊤ k .fst
-          s = ▹map F⊩f (f tt* .snd .snd)
-  
-      QΛ-is-quoting : (k : Cl)
-        → (M : Λ₀) → QΛ k [ M ] -↠ ⌜ M ⌝
-      QΛ-is-quoting k M = begin
-        QΛ k [ M ]
-          -↠⟨ lower (QΛ[M] -↠-refl) ⟩
-        ⌜ qΛ k M .fst ⌝
-        ≡[ i ]⟨ ⌜ lem k M i .fst  ⌝ ⟩
-        ⌜ M ⌝ ∎
-        where open -↠-Reasoning
-
-  GL : {X : Asm 𝓤}
+  _† : {X : Asm 𝓤}
     → Trackable (□ k X) X
-    → Trackable ⊤ₐ X
-  GL {k = k} {X} (f , F , F⊩f) = Final.global-element (F [ ⌜ gfix′ F ⌝ ]) (fixf .fst) (fixf .snd)
+    → Trackable ⊤ₐ (□ k X)
+  _† {k = k} {X} (f , F , F⊩f) = (λ _ → F [ ⌜ gfix′ F ⌝ ] , fixf) , {!!} , λ { (lift r) → lift {!!} }
+  -- Final.global-element (F [ ⌜ gfix′ F ⌝ ]) (fixf .fst) (fixf .snd)
     where
       module X  = AsmStr (str X)
 
-      f′ : Σ[ x ꞉ ▹ k ⟨ X ⟩ ] ▹[ α ꞉ k ] F [ ⌜ gfix (ƛ F) ⌝ ] X.⊩ x α
-        → Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
-      f′ (x , r) = f (gfix′ F , x , λ α → X.⊩-respects-↠ gfix′-↠ (r α)) , F⊩f (lift -↠-refl)
-      -- f (gfix′ F , x , λ α → X.⊩-respects-↠ gfix′-↠ (r α)) , F⊩f (lift -↠-refl)
+      h : Σ[ x ∶ ▹ k ⟨ X ⟩ ] ▹[ α ∶ k ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x α
+        → Σ[ x ∶     ⟨ X ⟩ ]            F [ ⌜ gfix′ F ⌝ ] X.⊩ x
+      h (x , r) = f (gfix′ F , x , λ α → X.⊩-respects-↠ gfix′-↠ (r α)) , F⊩f (lift -↠-refl)
 
-      fixf : Σ[ x ꞉ ⟨ X ⟩ ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x
-      fixf = fixΣ f′
+      fixf : Σ[ x ∶ ▹ k ⟨ X ⟩ ] ▹[ α ∶ k ] F [ ⌜ gfix′ F ⌝ ] X.⊩ x α
+      fixf = dfixΣ h
 
   -- IGL : (X : Asm 𝓤)
   --   → Trackable (□ k (□ k X ⇒ X)) (□ k X)
@@ -180,7 +180,7 @@ module _ (Q : Quoting) where
   --     irec : ⟨ □ k (□ k X ⇒ X) ⟩ → ⟨ □ k X ⟩
   --     irec (F , f , F⊩f) = F · ⌜ gfix F ⌝  , ▹Σ y
   --       where
-  --         y : ▹ k (Σ[ x ꞉ ⟨ X ⟩ ] ∥ F · ⌜ gfix F ⌝ X.⊩ x ∥) 
+  --         y : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] ∥ F · ⌜ gfix F ⌝ X.⊩ x ∥) 
   --         y α = fix λ hyp →
   --           f α .fst (gfix F , (λ α → hyp α .fst) ,
   --             λ α → rec propTruncIsProp (λ r → ∣ X.⊩-respects-↠ gfix-↠ r ∣) (hyp α .snd)) ,

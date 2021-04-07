@@ -34,10 +34,10 @@ private
 ▹-syntax : (k : Cl) → ▹ k (𝓤 ̇) → 𝓤 ̇
 ▹-syntax k A = (@tick α : Tick k) → A α
 
-syntax ▹-syntax k (λ α → e) = ▹[ α ꞉ k ] e
+syntax ▹-syntax k (λ α → e) = ▹[ α ∶ k ] e
 
 postulate
-  tick-irr : {k : Cl} (x : ▹ k A) → ▹[ α ꞉ k ] ▹[ β ꞉ k ] x α ≡ x β
+  tick-irr : {k : Cl} (x : ▹ k A) → ▹[ α ∶ k ] ▹[ β ∶ k ] x α ≡ x β
 
 postulate
   dfix : (▹ k A → A) → ▹ k A
@@ -45,7 +45,7 @@ postulate
 
 postulate
   force       : {A : Cl → 𝓤 ̇}        → (∀ k → ▹ k (A k)) → ∀ k → A k
-  force-delay : {A : Cl → 𝓤 ̇}        → (f : ∀ k → ▹ k (A k)) → ∀ k → ▹[ α ꞉ k ] force f k ≡ f k α
+  force-delay : {A : Cl → 𝓤 ̇}        → (f : ∀ k → ▹ k (A k)) → ∀ k → ▹[ α ∶ k ] force f k ≡ f k α
   delay-force : {A : Cl → 𝓤 ̇}        → (f : ∀ k → A k)       → ∀ k → force (\ k α → f k) k ≡ f k
   force^      : {A : ∀ k → ▹ k (𝓤 ̇)} → (∀ k → ▸ k (A k))     → ∀ k → force A k
 -- No more postulates after this line.
@@ -61,25 +61,25 @@ next : A → ▹ k A
 next x k = x
 
 _⊛_ : ▹ k ((a : A) → B a)
-  → (a : ▹ k A) → ▹[ α ꞉ k ] B (a α)
+  → (a : ▹ k A) → ▹[ α ∶ k ] B (a α)
 (f ⊛ x) k = f k (x k)
 
 ▹map : ((a : A) → B a)
-  → (a : ▹ k A) → ▹[ α ꞉ k ] B (a α)
+  → (a : ▹ k A) → ▹[ α ∶ k ] B (a α)
 ▹map f x k = f (x k)
 
 Σ▹
-  : Σ[ x ꞉ ▹ k A ] ▹[ α ꞉ k ] B (x α)
-  → ▹[ α ꞉ k ]     Σ[ a ꞉ A ] B a
+  : Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α)
+  → ▹[ α ∶ k ]     Σ[ a ∶ A ] B a
 Σ▹ (x , y) α = (x α) , (y α)
 
 ▹Σ
-  : ▹[ α ꞉ k ]     Σ[ a ꞉ A ] B a
-  → Σ[ x ꞉ ▹ k A ] ▹[ α ꞉ k ] B (x α)
+  : ▹[ α ∶ k ]     Σ[ a ∶ A ] B a
+  → Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α)
 ▹Σ f = (λ α → fst (f α)) , λ α → snd (f α)
 
 ▹-extensionality : {A : I → 𝓤 ̇} {x : ▹ k (A i0)} {y : ▹ k (A i1)}
-  → ▹[ α ꞉ k ] PathP A (x α) (y α) → PathP (λ i → ▹ k (A i)) x y
+  → ▹[ α ∶ k ] PathP A (x α) (y α) → PathP (λ i → ▹ k (A i)) x y
 ▹-extensionality p i α = p α i
 
 fix : (▹ k A → A) → A
@@ -91,22 +91,22 @@ fix-path f i = f (pfix f i)
 delay : {A : Cl → 𝓤 ̇} → (∀ k → A k) → ∀ k → ▹ k (A k)
 delay a k _ = a k
 
-▹Σ≃Σ▹ : BiInvEquiv (▹[ α ꞉ k ] Σ[ a ꞉ A ] B a) (Σ[ x ꞉ ▹ k A ] ▹[ α ꞉ k ] B (x α))
+▹Σ≃Σ▹ : BiInvEquiv (▹[ α ∶ k ] Σ[ a ∶ A ] B a) (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α))
 ▹Σ≃Σ▹ = biInvEquiv ▹Σ
   Σ▹ (λ { (x , y) i → (λ α → x α) , λ α → y α})
   Σ▹ λ x i α → x α .fst , x α .snd
 
 dfixΣ : {A : 𝓤 ̇} {B : A → 𝓤 ̇}
-  → (Σ[ x ꞉ ▹ k A ] ▹[ α ꞉ k ] B (x α) → Σ[ a ꞉ A ] B a)
-  → Σ[ x ꞉ ▹ k A ] ▹[ α ꞉ k ] B (x α)
+  → (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α) → Σ[ a ∶ A ] B a)
+  → Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α)
 dfixΣ {𝓤} {k} {A} {B} f = ▹Σ (dfix f′)
   where
-    f′ : ▹ k (Σ[ x ꞉ A ] B x) → Σ[ a ꞉ A ] B a
+    f′ : ▹ k (Σ[ x ∶ A ] B x) → Σ[ a ∶ A ] B a
     f′ y = f (▹Σ y)
 
 fixΣ : {A : 𝓤 ̇} {B : A → 𝓤 ̇}
-  → (Σ[ x ꞉ ▹ k A ] ▹[ α ꞉ k ] B (x α) → Σ[ a ꞉ A ] B a)
-  → Σ[ x ꞉ A ] B x
+  → (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α) → Σ[ a ∶ A ] B a)
+  → Σ[ x ∶ A ] B x
 fixΣ {𝓤} {k} {A} {B} f = f (dfixΣ f)
 
 {-
@@ -137,23 +137,23 @@ fixΣ {𝓤} {k} {A} {B} f = f (dfixΣ f)
     sq j (i = i1) = delay-force (λ _ → g x) k j
 
 ▹isContr→isContr▹ : {A : ▹ k (𝓤 ̇)}
-  → ▹[ α ꞉ k ] isContr (A α)
-  → isContr (▹[ α ꞉ k ] (A α))
+  → ▹[ α ∶ k ] isContr (A α)
+  → isContr (▹[ α ∶ k ] (A α))
 ▹isContr→isContr▹ p = (λ α → p α .fst) , λ y i α → p α .snd (y α) i
 
 ▹isProp→isProp▹ : {A : ▹ k (𝓤 ̇)}
-  → ▹[ α ꞉ k ] isProp (A α)
-  → isProp (▹[ α ꞉ k ] (A α))
+  → ▹[ α ∶ k ] isProp (A α)
+  → isProp (▹[ α ∶ k ] (A α))
 ▹isProp→isProp▹ p x y i α = p α (x α) (y α) i
 
 ▹isSet→isSet▹ : {A : ▹ k (𝓤 ̇)}
-  → ▹[ α ꞉ k ] isSet (A α)
-  → isSet (▹[ α ꞉ k ] (A α))
+  → ▹[ α ∶ k ] isSet (A α)
+  → isSet (▹[ α ∶ k ] (A α))
 ▹isSet→isSet▹ hyp x y p q i j α =
   hyp α (x α) (y α) (λ j → p j α) (λ j → q j α) i j
 
 ▹isSet'→isSet'▹ : {A : ▹ k (𝓤 ̇)}
-  → ▹[ α ꞉ k ] isSet' (A α)
-  → isSet' (▹[ α ꞉ k ] (A α))
+  → ▹[ α ∶ k ] isSet' (A α)
+  → isSet' (▹[ α ∶ k ] (A α))
 ▹isSet'→isSet'▹ hyp p q r s i j α = hyp α
   (λ i → p i α) (λ i → q i α) (λ j → r j α) (λ j → s j α) i j

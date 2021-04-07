@@ -27,7 +27,7 @@ module _ (Q : Quoting) where
     where
       module X = AsmStr (str X)
       |⊠X| : 𝓤 ̇
-      |⊠X| = Σ[ M ꞉ Λ₀ ] Σ[ x ꞉ |X| ] M ⊩ x
+      |⊠X| = Σ[ M ∶ Λ₀ ] Σ[ x ∶ |X| ] M ⊩ x
 
       isSet⊠X : isSet |⊠X|
       isSet⊠X = isSetΣ (Discrete→isSet _≟_) λ M → isSetΣ XisSet λ _ → X.⊩-isSet
@@ -171,7 +171,7 @@ module _ (Q : Quoting) where
       q-at-Λ : Trackable Λ₀ₐ (⊠ Λ₀ₐ)
       q-at-Λ = fun
 
-      qΛ : Λ₀ → Σ[ N ꞉ Λ₀ ] Σ[ M ꞉ Λ₀ ] N -↠ M
+      qΛ : Λ₀ → Σ[ N ∶ Λ₀ ] Σ[ M ∶ Λ₀ ] N -↠ M
       qΛ = q-at-Λ .fst
 
       QΛ = HasTracker.F (q-at-Λ .snd)
