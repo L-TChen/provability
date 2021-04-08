@@ -41,12 +41,12 @@ postulate
 
 postulate
   dfix : (▹ k A → A) → ▹ k A
-  pfix : (f : ▹ k A → A) → dfix f ≡ (\ _ → f (dfix f))
+  pfix : (f : ▹ k A → A) → dfix f ≡ λ _ → f (dfix f)
 
 postulate
   force       : {A : Cl → 𝓤 ̇}        → (∀ k → ▹ k (A k)) → ∀ k → A k
   force-delay : {A : Cl → 𝓤 ̇}        → (f : ∀ k → ▹ k (A k)) → ∀ k → ▹[ α ∶ k ] force f k ≡ f k α
-  delay-force : {A : Cl → 𝓤 ̇}        → (f : ∀ k → A k)       → ∀ k → force (\ k α → f k) k ≡ f k
+  delay-force : {A : Cl → 𝓤 ̇}        → (f : ∀ k → A k)       → ∀ k → force (λ k α → f k) k ≡ f k
   force^      : {A : ∀ k → ▹ k (𝓤 ̇)} → (∀ k → ▸ k (A k))     → ∀ k → force A k
 -- No more postulates after this line.
 
@@ -96,19 +96,26 @@ delay a k _ = a k
   Σ▹ (λ { (x , y) i → (λ α → x α) , λ α → y α})
   Σ▹ λ x i α → x α .fst , x α .snd
 
-dfixΣ : {A : 𝓤 ̇} {B : A → 𝓤 ̇}
+▹Σ≡Σ▹ : (k : Cl) (A : 𝓤 ̇) (B : A → 𝓥 ̇)
+  → (▹[ α ∶ k ] Σ[ a ∶ A ] B a) ≡ (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α))
+▹Σ≡Σ▹ k A B = ua (biInvEquiv→Equiv-right ▹Σ≃Σ▹)
+
+dfixΣ : {k : Cl} {A : 𝓤 ̇} {B : A → 𝓥 ̇}
   → (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α) → Σ[ a ∶ A ] B a)
-  → Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α)
-dfixΣ {𝓤} {k} {A} {B} f = ▹Σ (dfix f′)
-  where
-    f′ : ▹ k (Σ[ x ∶ A ] B x) → Σ[ a ∶ A ] B a
-    f′ y = f (▹Σ y)
+  →  Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α)
+dfixΣ {𝓤} {𝓥} {k} {A} {B} = transport
+  (λ i → (▹Σ≡Σ▹ k A B i → Σ[ a ∶ A ] B a) → ▹Σ≡Σ▹ k A B i) dfix
 
 fixΣ : {A : 𝓤 ̇} {B : A → 𝓤 ̇}
   → (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α) → Σ[ a ∶ A ] B a)
   → Σ[ x ∶ A ] B x
-fixΣ {𝓤} {k} {A} {B} f = f (dfixΣ f)
-
+fixΣ f = f (dfixΣ f)
+{-
+pfixΣ : {k : Cl} {A : 𝓤 ̇} {B : A → 𝓥 ̇}
+  → (f : Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α) → Σ[ a ∶ A ] B a)
+  → dfixΣ f ≡ (next (f (dfixΣ f) .fst) , next (f (dfixΣ f) .snd))
+pfixΣ f = {!!}
+-}
 {-
   force (λ _ _ → f x) k ---------------------> force (λ _ _ → g x) k
         |                                        |
