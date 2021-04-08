@@ -121,16 +121,16 @@ record Quoting : 𝓤₀ ̇ where
       F · ⌜ Wₘ · ⌜ Wₘ ⌝ ⌝ ∎
     where Wₘ = W F
 
-  gfix′ : Λ₁ → Λ₀
-  gfix′ F = gfix (ƛ F)
+  sfix : Λ₁ → Λ₀
+  sfix F = gfix (ƛ F)
 
-  gfix′-↠ : gfix′ F -↠ F [ ⌜ gfix′ F ⌝ ]
-  gfix′-↠ {F = F} = begin
-    gfix′ F
+  sfix-↠ : sfix F -↠ F [ ⌜ sfix F ⌝ ]
+  sfix-↠ {F = F} = begin
+    sfix F
       -↠⟨ gfix-↠ ⟩
     (ƛ F) · ⌜ gfix (ƛ F) ⌝ 
       -→⟨ β ⟩
-    F [ ⌜ gfix′ F ⌝ ]
+    F [ ⌜ sfix F ⌝ ]
       ∎
   -- -- ⊢ □ (□ A `→ A) `→ □ A
   -- igfix : (A : 𝕋) → Prog (nat `→ nat)
