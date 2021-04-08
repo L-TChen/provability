@@ -434,7 +434,7 @@ Contrary to the well-known Kleene's first recursion theorem, his second recursio
 
 \begin{theorem}[Second Recursion Theorem] \label{thm:SRT}
   Every term $F : \Lambda$ has a closed term $M$ with $M \reduce F\,\qquote{M}$.
-  In particular, if $F : \Lambda_1$, then there is $\mathsf{fix}\,F$ with $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
+  In particular every $F : \Lambda_1$ has $\mathsf{fix}\,F : \Lambda_0$ satisfying $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
 \end{theorem}
 
 \subsection{An exposure for \texorpdfstring{\SFour}{S4} modality}
@@ -617,9 +617,9 @@ To express this idea cleanly, we work in an extension of HoTT with the support o
 
 \begin{lemma}\label{lem:later-sum}
   For $A : \UU$ and $B : A \to \UU$, there is an equivalence
-  \[
+  \begin{equation}\label{eq:later-sum}
     \eqv{\laterp^\kappa \sm{x : A} B\,x}{\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B (x [\alpha])}.
-  \]
+  \end{equation}
   between $\Sigma$-types.
 \end{lemma}
 \ltnote{Use the definition of bi-invertible equivalences}
@@ -640,7 +640,7 @@ To express this idea cleanly, we work in an extension of HoTT with the support o
 Inspired by~\Cref{lem:later-identity}, we introduce the notion of clocked exposures which are like exposures but indexed by clocks~$\kappa$.
 
 \begin{definition}[Clocked exposure]
-  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ \emph{(b)} and for each clock $\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
+  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ and \emph{(b)} for each clock $\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
   \begin{romanenumerate}
     \item $Q^\kappa \iid_X \sim \iid_{QX}$,
     \item $Q^\kappa (g \circ f) \sim Q^\kappa g \circ Q^\kappa f$, and
@@ -675,6 +675,12 @@ For any trackable map $f$ from $X$ to $Y$, also define $\Box^\kappa f$ as the sa
 \]
 where $(\laterp^\kappa f\, x)[\alpha]$ is judgementally equal to $f(x[\alpha])$, and $\laterp^\kappa \bproj{f} : \laterp^\kappa \bproj{X} \to \laterp^\kappa \bproj{Y}$ is given by the functoriality of the later modality~$\mathord{\laterp}^\kappa$.
 The very same argument for $\boxtimes f$ shows that $\Box^\kappa f$ is indeed a trackable map from $\bproj{\Box^\kappa X}$ to $\bproj{\Box^\kappa Y}$.
+
+\begin{remark*}
+  By the equivalence~\eqref{eq:later-sum} and univalence, the carrier of $\Box^\kappa X$ is identical to
+  $ \sm{M : \Lambda_0}\laterp^\kappa\, \sm{x : \bproj{X}} M \Vdash_X x$.
+  This equivalent form is more convenient when used to reason about the delayed fixed point and will be used interchangeably with the original definition.
+\end{remark*}
 
 It is straightforward to show that $\Box^\kappa$ is a clocked exposure by \Cref{lem:later-identity}.
 \begin{theorem}\label{thm:GL-exposure}
@@ -711,35 +717,45 @@ The pay-off for disallowing evaluation is to be able to adopt guarded recursion 
 From the logical perspective, it is the deductive form of the Gödel-Löb axiom.
 
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
-  For every trackable map $f \colon \Box^\kappa X \to X$ tracked by some $F$, there exists a global element of $\Box^\kappa X$ tracked by $F[ \qquote{\mathsf{fix}\,F} ]$.
+  Every map $f \colon \bproj{\Box^\kappa X} \to \bproj{X}$ tracked by some $F$ gives rise to a global element~$f^\dagger$ of $\Box^\kappa X$ tracked by $\qquote{\mathsf{fix}\,F}$.
 \end{theorem}
 This theorem follows from the Löb induction and the fact that $\mathsf{fix}\,F$ is a fixpoint of $F$
 given by the Second Recursion Theorem.
 
 \begin{proof}
   Let $f$ be a trackable map from $\Box^\kappa X$ to $X$.
-  We prove this statement by Löb induction on a $\sum$-type (\Cref{coro:lob-induction-sum}). 
+  We prove this statement by Löb induction on a $\Sigma$-type (\Cref{coro:lob-induction-sum}). 
   That is, assuming 
   \[
     x : \laterp \bproj{X}
     \quad\text{and}\quad
     r : \laterp (\alpha : \kappa).\, F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]
   \]
-  we derive an inhabitant $y : \bproj{X}$ realised by $F[\,\qquote{\mathsf{fix}\,F}\,]$ as follows:
+  we show an inhabitant of type $\bproj{X}$ realised by $F[\,\qquote{\mathsf{fix}\,F}\,]$ as follows.
   \begin{enumerate}
-    \item First, we have $r' : \laterp (\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x [\alpha]$ since the realisability relation $\Vdash$ respects reductions and $\mathsf{fix}\,F$ reduces to $F[\,\qquote{\mathsf{fix}\,F}\,]$. 
-    \item Choose $y$ to be $\bproj{f}(\mathsf{fix}\,F, x, r')$ so that we derive
+    \item First,
+      $\laterp(\alpha : \kappa).\left( \mathsf{fix}\,F \Vdash x [\alpha]\right)$ has an inhabitant, say $r'$, since $\mathsf{fix}\,F$ reduces to $F[\,\qquote{\mathsf{fix}\,F}\,]$. 
+    \item Then, we derive an inhabitant of type $\bproj{X}$ realised by~$F[\qquote{\mathsf{fix}\,F}$:
       \[
-        s \defeq \mathfrak{f} (\mathsf{refl}_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
+        \mathfrak{f} (\mathsf{refl}_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
       \]
-      by the fact that $F$ tracks $\bproj{f}$ and the realisability $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is just $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$ which holds by reflexivity.
+      by the fact that $F$ tracks $\bproj{f}$ and the realisability $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is judgementally equal to $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$.
+
+    \item By Löb induction, the type $\sm{x : \laterp \bproj{X}} \laterp (\alpha : \kappa).\, F[\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ has an inhabitant~$(x_0, r_0)$.
   \end{enumerate}
-  By \Cref{lem:global-elemnt}, the pair $y$ and $s$ give rise to a global element of $X$, concluding our proof.
+  Therefore $(F[\qquote{\mathsf{fix}\,F}], x_0, r_0)$ is an inhabitant of $\Box^\kappa X$ which evidently is realised by $\qquote{F[\qquote{\mathsf{fix}\,F}]}$ and thus by \Cref{lem:global-elemnt} it gives rise to a global element~$f^\dagger$ of $\Box X$, concluding our proof.
 \end{proof}
 
+We may wish to prove further that the global element $f^\dagger$ is indeed a fixpoint of $f$ in the sense that $f^\dagger \sim \Box(f \circ f^\dagger) \circ \bigstar$ mimicking Kavvos' Definition~\cite[Definition~5.29]{Kavvos2020} where $\bigstar : \top \to \Box \top$ is a global element of $\Box \top$ given by $\star : \Unit$ and its realiser $\lambda \mathtt{x}.\,\mathtt{x}$ using~\Cref{lem:global-elemnt}.
+This extensional equality, however, violates in our framework as they have different intensions ($\mathsf{fix}\,F$ versus $F[\qquote{\mathsf{fix}\,F}]$) in spite that their extensions are the same (see below).
+This situation echoes the discussion of~\Cref{remark:difference-boxtimes}.
+
+\begin{proposition}
+  \ltnote{show that LHS and RHS have the same extension}
+\end{proposition}
 \section{Conclusion}\label{sec:conclusion}
 
-To summarise, we follow the inspiring works by Kavvos in this paper to manifest the concepts of denotations, extensions, and intensions.
+We follow the inspiring works by Kavvos in this paper to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus as the foundation of categorical semantics for intensionality. 
 The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which are not exposed in ordinary categories, since computationally equivalent terms are mostly identified on the semantics side \emph{a priori}.
 The situation is likely caused by the confusion between the concept of \emph{denotation} and that of \emph{extension}.
@@ -761,7 +777,7 @@ This suggests a new language construct for $\Box^\kappa X$ apart from its introd
 This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
 
 Finally, categories internal to clocked type theory seem worth further investigation.
-It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract replacement of the step-indexing technique.
+It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract approach to the step-indexing technique used to reason about programming language features.
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
 %As a sanity check, we may further ask the type $\mathsf{Code}$ of \emph{untyped} code and a polymorphic function from $\boxtimes A$ to $\mathsf{Code}$ forgetting what a typed code denotes. 
