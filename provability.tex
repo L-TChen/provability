@@ -121,14 +121,15 @@ Terms are defined informally by
 where variables $\mathtt{x}$ are in the typewriter font.
 $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms with at most $n$ free variables.
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
-By using the de Bruijn representation $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence $=_\alpha$ coincides with the identity type $=_\Lambda$ by construction.
-Hence, for $F : \Lambda_1$ we just write $F[M]$ instead of $F[M/\mathtt{x}]$ if there is no danger of confusion.
+By using the de Bruijn representation, $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction.
+Also, for $F : \Lambda_1$ we just write $F[M]$ instead of $F[M/\mathtt{x}]$ for substitution when there is no danger of confusion.
 The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
-Note that the type $\Lambda$ of terms has decidable equality as well as $M \reduce N$, so they are sets. 
+Note that the type $\Lambda$ of terms has decidable equality, and so does $M \reduce N$, so they are sets by Hedberg's theorem.
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
 Instead of ordinary categories, we work with $\PP$-categories as pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} to study normalisation in typed $\lambda$-calculus.
-Its use is lately advocated by Kavvos~\cite{Kavvos2017b} who introduced a functor-like concept called \emph{exposure} exemplified by the Second Recursion Theorem and more in the realm of computability theory.
+Their use was recently advocated by Kavvos~\cite{Kavvos2017b}, who introduced a functor-like concept called \emph{exposure} exemplified by the Second Recursion Theorem and more in the realm of computability theory.
+\hsnote{doesn’t really help with understanding what exposures are about}
 
 We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph{op.\ cit.} as follows.
 \begin{definition}
@@ -137,31 +138,31 @@ We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph
   A \emph{$\PP$-function} from $(X, \sim_X)$ to $(Y, \sim_Y)$ is a function $f\colon X \to Y$ which respects the relation~$\sim$ in the sense that $f\,x \sim_Y f\,y$ whenever $x \sim_X y$.
   An element $x \in X$ is \emph{well-defined} (with respect to $\sim$) if $x \sim x$.
 \end{definition}
-The identity function $\idfunc[X] : X \to X$ is a $\PP$-function.
-The composite of two $\PP$-functions by function composition is a $\PP$-function.
+The identity function $\idfunc[X] : X \to X$ is a $\PP$-function, and the composite of two $\PP$-functions is again a $\PP$-function.
 It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed category~$\PP\text{-}\mathbf{Set}$, so by enriched category theory~\cite{Kelly1982} we have a notion of categories enriched by $\PP$-sets below.
 
 \begin{definition}[{\cite[Definition~2.4]{Cubric1998a}}]
-  A $\PP$-category is a category whose hom-sets are $\PP$-sets satisfying associativity and the identity law up to~$\sim$ in the sense that 
+  A $\PP$-category is a category whose hom-sets are $\PP$-sets satisfying the associativity and identity laws up to~$\sim$ in the sense that 
   \begin{romanenumerate}
   \item every object~$X$ has an identity morphism $\iid_X$, 
-  \item $g f \sim g' f'$ whenever $g\sim g'$ and $f \sim f'$,
+  \item $g \circ f \sim g' \circ f'$ whenever $g\sim g'$ and $f \sim f'$,
   \item $\iid \circ f \sim f'$ and $f \circ \iid \sim f'$ whenever $f \sim f'$,
-  \item $h(gf) \sim (h'g')f'$ whenever $h\sim h'$, $g \sim g'$, and $f \sim f'$.
+  \item $h \circ (g \circ f) \sim (h' \circ g') \circ f'$ whenever $h\sim h'$, $g \sim g'$, and $f \sim f'$.
   \end{romanenumerate}
 \end{definition}
 
-A $\PP$-category has two kinds of equalities for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$ where the former is considered as the \emph{very intensional equality} and the latter as the \emph{extensional equality}.
-\hsnote{`very' intensional?}
-This additional equality~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not the converse.
-For categorical semantics where terms are interpreted as morphisms, an interpretation into a $\PP$-category is able to discriminate these two kinds of identities, enabling us to model intensionality.
+A $\PP$-category has two kinds of equality for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$, where the former is considered as the \emph{intensional equality} and the latter as the \emph{extensional equality}.
+Having two different equalities $=$~and~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not vice versa.
+For categorical semantics, where terms are interpreted as morphisms, an interpretation into a $\PP$-category is able to discriminate these two kinds of equality, enabling us to model intensionality.
+The usual categorical notions such as functors and initiality are up to the intensional equality~$=$\,; when we want to use the notions up to the extensional equality~$\sim$, we will add the `$\PP$-' prefix and say $\PP$-functors, $\PP$-initiality, etc.
 
-We recall the notion of exposures.
-An exposure is like a $\PP$-functor but it does not preserve $\sim$-equality.%
-\hsnote{Some more explanation here}
-Instead, it is faithful with respect to~$\sim$ in the following sense.
+We recall the notion of exposures, which are like ($\PP$-)functors but are intended to `expose' intensional differences at the extensional level: when an exposure is applied to intensionally different morphisms (which may be identified up to the extensional $\sim$-equality in the source $\PP$-category), the resulting morphisms may be distinguished extensionally in the target $\PP$-category.
+Consequently, exposures are not required to preserve $\sim$-equality.
+Moreover, exposures are only supposed to refine the extensional equality and do not eliminate existing extensional differences---that is, they are faithful with respect to~$\sim$.
+The precise definition is as follows.
+
 \begin{definition}
-  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, an \emph{exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ from objects $X$ of $\mathbf{C}$ to objects~$QX$ of $\mathbf{D}$ and \emph{(b)} from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Qf\colon QX \to QY$ satisfying following properties
+  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, an \emph{exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ from objects $X$ of\/ $\mathbf{C}$ to objects~$QX$ of\/ $\mathbf{D}$ and \emph{(b)} from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Qf\colon QX \to QY$ satisfying the following properties:
   \begin{romanenumerate}
     \item $Q\iid_X \sim \iid_{QX}$,
     \item $Q(g \circ f) \sim Qg \circ Qf$, and
@@ -170,7 +171,7 @@ Instead, it is faithful with respect to~$\sim$ in the following sense.
 \end{definition}
 
 
-The \emph{identity exposure} $\mathcal{I}$ maps every object to itself as well as morphisms.
+The \emph{identity exposure} $\mathcal{I}$ maps every object or morphism to itself.
 Composing two exposures in the usual way clearly gives us an exposure. 
 
 %We also need a proper notion of morphisms between exposures below.
@@ -184,10 +185,9 @@ Composing two exposures in the usual way clearly gives us an exposure.
 %  \]
 %  commutes up to the extensional equality~$\sim$.
 %\end{definition}
-We may further define the notion of natural transformations for exposure and comonadic exposures as introduced by Kavvos~\cite{Kavvos2017b} to formulate \SFour modality.
-However, in our framework, we would have to adopt the \emph{oplax} version instead where the naturality only holds up to $\reduce$.
+We may further define the notion of natural transformations for exposures and comonadic exposures as introduced by Kavvos~\cite{Kavvos2017b} to formulate the \SFour modality.
+However, in our framework, we would have to adopt the \emph{oplax} version instead, where the naturality only holds up to $\reduce$.
 We will revisit this issue in~\Cref{sec:provability}.
-\hsnote{$\PP$-terminality/initiality etc}
 
 \section{\texorpdfstring{$\PP$}{P}-Category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
 
@@ -477,7 +477,7 @@ In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\box
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-  It is not hard to prove the $\boxtimes$ preserves identities and composition.
+  It is not hard to prove that $\boxtimes$ preserves identities and composition.
   For example, to see that $\boxtimes$ preserves identities, we observe that
 \[
   \idfunc[\bproj{X}]^\boxtimes (M, x, r) \equiv (\mathtt{x}[M], x, \pr_3\,M\,x\,r) \equiv (M, x, r) \equiv \idfunc[\bproj{\boxtimes X}](M, x, r).
@@ -489,7 +489,7 @@ In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\box
     \boxtimes f(M, x, r) = (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r)
     = (G[M], \bproj{g}\,x, \mathfrak{g}\,M\,x\,r) = \boxtimes g (M, x, r). 
   \]
-  Therefore, we have $\prd{x : \bproj{X}} \to \left(\bproj{f}\,x =_Y \bproj{g}\,x\right)$.
+  Therefore, we have $\prd{x : \bproj{X}} \bproj{f}\,x =_Y \bproj{g}\,x$.
   By function extensionality it then follows that $\left(\bproj{f} =_{\bproj{X} \to \bproj{Y}} \bproj{g}\right) \equiv f \sim g$.
 
   For the families of maps $\boxtimes X \to X$ and $\boxtimes X \to \boxtimes \boxtimes X$ for each $X$, recall that there are terms $\mathtt{eval}$ and $\mathtt{quote}$ which evaluates a code to its representing term and computes the code $\qquote{N}$ of a given term~$N \equiv \qquote{M}$ in the form of code respectively. That is, 
