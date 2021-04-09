@@ -123,7 +123,8 @@ $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms with at mo
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
 By using the de Bruijn representation, $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction.
 Also, for $F : \Lambda_1$ we just write $F[M]$ instead of $F[M/\mathtt{x}]$ for substitution when there is no danger of confusion.
-The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
+The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
+The set $M \reduce M$ has an exactly one inhabitant---the empty sequence understood as (the proof of) the reflexivity~$\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$ if $M$ is clear from the context.
 Note that the type $\Lambda$ of terms has decidable equality, and so does $M \reduce N$, so they are sets by Hedberg's theorem.
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
@@ -507,8 +508,7 @@ They are now straightforward to define.
   \ltnote{discuss K axioms here}
 
   In terms of our $\boxtimes$, there are countably many representations for $\star : \Unit$ in $\boxtimes \top$, so clearly $\boxtimes \top$ is not $\PP$-isomorphic to $\top$. 
-
-  Also, $\boxtimes (X \times Y)$ is not $\PP$-isomorphic to $\boxtimes X \times \boxtimes Y$ by the same reason.
+Also, $\boxtimes (X \times Y)$ is not $\PP$-isomorphic to $\boxtimes X \times \boxtimes Y$ by the same reason.
 
 In particular, the map $\epsilon_X\colon \boxtimes X \to X$ is understood as the evaluation of the intension $M$ to its extension~$x$, as justified by the its tracker~$\mathtt{eval}$.
 One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\epsilon$ and $\delta$ are natural up to~$\sim$ satisfying comonad laws.
@@ -521,9 +521,10 @@ Indeed, observer that for each trackable map $f\colon X \to Y$ the inhabitant
 of type $\boxtimes \boxtimes Y$ is not equal to
 \[
   \delta_Y (\boxtimes f(M, x, r))
-  \equiv \left(\qquote{F[M]}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \mathsf{refl}_{\twoheadrightarrow}\right)
+  \equiv \left(\qquote{F[M]}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \refl_{\twoheadrightarrow}\right)
 \]
-where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$. 
+in spite that their extensions $(F[M], f\,x, \mathfrak{f}\,M\,x\,r)$ are the same
+where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
 Yet we may consider the reduction relation $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$ as a partial order, then we have $\boxtimes \boxtimes f \circ \delta_X \leq \delta_Y \circ \boxtimes f$.
 That is, $\delta$ is a \emph{lax natural transformation} up to $\sim$.
 \end{remark}
@@ -531,7 +532,6 @@ That is, $\delta$ is a \emph{lax natural transformation} up to $\sim$.
 The above remark suggests a theory on categories enriched not by $\PP$-sets but \emph{partially ordered $\PP$-sets}, which is beyond the scope of this paper, so we refrain ourselves from further discussion.
 
 \begin{remark} \label{remark:difference-boxtimes}
-\ltnote{$\boxtimes$ is not cartesian and not product-preserving. Moreover $\boxtimes_K \Nat$ is not isomorphic ot $\Nat$.}
   The exposure $\boxtimes_K$ is defined for assemblies on a PCA with the carrier and the realisability relation given by
   \[
     \bproj{\boxtimes_K X} \defeq \{\,(M, x) \mid M \Vdash x \,\}
@@ -541,36 +541,52 @@ The above remark suggests a theory on categories enriched not by $\PP$-sets but 
   without the Gödel encoding. 
   It gives rise to not only an exposure but also a comonadic exposure.
   Moreover $\boxtimes_K$ preserves finite products including the terminal object $\top$.
+  Preserving finite products are considered \emph{unsatisfactory} because intensions, i.e.\ elements of a PCA, are subject to certain equations already as some of different representations are already identified on the level of PCA.
+  By taking $\lambda$-terms only subject to $\alpha$-equivalence as realisers, we are able to distinguish more extensionally equivalent but intensionally different inhabitants.
+
 \hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
 
 \end{remark}
 
-The following theorem is another difference between $\boxtimes_K$ and $\boxtimes$.
 \begin{theorem}\label{thm:S4-no-quoting}
-  There is no natural transformation from the identity $\mathcal{I}$ to $\boxtimes$.
+  \ltnote{can we weaken the premise? Use oplax naturality instead of ordinary naturality?}
+  There is no family of trackable maps from $X$ to $\boxtimes X$ indexed by assemblies~$X$ satisfying the commutative diagram
+  \begin{equation} \label{eq:naturality-quoting}
+    \xymatrix{
+      X \ar[r]^{\eta_X} \ar[d]_{f} & \boxtimes \ar[d]^{\boxtimes f} Y \\
+      Y \ar[r]_{\eta_Y} & \boxtimes X
+    }
+  \end{equation}
+  up to~$\sim$ for each trackable map $f\colon X \to Y$.
 \end{theorem}
 We show the existence of such a natural transformation implies the existence of a term $\mathsf{quote}'$ with $\mathsf{quote}'[M] \reduce \qquote{M}$ using naturality and the fact that $\Lambda_0$ itself has an assembly structure (\Cref{ex:assembly-lambda}), but $\Quote'$ cannot exist as discussed in \Cref{subsec:godel}.
 \begin{proof}
   Assume that such a family of maps $\eta_X\colon X \to \boxtimes X$ natural in $X$ exist.
-  Every closed term $M_0$ corresponds to a trackable map $\widehat{M_0} \defeq (\mathsf{c}_{M_0}, M_0, \mathfrak{M}_0) \colon \top \to \Lambda$ where $\mathsf{c}_{M_0}$ is the constant function with the value $M_0$ and $\mathfrak{M}_0$ is also the constant function with the value $\mathsf{refl}_{\twoheadrightarrow} M_0 : M_0 \reduce M_0$.
-  \ltnote{it does not have to be a constant function}
-  Consider the naturality of $\eta$
-  \[
-    \xymatrix{
-      \top \ar[r]^{\eta_\top} \ar[d]_{\widehat{M_0}} & \boxtimes \ar[d]^{\boxtimes \widehat{M_0}} \top \\
-      \Lambda \ar[r]_{\eta_\Lambda} & \boxtimes \Lambda
-    }
-  \]
-  which commutes up to $\sim$, namely, ${\eta_\Lambda \circ \widehat{M_0}} \sim {\boxtimes \widehat{M_0} \circ \eta_\top}$.
-  Note that $\boxtimes \widehat{M_0}$ maps an arbitrary inhabitant of $\boxtimes \top$ to $(M_0, M_0, \bproj{\mathsf{refl}_{\twoheadrightarrow}M_0})$ so that $\bproj{\eta}$ must satisfy 
-\[
-  \bproj{\eta_\Lambda}\,M_0 \equiv \left(\bproj{\eta_\Lambda} \circ \widehat{M_0}\right)\,\star = \left(\boxtimes \widehat{M_0} \circ \eta_\top \right)\,\star \equiv (M_0, M_0, \bproj{\mathsf{refl}_{\twoheadrightarrow}M_0}).
-\]
+  Every closed term $M_0$ corresponds to a trackable map $\widehat{M_0} \defeq (\mathsf{c}_{M_0}, M_0, \mathfrak{M}_0) \colon \top \to \Lambda$ where $\mathsf{c}_{M_0}$ is the constant function with the value $M_0$ and $\mathfrak{M}_0$ is propositionally equal to the constant function with the value $\refl_{\twoheadrightarrow} : M_0 \reduce M_0$.
+  Consider the naturality~\eqref{eq:naturality-quoting}, that is, ${\eta_\Lambda \circ \widehat{M_0}} \sim {\boxtimes \widehat{M_0} \circ \eta_\top}$ when $f = \widehat{M_0}$.
+  Note that $\boxtimes \widehat{M_0}$ maps an arbitrary inhabitant of $\boxtimes \top$ to $(M_0, M_0, \refl_{\twoheadrightarrow})$ so that $\bproj{\eta}$ must satisfy that for each trackable map $f$ 
+  \begin{equation} \label{eq:naturality-at-lambda}
+    \bproj{\eta_\Lambda}\,M_0 \equiv \left(\bproj{\eta_\Lambda} \circ \widehat{M_0}\right)\,\star = \left(\boxtimes \widehat{M_0} \circ \eta_\top \right)\,\star \equiv (M_0, M_0, \refl_{\twoheadrightarrow}).
+  \end{equation}
 By assumption, $\eta_\Lambda$ is tracked by some term $\mathtt{quote}'$ with $\mathtt{quote}'[N] \reduce \qquote{M}$ whenever $N \reduce M$.
 However, it implies that $\mathtt{quote}'[M] \reduce \qquote{M}$ for any $M$, a contradiction.
 \end{proof}
+\begin{remark}
+  The above theorem can be further strengthened by weakening the naturality.
+  Indeed, if we only require $\eta$ to satisfy
+  \[
+    \boxtimes f \circ \eta_X (x) \leq \eta_Y \circ f (x)
+  \]
+  where $(M, x, r) \leq (N, y, s)$ holds if $x = y$ and $M \reduce N$. 
+  Then reconsider~\eqref{eq:naturality-at-lambda} with $M_0 = \mathtt{I}$ and $\mathtt{I I}$.
+  By assumption $\bproj{\eta_\Lambda}\,\mathtt{I} = (N , \mathtt{I}, r) \geq (\mathtt{I}, \mathtt{I}, \refl_{\twoheadrightarrow})$ so that $\mathtt{I} \reduce N$ and thus $N =_\alpha \mathtt{I}$. 
+  Similarly, one can show that $\bproj{\eta_\Lambda}\,(\mathtt{I}\,\mathtt{I}) = (\mathtt{I}\,\mathtt{I}, \mathtt{I}\,\mathtt{I}, \refl_{\twoheadrightarrow})$.
+  Then, we can proceed with the same argument in \Cref{subsec:godel} to show that the tracker of $\eta_\Lambda$ cannot exist.
+  
+\end{remark}
 
-\ltnote{can $\mathcal{I} \to \boxtimes_K$ be refutable?}
+It is unclear if there is any way to prove the above theorem without resorting to the non-existence of $\Quote'$ in $\lambda$-calculus and naturality.
+Likewise, it remains unclear to us if the existence of a natural transformation $\mathcal{I} \to \boxtimes_K$ can be refuted.
 
 
 \begin{remark}\label{remark:S4-modality}
@@ -695,10 +711,11 @@ Similar to~\Cref{thm:S4-no-quoting}, there is no family of trackable maps $\eta_
 
 On the other hand, it is not possible to have a family of trackable maps $\epsilon_X$ from $\Box^\kappa X$ to $X$ natural in $X$, since the extension part of an inhabitant of $\Box^\kappa X$ can only be projected in a time step away from now.
 \begin{theorem}\label{thm:GL-no-eval}
-  There is no natural transformation from $\Box^\kappa$ to $\mathcal{I}$ for any clock $\kappa$.
+  There is no family of trackable maps $\Box^\kappa X$ to $X$ indexed by assemblies~$X$ for any clock $\kappa$.
 \end{theorem}
 \begin{proof}
-  Assume such a natural transformation~$\epsilon$. In particular, consider $\epsilon_\bot \colon \Box^\kappa \bot \to \bot$. 
+  Assume such a family $\epsilon_X : \Box^\kappa X \to X$ exists.
+  In particular, consider $\epsilon_\bot \colon \Box^\kappa \bot \to \bot$. 
   We will show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by guarded recursion $\mathsf{fix}\,\mathsf{bang} : \Empty$ is a contradiction.
   
   First, let $x$ be an inhabitant of $\laterp \Empty$. We construct an inhabitant $(M, x, r)$ of
@@ -735,19 +752,19 @@ given by the Second Recursion Theorem.
   \begin{enumerate}
     \item First,
       $\laterp(\alpha : \kappa).\left( \mathsf{fix}\,F \Vdash x [\alpha]\right)$ has an inhabitant, say $r'$, since $\mathsf{fix}\,F$ reduces to $F[\,\qquote{\mathsf{fix}\,F}\,]$. 
-    \item Then, we derive an inhabitant of type $\bproj{X}$ realised by~$F[\qquote{\mathsf{fix}\,F}$:
+    \item Then, we derive an inhabitant of type $\bproj{X}$ realised by~$F[\qquote{\mathsf{fix}\,F}$ as witnessed by
       \[
-        \mathfrak{f} (\mathsf{refl}_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
+        \mathfrak{f} (\refl_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
       \]
-      by the fact that $F$ tracks $\bproj{f}$ and the realisability $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is judgementally equal to $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$.
+    since $F$ tracks $\bproj{f}$ and the set $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is judgementally equal to $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$ which is inhabited by~$\refl_\twoheadrightarrow$.
 
     \item By Löb induction, the type $\sm{x : \laterp \bproj{X}} \laterp (\alpha : \kappa).\, F[\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ has an inhabitant~$(x_0, r_0)$.
   \end{enumerate}
   Therefore $(F[\qquote{\mathsf{fix}\,F}], x_0, r_0)$ is an inhabitant of $\Box^\kappa X$ which evidently is realised by $\qquote{F[\qquote{\mathsf{fix}\,F}]}$ and thus by \Cref{lem:global-elemnt} it gives rise to a global element~$f^\dagger$ of $\Box X$, concluding our proof.
 \end{proof}
 
-We may wish to prove further that the global element $f^\dagger$ is indeed a fixpoint of $f$ in the sense that $f^\dagger \sim \Box(f \circ f^\dagger) \circ \bigstar$ mimicking Kavvos' Definition~\cite[Definition~5.29]{Kavvos2020} where $\bigstar : \top \to \Box \top$ is a global element of $\Box \top$ given by $\star : \Unit$ and its realiser $\lambda \mathtt{x}.\,\mathtt{x}$ using~\Cref{lem:global-elemnt}.
-This extensional equality, however, violates in our framework as they have different intensions ($\mathsf{fix}\,F$ versus $F[\qquote{\mathsf{fix}\,F}]$) in spite that their extensions are the same (see below).
+We may wish to prove further that the global element $f^\dagger$ is indeed a fixpoint of $f$ in the sense that $f^\dagger \sim \Box(f \circ f^\dagger) \circ \bigstar$ in line with Kavvos' definition~\cite[Definition~5.29]{Kavvos2020} where $\bigstar : \top \to \Box \top$ is a global element of $\Box \top$ given by $\star : \Unit$ and its realiser $\lambda \mathtt{x}.\,\mathtt{x}$ using~\Cref{lem:global-elemnt}.
+This extensional equality, however, does not hold as they have different intensions ($\mathsf{fix}\,F$ versus $F[\qquote{\mathsf{fix}\,F}]$) in spite that their extensions are the same (see below).
 This situation echoes the discussion of~\Cref{remark:difference-boxtimes}.
 
 \begin{proposition}
