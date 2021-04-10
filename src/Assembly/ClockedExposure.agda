@@ -38,9 +38,9 @@ open CloExpo
 record NaturalTransformation (P Q : CloExpo 𝓤) : 𝓤 ⁺ ̇ where
   constructor _,_
   field
-    fun        : (k : Cl) → Trackable (P .obj k X) (Q .obj k X) 
-    naturality : (k : Cl) → {X Y : Asm 𝓤} → (f : Trackable X Y)
-      → (fun k) ∘ P .map k f ∼ Q .map k f ∘ (fun k)
+    fun        : (k : Cl) → (X : Asm 𝓤) → Trackable (P .obj k X) (Q .obj k X) 
+    naturality : {k : Cl} → {X Y : Asm 𝓤} → (f : Trackable X Y)
+      → (fun k Y) ∘ P .map k f ∼ Q .map k f ∘ (fun k X)
 
 Id : CloExpo 𝓤
 Id = exposure (λ _ X → X) (λ _ f → f) record

@@ -1,4 +1,4 @@
-{-# OPTIONS --guarded #-}
+{-# OPTIONS --cubical --guarded #-}
 
 module Assembly.GL where
 
@@ -119,14 +119,11 @@ module _ (Q : Quoting) where
   quoting-does-not-exist : Cl → (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
   quoting-does-not-exist k′ (fun , naturality) = quoting′-not-definable (QΛ k′ , QΛ-is-quoting k′)
     where
-      qQ-at-Λ : (k : Cl) → Trackable Λ₀ₐ (□ k Λ₀ₐ)
-      qQ-at-Λ k = fun k
+      qQ-at-Λ = λ (k : Cl) → fun k Λ₀ₐ
+      qQ-at-⊤ = λ (k : Cl) → fun k ⊤ₐ
 
       qΛ = λ (k : Cl) → qQ-at-Λ k .fst
       QΛ = λ (k : Cl) → HasTracker.F (qQ-at-Λ k .snd)
-
-      qQ-at-⊤ : (k : Cl) → Trackable ⊤ₐ (□ k ⊤ₐ)
-      qQ-at-⊤ k = fun k
      
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ k [ N ] -↠ ⌜ qΛ k M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (qQ-at-Λ _ .snd) 
@@ -136,7 +133,7 @@ module _ (Q : Quoting) where
         qΛ k M
           ≡⟨ refl ⟩
         qΛ k (*→Λ M .fst _)
-          ≡⟨ naturality k (*→Λ M) _ ⟩
+          ≡⟨ naturality (*→Λ M) _ ⟩
         □map k (*→Λ M) .fst (qQ-at-⊤ k .fst tt*)
           ≡⟨ refl ⟩
         ↑₁ M [ _ ]  , next M , (λ α → s α)
@@ -158,7 +155,6 @@ module _ (Q : Quoting) where
         ≡[ i ]⟨ ⌜ lem k M i .fst  ⌝ ⟩
         ⌜ M ⌝ ∎
         where open -↠-Reasoning
-
 
   _† : Trackable (□ k X) X
     → Trackable ⊤ₐ (□ k X)

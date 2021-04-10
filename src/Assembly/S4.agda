@@ -80,12 +80,13 @@ module _ (Q : Quoting) where
     where
       module X = AsmStr (str X)
 
-  ⊠-isExposure : IsExposure 𝓤 ⊠_  ⊠map
-  ⊠-isExposure = record
-    { preserve-id   = ⊠id=id
-    ; preserve-comp = ⊠gf=⊠g⊠f
-    ; reflects-∼    = ⊠reflects∼
-    }
+  abstract 
+    ⊠-isExposure : IsExposure 𝓤 ⊠_  ⊠map
+    ⊠-isExposure = record
+      { preserve-id   = ⊠id=id
+      ; preserve-comp = ⊠gf=⊠g⊠f
+      ; reflects-∼    = ⊠reflects∼
+      }
 
   ⊠-exposure : Exposure 𝓤
   ⊠-exposure = exposure ⊠_ ⊠map ⊠-isExposure
@@ -166,7 +167,7 @@ module _ (Q : Quoting) where
   quoting′-does-not-exist : (q : NaturalTransformation 𝓤₀ Id ⊠-exposure) → ⊥
   quoting′-does-not-exist (fun , naturality) = quoting′-not-definable (QΛ , QΛ-is-quoting)
     where
-      q-at-Λ : Trackable Λ₀ₐ (⊠ Λ₀ₐ)
+      qQ-at-⊤ = fun ⊤ₐ
       q-at-Λ = fun Λ₀ₐ
 
       qΛ : Λ₀ → Σ[ N ∶ Λ₀ ] Σ[ M ∶ Λ₀ ] N -↠ M
@@ -174,8 +175,6 @@ module _ (Q : Quoting) where
 
       QΛ = HasTracker.F (q-at-Λ .snd)
 
-      qQ-at-⊤ : Trackable ⊤ₐ (⊠ ⊤ₐ)
-      qQ-at-⊤ = fun ⊤ₐ
 
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (q-at-Λ .snd) 
