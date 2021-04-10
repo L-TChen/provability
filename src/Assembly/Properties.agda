@@ -107,8 +107,8 @@ module Final {X : Asm 𝓤} where
   separator : (f g : Trackable X Y)
     → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x)
     → f ∼ g
-  separator {Y = Y} (f , _) (g , _) fx=gx x = rec
-    ((Y is-set) (f x) (g x)) (λ { (M , r) → fx=gx (global-element M x r) _ })
+  separator {Y = Y} f g fx=gx x = rec
+    ((Y is-set) (f .fst x) (g .fst x)) (λ { (M , r) → fx=gx (global-element M x r) _ })
     (X.⊩-right-total x)
     where
       module Y = AsmStr (str Y)
@@ -140,10 +140,10 @@ module Initial (X : Asm 𝓤) where
   universality = ⊥*-elim , 0 , (λ { {x = ()} })
 
   strict : (f : Trackable X ⊥ₐ) → AsmIso X ⊥ₐ f
-  strict (f , F , F⊩f) = ∣ universality , (λ ()) , (λ x → ⊥*-elim (transport ⊥=X x)) ∣
+  strict f = ∣ universality , (λ ()) , (λ x → ⊥*-elim (transport ⊥=X x)) ∣
     where
       ⊥=X : ⟨ X ⟩ ≡ ⊥*
-      ⊥=X = ua (strict-initial f)
+      ⊥=X = ua (strict-initial (f .fst))
     
 ------------------------------------------------------------------------------
 -- Product

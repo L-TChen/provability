@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guarded #-}
+{-# OPTIONS --guarded #-}
 
 module Assembly.GL where
 
@@ -21,28 +21,27 @@ module _ (Q : Quoting) where
   open Quoting Q
 
   □ : (k : Cl) → Asm 𝓤 → Asm 𝓤
-  □ {𝓤} k X@((|X| , XisSet) , _ , _) = (|□X| , isSet□X) , _⊩_ , record
+  □ {𝓤} k ((|X| , XisSet) , Xstr) = (|□X| , isSet□X) , _⊩_ , record
     { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respect-↠ {x} {x′} {y}
     ; ⊩-right-total = ⊩-right-total
     ; ⊩-isSet       = isOfHLevelLift 2 -↠isSet 
     }
     where
-      module X = AsmStr (str X)
+      module X = AsmStr Xstr
       |□X| : 𝓤 ̇
-      |□X| = Σ[ M ∶ Λ₀ ] Σ[ ▹x ∶ ▹ k ⟨ X ⟩ ] ▹[ α ∶ k ] M X.⊩ ▹x α
-      -- Can we remove truncation? Yes.
+      |□X| = Σ[ M ∶ Λ₀ ] Σ[ ▹x ∶ ▹ k |X| ] ▹[ α ∶ k ] M X.⊩ ▹x α
       
       isSet□X : isSet |□X|
-      isSet□X = isSetΣ ≟→isSet λ _ → isSetΣ (▹isSet→isSet▹ (λ _ → X is-set)) (λ _ → ▹isSet→isSet▹ (λ α → X.⊩-isSet))
+      isSet□X = isSetΣ ≟→isSet λ _ → isSetΣ (▹isSet→isSet▹ (λ _ → XisSet)) (λ _ → ▹isSet→isSet▹ (λ α → X.⊩-isSet))
 
       _⊩_ : (M : Λ₀) → |□X| → 𝓤 ̇
-      n̅ ⊩ (M , _ , _)= Lift (n̅ -↠ ⌜ M ⌝)
+      n̅ ⊩ (M , _)= Lift (n̅ -↠ ⌜ M ⌝)
 
       ⊩-respect-↠ : _⊩_ respects _-↠_ on-the-left
-      ⊩-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
+      ⊩-respect-↠ M-↠N N-↠⌜L⌝ = lift (-↠-trans M-↠N (lower N-↠⌜L⌝))
       
       ⊩-right-total :  _⊩_ IsRightTotal
-      ⊩-right-total (M , ▹x , M⫣x) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
+      ⊩-right-total (M , _) = ∣ ⌜ M ⌝ , lift -↠-refl ∣
 
   □map₀ : Trackable X Y → ⟨ □ k X ⟩ → ⟨ □ k Y ⟩
   □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , ▹map f x , λ α → F⊩f (M⊩x α) 
@@ -51,12 +50,12 @@ module _ (Q : Quoting) where
   □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
 
   □map : (k : Cl) → Trackable X Y → Trackable (□ k X) (□ k Y)
-  □map {𝓤} {X} {Y} _ Ff@(f , F , f⫣F) = □map₀ Ff , □map₁ F , 
+  □map {𝓤} {X} {Y} _ Ff@(f , F , _) = □map₀ Ff , □map₁ F , 
     λ {M} {x} → □F⊩□f {_} {M} {x}
     where
       open -↠-Reasoning
       □F⊩□f : Tracks (□ k X) (□ k Y) (□map₁ F) (□map₀ Ff)
-      □F⊩□f {_} {n̅} {M , _ , _} (lift n̅-↠⌜M⌝) = lift (begin
+      □F⊩□f {_} {n̅} {M , _} (lift n̅-↠⌜M⌝) = lift (begin
         ↑₁ Sub [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
           ≡[ i ]⟨ subst-rename-∅ {ρ = fsuc} (subst-zero n̅) Sub i · subst-rename-∅ {ρ = fsuc} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
         Sub · ⌜ F ⌝ · n̅
@@ -66,7 +65,7 @@ module _ (Q : Quoting) where
         ⌜ F [ M ] ⌝ ∎)
 
   □id=id : (X : Asm 𝓤) → (x : ⟨ □ k X ⟩) → □map₀ (id X) x ≡ x
-  □id=id X (M , x , M⊩x) i = M , x , M⊩x
+  □id=id X Mxr = refl
 
   □gf=□g□f : {X Y Z : Asm 𝓤} (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ □ k X ⟩) → □map₀ (g ∘ f) x ≡ □map₀ g (□map₀ f x)
   □gf=□g□f {Z = Z} (f , F , F⊩f) (g , G , G⊩g) (M , x , r) i = G[F[M]]=G[F][M] i , ▹map g (▹map f x) , λ α →
@@ -111,7 +110,7 @@ module _ (Q : Quoting) where
 
   -- Theorem. Evaluation □ ⊥ → ⊥ does not exist.
   eval-does-not-exist : Trackable {𝓤} (□ k ⊥ₐ) ⊥ₐ → ⊥*
-  eval-does-not-exist (e , hasTracker) = fix (bang e)
+  eval-does-not-exist e = fix (bang (e .fst))
 
   -- Theorem: There is no natural transformation q : I ⇒ □.
   -- Proof sketch: By naturality, qΛ is determined by its component at the terminal object ⊤ₐ. 
@@ -119,6 +118,7 @@ module _ (Q : Quoting) where
   quoting-does-not-exist : Cl → (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
   quoting-does-not-exist k′ (fun , naturality) = quoting′-not-definable (QΛ k′ , QΛ-is-quoting k′)
     where
+      -- qQ-at-Λ : (k : Cl) → Trackable Λ₀ₐ (□ k Λ₀ₐ)
       qQ-at-Λ = λ (k : Cl) → fun k Λ₀ₐ
       qQ-at-⊤ = λ (k : Cl) → fun k ⊤ₐ
 
@@ -174,7 +174,7 @@ module _ (Q : Quoting) where
       fixf = dfixΣ h .fst , fold (dfixΣ h .fst) (dfixΣ h .snd)
 
   □′ : (k : Cl) → Asm 𝓤 → Asm 𝓤
-  □′ {𝓤} k X@((|X| , XisSet) , _ , _) = (|□X| , isSet□X) , _⊩_ , record
+  □′ {𝓤} k X = (|□X| , isSet□X) , _⊩_ , record
     { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respect-↠ {x} {x′} {y}
     ; ⊩-right-total = ⊩-right-total
     ; ⊩-isSet       = isOfHLevelLift 2 -↠isSet 
@@ -198,11 +198,11 @@ module _ (Q : Quoting) where
 
   □′map₀ : Trackable X Y
     → ⟨ □′ k X ⟩ → ⟨ □′ k Y ⟩
-  □′map₀ f@(|f| , F , F⊩f) (M , x) = F [ M ] , λ α → |f| (x α .fst) , F⊩f (x α .snd)
+  □′map₀ (|f| , F , F⊩f) (M , x) = F [ M ] , λ α → |f| (x α .fst) , F⊩f (x α .snd)
       
   _†′ : Trackable (□′ k X) X
      → Trackable ⊤ₐ       (□′ k X)
-  _†′ {k} {_} {X} f@(|f| , F , F⊩f) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf′) (lift -↠-refl)
+  _†′ {k} {_} {X} (|f| , F , F⊩f) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf′) (lift -↠-refl)
     where
       module X  = AsmStr (str X)
 

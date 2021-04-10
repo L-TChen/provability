@@ -126,15 +126,14 @@ record SetWithStr (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) : 𝓥 ⊔ 𝓤 �
     structure : S (fst carrier)
 
 ⟨_⟩ : {S : 𝓤 ̇ → 𝓥 ̇} → SetWithStr 𝓤 S → 𝓤 ̇
-⟨ (X , _) , _ ⟩ = X
+⟨ X ⟩ = SetWithStr.carrier X .fst
 
 str : {S : 𝓤 ̇ → 𝓥 ̇} → (X : SetWithStr 𝓤 S) → S ⟨ X ⟩
 str (X , s) = s
 
 _is-set : {S : 𝓤 ̇ → 𝓥 ̇}
   → (X : SetWithStr 𝓤 S) → isSet ⟨ X ⟩
-((_ , p) , _) is-set = p
-
+(X , _) is-set = X .snd
 
 Rel : 𝓤 ̇ → 𝓥 ̇ → (𝓤 ⊔ 𝓥) ⁺ ̇
 Rel {𝓤} {𝓥} A B = A → B → (𝓤 ⊔ 𝓥) ̇ 

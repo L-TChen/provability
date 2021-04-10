@@ -29,16 +29,15 @@ module _ (Q : Quoting) where
 
       isSet⊠X : isSet |⊠X|
       isSet⊠X = isSetΣ (Discrete→isSet _≟_) λ M → isSetΣ XisSet λ _ → X.⊩-isSet
-      -- Can we remove truncation? Yes.
 
       _⊩⊠X_ : (M : Λ₀) → |⊠X| → 𝓤 ̇
-      n̅ ⊩⊠X (M , _ , _) = Lift (n̅ -↠ ⌜ M ⌝)
+      n̅ ⊩⊠X (M , _) = Lift (n̅ -↠ ⌜ M ⌝)
 
       ⊩⊠X-respect-↠ : _⊩⊠X_ respects _-↠_ on-the-left
-      ⊩⊠X-respect-↠ M-↠N (lift N-↠⌜L⌝) = lift (-↠-trans M-↠N N-↠⌜L⌝)
+      ⊩⊠X-respect-↠ M-↠N N-↠⌜L⌝ = lift (-↠-trans M-↠N (lower N-↠⌜L⌝))
    
       ⊩⊠X-right-total :  _⊩⊠X_ IsRightTotal
-      ⊩⊠X-right-total (M , _ , M⫣x) = ∣ ⌜ M ⌝ , lift (⌜ M ⌝ _-↠_.∎) ∣
+      ⊩⊠X-right-total (M , _)  = ∣ ⌜ M ⌝ , lift (⌜ M ⌝ _-↠_.∎) ∣
 
   ⊠map₀ : {X Y : Asm 𝓤} → Trackable X Y → ⟨ ⊠ X ⟩ → ⟨ ⊠ Y ⟩
   ⊠map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , f x , F⊩f M⊩x
@@ -47,12 +46,12 @@ module _ (Q : Quoting) where
   ⊠map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
 
   ⊠map : {X Y : Asm 𝓤} → Trackable X Y → Trackable (⊠ X) (⊠ Y)
-  ⊠map {𝓤} {X} {Y} Ff@(f , F , f⫣F) = ⊠map₀ Ff , ⊠map₁ F , 
+  ⊠map {𝓤} {X} {Y} Ff@(f , F , _) = ⊠map₀ Ff , ⊠map₁ F , 
     λ {M} {x} → ⊠F⊩⊠f {M} {x}
     where
       open -↠-Reasoning
       ⊠F⊩⊠f : Tracks (⊠ X) (⊠ Y) (⊠map₁ F) (⊠map₀ Ff)
-      ⊠F⊩⊠f {n̅} {M , _ , _} (lift n̅-↠⌜M⌝) = lift (begin
+      ⊠F⊩⊠f {n̅} {M , _} (lift n̅-↠⌜M⌝) = lift (begin
         ↑₁ Sub [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
           ≡[ i ]⟨ subst-rename-∅ {ρ = fsuc} (subst-zero n̅) Sub i · subst-rename-∅ {ρ = fsuc} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
         Sub · ⌜ F ⌝ · n̅
@@ -62,7 +61,7 @@ module _ (Q : Quoting) where
         ⌜ F [ M ] ⌝ ∎)
 
   ⊠id=id : (X : Asm 𝓤) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (id X) x ≡ x
-  ⊠id=id X x = refl
+  ⊠id=id X Mxr = refl
 
   ⊠gf=⊠g⊠f : {X Y Z : Asm 𝓤} (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (g ∘ f) x ≡ ⊠map₀ g ( ⊠map₀ f x)
   ⊠gf=⊠g⊠f {𝓤} {Z = Z} (f , F , F⊩f) (g , G , G⊩g) (M , x , r) i =
@@ -141,8 +140,8 @@ module _ (Q : Quoting) where
       module Y = AsmStr (str Y)
 
   eval : (X : Asm 𝓤) → Trackable (⊠ X) X
-  eval X = (λ x → fst (snd x)) , Eval ,
-    λ { {N} {M , x , M⊩x} N-↠⌜M⌝ →
+  eval X  = (λ x → fst (snd x)) , Eval ,
+    λ { {_} {_ , _ , M⊩x} N-↠⌜M⌝ →
       X.⊩-respects-↠ (reduce-ssubst Eval (lower N-↠⌜M⌝)) ((X.⊩-respects-↠ Eval-↠ M⊩x)) }
     where
       module X  = AsmStr (str X)
@@ -168,13 +167,12 @@ module _ (Q : Quoting) where
   quoting′-does-not-exist (fun , naturality) = quoting′-not-definable (QΛ , QΛ-is-quoting)
     where
       qQ-at-⊤ = fun ⊤ₐ
-      q-at-Λ = fun Λ₀ₐ
+      q-at-Λ  = fun Λ₀ₐ
 
       qΛ : Λ₀ → Σ[ N ∶ Λ₀ ] Σ[ M ∶ Λ₀ ] N -↠ M
       qΛ = q-at-Λ .fst
 
       QΛ = HasTracker.F (q-at-Λ .snd)
-
 
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (q-at-Λ .snd) 
@@ -200,11 +198,11 @@ module _ (Q : Quoting) where
               (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎
 
   forgetful : {X : Asm 𝓤₀} → Trackable (⊠ X) (⊠ Λ₀ₐ)
-  forgetful = (λ { (M , _ , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)
+  forgetful = (λ { (M , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)
 
   Λ-map : {X Y : Asm 𝓤₀} → Trackable X Y → Trackable (⊠ Λ₀ₐ) (⊠ Λ₀ₐ)
-  Λ-map (f , F , F⊩f) = (λ { (M , N , r) → F [ M ] , F [ N ] , reduce-ssubst F r }) ,
-    ↑₁ Sub · (↑₁ ⌜ F ⌝) · 0 , λ { {M} {N , _ , _} (lift M-↠N) → lift (begin
+  Λ-map (f , F , _) = (λ { (M , N , r) → F [ M ] , F [ N ] , reduce-ssubst F r }) ,
+    ↑₁ Sub · (↑₁ ⌜ F ⌝) · 0 , λ { {M} {N , _} (lift M-↠N) → lift (begin
       (↑₁ Sub · (↑₁ ⌜ F ⌝) · 0) [ M ]
         ≡⟨ refl ⟩
       (↑₁ Sub) [ M ] · (↑₁ ⌜ F ⌝) [ M ] · M
