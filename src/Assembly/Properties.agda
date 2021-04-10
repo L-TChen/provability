@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical #-}
-
 module Assembly.Properties where
 
 open import Prelude as 𝓤
@@ -70,7 +68,7 @@ id-∘ {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , F , λ {M} {x} r → lem
     M ⊩ n = M -↠ 𝒄 n
 
 -- Proposition: The set Λ₀ of lambda terms is equipped with an assembly structure.
-Λ₀ₐ : Asm 𝓤₀
+Λ₀ₐ : Asm₀
 Λ₀ₐ = (Λ₀ , ≟→isSet) , (λ M N → M -↠ N) , record
   { ⊩-respects-↠  = -↠-trans
   ; ⊩-right-total = λ M → ∣ M , -↠-refl ∣
@@ -109,8 +107,8 @@ module Final {X : Asm 𝓤} where
   separator : (f g : Trackable X Y)
     → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x)
     → f ∼ g
-  separator {Y = Y} f g fx=gx x = rec
-    ((Y is-set) (f .fst x) (g .fst x)) (λ { (M , r) → fx=gx (global-element M x r) _ })
+  separator {Y = Y} (f , _) (g , _) fx=gx x = rec
+    ((Y is-set) (f x) (g x)) (λ { (M , r) → fx=gx (global-element M x r) _ })
     (X.⊩-right-total x)
     where
       module Y = AsmStr (str Y)

@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical #-}
-
 module Assembly.Base where
 
 open import Prelude as 𝓤
@@ -53,6 +51,12 @@ record HasTracker (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) : 𝓤 ̇ where
 --HasTracker : (X Y : Asm 𝓤) (f : ⟨ X ⟩ → ⟨ Y ⟩) → 𝓤 ̇
 --HasTracker X Y f = Σ[ F ∶ Λ₁ ] Tracks X Y F f
 
+--record Trackable (X Y : Asm 𝓤) : 𝓤 ̇ where
+--  constructor _,_
+--  field
+--    f          : ⟨ X ⟩ → ⟨ Y ⟩
+--    hasTracker : HasTracker X Y f
+
 Trackable : (X Y : Asm 𝓤) → 𝓤 ̇
 Trackable X Y = Σ[ f ∶ ⟨ X ⟩ ➝ ⟨ Y ⟩ ] HasTracker X Y f
 
@@ -72,13 +76,13 @@ record isPER {X : 𝓤 ̇} (_∼_ : Rel X X) : 𝓤 ⁺ ̇ where
     is-prop : (x y : X) → isProp (x ∼ y)
       
 ∼-eq : (X Y : Asm 𝓤) → (f g : Trackable X Y) → 𝓤 ̇
-∼-eq X Y (f , _) (g , _) = ∀ x → f x ≡ g x
+∼-eq X Y f g = (x : ⟨ X ⟩) → f .fst x ≡ g .fst x
 
 ∼-syntax : {X Y : Asm 𝓤} → (f g : Trackable X Y) → 𝓤 ̇
 ∼-syntax {X = X} {Y = Y} f g = ∼-eq X Y f g
 
 infix 4 ∼-syntax
-syntax ∼-syntax f g = f ∼ g 
+syntax ∼-syntax f g = f ∼ g
 
 ∼-isProp : (f g : Trackable X Y) → isProp (∼-eq X Y f g)
 ∼-isProp {X = X} {Y} (f , _ , _) (g , _ , _) = isPropΠ λ _ → (Y is-set) _ _

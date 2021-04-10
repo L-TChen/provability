@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical #-}
-
 module Calculus.Untyped where
 
 open import Calculus.Untyped.Base         public

@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical #-}
-
 module Calculus.Untyped.Substitution where
 
 open import Prelude

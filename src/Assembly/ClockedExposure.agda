@@ -34,14 +34,13 @@ record CloExpo (𝓤 : Universe) : 𝓤 ⁺ ̇ where
     isExposure : IsCloExpo obj map
 open CloExpo
 
-Naturality : {k : Cl} → (P Q : CloExpo 𝓤) → ({X : Asm 𝓤} → Trackable (P .obj k X) (Q .obj k X)) → 𝓤 ⁺ ̇
-Naturality {𝓤} {k} P Q fun = {X Y : Asm 𝓤} → (f : Trackable X Y) → (fun {Y}) ∘ P .map k f ∼ Q .map k f ∘ (fun {X})
 
 record NaturalTransformation (P Q : CloExpo 𝓤) : 𝓤 ⁺ ̇ where
   constructor _,_
   field
     fun        : (k : Cl) → Trackable (P .obj k X) (Q .obj k X) 
-    naturality : (k : Cl) → Naturality P Q (fun k)
+    naturality : (k : Cl) → {X Y : Asm 𝓤} → (f : Trackable X Y)
+      → (fun k) ∘ P .map k f ∼ Q .map k f ∘ (fun k)
 
 Id : CloExpo 𝓤
 Id = exposure (λ _ X → X) (λ _ f → f) record

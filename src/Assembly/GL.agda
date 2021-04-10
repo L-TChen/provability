@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --cubical --guarded #-}
+{-# OPTIONS --guarded #-}
 
 module Assembly.GL where
 

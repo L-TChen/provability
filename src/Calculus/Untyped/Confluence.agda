@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical --no-import-sorts #-}
-
 module Calculus.Untyped.Confluence where
 
 open import Prelude

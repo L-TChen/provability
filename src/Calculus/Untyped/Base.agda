@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical #-}
-
 module Calculus.Untyped.Base where
 
 open import Prelude

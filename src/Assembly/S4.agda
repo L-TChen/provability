@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical --guarded #-}
-
 module Assembly.S4 where
 
 open import Prelude           as 𝓤
@@ -66,7 +64,7 @@ module _ (Q : Quoting) where
   ⊠id=id : (X : Asm 𝓤) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (id X) x ≡ x
   ⊠id=id X x = refl
 
-  ⊠gf=⊠g⊠f : {X Y Z : Asm 𝓤} (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (g ∘ f) x ≡ ⊠map₀ g (⊠map₀ f x)
+  ⊠gf=⊠g⊠f : {X Y Z : Asm 𝓤} (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (g ∘ f) x ≡ ⊠map₀ g ( ⊠map₀ f x)
   ⊠gf=⊠g⊠f {𝓤} {Z = Z} (f , F , F⊩f) (g , G , G⊩g) (M , x , r) i =
     G[F[M]]=G[F][M] i , g (f x) , transport-filler (cong (Z._⊩ g (f x)) (G[F[M]]=G[F][M] ⁻¹)) (G⊩g (F⊩f r)) (~ i)
     where
@@ -74,15 +72,15 @@ module _ (Q : Quoting) where
       G[F[M]]=G[F][M] = ∘-ssubst-ssubst G F M
       
   ⊠reflects∼ : {X Y : Asm 𝓤} (f g : Trackable X Y)
-    → ⊠map f ∼ ⊠map g
-    → f ∼ g
+    → ⊠map f ∼ ⊠map g -- ∶ ⊠ X →ₐ ⊠ Y
+    → f ∼ g -- ∶ X →ₐ Y
   ⊠reflects∼ {𝓤} {X} {Y} f g ⊠f=⊠g x = rec ((Y is-set) _ _)
     (λ { (M , M⊩x) → cong (λ x → fst (snd x)) (⊠f=⊠g (M , x , M⊩x))  })
     (X.⊩-right-total x)
     where
       module X = AsmStr (str X)
 
-  ⊠-isExposure : IsExposure {𝓤} ⊠_  ⊠map
+  ⊠-isExposure : IsExposure 𝓤 ⊠_  ⊠map
   ⊠-isExposure = record
     { preserve-id   = ⊠id=id
     ; preserve-comp = ⊠gf=⊠g⊠f
@@ -141,16 +139,16 @@ module _ (Q : Quoting) where
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
 
-  eval : {X : Asm 𝓤} → Trackable (⊠ X) X
-  eval {X = X} = (λ x → fst (snd x)) , Eval ,
+  eval : (X : Asm 𝓤) → Trackable (⊠ X) X
+  eval X = (λ x → fst (snd x)) , Eval ,
     λ { {N} {M , x , M⊩x} N-↠⌜M⌝ →
       X.⊩-respects-↠ (reduce-ssubst Eval (lower N-↠⌜M⌝)) ((X.⊩-respects-↠ Eval-↠ M⊩x)) }
     where
       module X  = AsmStr (str X)
       module ⊠X = AsmStr (str (⊠ X))
 
-  eval-nat : {𝓤 : Universe} → NaturalTransformation {𝓤} ⊠-exposure Id
-  eval-nat = eval , λ f x → refl
+  eval-nat : {𝓤 : Universe} → NaturalTransformation 𝓤 ⊠-exposure Id
+  eval-nat = eval , λ _ _ f x → refl
 
   quoting : {X : Asm 𝓤} → Trackable (⊠ X) (⊠ ⊠ X)
   quoting {X = X} = (λ { y@(M , x , r) → ⌜ M ⌝ , y , lift -↠-refl }) , Quote , λ where
@@ -165,11 +163,11 @@ module _ (Q : Quoting) where
         module ⊠X  = AsmStr (str (⊠ X))
         module ⊠⊠X = AsmStr (str (⊠ ⊠ X))
 
-  quoting′-does-not-exist : (q : NaturalTransformation {𝓤₀} Id ⊠-exposure) → ⊥
+  quoting′-does-not-exist : (q : NaturalTransformation 𝓤₀ Id ⊠-exposure) → ⊥
   quoting′-does-not-exist (fun , naturality) = quoting′-not-definable (QΛ , QΛ-is-quoting)
     where
       q-at-Λ : Trackable Λ₀ₐ (⊠ Λ₀ₐ)
-      q-at-Λ = fun
+      q-at-Λ = fun Λ₀ₐ
 
       qΛ : Λ₀ → Σ[ N ∶ Λ₀ ] Σ[ M ∶ Λ₀ ] N -↠ M
       qΛ = q-at-Λ .fst
@@ -177,7 +175,7 @@ module _ (Q : Quoting) where
       QΛ = HasTracker.F (q-at-Λ .snd)
 
       qQ-at-⊤ : Trackable ⊤ₐ (⊠ ⊤ₐ)
-      qQ-at-⊤ = fun
+      qQ-at-⊤ = fun ⊤ₐ
 
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (q-at-Λ .snd) 
@@ -194,9 +192,10 @@ module _ (Q : Quoting) where
           lem M =
             let open ≡-Reasoning
                 open HasTracker (*→Λ M .snd)
-                s = F⊩f (snd (snd (qQ-at-⊤ .fst tt*))) in begin
+                s = F⊩f (snd (snd (qQ-at-⊤ .fst tt*)))
+              in begin
               qΛ M
-                ≡⟨ naturality (*→Λ M) _ ⟩
+                ≡⟨ naturality _ _ (*→Λ M) _ ⟩
               (↑₁ M [ _ ] , M , s) 
                 ≡[ i ]⟨ subst-rename-∅ _ M i , M , transport-filler (cong (_-↠ M) (subst-rename-∅ _ M)) s i ⟩ 
               (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎

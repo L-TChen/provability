@@ -3,3 +3,4 @@ include:
   src
 depend:
   cubical
+flags: --auto-inline --without-K --cubical --no-import-sorts

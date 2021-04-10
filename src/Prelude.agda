@@ -1,5 +1,3 @@
-{-# OPTIONS --without-K --cubical --no-import-sorts #-}
-
 module Prelude where
 
 open import Agda.Builtin.FromNat                 public
@@ -118,8 +116,14 @@ id = λ x → x
 ------------------------------------------------------------------------------
 -- 
 
-SetWithStr : (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) → 𝓥 ⊔ 𝓤 ⁺ ̇
-SetWithStr 𝓤 S = Σ[ X ∶ hSet 𝓤 ] S (fst X)
+-- SetWithStr : (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) → 𝓥 ⊔ 𝓤 ⁺ ̇
+-- SetWithStr 𝓤 S = Σ[ X ∶ hSet 𝓤 ] S (fst X)
+
+record SetWithStr (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) : 𝓥 ⊔ 𝓤 ⁺ ̇  where
+  constructor _,_
+  field
+    carrier   : hSet 𝓤
+    structure : S (fst carrier)
 
 ⟨_⟩ : {S : 𝓤 ̇ → 𝓥 ̇} → SetWithStr 𝓤 S → 𝓤 ̇
 ⟨ (X , _) , _ ⟩ = X
