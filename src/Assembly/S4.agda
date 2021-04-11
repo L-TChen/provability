@@ -79,13 +79,12 @@ module _ (Q : Quoting) where
     where
       module X = AsmStr (str X)
 
-  abstract 
-    ⊠-isExposure : IsExposure 𝓤 ⊠_  ⊠map
-    ⊠-isExposure = record
-      { preserve-id   = ⊠id=id
-      ; preserve-comp = ⊠gf=⊠g⊠f
-      ; reflects-∼    = ⊠reflects∼
-      }
+  ⊠-isExposure : IsExposure 𝓤 ⊠_  ⊠map
+  ⊠-isExposure = record
+    { preserve-id   = ⊠id=id
+    ; preserve-comp = ⊠gf=⊠g⊠f
+    ; reflects-∼    = ⊠reflects∼
+    }
 
   ⊠-exposure : Exposure 𝓤
   ⊠-exposure = exposure ⊠_ ⊠map ⊠-isExposure
@@ -96,13 +95,8 @@ module _ (Q : Quoting) where
       postulate ↑ₗ-injective : ∀ {m n} {M N : Λ n} → ↑ₗ_ {n} {m} M ≡ ↑ₗ N → M ≡ N
 
   ⊤→⊠⊤ : Trackable (⊤ₐ {𝓤}) (⊠ ⊤ₐ)
-  ⊤→⊠⊤ = (λ _ → (𝑰 , tt* , lift -↠-refl)) , (↑₁ ⌜ 𝑰 ⌝) , λ { (lift M-↠𝑰) → lift (begin
-    (↑₁ ⌜ 𝑰 ⌝) [ _ ]
-      ≡⟨ subst-rename-∅ _ _ ⟩
-    ⌜ 𝑰 ⌝ ∎) }
-    where
-      open -↠-Reasoning
-
+  ⊤→⊠⊤ = Final.global-element ⌜ 𝑰 ⌝ (𝑰 , tt* , lift -↠-refl) (lift -↠-refl)
+  
   ⊠X×Y→⊠X : {X Y : Asm 𝓤} → Trackable (⊠ (X ×ₐ Y)) (⊠ X)
   ⊠X×Y→⊠X {𝓤} {X} {Y} = (λ { (L , (x , _) , ((M , red , r) , _)) → ( (ƛ 0 · ↑₁ 𝑻) · L , x , X.⊩-respects-↠ (begin
     (ƛ 0 · ↑₁ 𝑻) · L

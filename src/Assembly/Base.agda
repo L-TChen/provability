@@ -93,8 +93,8 @@ syntax ∼-syntax f g = f ∼ g
 ∼-is-PER : {X Y : Asm 𝓤}
   → isPER (∼-eq X Y)
 ∼-is-PER = record
-  { symmetric  = λ { {f , _} {g , _}         f=g     x → sym (f=g x) }
-  ; transitive = λ { {f , _} {g , _} {h , _} f=g g=h x → f=g x ∙ g=h x }
+  { symmetric  = λ { f=g     x → sym (f=g x) }
+  ; transitive = λ { f=g g=h x → f=g x ∙ g=h x }
   ; is-prop    = ∼-isProp 
   }
 

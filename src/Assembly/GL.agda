@@ -158,7 +158,7 @@ module _ (Q : Quoting) where
 
   _† : Trackable (□ k X) X
     → Trackable ⊤ₐ (□ k X)
-  _† {k} {_} {X} f@(|f| , F , 𝔣) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf) (lift -↠-refl)
+  _† {k} {_} {X} (|f| , F , 𝔣) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf) (lift -↠-refl)
     where
       module X = AsmStr (str X)
 
