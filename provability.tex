@@ -466,9 +466,11 @@ In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\box
 \begin{example} \label{ex:global-element-of-unit}
   One has a global element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{M}$ using \Cref{lem:global-element}. 
   Yet, there are other global elements of $\boxtimes \top$ such as $(\mathtt{I}\,\mathtt{I}, \star, \beta)$ realised by $\qquote{\mathtt{I\,I}}$ where $\beta : \mathtt{I}\,\mathtt{I} \onereduce \mathtt{I}$ is the $\beta$-reduction rule. 
+  Furthermore, the tracker of a global element might not even be a closed term but a open term. 
 \end{example}
-The above example also shows that $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many representations for $\star : \Unit$, i.e.\ inhabitants of $\bproj{\boxtimes \top}$ while there is exactly only one inhabitant of $\bproj{\top} \equiv \Unit$. 
-Similarly, $\boxtimes (X \times Y)$ is not $\PP$-isomorphic to $\boxtimes X \times \boxtimes Y$.
+
+The above example also shows that $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many representations for $\star : \Unit$, i.e.\ inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
+Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.\ltnote{write it down formally}
 
 \begin{theorem}[{\emph{cf}.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
   $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is an exposure of assemblies.
@@ -498,40 +500,40 @@ Similarly, $\boxtimes (X \times Y)$ is not $\PP$-isomorphic to $\boxtimes X \tim
   The naturality of $\epsilon$ follows by definition.
 \end{proof}
 
-In addition, there is also a family of maps $\delta_X : \boxtimes X \to \boxtimes \boxtimes X$ tracked by~$\mathtt{quote}$ corresponding to the quotation of a quoted term where $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$. 
-For any global element $a\colon \top \to \boxtimes X$ given by~\Cref{lem:global-element} whose tracker is indeed a closed term, we can see that $\delta_X \circ a$ coincides with $\boxtimes a \circ \bigstar$:
+In addition, there is a family of functions $\bproj{\delta_X}\colon \boxtimes X \to \boxtimes \boxtimes X$ defined by $(M, x, r) \mapsto (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ and
+tracked by~$\mathtt{quote}$ corresponding to the quotation of a quoted term. 
+For any global element $a\colon \top \to \boxtimes X$ given by~\Cref{lem:global-element} whose tracker is indeed the quoted term~$\qquote{M}$, we can see that $\delta_X \circ a$ coincides with $\boxtimes a \circ \bigstar\colon \top \to \boxtimes \boxtimes X$
 \[
   \delta_X(a(\star)) = \delta_X(M, x, r) = (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
   = \boxtimes a(\mathtt{I}, \star, \refl_\twoheadrightarrow) = \boxtimes a(\bigstar(\star)).
 \]
-\ltnote{is every global element of $\boxtimes X$ tracked by a closed term?}
 
 \begin{remark} \label{re:boxtimes-is-not}
 One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\delta$ is also a natural transformation up to~$\sim$ satisfying comonad laws.
-However, unlike Theorem~11 of Kavvos~\cite{Kavvos2017a}, these maps $\delta_X$ are unfortunately \emph{not} natural in~$X$.
+However, unlike the exposure $\boxtimes_K$ introduced by Kavvos~\cite[Theorem~11]{Kavvos2017a}, these maps $\delta_X$ are unfortunately \emph{not} natural in~$X$.
 Indeed, for each trackable map $f\colon X \to Y$ the inhabitant 
-\[
-  \boxtimes \boxtimes f (\delta_X(M, x, r))
-  \equiv (\mathsf{subst}\,\qquote{F}\,\qquote{M}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \mathsf{subst}_{\twoheadrightarrow})
-\]
-of type $\boxtimes \boxtimes Y$ is not equal to
 \[
   \delta_Y (\boxtimes f(M, x, r))
   \equiv \left(\qquote{F[M]}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \refl_{\twoheadrightarrow}\right)
 \]
+of type $\boxtimes \boxtimes Y$ is not equal to
+\[
+  \boxtimes \boxtimes f (\delta_X(M, x, r))
+  \equiv (\mathsf{subst}\,\qquote{F}\,\qquote{M}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \mathsf{subst}_{\twoheadrightarrow})
+\]
 in spite that their extensions $(F[M], f\,x, \mathfrak{f}\,M\,x\,r)$ are the same
-where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
-Yet we may consider the reduction relation $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$ as a partial order.
+where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction sequence $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
+Nevertheless we may consider a partial order induced by the reduction relation $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
 In detail, for inhabitants of $\boxtimes X$ define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$, and
-accordingly define $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$.
-Then we have $\bproj{\boxtimes \boxtimes f \circ \delta_X} \leq \bproj{\delta_Y \circ \boxtimes f}$.
-That is, $\delta$ is a \emph{lax natural transformation} up to $\sim$.
+accordingly define $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for any $x$.
+Then we have $\bproj{\boxtimes \boxtimes f \circ \delta_X} \leq \bproj{\delta_Y \circ \boxtimes f}$ instead.
+This kind of transformations $\delta$ are called \emph{lax natural transformations}.
 \end{remark}
 
-The above remark suggests a theory on categories enriched not by $\PP$-sets but \emph{partially ordered $\PP$-sets}, which is beyond the scope of this paper, so we refrain ourselves from further discussion.
+What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intensional part of $\boxtimes f$ is only applied verbatim.
 
 \begin{remark} \label{remark:difference-boxtimes}
-  The exposure $\boxtimes_K$ is defined for assemblies on a PCA with the carrier and the realisability relation given by
+  The exposure $\boxtimes_K$ defined for assemblies on a PCA is with the carrier and the realisability relation given by
   \[
     \bproj{\boxtimes_K X} \defeq \{\,(M, x) \mid M \Vdash x \,\}
     \quad\text{and}\quad
@@ -540,37 +542,41 @@ The above remark suggests a theory on categories enriched not by $\PP$-sets but 
   without the Gödel encoding. 
   It gives rise to not only an exposure but also a comonadic exposure.
   Moreover $\boxtimes_K$ preserves finite products including the terminal object $\top$.
-  Preserving finite products are considered \emph{unsatisfactory} because intensions, i.e.\ elements of a PCA, are subject to certain equations already as those representations are identified on the level of PCA.
-  By taking $\lambda$-terms only subject to $\alpha$-equivalence as realisers, we are able to distinguish computationally equivalent intensions.
+  Preserving finite products is considered \emph{unsatisfactory} because intensions, i.e.\ elements of a PCA, are subject to certain equations already as those representations are identified on the level of PCA.
+  By taking $\lambda$-terms subject only to $\alpha$-equivalence as realisers, we are able to distinguish computationally equivalent intensions---the main point of introducing the $\PP$-category of assemblies.
 
 \hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
 
 \end{remark}
 
+\begin{lemma}\label{lem:no-quoting}
+  The function $\eta_\Lambda \colon \Lambda_0 \to \boxtimes \Lambda_0$ defined by 
+  \[
+    M \mapsto (M, M, \refl_\twoheadrightarrow)
+  \] 
+  is not trackable by any term.
+\end{lemma}
+\begin{proof}
+  Suppose that $\eta_\Lambda$ is tracked by a term~$\mathtt{Q}$.
+  Being a tracker means that $\mathtt{Q}\,N \Vdash (M, M, \refl_{\twoheadrightarrow})$ which is judgementally equal to $\mathtt{Q}\,N\reduce \qquote{M}$ whenever $N \Vdash M$ (judgementally equal to $N \reduce M$).
+  It follows that $\mathtt{Q}\,M \reduce \qquote{M}$ and thus such $\mathtt{Q}$ cannot exist.
+\end{proof}
+
 \begin{theorem}\label{thm:S4-no-quoting}
-  There is no family of trackable maps from $X$ to $\boxtimes X$ indexed by assemblies~$X$ satisfying
-  \begin{equation} \label{eq:naturality-quoting}
-    \bproj{\boxtimes f \circ \eta_X}\,x \leq \bproj{\eta_Y \circ f}\,x
-  \end{equation}
-  for each trackable map $f\colon X \to Y$ where $(M, x, r) \leq (N, y, s)$ if $x = y$ and $M \reduce N$.
+  There is no natural transformation $\eta$ from $\mathcal{I}$ to $\boxtimes$.
 \end{theorem}
 %We show the existence of such a natural transformation implies the existence of a term $\mathsf{quote}'$ with $\mathsf{quote}'[M] \reduce \qquote{M}$ using naturality and the fact that $\Lambda_0$ itself has an assembly structure (\Cref{ex:assembly-lambda}), but $\Quote'$ cannot exist as discussed in \Cref{subsec:godel}.
 \begin{proof}
-  Assume that such a family of maps $\eta_X\colon X \to \boxtimes X$ exist.
-  Every closed term $M_0$ corresponds to a trackable map $\widehat{M_0} \defeq (\mathsf{c}_{M_0}, M_0, \mathfrak{M}_0) \colon \top \to \Lambda$ where $\mathsf{c}_{M_0}$ is the constant function with the value $M_0$ and $\mathfrak{M}_0$ is propositionally equal to the constant function with the value $\refl_{\twoheadrightarrow} : M_0 \reduce M_0$.
+  Assume that such a family of trackable maps $\eta_X\colon X \to \boxtimes X$ exist.
+  To prove the statement, it suffices to show that $\eta_\Lambda\,M_0$ is propositionally equal to $(M_0, M_0, \refl_{\twoheadrightarrow})$ so that this family $\eta$ cannot exist by \Cref{lem:no-quoting} and functional extensionality.
+  By \Cref{lem:global-element}, every closed term $M_0$ gives a trackable map $\widehat{M_0} \defeq (\lambda x.\, M_0, M_0, \mathfrak{M_0}) \colon \top \to \Lambda$ where $\mathfrak{M_0}$ is propositionally equal to the constant function with the value $\refl_{\twoheadrightarrow} : M_0 \reduce M_0$.
 
-  Consider~\eqref{eq:naturality-quoting}  when $f = \widehat{M_0}$ and $M_0 = \mathtt{I}$ and $\mathtt{I I}$.
-  Note that $\boxtimes \widehat{M_0}$ maps an arbitrary inhabitant of $\boxtimes \top$ to $(M_0, M_0, \refl_{\twoheadrightarrow})$.
-  Hence, by assumption $\bproj{\eta_\Lambda}\,\mathtt{I} = (N , \mathtt{I}, r) \geq (\mathtt{I}, \mathtt{I}, \refl_{\twoheadrightarrow})$ so that $\mathtt{I} \reduce N$ and thus $N =_\alpha \mathtt{I}$. 
-  On the other hand, $\bproj{\eta_\Lambda}\,(\mathtt{I}\,\mathtt{I}) \geq (\mathtt{I\,I}, \mathtt{I\,I}, \refl_{\twoheadrightarrow})$ by assumption, so $\bproj{\eta_\Lambda}\,(\mathtt{I}\,\mathtt{I}) \equiv (N, \mathtt{I\,I}, s)$ for some $N$ with $\mathtt{I\,I} \reduce N$ but also $s : N \reduce \mathtt{I\,I}$.
-  Thus, $N$ can only be $\mathtt{I\,I}$. 
-  \ltnote{this is not a very type-theoretic argument}
+  Note that $\bproj{\boxtimes\widehat{M_0}}(M, x, r) = (M_0[M], M, \refl_\twoheadrightarrow)$ by definition for any inhabitant $(M, x, r)$ of type $\boxtimes \top$ where $M_0[M]$ is propositionally equal to $M_0$.
+  Hence, by naturality, $\bproj{\eta_{\Lambda}}\,M_0 \equiv \bproj{\eta_{\Lambda}} \left(\bproj{\widehat{M_0}}\,\star\right) =  \bproj{\boxtimes\widehat{M_0}}\,(\bproj{\eta_\top}\,\star) = (M_0, M_0, \refl_\twoheadrightarrow)$.
 
-  Now let the tracker of $\eta$ be $\mathtt{Q}$.
-  It follows that $\mathtt{Q}\,\mathtt{I} \reduce \qquote{I}$ but also $\mathtt{Q}\,\mathtt{I\,I} \reduce \qquote{\mathtt{I\,I}}$, leading to a contraction.
 \end{proof}
 
-It remains unclear to us if the existence of a natural transformation $\mathcal{I} \to \boxtimes_K$ can be refuted.
+It remains unclear to us if the existence of a transformation $\mathcal{I} \to \boxtimes_K$ can be refuted.
 
 \begin{remark}\label{remark:S4-modality}
   Recall that the modal type theory considered by Davies and Pfenning~\cite{Davies2001b} is a dual-context simple type theory extended with an \SFour modality $\Box$, a construct $\mathtt{box}$, a $\mathtt{let}$-expression for boxed terms, and typing rules below.
@@ -694,12 +700,12 @@ Similar to~\Cref{thm:S4-no-quoting}, there is no family of trackable maps $\eta_
 
 On the other hand, it is not possible to have a family of trackable maps $\epsilon_X$ from $\Box^\kappa X$ to $X$ natural in $X$, since the extension part of an inhabitant of $\Box^\kappa X$ can only be projected in a time step away from now.
 \begin{theorem}\label{thm:GL-no-eval}
-  There is no family of trackable maps $\Box^\kappa X$ to $X$ indexed by assemblies~$X$ for any clock $\kappa$.
+  There is no function from $\bproj{\Box^\kappa \bot}$ to $\bproj{\bot}$.
+  In particular, there is no natural transformation from $\Box^\kappa$ to $\mathcal{I}$ for any $\kappa$.
 \end{theorem}
 \begin{proof}
-  Assume such a family $\epsilon_X : \Box^\kappa X \to X$ exists.
-  In particular, consider $\epsilon_\bot \colon \Box^\kappa \bot \to \bot$. 
-  We will show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by guarded recursion $\mathsf{fix}\,\mathsf{bang} : \Empty$ is a contradiction.
+  Assume $\epsilon_\bot \colon \bproj{\Box^\kappa \bot} \to \bproj{\bot}$ exists. 
+  We will show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by Löb induction a contradiction $\mathsf{fix}\,\mathsf{bang} : \Empty$ is derivable.
   
   First, let $x$ be an inhabitant of $\laterp \Empty$. We construct an inhabitant $(M, x, r)$ of
   \[
@@ -779,7 +785,7 @@ This construct may correspond to compiler-time code generation---a common form o
 Finally, categories internal to clocked type theory seem worth further investigation.
 It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract approach to the step-indexing technique used to reason about programming language features.
 
-\ltnote{The above remark suggests a theory on categories enriched not by $\PP$-sets but \emph{partially ordered $\PP$-sets}, which is beyond the scope of this paper, so we refrain ourselves from further discussion.}
+\ltnote{\Cref{re:boxtimes-is-not} suggests a theory on categories enriched not by $\PP$-sets but \emph{partially ordered $\PP$-sets}, which is beyond the scope of this paper, so we refrain ourselves from further discussion.}
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
 %As a sanity check, we may further ask the type $\mathsf{Code}$ of \emph{untyped} code and a polymorphic function from $\boxtimes A$ to $\mathsf{Code}$ forgetting what a typed code denotes. 
