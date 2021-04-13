@@ -58,7 +58,7 @@ hcomp▹ : (A : ▹ k (𝓤 ̇)) (φ : I) (u : I → Partial φ (▸ k A))
 hcomp▹ A φ u u0 a = hcomp (λ { i (φ = i1) → u i 1=1 a }) (outS u0 a)
 
 next : A → ▹ k A
-next x k = x
+next x α = x
 
 _⊛_ : ▹ k ((a : A) → B a)
   → (a : ▹ k A) → ▹[ α ∶ k ] B (a α)
