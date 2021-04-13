@@ -535,7 +535,7 @@ This kind of transformations $\delta$ are called \emph{lax natural transformatio
 
 What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intensional part of $\boxtimes f$ is only applied verbatim.
 
-\begin{remark} \label{remark:difference-boxtimes}
+\begin{remark} \label{re:difference-boxtimes}
   The exposure $\boxtimes_K$ defined for assemblies on a PCA is with the carrier and the realisability relation given by
   \[
     \bproj{\boxtimes_K X} \defeq \{\,(M, x) \mid M \Vdash x \,\}
@@ -581,7 +581,7 @@ What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not al
 
 It remains unclear to us if the existence of a transformation $\mathcal{I} \to \boxtimes_K$ can be refuted.
 
-\begin{remark}\label{remark:S4-modality}
+\begin{remark}\label{re:S4-modality}
   Recall that the modal type theory considered by Davies and Pfenning~\cite{Davies2001b} is a dual-context simple type theory extended with an \SFour modality $\Box$, a construct $\mathtt{box}$, a $\mathtt{let}$-expression for boxed terms, and typing rules below.
 \[
 \begin{minipage}{.47\linewidth}
@@ -612,7 +612,7 @@ Indeed, let $A$ be the falsity $\bot$ for both laws. Then, we have
 \]
 By the necessitation rule and modus ponens, $\Box (\Box \bot \to \bot)$ as well as $\bot$ are derivable.
 Yet, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the Gödel-Löb axiom.
-Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood also as the type of code of type~$A$ (cf.~\Cref{remark:S4-modality}) and as \emph{intensional recursion} respectively from the computational perspective~\cite{Kavvos2017b}, if one is willing to give up consistency.
+Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood also as the type of code of type~$A$ (cf.~\Cref{re:S4-modality}) and as \emph{intensional recursion} respectively from the computational perspective~\cite{Kavvos2017b}, if one is willing to give up consistency.
 
 To untie the knot but to retain consistency and the interpretation of $\Box A$ as code of type~$A$, we refine our interpretation with a notion of \emph{computation stages}. 
 Considering the counit $\epsilon_X\colon \boxtimes X \to X$, it is possible to evaluate $(M, x, r)$ because the code is already available for doing so.
@@ -620,7 +620,7 @@ And, the provability reading of $\Box$ suggests that inhabitants of $\Box X$ are
 To express this idea cleanly, we work in an extension of HoTT with the support of Nakano's later modality~\cite{Nakano2000}.
 \hsnote{need a better story}
 
-\subsubsection{Digression: Clocked Cubical Type Theory}
+\subsubsection{Clocked Cubical Type Theory}
 \ltnote[inline,nomargin]{Introduce clocked cubical type theory here}
 
 \begin{lemma}\label{lem:later-sum}
@@ -726,7 +726,7 @@ The pay-off for disallowing evaluation is to be able to adopt guarded recursion 
 From the logical perspective, it is the deductive form of the Gödel-Löb axiom.
 
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
-  Every map $f \colon \bproj{\Box^\kappa X} \to \bproj{X}$ tracked by some $F$ gives rise to a global element~$f^\dagger$ of $\Box^\kappa X$ tracked by $\qquote{\mathsf{fix}\,F}$.
+  Every function $\bproj{f} \colon \bproj{\Box^\kappa X} \to \bproj{X}$ tracked by some $F$ gives rise to a global element~$f^\dagger$ of $\Box^\kappa X$ tracked by $\qquote{\mathsf{fix}\,F}$.
 \end{theorem}
 This theorem follows from the Löb induction and the fact that $\mathsf{fix}\,F$ is a fixpoint of $F$
 given by the Second Recursion Theorem.
@@ -740,7 +740,7 @@ given by the Second Recursion Theorem.
     \quad\text{and}\quad
     r : \laterp (\alpha : \kappa).\, F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]
   \]
-  we show an inhabitant of type $\bproj{X}$ realised by $F[\,\qquote{\mathsf{fix}\,F}\,]$ as follows.
+  we show an inhabitant of type $\bproj{X}$ realised by $\qquote{\mathsf{fix}\,F}$ as follows.
   \begin{enumerate}
     \item First,
       $\laterp(\alpha : \kappa).\left( \mathsf{fix}\,F \Vdash x [\alpha]\right)$ has an inhabitant, say $r'$, since $\mathsf{fix}\,F$ reduces to $F[\,\qquote{\mathsf{fix}\,F}\,]$. 
@@ -750,18 +750,16 @@ given by the Second Recursion Theorem.
       \]
     since $F$ tracks $\bproj{f}$ and the set $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is judgementally equal to $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$ which is inhabited by~$\refl_\twoheadrightarrow$.
 
-    \item By Löb induction, the type $\sm{x : \laterp \bproj{X}} \laterp (\alpha : \kappa).\, F[\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ has an inhabitant~$(x_0, r_0)$.
+    \item By Löb induction, $\sm{x : \laterp \bproj{X}} \laterp (\alpha : \kappa).\, F[\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ has an inhabitant~$(x_0, r_0)$.
+    \item Therefore, by $\mathsf{fix}\,F \reduce F[\qquote{\mathsf{fix}\,F}]$ again, there is an inhabitant
+      $(\mathsf{fix}\,F, x_0, r_0') : \Box^\kappa X$ where $r_0' : \laterp(\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x_0 [\alpha]$.
   \end{enumerate}
-  Therefore $(F[\qquote{\mathsf{fix}\,F}], x_0, r_0)$ is an inhabitant of $\Box^\kappa X$ which evidently is realised by $\qquote{F[\qquote{\mathsf{fix}\,F}]}$ and thus by \Cref{lem:global-element} it gives rise to a global element~$f^\dagger$ of $\Box X$, concluding our proof.
+  Evidently $(\mathsf{fix}\,F, x_0, r_0')$ is realised by $\qquote{\mathsf{fix}\,F}$ and thus by \Cref{lem:global-element} it gives rise to a global element~$f^\dagger$ of $\Box X$, concluding our proof.
 \end{proof}
 
-We may wish to prove further that the global element $f^\dagger$ is indeed a fixpoint of $f$ in the sense that $f^\dagger \sim \Box(f \circ f^\dagger) \circ \bigstar$ in line with Kavvos' definition~\cite[Definition~5.29]{Kavvos2020} where $\bigstar : \top \to \Box \top$ is a global element of $\Box \top$ given by $\star : \Unit$ and its realiser $\lambda \mathtt{x}.\,\mathtt{x}$ using~\Cref{lem:global-element}.
-This extensional equality, however, does not hold as they have different intensions ($\mathsf{fix}\,F$ versus $F[\qquote{\mathsf{fix}\,F}]$) in spite that their extensions are the same (see below).
-This situation echoes the discussion of~\Cref{remark:difference-boxtimes}.
+We may wish to prove further that the global element $f^\dagger$ is indeed a fixpoint of $f$ in the sense that $f^\dagger \sim \Box(f \circ f^\dagger) \circ \bigstar$.
+This extensional equality, however, does not hold as they have different intensions ($\mathsf{fix}\,F$ versus $F[\qquote{\mathsf{fix}\,F}]$) in spite of sharing the same extension by the fixed point equality.
 
-\begin{proposition}
-  \ltnote{show that LHS and RHS have the same extension}
-\end{proposition}
 \section{Conclusion}\label{sec:conclusion}
 
 We follow the inspiring works by Kavvos in this paper to manifest the concepts of denotations, extensions, and intensions.
@@ -770,7 +768,7 @@ The additional equality available in $\PP$-categories allows us to bring out int
 The situation is likely caused by the confusion between the concept of \emph{denotation} and that of \emph{extension}.
 
 Based on the framework established in~\Cref{sec:assemblies}, we modelled two intensional modalities $\boxtimes$ and $\Box$ satisfying the \SFour axiom and the \GL axiom respectively.
-The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{remark:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
+The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{re:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
 As for the \GL modality, we use the clocked cubical type theory to define with a notion of computation stages.
 We then show that it satisfies the Gödel-Löb axiom and its deductive form---the intensional recursion~\cite{Kavvos2017b}.
 This \GL modality then answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contribution of this paper.
@@ -785,10 +783,12 @@ Second, inhabitants of $\Box^\kappa X$ are not accessible until the next stage. 
 This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2017a}.
 This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
 
+\ltnote{Third, \Cref{re:boxtimes-is-not} suggests a theory on categories enriched by \emph{partially ordered $\PP$-sets} instead}
+
 Finally, categories internal to clocked type theory seem worth further investigation.
 It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract approach to the step-indexing technique used to reason about programming language features.
+We expect this line of research may provide a convenient framework for categorical semantics of those programming languages.
 
-\ltnote{\Cref{re:boxtimes-is-not} suggests a theory on categories enriched not by $\PP$-sets but \emph{partially ordered $\PP$-sets}, which is beyond the scope of this paper, so we refrain ourselves from further discussion.}
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
 %As a sanity check, we may further ask the type $\mathsf{Code}$ of \emph{untyped} code and a polymorphic function from $\boxtimes A$ to $\mathsf{Code}$ forgetting what a typed code denotes. 
