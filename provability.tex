@@ -390,9 +390,9 @@ Hitherto, we have reformulated and refined the previous results (based on a part
 
 Thereafter, we use an extension of cubical type theory with Löb induction---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the \GL modality.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$ but logically inconsistent with Gödel-Löb axiom.
-Finally, we establish one of the main contributions of this paper: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$F[\qquote{\mathsf{fix}\,F}]$
+Finally, we establish one of the main contributions of this paper: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$\qquote{\mathsf{fix}\,F}$
 where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
-That is exactly the deductive form of the Gödel-Löb axiom in $\Asm(\Lambda)$.
+This is exactly the deductive form of the Gödel-Löb axiom in $\Asm(\Lambda)$.
 
 \subsection{A recap: Gödel encoding and the Second Recursion Theorem}\label{subsec:godel}
 Before entering into the main topic of this section, we review the Second Recursion Theorem in $\lambda$-calculus.
@@ -457,12 +457,12 @@ First define a function from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes Y}$ by
 \[
   \bproj{f}^\boxtimes\colon (M, x, r) \mapsto (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r).
 \]
-To give a tracker of $f^\boxtimes$ recall that there is a term $\mathtt{subst}$ performing term substitution on codes, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ by
+To give a tracker of $f^\boxtimes$ recall that there is a term $\mathtt{subst}$ performing term substitution on codes, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ because of
 \begin{align*}
   \left(\mathtt{subst} \,\qquote{F}\,\mathtt{x}\right)[N/\mathtt{x}]
-  \equiv  {} & \mathtt{subst}\,\qquote{F}\,N \\
-  \reduce {} & \mathtt{subst}\,\qquote{F}\,\qquote{M} \\
-  \reduce {} & \qquote{F[M]} \Vdash_{\boxtimes Y} f^\boxtimes(M, x, r)
+  \equiv  \mathtt{subst}\,\qquote{F}\,N 
+  \reduce \mathtt{subst}\,\qquote{F}\,\qquote{M}
+  \reduce \qquote{F[M]} \Vdash_{\boxtimes Y} f^\boxtimes(M, x, r)
 \end{align*}
 completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
@@ -893,18 +893,5 @@ We expect this line of research may provide a convenient framework for categoric
 \bibliography{ref}
 
 \appendix
-
-\section{Clocked Cubical Type Theory}
-
-%\section{environments}
-%
-%\begin{claim}\label{testenv-claim}
-%Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-%\end{claim}
-%
-%
-%\begin{claimproof}
-%Fusce eu leo nisi. Cras eget orci neque, eleifend dapibus felis. Duis et leo dui. Nam vulputate, velit et laoreet porttitor, quam arcu facilisis dui, sed malesuada risus massa sit amet neque.
-%\end{claimproof}
 
 \end{document}
