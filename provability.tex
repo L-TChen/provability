@@ -459,8 +459,7 @@ First define a function from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes Y}$ by
 \]
 To give a tracker of $f^\boxtimes$ recall that there is a term $\mathtt{subst}$ performing term substitution on codes, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ because of
 \begin{align*}
-  \left(\mathtt{subst} \,\qquote{F}\,\mathtt{x}\right)[N/\mathtt{x}]
-  \equiv  \mathtt{subst}\,\qquote{F}\,N 
+  \mathtt{subst}\,\qquote{F}\,N 
   \reduce \mathtt{subst}\,\qquote{F}\,\qquote{M}
   \reduce \qquote{F[M]} \Vdash_{\boxtimes Y} f^\boxtimes(M, x, r)
 \end{align*}
@@ -533,7 +532,7 @@ Then we have $\bproj{\boxtimes \boxtimes f \circ \delta_X} \leq \bproj{\delta_Y 
 This kind of transformations $\delta$ are called \emph{lax natural transformations}.
 \end{remark}
 
-What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intensional part of $\boxtimes f$ is only applied verbatim.
+What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intension part of $\boxtimes f$ is only applied verbatim.
 
 \begin{remark} \label{re:difference-boxtimes}
   The exposure $\boxtimes_K$ defined for assemblies on a PCA is with the carrier and the realisability relation given by
@@ -709,7 +708,7 @@ The proof is based on the fact that tick variables cannot be exchanged in a cont
 \end{lemma}
 
 The later modality distributes over a $\Sigma$-type.
-This can be proved with the bi-invertible equivalence easily.
+It follows from that the function from $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B\,(x[\alpha])$ to $\laterp^\kappa \left(\sm{x : A} B\,x\right)$ mapping $(x, y)$ to $\lambda (\alpha : \kappa).\, (x[\alpha], y[\alpha])$ has a quasi-inverse which entails equivalence between types.
 \begin{lemma}\label{lem:later-sum}
   For $A : \UU$ and $B : A \to \UU$, there is an equivalence
   \begin{equation}\label{eq:later-sum}
@@ -735,9 +734,9 @@ In other words, paths are timeless.
 \begin{proposition}\label{lem:later-identity}
   Let $x$ and $y$ be inhabitants of $A$. Then, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right)$ implies $\forall \kappa.\, x_1 = x_2$.
 \end{proposition}
-
-Inspired by~\Cref{lem:later-identity}, we introduce the notion of clocked exposures which are like exposures but indexed by clocks~$\kappa$.
-
+Here is a caveat, though.
+The above proposition cannot hold within the same clock, i.e. $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right) \to \left(x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
+In order to formulate faithfulness of an exposure, the notion of exposures is adopted with a clock variable accordingly to express the faithfulness with respect to~$\sim$ properly:
 \begin{definition}[Clocked exposure]
   Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ and \emph{(b)} for each clock $\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
   \begin{romanenumerate}
@@ -753,15 +752,18 @@ Inspired by~\Cref{lem:later-identity}, we introduce the notion of clocked exposu
 
 \subsubsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
 
-Now we introduce the clocked exposure $\Box^\kappa \colon \Asm(\Lambda) \to \Asm(\Lambda)$ modelling the \GL modality as follows. 
-For any assembly $X$, the carrier of $\Box^\kappa X$ and the realisability relation are now defined as
+Now we introduce the clocked exposure $\Box^\kappa \colon \Asm(\Lambda) \to \Asm(\Lambda)$ modelling the \GL modality. 
+For an assembly $X$, the carrier $\bproj{\Box^\kappa X}$ and its realisability relation $\Vdash_{\Box^\kappa}$ are defined as
 \[
   \bproj{\Box^\kappa X} \defeq \sm{M : \Lambda_0}{x : {\laterp^\kappa \bproj{X}}} \laterp (\alpha : \kappa) .\, M \Vdash_X x [\alpha]
   \quad\text{and}\quad
   \left(N \Vdash_{\Box^\kappa X} (M, x, \star) \right) \defeq N \reduce \qquote{M}
 \]
 where $\Vdash_{\Box^\kappa X}$ is defined as the same as the comonadic exposure~$\boxtimes$.
-The only difference between carriers $\bproj{\Box^\kappa X}$ and $\bproj{\boxtimes X}$ is the extensional part which becomes $\laterp^\kappa \bproj{X}$ so that the extension of $(M, x, r)$ is available in the next stage but not earlier (within the clock $\kappa$).
+The only difference between carriers $\bproj{\Box^\kappa X}$ and $\bproj{\boxtimes X}$ is that the type $\bproj{X}$ as what the intension denotes becomes $\laterp^\kappa \bproj{X}$.
+That is, the extension $x$ of $(M, x, r)$ is available in the next stage but not earlier (within the clock $\kappa$), but the intension $M$ remains the same type.
+
+For the obvious reason, we may drop the superscript $\kappa$ if there is no danger of confusion in the rest of this section.
 Similarly, $\Box^\kappa X \defeq (\bproj{\Box^\kappa X}, \Vdash_{\Box^\kappa X}, r_{\Box^\kappa X}, t_{\Box^\kappa X})$ is an assembly where $r_{\Box^\kappa X}$ and $t_{\Box^\kappa X}$ are given by the transitivity and the reflexivity of $\reduce$. 
 
 %\begin{notation*}

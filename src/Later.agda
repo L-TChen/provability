@@ -70,7 +70,7 @@ _⊛_ : ▹ k ((a : A) → B a)
 
 Σ▹
   : Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α)
-  → ▹[ α ∶ k ]     Σ[ a ∶ A ] B a
+  → ▹ k (Σ[ a ∶ A ] B a)
 Σ▹ (x , y) α = (x α) , (y α)
 
 ▹Σ
@@ -91,14 +91,14 @@ fix-path f i = f (pfix f i)
 delay : {A : Cl → 𝓤 ̇} → (∀ k → A k) → ∀ k → ▹ k (A k)
 delay a k _ = a k
 
-▹Σ≃Σ▹ : BiInvEquiv (▹[ α ∶ k ] Σ[ a ∶ A ] B a) (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α))
-▹Σ≃Σ▹ = biInvEquiv ▹Σ
-  Σ▹ (λ { (x , y) i → (λ α → x α) , λ α → y α})
-  Σ▹ λ x i α → x α .fst , x α .snd
+▹Σ≃Σ▹ : Iso (▹[ α ∶ k ] Σ[ a ∶ A ] B a) (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α))
+▹Σ≃Σ▹ = iso ▹Σ Σ▹
+  (λ { (x , y) i → x , y } )
+  λ x i α → x α .fst , x α .snd
 
 ▹Σ≡Σ▹ : (k : Cl) (A : 𝓤 ̇) (B : A → 𝓥 ̇)
   → (▹[ α ∶ k ] Σ[ a ∶ A ] B a) ≡ (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α))
-▹Σ≡Σ▹ k A B = ua (biInvEquiv→Equiv-right ▹Σ≃Σ▹)
+▹Σ≡Σ▹ k A B = isoToPath ▹Σ≃Σ▹
 
 dfixΣ : {k : Cl} {A : 𝓤 ̇} {B : A → 𝓥 ̇}
   → (Σ[ x ∶ ▹ k A ] ▹[ α ∶ k ] B (x α) → Σ[ a ∶ A ] B a)
