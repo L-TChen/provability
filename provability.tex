@@ -597,6 +597,7 @@ It remains unclear to us if the existence of a transformation $\mathcal{I} \to \
   \end{prooftree}
 \end{minipage}
 \]
+
 Following \Cref{thm:S4-exposure,thm:S4-no-quoting}, we anticipate an interpretation of $\Box$ to justify the `omitted congruence rule' for the $\mathtt{box}$ construct~\cite[Section~2.5]{Davies2001b} and the absence of quoting function $A \to \Box A$ in their system.
 \hsnote{a brief recap on the `omitted congruence rule'}
 \end{remark}
@@ -620,12 +621,12 @@ To express this idea cleanly, we work with Nakano's later modality~$\laterp$ and
 \hsnote{need a better story}
 
 \subsubsection{Digression: Clocked Cubical Type Theory}
-Clocked cubical type theory~\cite{Kristensen2021}, CCTT for short, consists of two extensions of dependent type theory.
+This section presents a crash course on clocked cubical type theory~\cite{Kristensen2021}, CCTT for short, which consists of two extensions of dependent type theory.
 The first extension is the machinery to manipulate $n$-dimensional cubes such as paths, squares, cubes, etc., allowing us to prove Voevodsky’s univalence axiom and function extensionality directly.
 The second extension adds a sort $\clock$ with \emph{ticks} to support Nakano style guarded recursion (also known as Löb induction) introduced by Bahr et al.~\cite{Bahr2017}.
 
 Clocks are of a different sort~$\clock$ than types, so usual type formers (such as $\to$) are not applicable.
-A clock quantification~$\forall \kappa.\, A$ introduces a clock to a context with rules similar to those for $\Pi$-types:
+A clock~$\kappa$ is introduced by a clock quantification~$\forall \kappa.\, A$ into a context with rules similar to those for $\Pi$-types:
 \[
   \begin{minipage}{0.47\linewidth}
     \begin{prooftree}
@@ -641,6 +642,7 @@ A clock quantification~$\forall \kappa.\, A$ introduces a clock to a context wit
     \end{prooftree}
   \end{minipage}
 \]
+For convenience, a clock constant~$\kappa_0$ is presumed in the type theory.
 
 A new type $\laterp (\alpha : \kappa). A$ on a clock~$\kappa$ is introduced as a type of suspended computations requiring a tick~$\alpha$ to compute inhabitants of~$A$.
 For the ease of notation, $\laterp (\alpha : \kappa).\,A$ is written as $\laterp^\kappa\, A$ if the tick variable is not referred.
@@ -669,7 +671,7 @@ is not typable but is
 \]
 An inhabitant of $A$ is available in a time step given by $\mathtt{next} \defeq \Lambda \kappa.\, \lambda x.\,\lambda \alpha.\, x \colon \forall \kappa.\, A \to \laterp^\kappa A$. 
 
-An inhabitant of $\laterp (\alpha : \kappa).\, A$ can tick on a different clock by a constant~$\diamond$ stated by 
+An inhabitant of $\laterp (\alpha : \kappa).\, A$ can tick on a different clock by a constant tick~$\diamond$ stated by 
 \begin{prooftree}
   \AxiomC{$\Gamma, \kappa : \clock \vdash t : \laterp (\alpha : \kappa).\, A$}
   \AxiomC{$\Gamma \vdash \kappa' : \clock$}
@@ -680,7 +682,7 @@ This tick~$\diamond$ is needed to type Atkey and McBride's~\cite{Atkey2013b} ope
   $\mathsf{force} \defeq \lambda x.\, \Lambda \kappa.\, x[\kappa][\diamond]
   : (\forall \kappa.\, \laterp^\kappa A) \to \forall \kappa.\, A$.
 
-  Finally, every function $t : \laterp^\kappa A \to A$ has a \emph{delayed fixed point} $\mathsf{dfix}\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics), called guarded recursion.
+  Finally, every function $t : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics), called \emph{guarded recursion}.
 Formally, there are two more rules
 \[
   \begin{minipage}{0.47\linewidth}
@@ -699,7 +701,6 @@ Formally, there are two more rules
 where $\mathrm{Path}_A\;x\;y$ is the type of paths from $x$ to $y$.
 
 We now list properties needed for~\Cref{sec:GL}.
-
 Being a proposition is irrelevant to ticks and clocks, so is being a set.
 The proof is based on the fact that tick variables cannot be exchanged in a context with ordinary variables but  variables of the interval~$\mathbb{I}$.
 \begin{lemma}
@@ -726,17 +727,17 @@ By univalence, guarded recursion has a particular form for $\Sigma$-types:
 The $\mathtt{force}$ operator is an inverse of~$\mathtt{next}$ in the following sense:
 \begin{lemma}
   Let $x$ be an inhabitant of $\forall \kappa.\, A$. Then, 
-  $\mathtt{force}\,(\lambda \kappa.\,\lambda (\alpha : \kappa).\, x~\kappa)\,\kappa = x\,\kappa$ is inhabited for any clock $\kappa$.
+  $\mathtt{force}\,(\lambda \kappa.\,\lambda (\alpha : \kappa).\, x [\kappa])\,\kappa = x\,\kappa$ is inhabited for any clock $\kappa$.
 \end{lemma}
 
 It follows that a path between two inhabitants $\mathtt{next}\,x_i$ in a time step gives rise to a path now.
 In other words, paths are timeless.
 \begin{proposition}\label{lem:later-identity}
-  Let $x$ and $y$ be inhabitants of $A$. Then, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right)$ implies $\forall \kappa.\, x_1 = x_2$.
+  Let $x$ and $y$ be inhabitants of $A$. Then, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right)$ implies $x_1 = x_2$.
 \end{proposition}
-Here is a caveat, though.
-The above proposition cannot hold within the same clock, i.e. $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right) \to \left(x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
-In order to formulate faithfulness of an exposure, the notion of exposures is adopted with a clock variable accordingly to express the faithfulness with respect to~$\sim$ properly:
+Be aware of the scope of clock quantification.
+The above proposition cannot hold within the same clock, that is, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2 \to x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
+In order to formulate the faithfulness of an exposure, the definition is adopted with a clock variable accordingly.
 \begin{definition}[Clocked exposure]
   Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ and \emph{(b)} for each clock $\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
   \begin{romanenumerate}
@@ -745,10 +746,7 @@ In order to formulate faithfulness of an exposure, the notion of exposures is ad
     \item $f \sim g$ whenever $Q^\kappa f \sim Q^\kappa g$ for any clock $\kappa$ and for any two well-defined morphisms $f, g\colon X \to Y$. 
   \end{romanenumerate}
 \end{definition}
-
-%\begin{lemma}\label{lem:proposition-closed-under-later}
-%  For every $A : \mathord{\laterp}\,\UU$ if $\laterp (\alpha : \mathbb{T}).\,\mathsf{isProp}(A[\alpha])$ then $\laterp(\alpha : \mathbb{T}).\,A[\alpha]$ is also a proposition. 
-%\end{lemma}
+\Cref{thm:GL-exposure} gives an example of clocked exposure.
 
 \subsubsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
 
