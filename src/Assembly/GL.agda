@@ -230,3 +230,9 @@ module _ (Q : Quoting) where
           ≡⟨ refl ⟩
         sfix F , (λ α → |f| (sfix F , fixf′) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl))) ∎
         where open ≡-Reasoning
+
+  run : (∀ k → ⟨ □ k X ⟩) → (k′ : Cl) → ⟨ X ⟩
+  run {X = X} x k′ = force x′ k′
+    where
+      x′ : ∀ k → ▹ k ⟨ X ⟩
+      x′ k α = x k .snd .fst α
