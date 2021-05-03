@@ -107,7 +107,7 @@ Most, if not all, of the materials are standard, so readers comfortable with the
 
 \subsection{Homotopy type theory}
 We highlight the main difference between set theory and homotopy type theory.
-\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality}
+\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type}
 \begin{theorem}[Hedberg]
   If $X$ has decidable quality, then $X$ is a set.
 \end{theorem}
@@ -226,12 +226,15 @@ Second, a plausible alternative to the right totality~\eqref{def:right-total} is
   \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
 \end{equation}
 stating that each $x : |X|$ has a choice of realisers.
-%This is not reasonable if, say, $|X|$ is a function type since it amounts to giving a standard implementation in $\lambda$-calculus for any realisable function $f$.
-However, with functional extensionality, any inhabitant of~\eqref{eq:alternative-right-totality} leads to a contradiction~\cite{Troelstra1977}. \ltnote{prove it formally}
+However, by inspecting Troelstra's argument~\cite{Troelstra1977} (also Forster's Coq formalisation~\cite{forster2021}) one can show that \eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ allows us to define 
+\begin{equation}\label{eq:all-zeros-is-decidable}
+  \prd{f : \Nat \to \Nat} \mathsf{Dec}\left(f = (\lambda x.\, 0)\right)
+\end{equation}
+using function extensionality and confluence of $\lambda$-calculus where natural numbers are realised by terms reducible to Church numerals.
+Clearly, \eqref{eq:all-zeros-is-decidable} is empty, so \eqref{eq:alternative-right-totality} is not adopted.
 
 \begin{example}\label{ex:assembly-lambda}
   The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
-  This assembly plays a major role in our study as the assembly of realisers.
 \end{example}
 
 \begin{example}
@@ -353,7 +356,7 @@ From the strictness of the initial object, no morphism from $\top$ to $\bot$ cou
 
 The construction of exponential $X \Rightarrow Y$ is a bit intriguing.
 With the definition of trackable maps, we may expect the exponential assembly $X \Rightarrow Y$ to consist of trackable maps.
-However, the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier, since the carrier is meant to be the type of extensions of trackable maps.
+However, the exponential assembly $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier, since the carrier is meant to be the type of \emph{extensions} of trackable maps.
 \begin{example}[Exponential]
   Given assemblies $X$ and $Y$, define
   \begin{align*}

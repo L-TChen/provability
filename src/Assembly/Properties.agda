@@ -57,15 +57,14 @@ id-∘ {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , F , λ {M} {x} r → lem
   ; ⊩-isSet       = isProp→isSet isPropUnit*
   }
 
+_⊩ℕ_ : Λ₀ → ℕ → 𝓤₀ ̇
+M ⊩ℕ n = M -↠ 𝒄 n
 ℕₐ : Asm₀
-ℕₐ = (ℕ , isSetℕ) , _⊩_ , record
+ℕₐ = (ℕ , isSetℕ) , _⊩ℕ_ , record
   { ⊩-respects-↠  = -↠-trans
   ; ⊩-right-total = λ n → ∣ 𝒄 n , -↠-refl ∣
   ; ⊩-isSet       = -↠isSet 
   }
-  where
-    _⊩_ : Λ₀ → ℕ → 𝓤₀ ̇
-    M ⊩ n = M -↠ 𝒄 n
 
 -- Proposition: The set Λ₀ of lambda terms is equipped with an assembly structure.
 Λ₀ₐ : Asm₀
@@ -74,6 +73,23 @@ id-∘ {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , F , λ {M} {x} r → lem
   ; ⊩-right-total = λ M → ∣ M , -↠-refl ∣
   ; ⊩-isSet       = -↠isSet 
   }
+
+CT+FunExt=⊥ : ((f : ℕ → ℕ) → Σ[ F ∶ Λ₀ ] ({n : ℕ} {M : Λ₀} → M ⊩ℕ n → (F · M) ⊩ℕ f n))
+  → (f : ℕ → ℕ)
+  → Dec ((n : ℕ) → f n ≡ 0)
+CT+FunExt=⊥ G f with G f .fst ≟ G (λ _ → 0) .fst
+... | no ¬p = no  λ h → ¬p (cong (λ g → G g .fst) (funExt h))
+... | yes p = yes λ n → 𝒄-inj (Gf .fst · 𝒄 n) (f n) 0 (Gf .snd -↠-refl)
+  (subst (λ M → M · (𝒄 n) -↠ 𝒄 0) (sym p) (G0 .snd -↠-refl))
+  where
+    open Λ.Progress
+    G0 = G (λ _ → 0)
+    Gf = G f
+    postulate
+      𝒄-inj′ : (m n : ℕ) → 𝒄 m ≡ 𝒄 n → m ≡ n
+      Normal-𝒄 : (n : ℕ) → Normal (𝒄 n)
+    𝒄-inj : (M : Λ₀) (m n : ℕ) → M -↠ 𝒄 m → M -↠ 𝒄 n → m ≡ n
+    𝒄-inj M m n p q = 𝒄-inj′ m n (Normal⇒Path (Normal-𝒄 m) (Normal-𝒄 n) p q)
 
 ------------------------------------------------------------------------------
 -- Finality
@@ -248,7 +264,10 @@ _⇒_ {𝓤} X Y = (X⇒Y , X⇒YisProp) , _⊩_ , record
 
       _⊩_ : Λ₀ → X⇒Y → 𝓤 ̇
       F ⊩ (f , _) = {M : Λ₀} {x : ⟨ X ⟩} → M X.⊩ x → (F · M Y.⊩ f x)
-
+{-
+      ⊩isSet : (F : Λ₀) (f : X⇒Y) → isSet (F ⊩ f)
+      ⊩isSet F f = isSetΠ3 λ _ _ _ → Y.⊩-isSet
+-}
       postulate
         ⊩isSet : {F : Λ₀} {f : X⇒Y} → isSet (F ⊩ f)
 
@@ -267,7 +286,7 @@ module Exponential (X Y : Asm 𝓤) where
   X⇒Y = X ⇒ Y
   module X⇒Y = AsmStr (str X⇒Y)
   open -↠-Reasoning
-      
+   
   postulate
     uncurry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
     eval : Trackable (X⇒Y ×ₐ X) Y
