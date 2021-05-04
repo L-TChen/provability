@@ -195,8 +195,8 @@ the technical foundation for~\Cref{sec:provability}.
 \subsection{Assembly}
 Traditionally, an assembly on natural numbers is a set $\bproj{X}$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ in $\bproj{X}$ there exists some $a$ with $a \Vdash x$.
 We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $a \Vdash x$.
-The notion of assemblies is nowadays often defined on a partial applicative structure $(A, \cdot)$ satisfying combinatory completeness, i.e.\ a partial combinatory algebra~\cite{Oosten2008}, PCA for short.
-Our definition below is, apart from being type-theoretic, not an instance of the definition based on a PCA.
+The notion of assemblies is nowadays often defined on a partial applicative structure $(A, \cdot)$ satisfying combinatory completeness~\cite{Oosten2008}, i.e.\ a partial combinatory algebra, \emph{PCA} for short.
+Our definition below is more akin to, but not an instance of, the definition based on an ordered PCA~\cite{Hofstra2003}.
 \hsnote{A bit of comparison here}
 \begin{definition}\label{def:assembly}
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} set $|X| : \setU$ and a family ${\Vdash_X}$ of sets indexed by $\Lambda_0$ to $|X|$ as its \emph{realisability relation} such that
@@ -216,34 +216,31 @@ Our definition below is, apart from being type-theoretic, not an instance of the
   \end{align}
 \end{definition}
 
-The required properties of \Cref{def:assembly} depart from the definition based on a PCA as follows. 
+Regarding our type-theoretic formulation, there are at least two aspects worthy of some discussion.
 First, as we would like to account for intensional equality in addition to extensional equality between terms,
-$\beta$-equivalent terms cannot be identified \emph{a priori}.
-As a result, the interaction with reduction $\reduce$ is formulated as~\eqref{def:respect-reduction} in line with the definition on an ordered PCA~\cite[Section~2.3]{Hofstra2003}.
+computationally equivalent terms should not be identified \emph{a priori}.
+It turns out that formulating the interaction with reduction $\reduce$ as~\eqref{def:respect-reduction} in line with the definition on an ordered PCA suffices to server our purpose.
 %The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
 Second, a plausible alternative to the right totality~\eqref{def:right-total} is
 \begin{equation}\label{eq:alternative-right-totality}
   \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
 \end{equation}
 stating that each $x : |X|$ has a choice of realisers.
-However, by inspecting Troelstra's argument~\cite{Troelstra1977} (also Forster's Coq formalisation~\cite{forster2021}) one can show that \eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ allows us to define 
-\begin{equation}\label{eq:all-zeros-is-decidable}
-  \prd{f : \Nat \to \Nat} \mathsf{Dec}\left(f = (\lambda x.\, 0)\right)
-\end{equation}
-using function extensionality and confluence of $\lambda$-calculus where natural numbers are realised by terms reducible to Church numerals.
-Clearly, \eqref{eq:all-zeros-is-decidable} is empty, so \eqref{eq:alternative-right-totality} is not adopted.
+However, let naturals be realised by terms reducible to Church numerals (\Cref{ex:assembly-naturals} below) and functions be realised in the typical way.
+Then, by function extensionality, any inhabitant~$G$ of~\eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ would allow us to decide whether a function~$f$ is propositionally equal to a constant function or not by comparing their realisers $Gf$ and~$G(\lambda x.\, 0)$ as shown by Troelstra~\cite{Troelstra1977,forster2021}, which is not possible.
+Hence, the type~\eqref{eq:alternative-right-totality} is just empty. 
 
-\begin{example}\label{ex:assembly-lambda}
-  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
-\end{example}
-
-\begin{example}
-  Every natural number $n : \Nat$ is realised by its Church numeral~$\mathtt{c}_n$. That is,
-  the type $\Nat$ of natural numbers with the realisability relation $\Vdash_{\Nat}$ defined by
+\begin{example} \label{ex:assembly-naturals}
+  Every natural number $n : \Nat$ is realised by its Church numeral~$\mathtt{c}_n$.
+  That is, the type $\Nat$ of natural numbers with the realisability relation $\Vdash_{\Nat}$ defined by
   \[
     \left(M \Vdash_\Nat n\right) \defeq \left(M \reduce \mathtt{c}_n\right)
   \]
-  is an assembly where $r_\Nat$ and $t_\Nat$ are similar to those of~\Cref{ex:assembly-lambda}.  
+  is an assembly where $r_\Nat$ and $t_\Nat$ are given by the transitivity and the reflexivity of~$\reduce$.
+\end{example}
+
+\begin{example}\label{ex:assembly-lambda}
+  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
 \end{example}
 
 \subsection{Trackable map}%
