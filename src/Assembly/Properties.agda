@@ -79,17 +79,14 @@ CT+FunExt=⊥ : ((f : ℕ → ℕ) → Σ[ F ∶ Λ₀ ] ({n : ℕ} {M : Λ₀} 
   → Dec ((n : ℕ) → f n ≡ 0)
 CT+FunExt=⊥ G f with G f .fst ≟ G (λ _ → 0) .fst
 ... | no ¬p = no  λ h → ¬p (cong (λ g → G g .fst) (funExt h))
-... | yes p = yes λ n → 𝒄-inj (Gf .fst · 𝒄 n) (f n) 0 (Gf .snd -↠-refl)
+... | yes p = yes λ n → 𝒄-inj′ (Gf .fst · 𝒄 n) (f n) 0 (Gf .snd -↠-refl)
   (subst (λ M → M · (𝒄 n) -↠ 𝒄 0) (sym p) (G0 .snd -↠-refl))
   where
     open Λ.Progress
     G0 = G (λ _ → 0)
     Gf = G f
-    postulate
-      𝒄-inj′ : (m n : ℕ) → 𝒄 m ≡ 𝒄 n → m ≡ n
-      Normal-𝒄 : (n : ℕ) → Normal (𝒄 n)
-    𝒄-inj : (M : Λ₀) (m n : ℕ) → M -↠ 𝒄 m → M -↠ 𝒄 n → m ≡ n
-    𝒄-inj M m n p q = 𝒄-inj′ m n (Normal⇒Path (Normal-𝒄 m) (Normal-𝒄 n) p q)
+    𝒄-inj′ : (M : Λ₀) (m n : ℕ) → M -↠ 𝒄 m → M -↠ 𝒄 n → m ≡ n
+    𝒄-inj′ M m n p q = 𝒄-inj m n (Normal⇒Path (𝒄-is-Normal m) (𝒄-is-Normal n) p q)
 
 ------------------------------------------------------------------------------
 -- Finality

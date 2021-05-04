@@ -4,6 +4,7 @@ open import Prelude
 
 open import Calculus.Untyped.Base
 open import Calculus.Untyped.Substitution
+open import Calculus.Untyped.Progress
 
 private
   variable
@@ -37,8 +38,24 @@ pre𝒄_ : ℕ → Λ 2
 pre𝒄 zero    = 0
 pre𝒄 (suc n) = 1 · pre𝒄 n
 
+pre𝒄-inj : (m n : ℕ) → pre𝒄 m ≡ pre𝒄 n → m ≡ n
+pre𝒄-inj zero    zero    _ = refl
+pre𝒄-inj (suc m) (suc n) p = cong suc (pre𝒄-inj m n (decode (encode p .snd)))
+pre𝒄-inj zero    (suc n) p = ⊥-elim {A = λ _ → 0 ≡ suc n} (encode p)
+pre𝒄-inj (suc m) zero    p = ⊥-elim {A = λ _ → suc m ≡ 0} (encode p)
+
 𝒄_ : ℕ → Λ₀
 𝒄 n = ƛ ƛ pre𝒄 n
+
+pre𝒄-is-Normal : (n : ℕ) → Normal (pre𝒄 n)
+pre𝒄-is-Normal zero    = ′ (` fzero)
+pre𝒄-is-Normal (suc n) = ′ ((` fsuc fzero) · pre𝒄-is-Normal n)
+
+𝒄-is-Normal : (n : ℕ) → Normal (𝒄 n)
+𝒄-is-Normal n = ƛ ƛ pre𝒄-is-Normal n
+
+𝒄-inj : (m n : ℕ) → 𝒄 m ≡ 𝒄 n → m ≡ n
+𝒄-inj m n p = pre𝒄-inj m n (decode (encode p) )
 ------------------------------------------------------------------------------
 -- Examples
 
