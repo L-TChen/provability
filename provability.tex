@@ -121,8 +121,7 @@ Terms are defined informally by
 where variables $\mathtt{x}$ are in the typewriter font.
 $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms with at most $n$ free variables.
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
-By using the de Bruijn representation, $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction.
-Also, for $F : \Lambda_1$ we just write $F[M]$ instead of $F[M/\mathtt{x}]$ for substitution when there is no danger of confusion.
+By using the de Bruijn representation, $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction, and likewise for $F : \Lambda_{n+1}$ we write $F[M]$ instead of $F[M/\mathtt{x_0}]$ for substitution for the variable of index~$0$.
 The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
 The set $M \reduce M$ has an exactly one inhabitant---the empty sequence understood as (the proof of) the reflexivity~$\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$ if $M$ is clear from the context.
 Note that the type $\Lambda$ of terms has decidable equality, and so does $M \reduce N$, so they are sets by Hedberg's theorem.
@@ -227,7 +226,7 @@ Second, a plausible alternative to the right totality~\eqref{def:right-total} is
 \end{equation}
 stating that each $x : |X|$ has a choice of realisers.
 However, let naturals be realised by terms reducible to Church numerals (\Cref{ex:assembly-naturals} below) and functions be realised in the typical way.
-Then, by function extensionality, any inhabitant~$G$ of~\eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ would allow us to decide whether a function~$f$ is propositionally equal to a constant function or not by comparing their realisers $Gf$ and~$G(\lambda x.\, 0)$ as shown by Troelstra~\cite{Troelstra1977,forster2021}, which is not possible.
+By function extensionality, any inhabitant~$G$ of~\eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ would then allow us to decide whether a function~$f$ is propositionally equal to a constant function or not by comparing their realisers $Gf$ and~$G(\lambda x.\, 0)$ as shown by Troelstra~\cite{Troelstra1977,forster2021}, which is not possible.
 Hence, the type~\eqref{eq:alternative-right-totality} is just empty. 
 
 \begin{example} \label{ex:assembly-naturals}
@@ -385,7 +384,7 @@ In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \
 For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not.%
 \hsnote{forward reference to \Cref{re:boxtimes-is-not}}
 Most importantly, we are able to refute the completeness principle $X \to \boxtimes X$ understood as a quoting function from the computational perspective, while we did not find a way to refute it with $\boxtimes_K$.
-Hitherto, we have reformulated and refined the previous results (based on a partial combinatory algebra, though) in HoTT.
+Hitherto, we have reformulated and refined the previous results (based on a partial combinatory algebra, though) of the \SFour modality by Kavvos~\cite{Kavvos2017b} in HoTT.
 \hsnote{Which is based on (a) PCA?}
 
 Thereafter, we use an extension of cubical type theory with Löb induction---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the \GL modality.
