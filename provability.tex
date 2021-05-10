@@ -114,6 +114,8 @@ We highlight the main difference between set theory and homotopy type theory.
 
 \subsection{\texorpdfstring{$\lambda$}{λ}-calculus}
 For $\lambda$-calculus, we fix notations and state a few of its properties in homotopy type theory.
+Most of details can be found in the classic textbook by Barendregt~\cite{Barendregt1984a}.
+
 Terms are defined informally by
 \[
   M \defeq \mathtt{x} \mid M\,N \mid \lambda \mathtt{x}.\, M
@@ -123,8 +125,47 @@ $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms with at mo
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
 By using the de Bruijn representation, $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction, and likewise for $F : \Lambda_{n+1}$ we write $F[M]$ instead of $F[M/\mathtt{x_0}]$ for substitution for the variable of index~$0$.
 The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
-The set $M \reduce M$ has an exactly one inhabitant---the empty sequence understood as (the proof of) the reflexivity~$\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$ if $M$ is clear from the context.
-Note that the type $\Lambda$ of terms has decidable equality, and so does $M \reduce N$, so they are sets by Hedberg's theorem.
+The set $M \reduce M$ has an exactly one inhabitant---the empty sequence understood as (the proof of) the reflexivity~$\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$.
+The type $\Lambda$ of terms has decidable equality as well as $M \reduce N$, so they are sets by Hedberg's theorem.
+
+\subsubsection{Gödel encoding and the Second Recursion Theorem}\label{subsec:godel}
+In $\lambda$-calculus there is a function between $\lambda$-terms
+  $\qquote{\cdot} : \Lambda \to \Lambda_0$
+mapping any term $M$ to a closed term $\qquote{M}$ such that $\qquote{M}$ is normal and
+$M \equiv_\alpha N$ whenever $\qquote{M} \equiv_\alpha \qquote{N}$.
+Moreover there are terms $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mathtt{quote}$, $\mathtt{eval} \in \Lambda_1$ satisfying
+
+\begin{align*}
+  \mathtt{ap}[\,\qquote{M}\,][\,\qquote{N}\,] & \reduce \qquote{M\,N}
+                                                                & \mathtt{subst}[\,\qquote{F}\,][\,\qquote{N}\,] & \reduce \qquote{F[N]} \\
+  \mathtt{quote}[\,\qquote{M}\,] & \reduce \qquote{\qquote{M}}         
+                                                     & \mathtt{eval}[\,\qquote{M}\,] & \reduce M.
+\end{align*}
+This function $\qquote{\cdot}$ is called a \emph{Gödel encoding}.
+By convention a quoted term $\qquote{M}$ is called a Gödel \emph{number} since the encoding function $\qquote{\cdot}$ is defined by assigning a natural number $\#M$ represented as a Church numeral $\mathbf{c}_{\#M}$ to every term~$M$, a method invented by Gödel to prove the incompleteness theorems.
+By nature it does not have to be a number at all, so we refrain from calling $\qquote{M}$ a number. 
+Instead, $\qquote{M}$ is simply called a \emph{code} of $M$. 
+For details on the axiomatic characterisation of encoding, see Polonsky~\cite{Polonsky2011}.
+
+Note that the term $\mathtt{quote}$ can only compute the code of a term $\qquote{M}$ already in a quoted form.
+Indeed, no such term can compute the code of any arbitrary term.
+\begin{proposition}\label{prop:no-quoting}
+  There is no $\mathtt{Q} : \Lambda_1$ such that $\mathtt{Q}[M] \reduce \qquote{M}$ for any $M : \Lambda$.
+\end{proposition}
+\begin{proof}
+  Assume such a term $\mathtt{Q}$ exists. 
+  Consider $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$ and $\mathtt{I}\,\mathtt{I}$. 
+  We have $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \qquote{\mathtt{I}\,\mathtt{I}}$ by assumption but also $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \mathtt{Q}[\mathtt{I}]\reduce \qquote{I}$.
+  Hence, by confluence and the assumption that $\qquote{M}$ is normal for any $M$, it follows that $\qquote{I\,I} \equiv_\alpha \qquote{I}$ and thus $\mathtt{I\,I} \equiv_\alpha \mathtt{I}$, a contradiction.
+\end{proof}
+\hsnote{revise}
+
+Contrary to the well-known Kleene's first recursion theorem, his second recursion theorem which works for \emph{code} is lesser known but far more interesting for our purpose.
+
+\begin{theorem}[Second Recursion Theorem] \label{thm:SRT}
+  Every term $F : \Lambda$ has a closed term $M$ with $M \reduce F\,\qquote{M}$.
+  In particular every $F : \Lambda_1$ has $\mathsf{fix}\,F : \Lambda_0$ satisfying $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
+\end{theorem}
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
 Instead of ordinary categories, we work with $\PP$-categories as pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} to study normalisation in typed $\lambda$-calculus.
@@ -209,25 +250,28 @@ Our definition below is more akin to but not an instance of the definition based
   \]
   where
   \begin{align}
-    \mathsf{Respects}\left(\mathord{\Vdash_X}, \mathord{\twoheadrightarrow_\beta}\right) & \defeq\prd{M N : \Lambda_0}{x : |X|} \left(M \twoheadrightarrow_ \beta N\right) \to \left(N \Vdash x\right) \to \left(M \Vdash x\right) \label{def:respect-reduction} \\      
+    \mathsf{Respects}\left(\mathord{\Vdash_X}, \mathord{\twoheadrightarrow_\beta}\right) & \defeq\prd{M N : \Lambda_0}{x : |X|} \left(M \twoheadrightarrow_ \beta N\right) \to \left(N \Vdash x\right) \to \left(M \Vdash x\right) \label{eq:respect-reduction} \\      
     \mathsf{RightTotal}(\Vdash_X) & \defeq \fall{x : |X|}\exis{M : \Lambda_0} M \Vdash x
-    \label{def:right-total}
+    \label{eq:right-total}
   \end{align}
 \end{definition}
 
 Regarding our type-theoretic formulation, there are at least two aspects worthy of some discussion.
 First, as we would like to account for intensional equality in addition to extensional equality between terms,
 computationally equivalent terms should not be identified \emph{a priori}.
-It turns out that formulating the interaction with reduction $\reduce$ as~\eqref{def:respect-reduction} in line with the definition on an ordered PCA suffices to server our purpose.
+It turns out that formulating the interaction with reduction $\reduce$ as~\eqref{eq:respect-reduction} in line with the definition on an ordered PCA suffices to derive properties akin to classic results.
 %The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
-Second, a plausible alternative to the right totality~\eqref{def:right-total} is
+Second, a plausible alternative to the right totality~\eqref{eq:right-total} one might expect is
 \begin{equation}\label{eq:alternative-right-totality}
   \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
 \end{equation}
-stating that each $x : |X|$ has a choice of realisers.
-However, let naturals be realised by terms reducible to Church numerals (\Cref{ex:assembly-naturals} below) and functions be realised in the typical way.
-By function extensionality, any inhabitant~$G$ of~\eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ would then allow us to decide whether a function~$f$ is propositionally equal to a constant function~$\lambda x.\, 0$ or not by comparing their realisers $\pr_1(Gf)$ and~$\pi_1(G(\lambda x.\, 0))$ following Troelstra's argument~\cite{Troelstra1977}.
-Hence, we choose not to use the type~\eqref{eq:alternative-right-totality} so that our formulation is most likely consistent with, say, Bauer's enumerability axiom~\cite{Bauer2006} as observed by Forster~\cite{forster2021}.
+stating that each inhabitant $x : |X|$ has a choice of realisers.
+However, when $\bproj{X} = \Lambda_0 \to \Lambda_0$, an inhabitant of type~\eqref{eq:alternative-right-totality} amounts to saying that the quoting function is $\lambda$-definable, contradicting~\Cref{prop:no-quoting} if $\Lambda_0$ is equipped with an assembly structure as given in~\Cref{ex:assembly-lambda} below.
+On the other hand, an instance of~\eqref{eq:right-total} amounts to the Church's thesis which is independent of univalent type theories~\cite{Swan2019}.
+
+\begin{example}\label{ex:assembly-lambda}
+  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
+\end{example}
 
 \begin{example} \label{ex:assembly-naturals}
   Every natural number $n : \Nat$ is realised by its Church numeral~$\mathtt{c}_n$.
@@ -236,10 +280,6 @@ Hence, we choose not to use the type~\eqref{eq:alternative-right-totality} so th
     \left(M \Vdash_\Nat n\right) \defeq \left(M \reduce \mathtt{c}_n\right)
   \]
   is an assembly where $r_\Nat$ and $t_\Nat$ are given by the transitivity and the reflexivity of~$\reduce$.
-\end{example}
-
-\begin{example}\label{ex:assembly-lambda}
-  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
 \end{example}
 
 \subsection{Trackable map}%
@@ -392,49 +432,6 @@ Finally, we establish one of the main contributions of this paper: given a track
 where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
 This is exactly the deductive form of the Gödel-Löb axiom in $\Asm(\Lambda)$.
 
-\subsection{A recap: Gödel encoding and the Second Recursion Theorem}\label{subsec:godel}
-Before entering into the main topic of this section, we review the Second Recursion Theorem in $\lambda$-calculus.
-All details can be found in the classic textbook by Barendregt~\cite[Section~6.5]{Barendregt1984a}.
-
-Recall that in $\lambda$-calculus there is a function between $\lambda$-terms
-\[
-  \qquote{\cdot} : \Lambda \to \Lambda_0
-\]
-mapping any term $M$ to a closed term $\qquote{M}$ such that $\qquote{M}$ is normal and
-$M \equiv_\alpha N$ whenever $\qquote{M} \equiv_\alpha \qquote{N}$.
-Moreover there are terms $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mathtt{quote}$, $\mathtt{eval} \in \Lambda_1$ satisfying
-
-\begin{align*}
-  \mathtt{ap}[\,\qquote{M}\,][\,\qquote{N}\,] & \reduce \qquote{M\,N}
-                                                                & \mathtt{subst}[\,\qquote{F}\,][\,\qquote{N}\,] & \reduce \qquote{F[N]} \\
-  \mathtt{quote}[\,\qquote{M}\,] & \reduce \qquote{\qquote{M}}         
-                                                     & \mathtt{eval}[\,\qquote{M}\,] & \reduce M.
-\end{align*}
-This function $\qquote{\cdot}$ is called a \emph{Gödel encoding}.
-By convention a quoted term $\qquote{M}$ is called a Gödel \emph{number} since the encoding function $\qquote{\cdot}$ is defined by assigning a natural number $\#M$ represented as a Church numeral $\mathbf{c}_{\#M}$ to every term~$M$, a method invented by Gödel to prove the incompleteness theorems.
-By nature it does not have to be a number at all, so we refrain from calling $\qquote{M}$ a number. 
-Instead, $\qquote{M}$ is simply called a \emph{code} of $M$. 
-For details on the axiomatic characterisation of encoding, see Polonsky~\cite{Polonsky2011}.
-
-Note that the term $\mathtt{quote}$ can only compute the code of a term $\qquote{M}$ already in a quoted form.
-Indeed, no such term can compute the code of any arbitrary term.
-\begin{proposition}\label{prop:no-quoting}
-  There is no $\mathtt{Q} : \Lambda_1$ such that $\mathtt{Q}[M] \reduce \qquote{M}$ for any $M : \Lambda$.
-\end{proposition}
-\begin{proof}
-  Assume such a term $\mathtt{Q}$ exists. 
-  Consider $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$ and $\mathtt{I}\,\mathtt{I}$. 
-  We have $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \qquote{\mathtt{I}\,\mathtt{I}}$ by assumption but also $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \mathtt{Q}[\mathtt{I}]\reduce \qquote{I}$.
-  Hence, by confluence and the assumption that $\qquote{M}$ is normal for any $M$, it follows that $\qquote{I\,I} \equiv_\alpha \qquote{I}$ and thus $\mathtt{I\,I} \equiv_\alpha \mathtt{I}$, a contradiction.
-\end{proof}
-\hsnote{revise}
-
-Contrary to the well-known Kleene's first recursion theorem, his second recursion theorem which works for \emph{code} is lesser known but far more interesting for our purpose.
-
-\begin{theorem}[Second Recursion Theorem] \label{thm:SRT}
-  Every term $F : \Lambda$ has a closed term $M$ with $M \reduce F\,\qquote{M}$.
-  In particular every $F : \Lambda_1$ has $\mathsf{fix}\,F : \Lambda_0$ satisfying $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
-\end{theorem}
 
 \subsection{An exposure for \texorpdfstring{\SFour}{S4} modality}
 An assembly $X$ records the interplay between intensions (i.e.\ terms) and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \bproj{X}$ with a term $M$ which realises $x$ as the carrier of $\boxtimes X$.
@@ -886,6 +883,7 @@ From the aspect of the design of programming languages, we expect that this line
 %  
 %\end{theorem}
 
+\nocite{Bauer2006}
 \bibliographystyle{plainurl}% the mandatory bibstyle
 \bibliography{ref}
 

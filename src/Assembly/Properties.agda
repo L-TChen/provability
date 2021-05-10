@@ -74,10 +74,9 @@ M ⊩ℕ n = M -↠ 𝒄 n
   ; ⊩-isSet       = -↠isSet 
   }
 
-CT+FunExt=⊥ : ((f : ℕ → ℕ) → Σ[ F ∶ Λ₀ ] ({n : ℕ} {M : Λ₀} → M ⊩ℕ n → (F · M) ⊩ℕ f n))
-  → (f : ℕ → ℕ)
-  → Dec ((n : ℕ) → f n ≡ 0)
-CT+FunExt=⊥ G f with G f .fst ≟ G (λ _ → 0) .fst
+CT+FunExt : ((f : ℕ → ℕ) → Σ[ F ∶ Λ₀ ] (∀ {n M} → M ⊩ℕ n → (F · M) ⊩ℕ f n))
+  → (f : ℕ → ℕ) → Dec ((n : ℕ) → f n ≡ 0)
+CT+FunExt G f with G f .fst ≟ G (λ _ → 0) .fst
 ... | no ¬p = no  λ h → ¬p (cong (λ g → G g .fst) (funExt h))
 ... | yes p = yes λ n → 𝒄-inj′ (Gf .fst · 𝒄 n) (f n) 0 (Gf .snd -↠-refl)
   (subst (λ M → M · (𝒄 n) -↠ 𝒄 0) (sym p) (G0 .snd -↠-refl))
@@ -87,6 +86,16 @@ CT+FunExt=⊥ G f with G f .fst ≟ G (λ _ → 0) .fst
     Gf = G f
     𝒄-inj′ : (M : Λ₀) (m n : ℕ) → M -↠ 𝒄 m → M -↠ 𝒄 n → m ≡ n
     𝒄-inj′ M m n p q = 𝒄-inj m n (Normal⇒Path (𝒄-is-Normal m) (𝒄-is-Normal n) p q)
+
+module _ (Q : Quoting) where
+  open Quoting Q
+
+  CT′+FunExt→⊥ : ((f : Λ₀ → Λ₀) → Σ[ F ∶ Λ₀ ] (∀ {M N : Λ₀} → M -↠ N → F · M -↠ f N))
+    → Σ[ Q ∶ Λ₀ ] ∀ (M : Λ₀) → Q · M -↠ ⌜ M ⌝
+  CT′+FunExt→⊥ G = QQ , λ M → q -↠-refl 
+    where
+      QQ = G ⌜_⌝ .fst
+      q  = G ⌜_⌝ .snd
 
 ------------------------------------------------------------------------------
 -- Finality
