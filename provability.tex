@@ -195,7 +195,7 @@ the technical foundation for~\Cref{sec:provability}.
 Traditionally, an assembly on natural numbers is a set $\bproj{X}$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ in $\bproj{X}$ there exists some $a$ with $a \Vdash x$.
 We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $a \Vdash x$.
 The notion of assemblies is nowadays often defined on a partial applicative structure $(A, \cdot)$ satisfying combinatory completeness~\cite{Oosten2008}, i.e.\ a partial combinatory algebra, \emph{PCA} for short.
-Our definition below is more akin to, but not an instance of, the definition based on an ordered PCA~\cite{Hofstra2003}.
+Our definition below is more akin to but not an instance of the definition based on an ordered PCA~\cite{Hofstra2003}.
 \hsnote{A bit of comparison here}
 \begin{definition}\label{def:assembly}
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} set $|X| : \setU$ and a family ${\Vdash_X}$ of sets indexed by $\Lambda_0$ to $|X|$ as its \emph{realisability relation} such that
@@ -871,7 +871,7 @@ Second, inhabitants of $\Box^\kappa X$ are not accessible until the next stage. 
 This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2017a}.
 This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
 
-\ltnote{Third, \Cref{re:boxtimes-is-not} suggests a theory on categories enriched by \emph{partially ordered $\PP$-sets} instead}
+%\ltnote{Third, \Cref{re:boxtimes-is-not} suggests a theory on categories enriched by \emph{partially ordered $\PP$-sets} instead}
 
 Finally, categories internal to clocked type theory seem worth further investigation.
 It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract approach to the step-indexing technique used to reason about programming language features.
