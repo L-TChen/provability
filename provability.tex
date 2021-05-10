@@ -862,21 +862,21 @@ We then show that it satisfies the deductive form of the Gödel-Löb axiom---the
 This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} mark one of the main contribution of this paper.
 From the aspect of the design of programming languages, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely for tactic programming in a principled way.
 
-\paragraph*{Future work}
-First, as we have two apparently related exposures, one immediate question is how these two exposures are connected.  There is clearly a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know else much.
-The classical \SFour and \GL modalities and their connection laws are studied in Hilbert-style logic by Goris~\cite{Goris2009} with Kripke semantics in the context of provability logic.
-Accordingly, we would like to describe a type theory enriched with modalities $\boxtimes$ and $\Box$ unifying modal type theories considered by Davies and Pfenning~\cite{Davies2001b}, Pfenning~\cite{Pfenning2002a}, and by Kavvos~\cite{Kavvos2017b,Kavvos2020} while maintaining consistency.
-
-Second, inhabitants of $\Box^\kappa X$ are not accessible until the next stage. In order to arrive the next stage one needs a way to $\mathtt{force}$ them. 
-This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2017a}.
-This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
+%\paragraph*{Future work}
+%First, as we have two apparently related exposures, one immediate question is how these two exposures are connected.  There is clearly a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know else much.
+%The classical \SFour and \GL modalities and their connection laws are studied in Hilbert-style logic by Goris~\cite{Goris2009} with Kripke semantics in the context of provability logic.
+%Accordingly, we would like to describe a type theory enriched with modalities $\boxtimes$ and $\Box$ unifying modal type theories considered by Davies and Pfenning~\cite{Davies2001b}, Pfenning~\cite{Pfenning2002a}, and by Kavvos~\cite{Kavvos2017b,Kavvos2020} while maintaining consistency.
+%
+%Second, inhabitants of $\Box^\kappa X$ are not accessible until the next stage. In order to arrive the next stage one needs a way to $\mathtt{force}$ them. 
+%This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2017a}.
+%This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
 
 %\ltnote{Third, \Cref{re:boxtimes-is-not} suggests a theory on categories enriched by \emph{partially ordered $\PP$-sets} instead}
 
-Finally, categories internal to clocked type theory seem worth further investigation.
-It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract approach to the step-indexing technique used to reason about programming language features.
-We expect this line of research may provide a convenient framework for categorical semantics of those programming languages.
-
+%Finally, categories internal to clocked type theory seem worth further investigation.
+%It is a natural setting when the underlying foundation is equipped with Löb induction (guarded recursion) as an abstract approach to the step-indexing technique used to reason about programming language features.
+%We expect this line of research may provide a convenient framework for categorical semantics of those programming languages.
+%
 
 %If we follow the insight of Davies and Pfenning, then $\boxtimes X$ should be understood as the denotation for the type of typed code.
 %As a sanity check, we may further ask the type $\mathsf{Code}$ of \emph{untyped} code and a polymorphic function from $\boxtimes A$ to $\mathsf{Code}$ forgetting what a typed code denotes. 
