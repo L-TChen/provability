@@ -853,14 +853,13 @@ This extensional equality, however, does not hold as they have different intensi
 
 We follow the inspiring works by Kavvos in this paper to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus as the foundation of categorical semantics for intensionality. 
-The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which are not exposed in ordinary categories, since computationally equivalent terms are mostly identified on the semantics side \emph{a priori}.
-The situation is likely caused by the confusion between the concept of \emph{denotation} and that of \emph{extension}.
+The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which are not exposed in ordinary categories, since computationally equivalent terms are mostly identified on the semantics side \emph{a priori}, likely caused by identifying \emph{denotation} with \emph{extension}.
 
 Based on the framework established in~\Cref{sec:assemblies}, we modelled two intensional modalities $\boxtimes$ and $\Box$ satisfying the \SFour axiom and the \GL axiom respectively.
 The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{re:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
 As for the \GL modality, we use the clocked cubical type theory to define with a notion of computation stages.
-We then show that it satisfies the Gödel-Löb axiom and its deductive form---the intensional recursion~\cite{Kavvos2017b}.
-This \GL modality then answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contribution of this paper.
+We then show that it satisfies the deductive form of the Gödel-Löb axiom---the intensional recursion~\cite{Kavvos2017b}.
+This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} mark one of the main contribution of this paper.
 From the aspect of the design of programming languages, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely for tactic programming in a principled way.
 
 \paragraph*{Future work}
