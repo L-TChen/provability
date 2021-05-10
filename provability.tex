@@ -226,8 +226,8 @@ Second, a plausible alternative to the right totality~\eqref{def:right-total} is
 \end{equation}
 stating that each $x : |X|$ has a choice of realisers.
 However, let naturals be realised by terms reducible to Church numerals (\Cref{ex:assembly-naturals} below) and functions be realised in the typical way.
-By function extensionality, any inhabitant~$G$ of~\eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ would then allow us to decide whether a function~$f$ is propositionally equal to a constant function or not by comparing their realisers $Gf$ and~$G(\lambda x.\, 0)$ as shown by Troelstra~\cite{Troelstra1977,forster2021}, which is not possible.
-Hence, the type~\eqref{eq:alternative-right-totality} is just empty. 
+By function extensionality, any inhabitant~$G$ of~\eqref{eq:alternative-right-totality} for $\bproj{X} = \Nat \to \Nat$ would then allow us to decide whether a function~$f$ is propositionally equal to a constant function~$\lambda x.\, 0$ or not by comparing their realisers $\pr_1(Gf)$ and~$\pi_1(G(\lambda x.\, 0))$ following Troelstra's argument~\cite{Troelstra1977}.
+Hence, we choose not to use the type~\eqref{eq:alternative-right-totality} so that our formulation is most likely consistent with, say, Bauer's enumerability axiom~\cite{Bauer2006} as observed by Forster~\cite{forster2021}.
 
 \begin{example} \label{ex:assembly-naturals}
   Every natural number $n : \Nat$ is realised by its Church numeral~$\mathtt{c}_n$.
