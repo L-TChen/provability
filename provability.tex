@@ -266,8 +266,7 @@ Second, a plausible alternative to the right totality~\eqref{eq:right-total} one
   \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
 \end{equation}
 stating that each inhabitant $x : |X|$ has a choice of realisers.
-However, when $\bproj{X} = \Lambda_0 \to \Lambda_0$, an inhabitant of type~\eqref{eq:alternative-right-totality} amounts to saying that the quoting function is $\lambda$-definable, contradicting~\Cref{prop:no-quoting} if $\Lambda_0$ is equipped with an assembly structure as given in~\Cref{ex:assembly-lambda} below.
-On the other hand, an instance of~\eqref{eq:right-total} amounts to the Church's thesis which is independent of univalent type theories~\cite{Swan2019}.
+However, with function extensionality valid in HoTT, the alternative type~\eqref{eq:alternative-right-totality} is in fact empty considering, say, $\lambda$-definable functions between natural numbers by Troelstra~\cite{Troelstra1977}.
 
 \begin{example}\label{ex:assembly-lambda}
   The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
