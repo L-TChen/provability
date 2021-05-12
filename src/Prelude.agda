@@ -90,6 +90,14 @@ pattern ∣_∣* x = ∣ lift x ∣
 isSet→ : {A : 𝓤 ̇} {B : 𝓥 ̇} → isSet B → isSet (A → B)
 isSet→ pB = isSetΠ λ _ → pB
 
+isSetImplicitΠ : {B : A → 𝓥 ̇}
+  → (h : (x : A) → isSet (B x)) → isSet ({x : A} → B x)
+isSetImplicitΠ h f g p q i j {x} = h x (f {x}) (g {x}) (λ i → p i {x}) (λ i → q i {x}) i j
+
+isSetImplicitΠ2 : {B : A → 𝓥 ̇} {C : (x : A) → (y : B x) → 𝓦 ̇}
+  → (h : (x : A) (y : B x) → isSet (C x y)) → isSet ({x : A} {y : B x} → C x y)
+isSetImplicitΠ2 h = isSetImplicitΠ λ x → isSetImplicitΠ λ y → h x y
+
 ------------------------------------------------------------------------------
 -- Some properties about relation
 
