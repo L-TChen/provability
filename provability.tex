@@ -236,8 +236,10 @@ the technical foundation for~\Cref{sec:provability}.
 Traditionally, an assembly on natural numbers is a set $\bproj{X}$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ in $\bproj{X}$ there exists some $a$ with $a \Vdash x$.
 We say that $a$ \emph{realises} $x$ or $a$ is a \emph{realiser} of $x$ if $a \Vdash x$.
 The notion of assemblies is nowadays often defined on a partial applicative structure $(A, \cdot)$ satisfying combinatory completeness~\cite{Oosten2008}, i.e.\ a partial combinatory algebra, \emph{PCA} for short.
-Our definition below is more akin to but not an instance of the definition based on an ordered PCA~\cite{Hofstra2003}.
-\hsnote{A bit of comparison here}
+In particular, assemblies on a PCA is the main example discussed by Kavvos~\cite[Section~9]{Kavvos2017b}.
+
+For the sake of formalisation and potential applications in the design of programming languages, instead of a PCA we base our definion on $\lambda$-calculus subject to $\alpha$-equivalence which is more akin to the one on an ordered PCA~\cite{Hofstra2003}. 
+
 \begin{definition}\label{def:assembly}
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} set $|X| : \setU$ and a family ${\Vdash_X}$ of sets indexed by $\Lambda_0$ to $|X|$ as its \emph{realisability relation} such that
   \emph{(a)} there is merely a realiser $M : \Lambda_0$ of every $x : \bproj{X}$, and
@@ -256,18 +258,18 @@ Our definition below is more akin to but not an instance of the definition based
   \end{align}
 \end{definition}
 
-Regarding our type-theoretic formulation, there are at least two aspects worthy of some discussion.
-First, as we would like to account for intensional equality in addition to extensional equality between terms,
+Our type-theoretic formulation is almost a direct translation from the set-theoretic formulation except that the realisability~$\Vdash$ is not a relation but an indexed family of sets.
+As we would like to account for intensional equality in addition to extensional equality between terms,
 computationally equivalent terms should not be identified \emph{a priori}.
-It turns out that formulating the interaction with reduction $\reduce$ as~\eqref{eq:respect-reduction} in line with the definition on an ordered PCA suffices to derive properties akin to classic results.
+It turns out that formulating the interaction with reduction $\reduce$ as~\eqref{eq:respect-reduction} in line with the definition on an ordered PCA suffices to derive classic properties.
 %The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
-Second, a plausible alternative to the right totality~\eqref{eq:right-total} one might expect is
-\begin{equation}\label{eq:alternative-right-totality}
-  \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
-\end{equation}
-stating that each inhabitant $x : |X|$ has a choice of realisers.
-However, with function extensionality valid in HoTT, the alternative type~\eqref{eq:alternative-right-totality} is in fact empty considering, say, $\lambda$-definable functions between natural numbers by Troelstra~\cite{Troelstra1977}.
-\ltnote{Prove this formally}
+%Second, a plausible alternative to the right totality~\eqref{eq:right-total} one might expect is
+%\begin{equation}\label{eq:alternative-right-totality}
+%  \lprd{x : |X|} \lsm{M : \Lambda_0} M \Vdash x
+%\end{equation}
+%stating that each inhabitant $x : |X|$ has a choice of realisers.
+%However, this is a stronger requirement than asking the mere existence of a realiser.
+%With function extensionality valid in HoTT, we believe that the alternative type~\eqref{eq:alternative-right-totality} is in fact empty when $\bproj{X}$ considering Troelstra's argument~\cite{Troelstra1977}.
 
 \begin{example}\label{ex:assembly-lambda}
   The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
@@ -286,8 +288,7 @@ However, with function extensionality valid in HoTT, the alternative type~\eqref
 
 A morphism between assemblies on a PCA $(A, \cdot)$ is defined as a function~$f$ merely \emph{tracked by} some $b \in A$ in the sense that there merely exists some $b$ such that $b \cdot a \Vdash f\,x$ whenever $a \Vdash x$.
 In this case, $b$ is called the \emph{tracker} of $f$.
-It is noted by Kavvos~\cite{Kavvos2017b} that to reconcile intensionality the tracker should be considered as part of the structure instead of a property.
-\hsnote{change `reconcile' to `reveal'? `express'?}
+It is noted by Kavvos~\cite{Kavvos2017b} that to bring out intensionality the tracker should be considered as part of the structure instead of a property.
 \begin{definition}\label{def:trackable}
   Given assemblies $X$ and $Y$, a \emph{trackable map} from $X$ to $Y$ consists of a function $\bproj{f}$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ such that $F[M] \Vdash \bproj{f}\,x$ if $M \Vdash x$.
   In other words, the type $\Asm_1(X, Y)$ of trackable maps is $\sum_{\bproj{f} : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, \bproj{f})$ where
