@@ -279,7 +279,7 @@ _⇒_ {𝓤} X Y = (X⇒Y , X⇒YisProp) , _⊩_ , record
 
       ⊩-right-total : _⊩_ IsRightTotal
       ⊩-right-total (f , ∃F⊩f) = rec propTruncIsProp
-        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} {x} M⊩x → Y.⊩-respects-↠
+        (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} M⊩x → Y.⊩-respects-↠
           ((ƛ F) · M -→⟨ β ⟩ F [ M ] ∎) (F⊩f M⊩x)) ∣})
         ∃F⊩f
         
@@ -288,15 +288,54 @@ module Exponential (X Y : Asm 𝓤) where
   module Y = AsmStr (str Y)
   X⇒Y = X ⇒ Y
   module X⇒Y = AsmStr (str X⇒Y)
-  open -↠-Reasoning
+
+  lem : (M N : Λ₀) → (↑₁ (↑₁ M)) ⟪ exts (subst-zero N) ⟫ ≡ (↑₁ M)
+  lem M N = begin
+    (↑₁ (↑₁ M)) ⟪ exts (subst-zero N) ⟫
+      ≡⟨ rename-exts (subst-zero N) (↑₁ M) ⟩
+    ↑₁ (↑₁ M [ N ])
+      ≡⟨ cong ↑₁_ (subst-rename-∅ (subst-zero N) M) ⟩
+    ↑₁ M ∎
+    where open ≡-Reasoning
+    
+  pair : ∀ {n} → Λ (suc n) → Λ (suc n) → Subst 1 (suc n)
+  pair M N fzero = Λ.`⟨ M , N ⟩
+
+  eval : Trackable (X⇒Y ×ₐ X) Y
+  eval = (λ where ((f , _) , x) → f x) , 0 · ↑₁ 𝑻 · (0 · ↑₁ 𝑭)  , λ where
+    ((_ , red₁ , r₁) , (_ , red₂ , r₂)) → Y.⊩-respects-↠ (·-cong red₁ red₂) (r₁ r₂) 
+    
+  uncurry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
+  uncurry {Z = Z} (f , F , 𝔣) = 
+    (λ z →
+      (λ x → f (z , x)) , rec propTruncIsProp (λ { (R , t) → ∣ F ⟪ pair (↑₁ R) 0 ⟫ ,
+        (λ {M} {x} r → Y.⊩-respects-↠
+          (begin
+            F ⟪ pair (↑₁ R) 0 ⟫ [ M ]
+              ≡⟨ subst-assoc _ (subst-zero M) F ⟩
+            F ⟪ pair (↑₁ R) 0 ⨟ subst-zero M ⟫
+              ≡⟨ subst-cong (λ { fzero → (cong (λ T → ƛ 0 · T · ↑₁ M) (lem R M)) }) F ⟩
+            F [ Λ.`⟨ R , M ⟩ ]
+            ∎)
+          (𝔣 ((_ , β-projₗ , t) , _ , β-projᵣ , r))) ∣ })
+      (Z.⊩-right-total z)) ,
+    ƛ F ⟪ pair 1 0 ⟫ ,
+    λ {R} {z} t {M} {x} r → Y.⊩-respects-↠ (begin
+      (ƛ F ⟪ pair 1 0 ⟫) [ R ] · M
+        -→⟨ β ⟩
+      F ⟪ pair 1 0 ⟫ ⟪ exts (subst-zero R) ⟫ [ M ]
+        ≡⟨ subst-assoc (exts (subst-zero R)) (subst-zero M) (F ⟪ pair 1 0 ⟫) ⟩
+      F ⟪ pair 1 0 ⟫ ⟪ exts (subst-zero R) ⨟ subst-zero M ⟫ 
+        ≡⟨ subst-assoc _ _ F ⟩
+      F ⟪ pair 1 0 ⨟ (λ x → exts (subst-zero R) x [ M ]) ⟫
+        ≡⟨ subst-cong (λ { fzero → cong (λ T → ƛ 0 · ↑₁ T · ↑₁ M) (subst-rename-∅ (subst-zero M) _)}) F ⟩
+      F [ Λ.`⟨ R , M ⟩ ] ∎)
+      (𝔣 ((_ , β-projₗ , t) , _ , β-projᵣ , r))
+    where
+      open -↠-Reasoning
+      module Z = AsmStr (str Z)
+
    
-  postulate
-    uncurry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
-    eval : Trackable (X⇒Y ×ₐ X) Y
-    {-
-      uncurry {Z = Z} (f , F , F⊩f) = (λ z → (λ x → f (z , x)) , rec propTruncIsProp
-        (λ { (L , L⊩z) → ∣ ↑₁ (ƛ F) · Λ.`⟨ ↑₁ L , 0 ⟩ , {!!} ∣ }) (Z.⊩-right-total z)) , 
-        {!!} , {!!}
-        where
-          module Z = AsmStr (str Z)
-      -}
+
+
+
