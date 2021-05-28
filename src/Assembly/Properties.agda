@@ -1,7 +1,7 @@
 module Assembly.Properties where
 
 open import Prelude as 𝓤
-  hiding (_∘_; id; uncurry)
+  hiding (_∘_; id; uncurry; curry)
 open import Calculus.Untyped as Λ
   hiding (`⟨_,_⟩)
 
@@ -305,17 +305,17 @@ module Exponential (X Y : Asm 𝓤) where
   eval = (λ where ((f , _) , x) → f x) , 0 · ↑₁ 𝑻 · (0 · ↑₁ 𝑭)  , λ where
     ((_ , red₁ , r₁) , (_ , red₂ , r₂)) → Y.⊩-respects-↠ (·-cong red₁ red₂) (r₁ r₂) 
     
-  uncurry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
-  uncurry {Z = Z} (f , F , 𝔣) = 
+  curry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
+  curry {Z = Z} (f , F , 𝔣) = 
     (λ z →
-      (λ x → f (z , x)) , rec propTruncIsProp (λ { (R , t) → ∣ F ⟪ pair (↑₁ R) 0 ⟫ ,
+      (λ x → f (z , x)) , rec propTruncIsProp (λ { (L , t) → ∣ F ⟪ pair (↑₁ L) 0 ⟫ ,
         (λ {M} {x} r → Y.⊩-respects-↠
           (begin
-            F ⟪ pair (↑₁ R) 0 ⟫ [ M ]
+            F ⟪ pair (↑₁ L) 0 ⟫ [ M ]
               ≡⟨ subst-assoc _ (subst-zero M) F ⟩
-            F ⟪ pair (↑₁ R) 0 ⨟ subst-zero M ⟫
-              ≡⟨ subst-cong (λ { fzero → (cong (λ T → ƛ 0 · T · ↑₁ M) (lem R M)) }) F ⟩
-            F [ Λ.`⟨ R , M ⟩ ]
+            F ⟪ pair (↑₁ L) 0 ⨟ subst-zero M ⟫
+              ≡⟨ subst-cong (λ { fzero → (cong (λ T → ƛ 0 · T · ↑₁ M) (lem L M)) }) F ⟩
+            F [ Λ.`⟨ L , M ⟩ ]
             ∎)
           (𝔣 ((_ , β-projₗ , t) , _ , β-projᵣ , r))) ∣ })
       (Z.⊩-right-total z)) ,
