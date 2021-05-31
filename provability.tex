@@ -361,7 +361,7 @@ Now define the partial equivalence relation $\sim$ referred to as the extensiona
 
 We now investigate some of its basic properties.
 
-\begin{example}[Terminal object]
+\begin{example}[$\PP$-Terminal object]
   The unit assembly $\top \defeq (\Unit, \Vdash_{\Unit}, r_{\Unit}, t_{\Unit})$ is $\PP$-terminal where 
   \begin{romanenumerate}
     \item $\Unit$ is the unit type,  
@@ -383,7 +383,7 @@ In $\Asm(\Lambda)$ where trackers are part of trackable maps, a global element c
   \end{enumerate}
 \end{lemma}
 
-As expected, the terminal object $\top$ in~$\ASM(\Lambda)$ is a separator up to~$\sim$ in the sense that $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
+As expected, the $\PP$-terminal object $\top$ in~$\Asm(\Lambda)$ is a $\PP$-separator in the sense that $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
 This property relies on the property that the carrier $\bproj{X}$ is a set.
 \begin{proposition}
   Let $f_1, f_2 : X \to Y$ be two trackable maps. Then, 
@@ -396,7 +396,7 @@ This property relies on the property that the carrier $\bproj{X}$ is a set.
 \end{proof}
 
 \begin{corollary}
-  The terminal object $\top$ is a separator in $\Asm(\Lambda)$.
+  The $\PP$-terminal object $\top$ is a $\PP$-separator in $\Asm(\Lambda)$.
 \end{corollary}
 
 It is straightforward but tedious to define the $\PP$-product of assemblies, so we omit the details from the paper.
@@ -406,17 +406,17 @@ The empty assembly $\bot$ is $\PP$-initial consisting of the empty type $\Empty$
 The other two components $r_\Empty$ and $t_\Empty$ are trivial.
 \end{example}
 
-In addition, one can show that $\bot$ is even a \emph{strict} initial object. That is, 
+In addition, one can show that $\bot$ is even a \emph{strict} $\PP$-initial object. That is, 
 \begin{proposition}\label{prop:strict-initial}
   Any trackable map from some assembly $X$ to $\bot$ is a $\PP$-isomorphism. 
 \end{proposition}
 The strictness of $\bot$ follows easily from that for any type $X$ with a function $X \to \Empty$ one can show the equivalence $\eqv{\Empty}{X}$ in HoTT.
 From the strictness of the initial object, no morphism from $\top$ to $\bot$ could exist, since $\top$ is not equivalent to $\bot$.
 
-The construction of exponential $X \Rightarrow Y$ is a bit laborious.
-With the definition of trackable maps, we may expect the exponential $X \Rightarrow Y$ to consist of trackable maps.
+The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious.
+With the definition of trackable maps, we may expect the $\PP$-exponential $X \Rightarrow Y$ to consist of trackable maps.
 However, it has the type of \emph{merely} trackable maps as its carrier, since the carrier is meant to be the type of \emph{extensions} of trackable maps.
-\begin{example}[Exponential]
+\begin{example}[$\PP$-Exponential]
   Given assemblies $X$ and $Y$, define
   \begin{align*}
     \bproj{X \Rightarrow Y} & \defeq \sm{f : |X| \to |Y|} \exis{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f) \equiv \sm{f : |X| \to |Y|} \brck{\sm{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f) }
@@ -435,7 +435,7 @@ However, it has the type of \emph{merely} trackable maps as its carrier, since t
   The \emph{evaluation map} $(X \Rightarrow Y) \times X \xrightarrow{ev_{X, Y}} Y$ natural in $X$ and $Y$ consists of a function
   $((f, \star) , x) \mapsto f\,x$ and its tracker $(\mathtt{proj}_1 \mathtt{x}_0)\,(\mathtt{proj}_2 \mathtt{x}_0) : \Lambda_1$ where $\mathtt{x}_0$ is the free variable (thought as a pair of realisers for a function and its argument) and $\mathtt{proj}_i$ the projection function between $\lambda$-terms.
 
-  The \emph{curried map} of a trackable function $(f, F, \mathfrak{f}) \colon Z \times X \to Y$ consists of
+  The \emph{curried map} of a trackable function $(f, F, \mathfrak{f})$ from $Z \times X$ to $Y$ consists of
   \begin{enumerate}
     \item a function
       $f^* \defeq \lambda z.\, ((\lambda x.\, f\,(z, x)) , \star_z)$
@@ -452,9 +452,9 @@ However, it has the type of \emph{merely} trackable maps as its carrier, since t
   It is easy to verify all details as well as the universality.
 \end{example}
 
-In short, we have classic properties of the category $\Asm(\Lambda)$:
+In short, we have classic properties of the $\PP$-category $\Asm(\Lambda)$:
 \begin{corollary}
-  $\Asm(\Lambda)$ is a cartesian closed $\PP$-category with a strict initial object.
+  $\Asm(\Lambda)$ is a cartesian closed $\PP$-category with a strict $\PP$-initial object.
 \end{corollary}
 \ltnote{shall we show that $\Asm(\Lambda)$ has a natural number object? The role is replaced by~$\Lambda$ instead.}
 
@@ -508,7 +508,7 @@ In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\box
 \end{example}
 
 The above example shows that $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many representations for $\star : \Unit$, i.e.\ inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
-Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.\ltnote{write it down formally}
+Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.\ltnote{Is it true?}
 
 \begin{theorem}[{\emph{cf}.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
   $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is an exposure of assemblies.
