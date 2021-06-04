@@ -1,7 +1,7 @@
 \documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
 \numberwithin{equation}{section}
 
-\usepackage{mlmodern}
+%\usepackage{mlmodern}
 
 \makeatletter
 \def\renewtheorem#1{%
@@ -96,18 +96,29 @@
 \maketitle
 
 \begin{abstract}
-  \ltnote{not super happy with the abstract; rewrite it}
-  In this paper, we give a positive answer to a recent open problem---is there a categorical interpretation of the Gödel-Löb axiom~$\Box (\Box A \to A) \to \Box A$ which refutes the completeness principle $A \to \Box A$?
 
-  We consider the $\PP$-category $\Asm(\Lambda)$ of assemblies on untyped $\lambda$-calculus and trackable maps with an exposure-like construction $\Box\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$, internal to a guarded homotopy type theory, as the interpretation of the provability modality~$\Box$.
-  We show that $\Box$ refutes the reflection principle $\Box A \to A$ and the completeness principle but proves the Gödel-Löb axiom.
-  Of the utmost significance of the interpretation for $\Box A$ is that its denotation involves not only intensions, e.g., derivations of a proof, code of programs, or $\lambda$-terms modulo $\alpha$-equivalence given its provability reading but also their extensions enriched with a notion of computation stages. 
+There have been investigations into type-theoretic foundations for metaprogramming, notably Davies and Pfenning's~(2001) treatment in \SFour modal logic, where code evaluating to values of type~$A$ is given the modal type $\mathtt{Code}\,A$ ($\Box A$ in the original paper).
+Recently, in his modally typed $\lambda$-calculus iPCF, Kavvos~(2017) extended $\mathtt{Code}\,A$ with intensional recursion, understood as the Gödel--Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
+Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be computed in a later stage, whereas \SFour modal type theory is a special case where code can be evaluated in the current stage, and thus the two types of code should be distinguished.
 
-  Following the understanding of $\Box A$ as a type of typed code \`a la Davies and Pfenning, our work is a step towards extending type theories on which proof assistants are based with non-structural but guarded recursion for typed code while maintaining consistency.
+Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ modelling \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
+Following Kavvos'~(2017) novel approach to categorical semantics of intensionality, we interpret the two modalities as exposures in the $\PP$-category of assemblies and trackable maps.
+For the \GL modality~$\Box$, we use guarded type theory to model what it means by a `later' stage.
+Our model validates the \SFour and \GL axioms and \emph{additionally} refutes congruence (quoting preserves extensional equality) and the completeness principle (quoting stays within the same stage).
+
+Our results are fully formalised in Guarded Cubical Agda, an implementation of homotopy type theory extended with guarded recursion.
+
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
 \cite{Litak2014,Davies2001b}
+
+\paragraph*{Related work}
+\cite{Visser2019,Beklemishev2006}
+\cite{Kavvos2020}
+\cite{Shamkanov2014,Shamkanov2016a}
+
+Compare with Kavvos
 
 \paragraph*{Contributions}
 \ltnote{intensional modality?}
@@ -117,11 +128,6 @@
 \Cref{sec:assemblies}
 \Cref{sec:provability}
 \Cref{sec:conclusion}
-
-\paragraph*{Related work}
-\cite{Visser2019,Beklemishev2006}
-\cite{Kavvos2020}
-\cite{Shamkanov2014,Shamkanov2016a}
 
 \section{Preliminaries}\label{sec:preliminaries}
 This work is based on untyped $\lambda$-calculus~\cite{Barendregt1984a}, homotopy type theory~\cite{hottbook}, and $\PP$-categories~\cite{Cubric1998a}, which will be recalled in the rest of this section.
@@ -145,7 +151,7 @@ On the other hand, the disjoint sums $P + Q$ and $\sum_{x : A} R(x)$ are usually
 This reflects the fact that they are constructive versions of disjunction and existential quantification.
 In particular, from a proof of $\sum_{x : A} R(x)$ we can project a witness $x : A$ and a proof of $R(x)$.
 
-For any type~$A$, the \emph{truncation} of~$A$ is a type~$\brck A$ for which there is an introduction rule that wraps any $a : A$ into $|a| : \brck A$, and a higher one that introduces an inhabitant of $|a| =_{\brck A} |b|$ for any $a$,~$b : A$, equating all inhabitants of~$\brck A$ and making~$\brck A$ a proposition; the elimination rule maps $\brck A$ to a proposition~$P$ provided that $A \to P$.
+For any type~$A$, the \emph{truncation} of~$A$ is a type~$\brck A$ for which there is an introduction rule that wraps any $a : A$ into $|a| : \brck A$, and a higher one that introduces an inhabitant of $|a| =_{\brck A} |b|$ for any $a$,~$b : A$, equating all inhabitants of~$\brck A$ and making~$\brck A$ a proposition; its recursion principle maps $\brck A$ to a proposition~$P$ provided that $A \to P$.
 With truncation, we can obtain a classical version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sum_{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sum_{x : A} R(x)\right) \to P$.
 Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
@@ -920,8 +926,9 @@ Based on the framework established in~\Cref{sec:assemblies}, we modelled two int
 The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{re:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
 As for the \GL modality, we use the clocked cubical type theory to define with a notion of computation stages.
 We then show that it satisfies the deductive form of the Gödel-Löb axiom---the intensional recursion~\cite{Kavvos2017b}.
-This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contribution of this paper.
-From the aspect of the design of programming languages, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely for tactic programming in a principled way.
+This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contributions of this paper.
+From the aspect of the design of programming languages, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely for tactic programming in a principled way.%
+\hsnote{More concrete future work?}
 
 %\paragraph*{Future work}
 %First, as we have two apparently related exposures, one immediate question is how these two exposures are connected.  There is clearly a natural transformation from $\boxtimes$ to $\Box$ deferring computation to the next stage, but we do not know else much.
