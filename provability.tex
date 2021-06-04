@@ -99,14 +99,14 @@
 
 There have been investigations into type-theoretic foundations for metaprogramming, notably Davies and Pfenning's~(2001) treatment in \SFour modal logic, where code evaluating to values of type~$A$ is given the modal type $\mathtt{Code}\,A$ ($\Box A$ in the original paper).
 Recently, in his modally typed $\lambda$-calculus iPCF, Kavvos~(2017) extended $\mathtt{Code}\,A$ with intensional recursion, understood as the Gödel--Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
-Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be computed in a later stage, whereas \SFour modal type theory is a special case where code can be evaluated in the current stage, and thus the two types of code should be distinguished.
+Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be computed in a later stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and thus the two types of code should be distinguished.
 
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ modelling \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
-Following Kavvos'~(2017) novel approach to categorical semantics of intensionality, we interpret the two modalities as exposures in the $\PP$-category of assemblies and trackable maps.
+Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities as exposures in the $\PP$-category of assemblies and trackable maps.
 For the \GL modality~$\Box$, we use guarded type theory to model what it means by a `later' stage.
 Our model validates the \SFour and \GL axioms and \emph{additionally} refutes congruence (quoting preserves extensional equality) and the completeness principle (quoting stays within the same stage).
 
-Our results are fully formalised in Guarded Cubical Agda, an implementation of homotopy type theory extended with guarded recursion.
+Our results are fully formalised in Guarded Cubical Agda---an implementation of homotopy type theory extended with Nakano's guarded recursion.
 
 \end{abstract}
 
@@ -130,39 +130,39 @@ Compare with Kavvos
 \Cref{sec:conclusion}
 
 \section{Preliminaries}\label{sec:preliminaries}
-This work is based on untyped $\lambda$-calculus~\cite{Barendregt1984a}, homotopy type theory~\cite{hottbook}, and $\PP$-categories~\cite{Cubric1998a}, which will be recalled in the rest of this section.
-Most, if not all, of the materials are standard, so readers comfortable with the aforementioned subjects should feel free to skip this section.
+This work is based on untyped $\lambda$-calculus, homotopy type theory, and $\PP$-categories.
+Most, if not all, of the materials are standard, so we do not go into details but only recall what we need in the rest of this section.
 
 \subsection{Homotopy type theory}
 
-The mathematical foundation of our work is homotopy type theory (HoTT).
-In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $x =_A y$ of proofs that $x$~and~$y$ are equal; given an equality proof $p : x =_A y$, we can convert any $z : B(x)$ to $\mathsf{transport}(p, z) : B(y)$.
+The mathematical foundation of our work is homotopy type theory (HoTT)~\cite{hottbook}.
+In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $x =_A y$ of proofs that $x$~and~$y$ are equal; given an equality proof $p : x =_A y$, any $z : B(x)$ can be converted to $\mathsf{transport}(p, z) : B(y)$.
 Between equality proofs $p$, $q : x =_A y$ there is again a higher-dimensional equality type $p =_{x\,{=_A}\,y} q$, and so on.
 This infinite-dimensional structure of equality types can be seen as an abstract form of homotopy theory, where types are interpreted as spaces and equality proofs as paths; in particular, equality types are path spaces, and paths between paths are homotopies.
 Our work is built upon the reformulated set theory and logic within HoTT~\cite[Chapter~3]{hottbook}, where the equality structure degenerates at higher dimensions, but is still rich enough for us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence.
-Moreover, since implementations of HoTT are readily available, we are able to formalise and verify our constructions, for which HoTT provides essential features that some previous type theories lack, notably function extensionality: $(\prod_{x : A} f\,x =_B g\,x) \to f =_{A \to B} g$.
+Moreover, since implementations of HoTT are readily available, we are able to formalise and verify our constructions, for which HoTT provides essential features that some previous type theories lack, notably function extensionality: $\left(\prd{x : A} f\,x =_B g\,x\right) \to f =_{A \to B} g$.
 
 A \emph{proposition}~$P$ is a type whose equality types (types $x =_P y$ where $x$,~$y : P$) are all inhabited---that is, all inhabitants of~$P$ are deemed equal, so all we care about~$P$ is whether it is inhabited or not.
 If $P$~and~$Q$ are propositions, then their product $P \times Q$ is also a proposition.
-Similarly, if a family $R(x)$ of types indexed by $x : A$ (where $A$~is any type) are all propositions, then the product $\prod_{x : A} R(x)$ is also a proposition.
-Logically these give us conjunction and universal quantification; therefore we sometimes write $\fall{x : A} R(x)$ in place of $\prod_{x : A} R(x)$.
+Similarly, if a family $R(x)$ of types indexed by $x : A$ (where $A$~is any type) are all propositions, then the product $\prd{x : A} R(x)$ is also a proposition.
+Logically these give us conjunction and universal quantification; therefore we sometimes write $\fall{x : A} R(x)$ in place of $\prd{x : A} R(x)$.
 Function types $A \to P$ are a special case of~$\prod$, so we have implication too.
-On the other hand, the disjoint sums $P + Q$ and $\sum_{x : A} R(x)$ are usually not propositions.
+On the other hand, the disjoint sums $P + Q$ and $\sm{x : A} R(x)$ are usually not propositions.
 This reflects the fact that they are constructive versions of disjunction and existential quantification.
-In particular, from a proof of $\sum_{x : A} R(x)$ we can project a witness $x : A$ and a proof of $R(x)$.
+In particular, from a proof of $\sm{x : A} R(x)$ we can project a witness $x : A$ and a proof of $R(x)$.
 
-For any type~$A$, the \emph{truncation} of~$A$ is a type~$\brck A$ for which there is an introduction rule that wraps any $a : A$ into $|a| : \brck A$, and a higher one that introduces an inhabitant of $|a| =_{\brck A} |b|$ for any $a$,~$b : A$, equating all inhabitants of~$\brck A$ and making~$\brck A$ a proposition; its recursion principle maps $\brck A$ to a proposition~$P$ provided that $A \to P$.
-With truncation, we can obtain a classical version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sum_{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sum_{x : A} R(x)\right) \to P$.
-Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
+For any type~$A$, the \emph{propositional truncation} of~$A$ is a type~$\brck A$ for which there is an introduction rule that wraps any $a : A$ into $\bproj{a} : \brck A$, and a higher one that introduces an inhabitant of $\bproj{a} =_{\brck A} \bproj{b}$ for any $a$,~$b : A$, equating all inhabitants of~$\brck A$ and making~$\brck A$ a proposition; its recursion principle maps $\brck A$ to a proposition~$P$ provided that $A \to P$.
+With truncation, we can obtain a classical version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sm{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sm{x : A} R(x)\right) \to P$.
+Following the convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
 In this paper we will work exclusively with \emph{sets}, which are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
-It is easy to check that the types we work with are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem} says that if a type~$A$ has decidable equality---that is, $\prod_{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set.
+It is easy to check that the types we work with are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set.
 
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
 
 \subsection{\texorpdfstring{$\lambda$}{λ}-calculus}
-For $\lambda$-calculus, we fix notations and state a few of its properties in homotopy type theory.
+For $\lambda$-calculus, we fix notations and state a few properties in homotopy type theory.
 Most of details can be found in the classic textbook by Barendregt~\cite{Barendregt1984a}.
 
 Terms are defined informally by
@@ -210,7 +210,7 @@ Indeed, no such term can compute the code of any arbitrary term.
 \end{proof}
 \hsnote{revise}
 
-Contrary to the well-known Kleene's first recursion theorem, his second recursion theorem which works for \emph{code} is lesser known but far more interesting for our purpose.
+Contrary to the well-known first recursion theorem, Kleene's second recursion theorem works for \emph{code} instead of values and will be used to model the \GL modality partly.
 
 \begin{theorem}[Second Recursion Theorem] \label{thm:SRT}
   Every term $F : \Lambda$ has a closed term $M$ with $M \reduce F\,\qquote{M}$.
@@ -218,19 +218,20 @@ Contrary to the well-known Kleene's first recursion theorem, his second recursio
 \end{theorem}
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
-Instead of ordinary categories, we work with $\PP$-categories as pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} to study normalisation in typed $\lambda$-calculus.
-Their use was recently advocated by Kavvos~\cite{Kavvos2017b}, who introduced a functor-like concept called \emph{exposure} exemplified by the Second Recursion Theorem and more in the realm of computability theory.
+Instead of ordinary categories, we work with $\PP$-categories pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} where morphisms are equipped with an additional partial equivalence relation (PER) as another level of equality between morphisms.
+Kavvos~\cite{Kavvos2017b} recently advocated its use and introduced a functor-like construct called \emph{exposure}, which does not enforce the preservation of PERs of $\PP$-categories, to manifest the essence of intensionality.
 \hsnote{doesn’t really help with understanding what exposures are about}
+\ltnote{better now?}
 
-We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph{op.\ cit.} as follows.
+% We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph{op.\ cit.} as follows.
 \begin{definition}
   A \emph{partial equivalence relation} is a symmetric and transitive relation.
   A \emph{$\PP$-set} $(X, \sim_X)$ is a set $X$ with a partial equivalence relation~$\sim_X$.
   A \emph{$\PP$-function} from $(X, \sim_X)$ to $(Y, \sim_Y)$ is a function $f\colon X \to Y$ which respects the relation~$\sim$ in the sense that $f\,x \sim_Y f\,y$ whenever $x \sim_X y$.
   An element $x \in X$ is \emph{well-defined} (with respect to $\sim$) if $x \sim x$.
 \end{definition}
-The identity function $\idfunc[X] : X \to X$ is a $\PP$-function, and the composite of two $\PP$-functions is again a $\PP$-function.
-It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed category~$\PP\text{-}\mathbf{Set}$, so by enriched category theory~\cite{Kelly1982} we have a notion of categories enriched by $\PP$-sets below.
+The identity function $\idfunc[X]$ is a $\PP$-function, and the composite of two $\PP$-functions is again a $\PP$-function.
+It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed category, so by enriched category theory~\cite{Kelly1982} we have a notion of categories enriched by $\PP$-sets below.
 
 \begin{definition}[{\cite[Definition~2.4]{Cubric1998a}}]
   A $\PP$-category is a category whose hom-sets are $\PP$-sets satisfying the associativity and identity laws up to~$\sim$ in the sense that 
@@ -242,13 +243,13 @@ It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed categor
   \end{romanenumerate}
 \end{definition}
 
-A $\PP$-category has two kinds of equality for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$, where the former is considered as the \emph{intensional equality} and the latter as the \emph{extensional equality} akin to the modal type theory by Pfenning~\cite{Pfenning2002a}.
+A $\PP$-category has two kinds of equality for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$, where the former is considered as the \emph{intensional equality} and the latter as the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
 Having two different equalities $=$~and~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not vice versa.
 For categorical semantics, where terms are interpreted as morphisms, an interpretation into a $\PP$-category is able to discriminate these two kinds of equality, enabling us to model intensionality.
 The usual categorical notions such as functors and initiality are up to the intensional equality~$=$\,; when we want to use the notions up to the extensional equality~$\sim$, we will add the `$\PP$-' prefix and say $\PP$-functors, $\PP$-initiality, etc.
 
-We recall the notion of exposures, which are like ($\PP$-)functors but are intended to `expose' intensional differences at the extensional level: when an exposure is applied to intensionally different morphisms (which may be identified up to the extensional $\sim$-equality in the source $\PP$-category), the resulting morphisms may be distinguished extensionally in the target $\PP$-category.
-Consequently, exposures are not required to preserve $\sim$-equality.
+We recall the notion of exposures, which are like $\PP$-functors but are intended to `expose' intensional differences at the extensional level: if an exposure is applied to intensionally different morphisms (which may or may not be identified extensionally), the resulting morphisms may be distinguished extensionally.
+Consequently, exposures are not required to preserve the extensional equality.
 Moreover, exposures are only supposed to refine the extensional equality and do not eliminate existing extensional differences---that is, they are faithful with respect to~$\sim$.
 The precise definition is as follows.
 
