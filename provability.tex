@@ -62,16 +62,16 @@
 \ccsdesc{Theory of computation~Type theory}
 \ccsdesc{Theory of computation~Logic}
 \ccsdesc{Theory of computation~Constructive mathematics}
-\keywords{Löb's theorem, provability, guarded recursion, realizability, homotopy type theory, modal type theory, metaprogramming}
+\keywords{Löb's theorem, provability, guarded recursion, realisability, homotopy type theory, modal type theory, metaprogramming}
 
 \relatedversion{} %optional, e.g. full version hosted on arXiv
 %\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
 
-\supplement{The results were formalised in (Guarded) Cubical Agda with source code available at \url{https://github.com/L-TChen/provability}.}
+\supplement{The results were formalised in Agda 2.6.2 in the guarded cubical mode, and the source code is available at \url{https://github.com/L-TChen/provability}.}
 
 \funding{This work was supported by the Ministry of Science and Technology of Taiwan under grant MOST~109-2222-E-001-002-MY3.}
 
-\acknowledgements{\ltnote{Alex Kavvos,, Rasmus Ejlers Møgelberg, Churn-Jung Liau, Zulip@HoTT, Zulip@Agda}}
+\acknowledgements{\ltnote{Alex Kavvos, Rasmus Ejlers Møgelberg, Churn-Jung Liau, Zulip@HoTT, Zulip@Agda}}
 
 \nolinenumbers 
 
@@ -98,27 +98,88 @@
 \begin{abstract}
 
 There have been investigations into type-theoretic foundations for metaprogramming, notably Davies and Pfenning's~(2001) treatment in \SFour modal logic, where code evaluating to values of type~$A$ is given the modal type $\mathtt{Code}\,A$ ($\Box A$ in the original paper).
-Recently, in his modally typed $\lambda$-calculus iPCF, Kavvos~(2017) extended $\mathtt{Code}\,A$ with intensional recursion, understood as the Gödel--Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
-Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be computed in a later stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and thus the two types of code should be distinguished.
+Recently, in his modally typed calculus iPCF, Kavvos~(2017) extended PCF with $\mathtt{Code}\,A$ and intensional recursion, understood as the deductive form of the Gödel--Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
 
-Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ modelling \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
-Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities as exposures in the $\PP$-category of assemblies and trackable maps.
-For the \GL modality~$\Box$, we use guarded type theory to model what it means by a `later' stage.
-Our model validates the \SFour and \GL axioms and \emph{additionally} refutes congruence (quoting preserves extensional equality) and the completeness principle (quoting stays within the same stage).
+Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be evaluated in a later stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and the two types of code should be discriminated.
+Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
+Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
+For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `later' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
+Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence and the completeness principle $A \to \Box A$ in provability logic as well as $A \to \boxtimes A$.
+That is, in our model, two extensionally equal terms may not be intensionally equal, and there is no internal quoting operation.
 
-Our results are fully formalised in Guarded Cubical Agda---an implementation of homotopy type theory extended with Nakano's guarded recursion.
-
+Our results are developed in (guarded) homotopy type theory and formalised in Agda.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
 \cite{Litak2014,Davies2001b}
+
+\begin{itemize}
+    \item typed metaprogramming and staged computation
+    \item many modal type systems: temporal, \citet{Davies2001b}, contextual, \citet{Kavvos2017a}
+    \item practical implementations: MetaML, MetaOCaml, (Typed) Template Haskell, BER MetaOCaml
+\end{itemize}
+
+\begin{itemize}
+    \item \SFour; a natural requirement (and can be taken as a default), for example there is a $\lambda$-term that evaluates a Gödel code \cite[Theorem~8.1.6]{Barendregt1984a}
+    \item a `new' construct is \citet{Kavvos2017a}'s intensional recursion (cf.\ extensional/general recursion, which is logically inconsistent, but intensional recursion isn't), which can be used as a form of recursion which allows the access to its own code (intension), and has the potential to enable reflective programming etc (quote Kavvos if necessary)---if we can construct a value (of type~$A$) from its own code (of type~$\Box A$), then intensional recursion gives us that value (of type~$A$). Computationally, this is Kleene's Second Recursion Theorem~\cite[Theorem~6.5.9]{Barendregt1984a}.
+    \item \citet{Kavvos2017a} merges \SFour and \GL, but that leads to logical inconsistency (because\ldots), makes it impossible to write internal proofs
+\end{itemize}
+
+\begin{itemize}
+    \item In our approach, we want that \SFour and \GL coexist in a single system but are kept as separate modalities $\boxtimes$~and~$\Box$ to maintain logical consistency.
+    \item start with a denotational semantics
+    \item there has been less work on denotational semantics: (Gabbay\&Nanevski, 2013) and \citet{Kavvos2017b} on \SFour, and they didn't discuss \GL
+    \item the key is to find out the commonalities and differences between the two modalities, for which we take inspiration from staged computation
+    \begin{itemize}
+        \item Executing a piece of code can result in another piece of code to be executed, and these consecutive executions are abstractly referred to as computation stages, whose structure is a form of possible worlds and can be reasoned about by suitable modal logics.
+        \item In the case where the result of executing a piece of code can be immediately used in the same stage, that is, if there is an operation $\Box A \to A$, then the system satisfies the \SFour modal logic.
+        \item need stage distinction for \GL; inconsistent otherwise
+    \end{itemize}
+    \item in short, we observe that a term of type $\Box A$ is, in general, code to be evaluated in a later stage, whereas $\boxtimes A$ is the type of code that can be evaluated in the current stage; this is the intuition behind the design of our denotational semantics
+\end{itemize}
+
+\begin{itemize}
+    \item The basis of our investigation is \citet{Kavvos2017b}'s $\PP$-categories, where morphisms are endowed with two kinds of equality, which we can use to model intensional and extensional equalities.
+    \item We revisit elements of the theory of realisability in this setting, and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps, where trackable maps consist of not only a function but also its intensional description as part of the structure.
+    
+    \item Roughly speaking, an assembly $X$ on $\lambda$-calculus is a set $\bproj{X}$ of values, i.e.\ extensions, equipped with some description(s), i.e.\ intensions, in the form of $\lambda$-terms; the existence of such descriptions is merely a property that the values should satisfy, but the descriptions are not part of the structure and do not need to be explicitly presented.
+    
+    \item  The denotation of a code in the sense of $\boxtimes X$ is not just a description but a pair of a value~$x$ and its description $M$, where the description is made part of the structure.
+    Further, the description of such a pair $(M, x)$ is a $\lambda$-term $N$ reducible to the \emph{Gödel code} of $M$.
+    We can then validate the \SFour axioms, for example $\boxtimes X \to X$ (natural in~$X$) by just projection.
+    The choice of using the Gödel code of~$M$ (rather than just~$M$ as chosen by Kavvos; see related work) as the description of $(M, x)$ prevents $X \to \boxtimes X$ from being natural in $X$ (so there is no generic internal quoting operation)---otherwise $\boxtimes X$ would be equivalent to~$X$ and become redundant from the view of modal logic.
+    \item The denotation $(M, x)$ of a code in the sense of $\Box X$ is similar to $\boxtimes X$ but the value~$x$ is only available in a `later' stage.
+    Guarded type theory has a built-in \emph{later} modality~$\laterp$ and guarded recursion $(\laterp X \to X) \to X$ available to use.
+    Hence, for convenience, to give the denotational semantics of $\Box X$, we work within guarded type theory in order to use guarded recursion to model intensional recursion.
+    It is still not possible for $X \to \Box X$ to be natural in~$X$ for the same reason as the case of $\boxtimes$, whereas $\Box X \to X$ can no longer be validated by projection (because the value from $(M, x)$ is only available later, not now), and in fact will be shown to be impossible.
+    
+    \item The two aforementioned constructions are not $\PP$-functors (but exposures~\cite{Kavvos2017b}) so that congruence (preservation of extensional equality) is not imposed by definition and is even shown to be false.
+    
+    \item In short our denotational semantics is tight enough to capture the essence of intensionality by refuting congruence and internal quoting, which previous work did not achieve.
+    \ltnote{Ask Kavvos}
+\end{itemize}
+
+\begin{itemize}
+    \item We develop our theory in homotopy type theory (HoTT) mainly for convenience.
+    
+    \item HoTT provides a high level of granularity of expressiveness clarifying the difference between property versus structure that we need for defining various notions above. 
+    
+    \item Also, we can work with a more structured version of sets within HoTT; in particular, equality between set elements can be handled much more naturally and conveniently, unlike in other dependent type theories.
+    
+    \item Due to the advances of formalised mathematics, our arguments can be fully formalised and checked by the proof assistant Agda with the aid of the community contribution (the cubical library, PLFA, etc.).
+    \item Guarded type theory we use is also partially implemented in Agda.
+\end{itemize}
 
 \paragraph*{Related work}
 \cite{Visser2019,Beklemishev2006}
 \cite{Kavvos2020}
 \cite{Shamkanov2014,Shamkanov2016a}
 
-Compare with Kavvos
+\begin{itemize}
+    \item  classic theory of categorical realisability is based on some partial combinatory algebra.
+\end{itemize}
+
+Compare with \citet{Kavvos2017a} in terms of the degree of intensionality
 
 \paragraph*{Contributions}
 \ltnote{intensional modality?}
@@ -153,10 +214,10 @@ In particular, from a proof of $\sm{x : A} R(x)$ we can project a witness $x : A
 
 For any type~$A$, the \emph{propositional truncation} of~$A$ is a type~$\brck A$ for which there is an introduction rule that wraps any $a : A$ into $\bproj{a} : \brck A$, and a higher one that introduces an inhabitant of $\bproj{a} =_{\brck A} \bproj{b}$ for any $a$,~$b : A$, equating all inhabitants of~$\brck A$ and making~$\brck A$ a proposition; its recursion principle maps $\brck A$ to a proposition~$P$ provided that $A \to P$.
 With truncation, we can obtain a classical version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sm{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sm{x : A} R(x)\right) \to P$.
-Following the convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
+Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
 In this paper we will work exclusively with \emph{sets}, which are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
-It is easy to check that the types we work with are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set.
+It is easy to check that the types we work with are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem}~\cite[Section~7.2]{hottbook} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set.
 
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
@@ -928,7 +989,7 @@ The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\box
 As for the \GL modality, we use the clocked cubical type theory to define with a notion of computation stages.
 We then show that it satisfies the deductive form of the Gödel-Löb axiom---the intensional recursion~\cite{Kavvos2017b}.
 This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contributions of this paper.
-From the aspect of the design of programming languages, we expect that this line of research is useful to articulate typing disciplines of metaprogramming on which many proof assistants rely for tactic programming in a principled way.%
+Finally, we expect that typing disciplines of metaprogramming can be drawn from this line of research to guide the design of tactic programming on which many proof assistants are based.%
 \hsnote{More concrete future work?}
 
 %\paragraph*{Future work}
