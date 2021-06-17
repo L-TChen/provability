@@ -111,35 +111,38 @@ Our results are developed in (guarded) homotopy type theory and formalised in Ag
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-\cite{Litak2014,Davies2001b}
 
-\begin{itemize}
-    \item typed metaprogramming and staged computation
-    \item many modal type systems: temporal, \citet{Davies2001b}, contextual, \citet{Kavvos2017a}
-    \item practical implementations: MetaML, MetaOCaml, (Typed) Template Haskell, BER MetaOCaml
-\end{itemize}
+\emph{Metaprogramming} is about writing programs that manipulate programs.
+A particular form of metaprogramming is \emph{staged computation}, where fragments of a program are marked to be evaluated in multiple stages, so that the program can be partially evaluated to produce a more efficient version.
+There have been investigations into type-theoretic foundations for metaprogramming and particularly the concept of staged computation modelled with temporal modality, \SFour modality~\cite{Davies2001b}, contextual \SFour modality, \GL modality~\cite{Kavvos2017a}, and so on, which have influenced the design of practical metaprogramming systems to varying degrees.\ltnote{cite metaprogramming languages}
 
-\begin{itemize}
-    \item \SFour; a natural requirement (and can be taken as a default), for example there is a $\lambda$-term that evaluates a Gödel code \cite[Theorem~8.1.6]{Barendregt1984a}
-    \item a `new' construct is \citet{Kavvos2017a}'s intensional recursion (cf.\ extensional/general recursion, which is logically inconsistent, but intensional recursion isn't), which can be used as a form of recursion which allows the access to its own code (intension), and has the potential to enable reflective programming etc (quote Kavvos if necessary)---if we can construct a value (of type~$A$) from its own code (of type~$\Box A$), then intensional recursion gives us that value (of type~$A$). Computationally, this is Kleene's Second Recursion Theorem~\cite[Theorem~6.5.9]{Barendregt1984a}.
-    \item \citet{Kavvos2017a} merges \SFour and \GL, but that leads to logical inconsistency (because\ldots), makes it impossible to write internal proofs
-\end{itemize}
+Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~$A$ in the next stage.
+In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the \SFour modality~$\boxtimes$.
+More specifically, the (\textbf{4}) axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages;
+the (\textbf{T}) axiom $\boxtimes A \to A$ corresponds to the evaluation of code to its value in the same stage.
+For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
+
+Recently, Kavvos proposed a `new' construct called \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ that can be used to construct a value recursively from its own code, extending the capabilities of metaprogramming.
+In contrast to general recursion $(A \to A) \to A$, which cannot inspect its own code (intension) but only its value (extension), intensional recursion alone does not lead to logical inconsistency.
+Intensional recursion amounts to the $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$ in provability logic where $\Box$ stands for `provability', and its computational behaviour mirrors Kleene's second recursion theorem.
+Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}\,A$ subject to both (\SFour)~and~(\GL);
+unfortunately, when $\mathtt{Code}\,A$ is understood as \emph{the} type of code merging~(\SFour) and~(\GL), a contradiction is derivable, making it impossible to treat the type system as a logical foundation.
 
 \begin{itemize}
     \item In our approach, we want that \SFour and \GL coexist in a single system but are kept as separate modalities $\boxtimes$~and~$\Box$ to maintain logical consistency.
     \item start with a denotational semantics
-    \item there has been less work on denotational semantics: (Gabbay\&Nanevski, 2013) and \citet{Kavvos2017b} on \SFour, and they didn't discuss \GL
+    \item there has been less work on denotational semantics: (Gabbay\&Nanevski, 2013) and \cite{Kavvos2017b} on \SFour, and they didn't discuss \GL
     \item the key is to find out the commonalities and differences between the two modalities, for which we take inspiration from staged computation
     \begin{itemize}
         \item Executing a piece of code can result in another piece of code to be executed, and these consecutive executions are abstractly referred to as computation stages, whose structure is a form of possible worlds and can be reasoned about by suitable modal logics.
-        \item In the case where the result of executing a piece of code can be immediately used in the same stage, that is, if there is an operation $\Box A \to A$, then the system satisfies the \SFour modal logic.
+        \item In the special case where the result of executing a piece of code can be immediately used in the same stage, that is, if there is an operation $\Box A \to A$, then the system satisfies the \SFour modal logic.
         \item need stage distinction for \GL; inconsistent otherwise
     \end{itemize}
     \item in short, we observe that a term of type $\Box A$ is, in general, code to be evaluated in a later stage, whereas $\boxtimes A$ is the type of code that can be evaluated in the current stage; this is the intuition behind the design of our denotational semantics
 \end{itemize}
 
 \begin{itemize}
-    \item The basis of our investigation is \citet{Kavvos2017b}'s $\PP$-categories, where morphisms are endowed with two kinds of equality, which we can use to model intensional and extensional equalities.
+    \item The basis of our investigation is \cite{Kavvos2017b}'s $\PP$-categories, where morphisms are endowed with two kinds of equality, which we can use to model intensional and extensional equalities.
     \item We revisit elements of the theory of realisability in this setting, and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps, where trackable maps consist of not only a function but also its intensional description as part of the structure.
     
     \item Roughly speaking, an assembly $X$ on $\lambda$-calculus is a set $\bproj{X}$ of values, i.e.\ extensions, equipped with some description(s), i.e.\ intensions, in the form of $\lambda$-terms; the existence of such descriptions is merely a property that the values should satisfy, but the descriptions are not part of the structure and do not need to be explicitly presented.
@@ -151,7 +154,7 @@ Our results are developed in (guarded) homotopy type theory and formalised in Ag
     \item The denotation $(M, x)$ of a code in the sense of $\Box X$ is similar to $\boxtimes X$ but the value~$x$ is only available in a `later' stage.
     Guarded type theory has a built-in \emph{later} modality~$\laterp$ and guarded recursion $(\laterp X \to X) \to X$ available to use.
     Hence, for convenience, to give the denotational semantics of $\Box X$, we work within guarded type theory in order to use guarded recursion to model intensional recursion.
-    It is still not possible for $X \to \Box X$ to be natural in~$X$ for the same reason as the case of $\boxtimes$, whereas $\Box X \to X$ can no longer be validated by projection (because the value from $(M, x)$ is only available later, not now), and in fact will be shown to be impossible.
+    It is still not possible for $X \to \Box X$ to be natural in~$X$ for the same reason as the case of $\boxtimes$, whereas $\Box X \to X$ can no longer be validated by projection (because the value from $(M, x)$ is not available now but later), and in fact will be shown impossible.
     
     \item The two aforementioned constructions are not $\PP$-functors (but exposures~\cite{Kavvos2017b}) so that congruence (preservation of extensional equality) is not imposed by definition and is even shown to be false.
     
@@ -160,13 +163,13 @@ Our results are developed in (guarded) homotopy type theory and formalised in Ag
 \end{itemize}
 
 \begin{itemize}
-    \item We develop our theory in homotopy type theory (HoTT) mainly for convenience.
+    \item As a minor issue, we develop our theory in homotopy type theory (HoTT) mainly for convenience.
     
-    \item HoTT provides a high level of granularity of expressiveness clarifying the difference between property versus structure that we need for defining various notions above. 
+    \item HoTT provides a high level of granularity of expressiveness, e.g., the clear difference between property versus structure that we need for defining various notions above. 
     
-    \item Also, we can work with a more structured version of sets within HoTT; in particular, equality between set elements can be handled much more naturally and conveniently, unlike in other dependent type theories.
+    \item We can work with a more structured version of sets within HoTT; in particular, equality between set elements can be handled much more naturally and conveniently, unlike in other type-theoretic foundations.
     
-    \item Due to the advances of formalised mathematics, our arguments can be fully formalised and checked by the proof assistant Agda with the aid of the community contribution (the cubical library, PLFA, etc.).
+    \item Due to advances in formalisation of mathematics, our arguments are fully formalised and checked by the proof assistant Agda with the aid of the community effort (the cubical library, PLFA, etc.).
     \item Guarded type theory we use is also partially implemented in Agda.
 \end{itemize}
 
@@ -174,12 +177,13 @@ Our results are developed in (guarded) homotopy type theory and formalised in Ag
 \cite{Visser2019,Beklemishev2006}
 \cite{Kavvos2020}
 \cite{Shamkanov2014,Shamkanov2016a}
+\cite{Litak2014}
 
 \begin{itemize}
     \item  classic theory of categorical realisability is based on some partial combinatory algebra.
 \end{itemize}
 
-Compare with \citet{Kavvos2017a} in terms of the degree of intensionality
+Compare with \cite{Kavvos2017a} in terms of the degree of intensionality
 
 \paragraph*{Contributions}
 \ltnote{intensional modality?}
