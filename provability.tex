@@ -99,14 +99,12 @@
 
 There have been investigations into type-theoretic foundations for metaprogramming, notably Davies and Pfenning's~(2001) treatment in \SFour modal logic, where code evaluating to values of type~$A$ is given the modal type $\mathtt{Code}\,A$ ($\Box A$ in the original paper).
 Recently, in his modally typed calculus iPCF, Kavvos~(2017) extended PCF with $\mathtt{Code}\,A$ and intensional recursion, understood as the deductive form of the Gödel--Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
-
 Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be evaluated in a later stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and the two types of code should be discriminated.
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
 Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
 For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `later' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
 Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence and the completeness principle $A \to \Box A$ in provability logic as well as $A \to \boxtimes A$.
 That is, in our model, two extensionally equal terms may not be intensionally equal, and there is no internal quoting operation.
-
 Our results are developed in (guarded) homotopy type theory and formalised in Agda.
 \end{abstract}
 
@@ -150,9 +148,8 @@ The subtle difference between $\boxtimes X$ and $\Box X$ is, however, where exte
     This set $\laterp \bproj{X}$ can be conveniently expressed in \emph{guarded type theory}, which features an internal later modality~$\laterp$ and moreover \emph{guarded recursion} $(\laterp X \to X) \to X$.
     By working in guarded typed theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
-The above constructions are not $\PP$-functors (but exposures~\cite{Kavvos2017b}) so that congruence (the preservation of extensional equality) is not imposed by definition and is even shown false.
-Hence, our denotational semantics is precise enough to capture the essence of intensionality by refuting internal quoting and congruence, which previous work fails to achieve.%
-\ltnote{alternative word for precise}
+The above constructions do not give $\PP$-functors (but exposures~\cite{Kavvos2017b}) so that congruence (the preservation of extensional equality) is not imposed by definition and is even shown false.
+Hence, our denotational semantics is precise enough to capture the essence of intensionality by refuting internal quoting and congruence, which previous work~\cite{Gabbay2013,Kavvos2017b} fails to achieve.%
 \ltnote{Ask Kavvos}
 
 \begin{itemize}
@@ -982,9 +979,9 @@ We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus a
 The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which are not exposed in ordinary categories, since computationally equivalent terms are identified on the semantics side \emph{a priori} caused by the identification of \emph{denotation} with \emph{extension}.
 
 Based on the framework established in~\Cref{sec:assemblies}, we modelled two intensional modalities $\boxtimes$ and $\Box$ satisfying the \SFour axiom and the \GL axiom respectively.
-The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{re:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
+The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{re:difference-boxtimes}. 
 As for the \GL modality, we use the clocked cubical type theory to define with a notion of computation stages.
-We then show that it satisfies the deductive form of the Gödel-Löb axiom---the intensional recursion~\cite{Kavvos2017b}.
+We then show that it satisfies the deductive form of the Gödel-Löb axiom---the intensional recursion.
 This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contributions of this paper.
 Finally, we expect that typing disciplines of metaprogramming can be drawn from this line of research to guide the design of tactic programming on which many proof assistants are based.%
 \hsnote{More concrete future work?}
