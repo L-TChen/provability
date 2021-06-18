@@ -112,55 +112,47 @@ Our results are developed in (guarded) homotopy type theory and formalised in Ag
 
 \section{Introduction}\label{sec:intro}
 
-\emph{Metaprogramming} is about writing programs that manipulate programs.
-A particular form of metaprogramming is \emph{staged computation}, where fragments of a program are marked to be evaluated in multiple stages, so that the program can be partially evaluated to produce a more efficient version.
-There have been investigations into type-theoretic foundations for metaprogramming and particularly the concept of staged computation modelled with temporal modality, \SFour modality~\cite{Davies2001b}, contextual \SFour modality, \GL modality~\cite{Kavvos2017a}, and so on, which have influenced the design of practical metaprogramming systems to varying degrees.\ltnote{cite metaprogramming languages}
+Metaprogramming is about writing (meta)programs that manipulate programs.
+Executing a metaprogram can result in another program to be executed, and these successive executions are abstractly referred to as computation \emph{stages}.
+A particular form of metaprogramming is \emph{staged computation}, where fragments of a program are \emph{internally} marked to be evaluated in multiple stages, so that the program can be partially evaluated to produce more efficient code.
+The stratification of computation stages forms possible worlds and can be ideally reasoned about by modal logic.
+Therefore, there have been investigations into type-theoretic foundations for staged computation using temporal modality, \SFour modality~\cite{Davies2001b}, contextual \SFour modality, \GL modality~\cite{Kavvos2017a}, and so on, which have influenced the design of practical implementations to varying degrees.\ltnote{cite staged programming languages}
 
-Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~$A$ in the next stage.
+Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~$A$ in a next stage.
 In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the \SFour modality~$\boxtimes$.
 More specifically, the (\textbf{4}) axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages;
-the (\textbf{T}) axiom $\boxtimes A \to A$ corresponds to the evaluation of code to its value in the same stage.
+the (\textbf{T}) axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
 For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
 
-Recently, Kavvos proposed a `new' construct called \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ that can be used to construct a value recursively from its own code, extending the capabilities of metaprogramming.
-In contrast to general recursion $(A \to A) \to A$, which cannot inspect its own code (intension) but only its value (extension), intensional recursion alone does not lead to logical inconsistency.
-Intensional recursion amounts to the $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$ in provability logic where $\Box$ stands for `provability', and its computational behaviour mirrors Kleene's second recursion theorem.
-Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}\,A$ subject to both (\SFour)~and~(\GL);
-unfortunately, when $\mathtt{Code}\,A$ is understood as \emph{the} type of code merging~(\SFour) and~(\GL), a contradiction is derivable, making it impossible to treat the type system as a logical foundation.
+Recently, Kavvos proposed a `new' construct called \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ that can be used to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
+In contrast to general recursion $(A \to A) \to A$, which also constructs a value recursively but does not inspect its own code but only its value (extension), intensional recursion alone does not lead to logical inconsistency.
+Intensional recursion amounts to the $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability' in provability logic, and its computational behaviour mirrors Kleene's second recursion theorem.
+Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}$ viewed as both \SFour~and~\GL modalities.
+Unfortunately, when $\mathtt{Code}$ is designed in this way, a contradiction is derivable, making it impossible to treat the type system as a logical foundation.
 
-\begin{itemize}
-    \item In our approach, we want that \SFour and \GL coexist in a single system but are kept as separate modalities $\boxtimes$~and~$\Box$ to maintain logical consistency.
-    \item start with a denotational semantics
-    \item there has been less work on denotational semantics: (Gabbay\&Nanevski, 2013) and \cite{Kavvos2017b} on \SFour, and they didn't discuss \GL
-    \item the key is to find out the commonalities and differences between the two modalities, for which we take inspiration from staged computation
-    \begin{itemize}
-        \item Executing a piece of code can result in another piece of code to be executed, and these consecutive executions are abstractly referred to as computation stages, whose structure is a form of possible worlds and can be reasoned about by suitable modal logics.
-        \item In the special case where the result of executing a piece of code can be immediately used in the same stage, that is, if there is an operation $\Box A \to A$, then the system satisfies the \SFour modal logic.
-        \item need stage distinction for \GL; inconsistent otherwise
-    \end{itemize}
-    \item in short, we observe that a term of type $\Box A$ is, in general, code to be evaluated in a later stage, whereas $\boxtimes A$ is the type of code that can be evaluated in the current stage; this is the intuition behind the design of our denotational semantics
-\end{itemize}
+To make \SFour and \GL coexist in a single system while maintaining logical consistency, our approach is to keep the two modalities $\boxtimes$~and~$\Box$ separate.
+Intuitively, while both modalities model code and may appear similar, there are still crucial differences:
+in general, programs are to be evaluated in a \emph{next} stage, but \SFour is a special case where the next stages include the current one, so in particular the result of evaluating a program can be immediately used in the current stage, as witnessed by $(\mathbf{T})$;
+on the other hand, a program constructed with \GL can recursively refer to its own code, which must not be evaluated within the same stage or risk non-termination computationally and inconsistency logically, so stage distinction has to be kept for \GL.
 
+To illuminate the above intuition, we present in this paper a denotational semantics of two types of code, namely a type $\boxtimes A$ of code that can be evaluated in the current stage and a type $\Box A$ of code to be evaluated in a next stage.
+Building on the previous work using $\PP$-categories~\cite{Cubric1998a,Kavvos2017b}, which allow us to distinguish between intensions and extensions, we revisit elements of \emph{realisability} in this setting, and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps, where trackable maps consist of not only a function but also its intensional description as part of the structure.
+Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term; the existence of such an intension is merely a property that the extension should satisfy, but the intension is not part of the structure.
+In contrast, the denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$, which is made part of the structure; the associated intensions of $(M, x)$ required to (merely) exist for assemblies are $\lambda$-terms~$N$ that are reducible to the Gödel code~$\qquote{M}$ of~$M$.
+The choice of using the Gödel code of~$M$ (rather than just~$M$ as chosen by Kavvos~\cite{Kavvos2017b}---see related work) as the intensions of $(M, x)$ prevent $X \to \boxtimes X$ from being natural in~$X$ (so there is no generic internal quoting operation).
+The subtle difference between $\boxtimes X$ and $\Box X$ is, however, where extensions are from.
 \begin{itemize}
-    \item The basis of our investigation is \cite{Kavvos2017b}'s $\PP$-categories, where morphisms are endowed with two kinds of equality, which we can use to model intensional and extensional equalities.
-    \item We revisit elements of the theory of realisability in this setting, and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps, where trackable maps consist of not only a function but also its intensional description as part of the structure.
-    
-    \item Roughly speaking, an assembly $X$ on $\lambda$-calculus is a set $\bproj{X}$ of values, i.e.\ extensions, equipped with some description(s), i.e.\ intensions, in the form of $\lambda$-terms; the existence of such descriptions is merely a property that the values should satisfy, but the descriptions are not part of the structure and do not need to be explicitly presented.
-    
-    \item  The denotation of a code in the sense of $\boxtimes X$ is not just a description but a pair of a value~$x$ and its description $M$, where the description is made part of the structure.
-    Further, the description of such a pair $(M, x)$ is a $\lambda$-term $N$ reducible to the \emph{Gödel code} of $M$.
+    \item For $\boxtimes X$, the extension part~$x$ in $(M, x)$ coincides with the values of the set~$\bproj{X}$.
     We can then validate the \SFour axioms, for example $\boxtimes X \to X$ (natural in~$X$) by just projection.
-    The choice of using the Gödel code of~$M$ (rather than just~$M$ as chosen by Kavvos; see related work) as the description of $(M, x)$ prevents $X \to \boxtimes X$ from being natural in $X$ (so there is no generic internal quoting operation)---otherwise $\boxtimes X$ would be equivalent to~$X$ and become redundant from the view of modal logic.
-    \item The denotation $(M, x)$ of a code in the sense of $\Box X$ is similar to $\boxtimes X$ but the value~$x$ is only available in a `later' stage.
-    Guarded type theory has a built-in \emph{later} modality~$\laterp$ and guarded recursion $(\laterp X \to X) \to X$ available to use.
-    Hence, for convenience, to give the denotational semantics of $\Box X$, we work within guarded type theory in order to use guarded recursion to model intensional recursion.
-    It is still not possible for $X \to \Box X$ to be natural in~$X$ for the same reason as the case of $\boxtimes$, whereas $\Box X \to X$ can no longer be validated by projection (because the value from $(M, x)$ is not available now but later), and in fact will be shown impossible.
     
-    \item The two aforementioned constructions are not $\PP$-functors (but exposures~\cite{Kavvos2017b}) so that congruence (preservation of extensional equality) is not imposed by definition and is even shown to be false.
-    
-    \item In short our denotational semantics is tight enough to capture the essence of intensionality by refuting congruence and internal quoting, which previous work did not achieve.
-    \ltnote{Ask Kavvos}
+    \item For $\Box X$, the extension~$x$ does not come from~$\bproj{X}$ but a different set $\laterp \bproj{X}$ whose elements denote values of~$\bproj{X}$ that are available in a next, or \emph{later}, stage.
+    This set $\laterp \bproj{X}$ can be conveniently expressed in \emph{guarded type theory}, which features an internal later modality~$\laterp$ and moreover \emph{guarded recursion} $(\laterp X \to X) \to X$.
+    By working in guarded typed theory, $\Box X \to X$ can no longer be validated by projection (because the value from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
+The above constructions are not $\PP$-functors (but exposures~\cite{Kavvos2017b}) so that congruence (preservation of extensional equality) is not imposed by definition and is even shown to be false.
+Hence, our denotational semantics is precise enough to capture the essence of intensionality by refuting internal quoting and congruence, which previous work fails to achieve.%
+\ltnote{alternative word for precise}
+\ltnote{Ask Kavvos}
 
 \begin{itemize}
     \item As a minor issue, we develop our theory in homotopy type theory (HoTT) mainly for convenience.
