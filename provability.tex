@@ -60,8 +60,6 @@
 
 \Copyright{Liang-Ting Chen and Hsiang-Shang Ko}
 \ccsdesc{Theory of computation~Type theory}
-\ccsdesc{Theory of computation~Logic}
-\ccsdesc{Theory of computation~Constructive mathematics}
 \keywords{Löb's theorem, provability, guarded recursion, realisability, homotopy type theory, modal type theory, metaprogramming}
 
 \relatedversion{} %optional, e.g. full version hosted on arXiv
@@ -71,7 +69,9 @@
 
 \funding{This work was supported by the Ministry of Science and Technology of Taiwan under grant MOST~109-2222-E-001-002-MY3.}
 
-\acknowledgements{\ltnote{Alex Kavvos, Rasmus Ejlers Møgelberg, Churn-Jung Liau, Zulip@HoTT, Zulip@Agda}}
+\acknowledgements{\ltnote{Alex Kavvos, Rasmus Ejlers Møgelberg, Churn-Jung Liau, Zulip@HoTT, Zulip@Agda}
+\ltnote{the aid of the community effort (the cubical library, PLFA, etc.}
+}
 
 \nolinenumbers 
 
@@ -99,25 +99,23 @@
 
 There have been investigations into type-theoretic foundations for metaprogramming, notably Davies and Pfenning's~(2001) treatment in \SFour modal logic, where code evaluating to values of type~$A$ is given the modal type $\mathtt{Code}\,A$ ($\Box A$ in the original paper).
 Recently, in his modally typed calculus iPCF, Kavvos~(2017) extended PCF with $\mathtt{Code}\,A$ and intensional recursion, understood as the deductive form of the Gödel--Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
-
 Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be evaluated in a later stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and the two types of code should be discriminated.
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
 Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
 For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `later' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
 Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence and the completeness principle $A \to \Box A$ in provability logic as well as $A \to \boxtimes A$.
 That is, in our model, two extensionally equal terms may not be intensionally equal, and there is no internal quoting operation.
-
 Our results are developed in (guarded) homotopy type theory and formalised in Agda.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
 
-Metaprogramming is about writing (meta)programs that manipulate programs.
+Metaprogramming is the activity of writing metaprograms that manipulate program code.
 Executing a metaprogram can result in another program to be executed, and these successive executions are abstractly referred to as computation \emph{stages}.
 A particular form of metaprogramming is \emph{staged computation}, where fragments of a program are \emph{internally} marked to be evaluated in multiple stages, so that the program can be partially evaluated to produce more efficient code.
 The stratification of computation stages forms possible worlds and can be ideally reasoned about by modal logic.
-Therefore, there have been investigations into type-theoretic foundations for staged computation with modalities~\cite{Davies2017,Davies2001b,Nanevski2008,Kavvos2017a}, which have influenced the design of practical implementations~\cite{Taha2000,Sheard2002,Kiselyov2014} to varying degrees.
-\ltnote{cite more?}
+Therefore, there have been investigations into type-theoretic foundations for staged computation with modalities~\cite{Davies2017,Davies2001b,Kavvos2017a,Nanevski2008}, which have influenced the design of practical implementations~\cite{Kiselyov2014,Sheard2002,Taha2000} to varying degrees.
+\ltnote{cite Typed Template Haskell?}
 
 Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~$A$ in a next stage.
 In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the \SFour modality~$\boxtimes$.
@@ -133,14 +131,16 @@ Unfortunately, when $\mathtt{Code}$ is designed in this way, a contradiction is 
 
 To make \SFour and \GL coexist in a single system while maintaining logical consistency, our approach is to keep the two modalities $\boxtimes$~and~$\Box$ separate.
 Intuitively, while both modalities model code and appear similar, there are crucial differences:
-in general, programs are to be evaluated in a \emph{next} stage, but \SFour is a special case where next stages include the current one, so the result of evaluating a program can be immediately used in the current stage, as witnessed by $(\mathbf{T})$.
+In general, programs are to be evaluated in a \emph{next} stage, but \SFour is a special case where next stages include the current one, so the result of evaluating a program can be immediately used in the current stage, as witnessed by $(\mathbf{T})$.
 On the other hand, a program constructed with \GL can recursively refer to its own code, which must not be evaluated within the same stage or risk non-termination computationally and inconsistency logically, so stage distinction has to be kept for \GL.
 
-To illuminate the above intuition, we present in this paper a denotational semantics of two types of code, namely a type $\boxtimes A$ of code that can be evaluated in the current stage and a type $\Box A$ of code to be evaluated in a next stage.
-Building on the previous work using $\PP$-categories~\cite{Cubric1998a,Kavvos2017b}, which allow us to distinguish between intensions and extensions, we revisit elements of \emph{realisability} in this setting and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps, where trackable maps consist of not only a function but also its intensional description as part of the structure.
-Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term; the existence of such an intension is merely a property that the extension should satisfy, but the intension is not part of the structure.
-In contrast, the denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$, which is made part of the structure; the associated intensions of $(M, x)$ required to (merely) exist for assemblies are $\lambda$-terms~$N$ that are reducible to the Gödel code~$\qquote{M}$ of~$M$.
-The choice of using the Gödel code of~$M$ (rather than just~$M$ as chosen by Kavvos~\cite{Kavvos2017b}---see related work) as the intensions of $(M, x)$ prevent $X \to \boxtimes X$ from being natural in~$X$ (so there is no generic internal quoting operation).
+To illuminate the difference, we present in this paper a denotational semantics of two types of code, namely a type $\boxtimes A$ of code that can be evaluated in the current stage and a type $\Box A$ of code to be evaluated in a next stage.
+To distinguish between intensions and extensions, we build on the previous work using $\PP$-categories~\cite{Cubric1998a,Kavvos2017b}, which have an additional partial equivalence relation on morphisms that models extensional equality, while the underlying equality on morphisms models intensional equality.
+Within this setting, we revisit elements of \emph{realisability} and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
+Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term (the existence of such an intension is merely a property that the extension should satisfy), while trackable maps are pairs of a function and one of its intensions, and can be equipped with both extensional and intensional equalities (taking only the function part or both parts into account).
+The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$; the associated intensions of $(M, x)$ required to exist for assemblies are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$ of~$M$.
+The choice of using~$\qquote{M}$ (rather than just~$M$ as chosen by Kavvos~\cite{Kavvos2017b}---see related work) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from being natural in~$X$, that is, there is no generic internal quoting operation.
+\ltnote{Ask Kavvos}
 The subtle difference between $\boxtimes X$ and $\Box X$ is, however, where extensions are from.
 \begin{itemize}
     \item For $\boxtimes X$, the extension part~$x$ in $(M, x)$ coincides with the values of the set~$\bproj{X}$.
@@ -150,55 +150,30 @@ The subtle difference between $\boxtimes X$ and $\Box X$ is, however, where exte
     This set $\laterp \bproj{X}$ can be conveniently expressed in \emph{guarded type theory}, which features an internal later modality~$\laterp$ and moreover \emph{guarded recursion} $(\laterp X \to X) \to X$.
     By working in guarded typed theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
-The above constructions are not $\PP$-functors (but exposures~\cite{Kavvos2017b}) so that congruence (the preservation of extensional equality) is not imposed by definition and is even shown false.
-Hence, our denotational semantics is precise enough to capture the essence of intensionality by refuting internal quoting and congruence, which previous work fails to achieve.%
+The above constructions are not $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not imposed by definition and is even shown false.
+Hence, our denotational semantics is precise enough to capture the essence of intensionality by refuting congruence and internal quoting, which previous work fails to achieve.%
 \ltnote{alternative word for precise}
-\ltnote{Ask Kavvos}
 
-\begin{itemize}
-    \item As a minor issue, we develop our theory in homotopy type theory (HoTT) mainly for convenience.
-    
-    \item HoTT provides a high level of granularity of expressiveness, e.g., the clear difference between property versus structure that we need for defining various notions above. 
-    
-    \item We can work with a more structured version of sets within HoTT; in particular, equality between set elements can be handled much more naturally and conveniently, unlike in other type-theoretic foundations.
-    
-    \item Due to advances in formalisation of mathematics, our arguments are fully formalised and checked by the proof assistant Agda with the aid of the community effort (the cubical library, PLFA, etc.).
-    \item Guarded type theory we use is also partially implemented in Agda.
-\end{itemize}
+We use homotopy type theory (HoTT)~\cite{hottbook} as our mathematical foundation, although this is mainly for convenience and not essential.
+More specifically, our work is built upon the reformulated set theory and logic within HoTT~\cite[Chapter~3]{hottbook}, which enable us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence (for example, within HoTT we can easily distinguish between `pairs of an extension and an intension' and `extensions associated with at least an intension').
+Moreover, since implementations of HoTT are readily available, we are able to formalise and verify our constructions, for which HoTT provides essential features that some previous type theories lack, notably function extensionality: $\left(\fall{x : A} f\,x =_B g\,x\right) \to f =_{A \to B} g$.
+Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda}, which also supports guarded type theory in the guarded cubical mode.
 
-\paragraph*{Related work}
-\cite{Visser2019,Beklemishev2006}
-\cite{Kavvos2020}
-\cite{Shamkanov2014,Shamkanov2016a}
-\cite{Litak2014}
-
-\begin{itemize}
-    \item  classic theory of categorical realisability is based on some partial combinatory algebra.
-\end{itemize}
-
-Compare with \cite{Kavvos2017a} in terms of the degree of intensionality
-
-\paragraph*{Contributions}
-\ltnote{intensional modality?}
+%\paragraph*{Contributions}
 
 \paragraph*{Plan of the paper}
-\Cref{sec:preliminaries}
-\Cref{sec:assemblies}
-\Cref{sec:provability}
-\Cref{sec:conclusion}
+After recalling preliminaries on untyped $\lambda$-calculus, homotopy type theory, and $\PP$-categories in \Cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\Cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\Cref{sec:provability}, and conclude with related and future work in~\Cref{sec:conclusion}.
 
 \section{Preliminaries}\label{sec:preliminaries}
-This work is based on untyped $\lambda$-calculus, homotopy type theory, and $\PP$-categories.
-Most, if not all, of the materials are standard, so we do not go into details but only recall what we need in the rest of this section.
+
+Most, if not all, of the materials in this section are standard, so we do not go into details but only recall what we need.
 
 \subsection{Homotopy type theory}
 
-The mathematical foundation of our work is homotopy type theory (HoTT)~\cite{hottbook}.
 In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $x =_A y$ of proofs that $x$~and~$y$ are equal; given an equality proof $p : x =_A y$, any $z : B(x)$ can be converted to $\mathsf{transport}(p, z) : B(y)$.
 Between equality proofs $p$, $q : x =_A y$ there is again a higher-dimensional equality type $p =_{x\,{=_A}\,y} q$, and so on.
-This infinite-dimensional structure of equality types can be seen as an abstract form of homotopy theory, where types are interpreted as spaces and equality proofs as paths; in particular, equality types are path spaces, and paths between paths are homotopies.
-Our work is built upon the reformulated set theory and logic within HoTT~\cite[Chapter~3]{hottbook}, where the equality structure degenerates at higher dimensions, but is still rich enough for us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence.
-Moreover, since implementations of HoTT are readily available, we are able to formalise and verify our constructions, for which HoTT provides essential features that some previous type theories lack, notably function extensionality: $\left(\prd{x : A} f\,x =_B g\,x\right) \to f =_{A \to B} g$.
+Homotopy type theory (HoTT) identifies this infinite-dimensional structure of equality types as an abstract form of homotopy theory, where types are interpreted as spaces and equality proofs as paths; in particular, equality types are path spaces, and paths between paths are homotopies.
+We do not make use of the full generality of HoTT, however, and work exclusively with \emph{propositions} and \emph{sets}, whose equality structure degenerates at higher dimensions.
 
 A \emph{proposition}~$P$ is a type whose equality types (types $x =_P y$ where $x$,~$y : P$) are all inhabited---that is, all inhabitants of~$P$ are deemed equal, so all we care about~$P$ is whether it is inhabited or not.
 If $P$~and~$Q$ are propositions, then their product $P \times Q$ is also a proposition.
@@ -213,8 +188,8 @@ For any type~$A$, the \emph{propositional truncation} of~$A$ is a type~$\brck A$
 With truncation, we can obtain a classical version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sm{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sm{x : A} R(x)\right) \to P$.
 Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
-In this paper we will work exclusively with \emph{sets}, which are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
-It is easy to check that the types we work with are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem}~\cite[Section~7.2]{hottbook} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set.
+\emph{Sets} are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
+It is easy to check that the types we work with in this paper are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem}~\cite[Section~7.2]{hottbook} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set.
 
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
@@ -977,6 +952,17 @@ This extensional equality, however, does not hold as they have different intensi
 
 \section{Conclusion}\label{sec:conclusion}
 
+\paragraph*{Related work}
+\cite{Visser2019,Beklemishev2006}
+\cite{Kavvos2020}
+\cite{Shamkanov2014,Shamkanov2016a}
+\cite{Litak2014}
+
+\begin{itemize}
+    \item  classic theory of categorical realisability is based on some partial combinatory algebra.
+\end{itemize}
+
+Compare with \cite{Kavvos2017a} in terms of the degree of intensionality
 We follow the inspiring works by Kavvos in this paper to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus as the foundation of categorical semantics for intensionality. 
 The additional equality available in $\PP$-categories allows us to bring out intensions as morphisms which are not exposed in ordinary categories, since computationally equivalent terms are identified on the semantics side \emph{a priori} caused by the identification of \emph{denotation} with \emph{extension}.
@@ -985,7 +971,7 @@ Based on the framework established in~\Cref{sec:assemblies}, we modelled two int
 The development of the \SFour modality $\boxtimes$ refines that of Kavvos' $\boxtimes_K$ by \Cref{thm:S4-no-quoting} and as discussed in \Cref{re:difference-boxtimes}, so the first part of results here are not just replicates of the set-theoretic results in homotopy type theory. 
 As for the \GL modality, we use the clocked cubical type theory to define with a notion of computation stages.
 We then show that it satisfies the deductive form of the Gödel-Löb axiom---the intensional recursion~\cite{Kavvos2017b}.
-This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020} as one of the main contributions of this paper.
+This \GL modality then partially answers the question following Theorem~5.38 in the work of Kavvos~\cite{Kavvos2020}.
 Finally, we expect that typing disciplines of metaprogramming can be drawn from this line of research to guide the design of tactic programming on which many proof assistants are based.%
 \hsnote{More concrete future work?}
 
