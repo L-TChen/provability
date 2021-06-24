@@ -99,10 +99,10 @@
 
 There have been investigations into type-theoretic foundations for metaprogramming, notably Davies and Pfenning's~(2001) treatment in \SFour modal logic, where code evaluating to values of type~$A$ is given the modal type $\mathtt{Code}\,A$ ($\Box A$ in the original paper).
 Recently, in his modally typed calculus iPCF, Kavvos~(2017) extended PCF with $\mathtt{Code}\,A$ and intensional recursion, understood as the deductive form of the Gödel-Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
-Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be evaluated in a later stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and the two types of code should be discriminated.
+Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be evaluated in a next stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and the two types of code should be discriminated.
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
 Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
-For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `later' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
+For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `next' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
 Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence and the completeness principle $A \to \Box A$ in provability logic as well as $A \to \boxtimes A$.
 That is, in our model, two extensionally equal terms may not be intensionally equal, and there is no internal quoting operation.
 Our results are developed in (guarded) homotopy type theory and formalised in Agda.
@@ -125,7 +125,7 @@ For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} tha
 
 Recently, Kavvos proposed a `new' construct called \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ that is used to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
 In contrast to general recursion $(A \to A) \to A$, which also constructs a value recursively from its value (extension) only, intensional recursion alone does not lead to logical inconsistency.
-Intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability' in provability logic, and its computational behaviour mirrors Kleene's second recursion theorem.
+Intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability' in provability modal logic, and its computational behaviour mirrors Kleene's second recursion theorem.
 Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}$ viewed as both \SFour~and~\GL modalities.
 Unfortunately, when $\mathtt{Code}$ is designed in this way, a contradiction is derivable, making it impossible to treat the type system as a logical foundation.
 
@@ -147,7 +147,7 @@ The difference between $\boxtimes X$ and $\Box X$ is, however, where extensions 
     We can then validate the \SFour axioms, for example $\boxtimes X \to X$ (natural in~$X$) by just projection.
     
     \item For $\Box X$, the extension~$x$ does not come from~$\bproj{X}$ but a different set $\laterp \bproj{X}$ whose elements denote values of~$\bproj{X}$ that are available in a next, or \emph{later}, stage.
-    This set $\laterp \bproj{X}$ can be conveniently expressed in \emph{guarded type theory}, which features an internal later modality~$\laterp$ and moreover \emph{guarded recursion} $(\laterp X \to X) \to X$.
+    This set $\laterp \bproj{X}$ can be conveniently expressed in a \emph{guarded type theory}, which features Nakano's later modality~$\laterp$ and \emph{guarded recursion}~\cite{Nakano2000}.
     By working in guarded typed theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
 The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually shown false.
@@ -156,7 +156,7 @@ Hence, by refuting both congruence and internal quoting, which previous work~\ci
 
 We use homotopy type theory (HoTT)~\cite{hottbook} as our metalanguage, although this is mainly for convenience.
 More specifically, our work is built upon the reformulated set theory and logic within HoTT, which enable us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence (for example, within HoTT we can easily distinguish between `pairs of an extension and an intension' and `extensions associated with at least an intension').
-Moreover, implementations of HoTT are readily available, so we are able to formalise and verify our constructions, for which HoTT provides essential features that some previous type theories lack, notably function extensionality: $\left(\fall{x : A} f\,x =_B g\,x\right) \to f = g$.
+Moreover, implementations of HoTT are readily available, so we are able to formalise and verify our constructions, for which HoTT provides essential features that some other type theories lack, notably function extensionality: $\left(\fall{x : A} f\,x =_B g\,x\right) \to f = g$.
 Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also supports guarded type theory in the guarded cubical mode.
 
 %\paragraph*{Contributions}
@@ -194,8 +194,8 @@ It is easy to check that the types we work with in this paper are sets: types co
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
 
-\subsection{\texorpdfstring{$\lambda$}{λ}-calculus}
-For $\lambda$-calculus, we fix only notations where details can be found in the classic textbook by Barendregt~\cite{Barendregt1984a}.
+\subsection{\texorpdfstring{$\lambda$}{λ}-calculus, Gödel encoding, and the Second Recursion Theorem}
+For $\lambda$-calculus, we only fix notations where details can be found in the classic textbook by Barendregt~\cite{Barendregt1984a}.
 Terms are defined informally by
 \[
   M \defeq \mathtt{x} \mid M\,N \mid \lambda \mathtt{x}.\, M
@@ -209,8 +209,7 @@ The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of red
 The set $M \reduce M$ has exactly one inhabitant---the empty sequence is understood as (the proof of) the reflexivity~$\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$.
 The type $\Lambda$ of terms has decidable equality as well as $M \reduce N$, so they are sets by Hedberg's theorem.
 
-\subsubsection{Gödel encoding and the Second Recursion Theorem}\label{subsec:godel}
-In $\lambda$-calculus there is a function between $\lambda$-terms
+There is a function between $\lambda$-terms
   $\qquote{\cdot} : \Lambda \to \Lambda_0$
 mapping any term $M$ to a closed term $\qquote{M}$ such that $\qquote{M}$ is normal and
 $M \equiv_\alpha N$ whenever $\qquote{M} \equiv_\alpha \qquote{N}$.
@@ -233,11 +232,11 @@ Indeed, no such term can compute the code of any arbitrary term.
 \begin{proposition}\label{prop:no-quoting}
   There is no $\mathtt{Q} : \Lambda_1$ such that $\mathtt{Q}[M] \reduce \qquote{M}$ for any $M : \Lambda$.
 \end{proposition}
-\begin{proof}
-  Assume such a term $\mathtt{Q}$ exists. 
-  Consider $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$ and $\mathtt{I}\,\mathtt{I}$ where $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \qquote{\mathtt{I}\,\mathtt{I}}$ by assumption but also $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \mathtt{Q}[\mathtt{I}]\reduce \qquote{I}$.
-  Hence, by confluence and the assumption that $\qquote{M}$ is normal for any $M$, it follows that $\qquote{I\,I} \equiv_\alpha \qquote{I}$ and thus $\mathtt{I\,I} \equiv_\alpha \mathtt{I}$, a contradiction.
-\end{proof}
+%\begin{proof}
+%  Assume such a term $\mathtt{Q}$ exists. 
+%  Consider $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$ and $\mathtt{I}\,\mathtt{I}$ where $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \qquote{\mathtt{I}\,\mathtt{I}}$ by assumption but also $\mathtt{Q}[\mathtt{I}\,\mathtt{I}] \reduce \mathtt{Q}[\mathtt{I}]\reduce \qquote{I}$.
+%  Hence, by confluence and the assumption that $\qquote{M}$ is normal for any $M$, it follows that $\qquote{I\,I} \equiv_\alpha \qquote{I}$ and thus $\mathtt{I\,I} \equiv_\alpha \mathtt{I}$, a contradiction.
+%\end{proof}
 \hsnote{revise}
 
 Contrary to the well-known first recursion theorem, Kleene's second recursion theorem works for \emph{code} instead of values and will be used to model the \GL modality.
@@ -249,7 +248,7 @@ Contrary to the well-known first recursion theorem, Kleene's second recursion th
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
 Instead of ordinary categories, we work with $\PP$-categories pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} where morphisms are equipped with an additional partial equivalence relation (PER) as another level of equality between morphisms.
-Kavvos~\cite{Kavvos2017b} recently advocated its use and introduced a functor-like construct called \emph{exposure}, which does not enforce the preservation of PERs of $\PP$-categories, to manifest the essence of intensionality.
+Kavvos~\cite{Kavvos2017b} recently advocated its use and introduced a construct called \emph{exposure}, which is similar to a ($\PP$-)functor but does not enforce the preservation of PERs of $\PP$-categories, to manifest the essence of intensionality.
 \hsnote{doesn’t really help with understanding what exposures are about}
 \ltnote{better now?}
 
@@ -291,8 +290,6 @@ The precise definition is as follows.
     \item $f \sim g$ whenever $Qf \sim Qg$ for any two well-defined morphisms $f, g\colon X \to Y$. 
   \end{romanenumerate}
 \end{definition}
-
-
 The \emph{identity exposure} $\mathcal{I}$ maps every object or morphism to itself.
 Composing two exposures in the usual way clearly gives us an exposure. 
 
@@ -313,7 +310,7 @@ Accordingly an appropriate notion of morphisms between assemblies is introduced 
 the technical foundation for~\Cref{sec:provability}.
 
 
-\subsection{Assembly}
+\subsection{Assembly and trackable map}
 Traditionally, an assembly on natural numbers is a set $\bproj{X}$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ in $\bproj{X}$ there exists some $a$ with $a \Vdash x$, where $a$ is said to \emph{realise} $x$ or $a$ is a \emph{realiser} of $x$.
 The modern notion of assemblies~\cite{Oosten2008} is often defined on a partial  combinatory algebra~$(A, \cdot)$, called \emph{PCA} for short.
 For the sake of formalisation and potential applications in the design of programming languages, we base our definion on $\lambda$-calculus subject to $\alpha$-equivalence which is more akin to the one on an ordered PCA~\cite{Hofstra2003}. 
@@ -322,7 +319,7 @@ For the sake of formalisation and potential applications in the design of progra
   An \emph{assembly} $X$ on $\lambda$-calculus consists of a \emph{carrier} set $|X| : \set$ and a family ${\Vdash_X}$ of sets indexed by $\Lambda_0$ to $|X|$ as its \emph{realisability relation} such that
   \emph{(a)} there is merely a realiser $M : \Lambda_0$ of every $x : \bproj{X}$, and
   \emph{(b)} $M \Vdash_X x$ whenever $M \reduce N$ and $N \Vdash_X x$.
-  That is, an assembly is a quadruple $(|X|, \Vdash_X, r_X, t_X)$ of type
+  In other words, an assembly is a quadruple $(|X|, \Vdash_X, r_X, t_X)$ of type
   \[
     \Asm_0(\Lambda) \defeq \sm{\bproj{X} : {\set}}{\mathord{\Vdash_X}:\Lambda_0 \to |X| \to \set} 
       \mathsf{Respects}\left(\Vdash_X, \mathord{\twoheadrightarrow_\beta}\right)
@@ -336,10 +333,10 @@ For the sake of formalisation and potential applications in the design of progra
   \end{align}
 \end{definition}
 
-Our type-theoretic formulation is almost a direct translation from the set-theoretic formulation except that the realisability~$\Vdash$ is not just a relation but an indexed family of sets.
+Our type-theoretic formulation is almost a direct translation from the set-theoretic formulation except that the realisability relation~$\Vdash$ is not really a relation but an indexed family of sets.
 As we would like to account for intensional equality in addition to extensional equality between terms,
 computationally equivalent terms should not be identified \emph{a priori}.
-It turns out that formulating the interaction with reduction $\reduce$ as~\eqref{eq:respect-reduction} in line with the definition on an ordered PCA suffices to derive classic properties.
+It turns out that formulating the interaction with reduction $\reduce$ as~\eqref{eq:respect-reduction} in line with the definition on an ordered PCA suffices to derive familiar properties.
 %The formulation $\left(\mathord{\Vdash_X}\;\mathsf{respects}\;\mathord{\twoheadrightarrow_\beta}\right)$ is motivated by the confluence of $\lambda$-calculus where every two $\beta$-equivalent terms $M_i$ have a confluent term $N$, i.e.\ $M_i \reduce N$ for $i = 1, 2$.
 %Second, a plausible alternative to the right totality~\eqref{eq:right-total} one might expect is
 %\begin{equation}\label{eq:alternative-right-totality}
@@ -350,26 +347,24 @@ It turns out that formulating the interaction with reduction $\reduce$ as~\eqref
 %With function extensionality valid in HoTT, we believe that the alternative type~\eqref{eq:alternative-right-totality} is in fact empty when $\bproj{X}$ considering Troelstra's argument~\cite{Troelstra1977}.
 
 \begin{example}\label{ex:assembly-lambda}
-  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
+  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_\Lambda, t_\Lambda)$ where $r_\Lambda$ and $t_\Lambda$ are given by the transitivity and the reflexivity of~$\reduce$.
 \end{example}
 
 \begin{example} \label{ex:assembly-naturals}
-  Every natural number $n : \Nat$ is realised by terms that reduce to its Church numeral~$\mathtt{c}_n$.
-  That is, the type $\Nat$ of natural numbers with the realisability~$\Vdash_{\Nat}$ defined by
+  Every natural number $n : \Nat$ is realised by terms reducible to its Church numeral~$\mathtt{c}_n$.
+  That is, the type $\Nat$ of natural numbers with the relation~$\Vdash_{\Nat}$ defined by
   \[
     \left(M \Vdash_\Nat n\right) \defeq \left(M \reduce \mathtt{c}_n\right)
   \]
   is an assembly where $r_\Nat$ and $t_\Nat$ are given by the transitivity and the reflexivity of~$\reduce$.
 \end{example}
 
-\subsection{Trackable map}%
-
 A morphism between assemblies on a PCA $(A, \cdot)$ is defined as a function~$f$ merely \emph{tracked by} some $b \in A$ in the sense that there merely exists some $b$ such that $b \cdot a \Vdash f\,x$ whenever $a \Vdash x$.
 In this case, $b$ is called the \emph{tracker} of $f$.
 It is noted by Kavvos~\cite{Kavvos2017b} that to bring out intensionality the tracker should be considered as part of the structure instead of a property.
 \begin{definition}\label{def:trackable}
   Given assemblies $X$ and $Y$, a \emph{trackable map}~$f$ from $X$ to $Y$ consists of a function $\bproj{f}$ from $|X|$ to $|Y|$ and a term $F : \Lambda_1$ such that $F[M] \Vdash \bproj{f}\,x$ whenever $M \Vdash x$.
-  In other words, the type of trackable maps is $\sum_{\bproj{f} : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, \bproj{f})$ where
+  That is, the type~$\Asm_1(X, Y)$ of trackable maps is $\sum_{\bproj{f} : |X| \to |Y|} \sum_{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, \bproj{f})$ where
   \[
     \mathsf{Tracks}_{X, Y}(F, \bproj{f}) \defeq \prd{M : \Lambda_0}{x : |X|}
     \left(M \Vdash_X x\right) \to \left(F[M] \Vdash_Y \bproj{f}\, x\right).
@@ -377,10 +372,10 @@ It is noted by Kavvos~\cite{Kavvos2017b} that to bring out intensionality the tr
   A \emph{merely trackable map} is an inhabitant of $\sm{\bproj{f} : |X| \to |Y|} \exis{F : \Lambda_1}\mathsf{Tracks}_{X, Y}(F, \bproj{f})$. 
 \end{definition}
 
-By definition, a trackable map~$f$ consists of not only a function~$\bproj{f}$ between carriers but also its tracker~$F$ and a transformation~$\mathfrak{f}$ for realisability.
+By definition, a trackable map~$f$ consists of not only a function~$\bproj{f}$ between carriers but also its tracker~$F$ and a transformation~$\mathfrak{f}$ of realisability.
 
-\begin{example}[Identity]
-  Every assembly $X$ has a trackable map $\iid_X \defeq (\idfunc[\bproj{X}], \mathtt{x}_0, \pr_3)$
+\begin{example}
+  Every assembly $X$ has an identity map $\iid_X \defeq (\idfunc[\bproj{X}], \mathtt{x}_0, \pr_3)$
   where
   \[
     \pr_3 \defeq \lam{M}{x}{r} r : \prd{M : \Lambda_0}{x : |X|} \left(M \Vdash_X x\right) \to \left(M  \Vdash_X x\right)
@@ -406,7 +401,7 @@ The above discussion amounts to defining a composition operation $(g, f) \mapsto
 
 \subsection{Extensional equality and \texorpdfstring{$\PP$}{P}-category of assemblies}
 
-We define the partial equivalence relation $\sim$ referred to as the extensional equality on trackable maps by $f_1 \sim f_2$, that $f_1$ is said to be \emph{extensionally equal} to $f_2$, if $\bproj{f_1} = \bproj{f_2}$.
+We define the partial equivalence relation $\sim$ referred to as the extensional equality on trackable maps by $f_1 \sim f_2$ (we call that $f_1$ is \emph{extensionally equal} to $f_2$), if $\bproj{f_1} = \bproj{f_2}$.
 \begin{proposition}
   The type $\Asm_0$ of assemblies and the family of types $\Asm_1(X, Y)$ for any two assemblies $X$ and $Y$ with the extensional equality form a $\PP$-category~$\Asm(\Lambda)$.
 \end{proposition}
@@ -424,9 +419,8 @@ We now investigate some of its basic properties.
   The finality follows from the function extensionality.
 \end{example}
 
-Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$.
-Moreover, distinct merely trackable maps can be separated by global elements~$\top \to X$ in the ordinary category of assemblies and merely trackable maps.
-In $\Asm(\Lambda)$ where trackers are part of trackable maps, a global element has to be constructed by a pair of inhabitant $x : \bproj{X}$ and its realiser.
+Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$, and distinct merely trackable maps can be separated by global elements of~$X$, which are morphisms to $X$ from the terminal object~$\top$.
+In $\Asm(\Lambda)$ where trackers are part of trackable maps, a global $\PP$-element has to be constructed by a pair of inhabitant $x : \bproj{X}$ and its realiser.
 \begin{lemma}\label{lem:global-element}
   Let $X$ be an assembly. Then the following statements hold:
   \begin{enumerate}
@@ -435,21 +429,16 @@ In $\Asm(\Lambda)$ where trackers are part of trackable maps, a global element h
   \end{enumerate}
 \end{lemma}
 
-As expected, the $\PP$-terminal object $\top$ in~$\Asm(\Lambda)$ is a $\PP$-separator in the sense that $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
+As expected, the $\PP$-terminal object $\top$ in~$\Asm(\Lambda)$ is a $\PP$-separator in the sense that for any two trackable maps $f_1$ and $f_2$ we have $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
 This property relies on the property that the carrier $\bproj{X}$ is a set.
 \begin{proposition}
-  Let $f_1, f_2 : X \to Y$ be two trackable maps. Then, 
-  $f_1$ is extensionally equal to $f_2$ if
-  $f_1 \circ x \sim f_2 \circ x$ for every global element $x$ to $X$.
+  The $\PP$-terminal object $\top$ is a $\PP$-separator in $\Asm(\Lambda)$.
 \end{proposition}
 \begin{proof}[Proof sketch]
-  By function extensionality, it suffices to define a trackable map $(\mathsf{c}_x, M_x, \mathfrak{M}_x)$ from $\top$ to $X$ for any inhabitant $x : \bproj{X}$, where $\mathsf{c}_x(\star) = x$.
-  Then, we show that there is a path $f_1\,x = f_2\,x$ independent of the choice of $M_x$ and $\mathfrak{M}_x$, by the right totality $t_X$, the recursion principle of propositional truncation, and the assumption that $\bproj{Y}$ is a set. 
+  Let $f_1$ and $f_2$ be two trackable maps.
+  By function extensionality, to prove that $\bproj{f_1} = \bproj{f_2}$, we define for any inhabitant $x : \bproj{X}$ a trackable map $\hat{x} \defeq (\mathsf{c}_x, M_x, \mathfrak{M}_x)$ from $\top$ to $X$  with $\mathsf{c}_x(\star) = x$ and $M_x \Vdash x$ by the right totality $t_X$.
+  By the recursion principle of propositional truncation and $\bproj{Y}$ being a set, it follows from our assumption that there exists a path $\bproj{f_1}\,x = \bproj{f_2}\, x$ independent of the choice of $M_x$ and $\mathfrak{M}_x$.
 \end{proof}
-
-\begin{corollary}
-  The $\PP$-terminal object $\top$ is a $\PP$-separator in $\Asm(\Lambda)$.
-\end{corollary}
 
 %so we leave this as an exercise to the reader.
 \begin{example}[Initial object]
@@ -486,24 +475,20 @@ However, it has the type of \emph{merely} trackable maps as its carrier, since t
   The \emph{evaluation map} $(X \Rightarrow Y) \times X \xrightarrow{ev_{X, Y}} Y$ natural in $X$ and $Y$ consists of a function
   $((f, \star) , x) \mapsto f\,x$ and its tracker $(\mathtt{proj}_1 \mathtt{x}_0)\,(\mathtt{proj}_2 \mathtt{x}_0) : \Lambda_1$ where $\mathtt{x}_0$ is the free variable (thought as a pair of realisers for a function and its argument) and $\mathtt{proj}_i$ the projection function between $\lambda$-terms.
 
-  The \emph{curried map} of a trackable function $(f, F, \mathfrak{f})$ from $Z \times X$ to $Y$ consists of
-  \begin{enumerate}
-    \item a function
-      $f^* \defeq \lambda z.\, ((\lambda x.\, f\,(z, x)) , \star_z)$
-      where by the recursion principle on the mere existence of a realiser $L_z \defeq t_Z z$ there is merely a tracker~$F[\left< L_z , \mathtt{x}_0 \right>]$ of $\lambda x.\, f\,(z, x)$;
-
-    \item a term $F^* \defeq \lambda \mathtt{x}_0.\, F[ \left< \mathtt{x}_1, \mathtt{x}_0 \right> ]$ with 
-
-    \item a witness $\mathfrak{f}^*$ of $\prd{L : \Lambda_0}{z : |Z|} \left(L \Vdash_Z z\right) \to \left(F^*[L] \Vdash_{X \Rightarrow Y} f\, z\right)$ by the reduction
+  The \emph{curried map} $(f^*, F^*, \mathfrak{f}^*)$ of a trackable function $(f, F, \mathfrak{f})$ from $Z \times X$ to $Y$ consists of
+    a function
+      $f^* \defeq \lambda z.\, ((\lambda x.\, f\,(z, x)) , \star_z)$, 
+      where by the recursion principle on the mere existence of a realiser $L_z \defeq t_Z z$ there is merely a tracker~$F[\left< L_z , \mathtt{x}_0 \right>]$ of $\lambda x.\, f\,(z, x)$, and
+    a term $F^* \defeq \lambda \mathtt{x}_0.\, F[ \left< \mathtt{x}_1, \mathtt{x}_0 \right> ]$ with 
+    a witness $\mathfrak{f}^*$ of $\prd{L : \Lambda_0}{z : |Z|} \left(L \Vdash_Z z\right) \to \left(F^*[L] \Vdash_{X \Rightarrow Y} f\, z\right)$ because of the reduction
       \[
         \left(\lambda \mathtt{x}_0, F[\left< L , \mathtt{x}_0 \right>]\right)\,M \onereduce F[\left< L , M \right>]
       \]
       and that $F$ is indeed a tracker of~$f\colon \bproj{Z \times X} \to \bproj{Y}$. 
-  \end{enumerate}
-  It is easy to verify all details as well as the universality.
+  It is routine to verify all details as well as the universality.
 \end{example}
 
-It is straightforward to define the $\PP$-product of assemblies, so we omit the details from the paper.
+It is not hard to define the $\PP$-product of assemblies, so we omit the details from the paper.
 In short, we have classic properties of the $\PP$-category $\Asm(\Lambda)$:
 \begin{corollary}
   $\Asm(\Lambda)$ is a cartesian closed $\PP$-category with a strict $\PP$-initial object.
@@ -516,9 +501,9 @@ In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \
 For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not.%
 \hsnote{forward reference to \Cref{re:boxtimes-is-not}}
 Most importantly, we are able to refute the existence of $X \to \boxtimes X$ being natural in~$X$, understood as a quoting function from the computational perspective, while we did not find a way to refute it with $\boxtimes_K$.
-Hitherto, we have reconstructed a similar but different model~$\boxtimes$ in HoTT than the set-theoretic model~$\boxtimes_K$ based on a PCA studied by Kavvos.
+Hitherto, we have reconstructed a similar but different model~$\boxtimes$ than the model~$\boxtimes_K$ based on a PCA.
 
-Thereafter, we use an extension of cubical type theory with guarded recursion---clocked cubical type theory~\cite{Bahr2017,Kristensen2021}---and introduce an exposure-like construction $\Box$ to model the \GL modality.
+Thereafter, we move to guarded homotopy type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
 We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$.
 Finally, we verify the deductive form of the Gödel-Löb axiom: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$\qquote{\mathsf{fix}\,F}$
 where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
@@ -526,7 +511,7 @@ where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
 \subsection{An exposure for \texorpdfstring{\SFour}{S4} modality}
 An assembly $X$ records the interplay between intensions (i.e.\ terms) and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \bproj{X}$ with a term $M$ which realises $x$ as the carrier of $\boxtimes X$.
 A pair $(M, x, r)$ with $r : M \Vdash_X x$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.
-Thus, we argue that $(M, x, r)$ shall be realised by terms which are $\beta$-equivalent to its code $\qquote{M}$ (instead of $M$ as proposed by Kavvos~\cite{Kavvos2017b}), since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.%
+Thus, we argue that $(M, x, r)$ shall be realised by terms which are $\beta$-equivalent to its code $\qquote{M}$, since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.%
 \hsnote{revise}
 In short, the carrier and the realisability relation are defined as
 \[
@@ -552,13 +537,14 @@ completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
 
 \begin{example} \label{ex:global-element-of-unit}
-  The global element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ is given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{\mathtt{I}}$ using \Cref{lem:global-element}. 
-  Yet, there are other global elements of $\boxtimes \top$ such as $(\mathtt{I}\,\mathtt{I}, \star, \beta)$ realised by $\qquote{\mathtt{I\,I}}$ where $\beta : \mathtt{I}\,\mathtt{I} \onereduce \mathtt{I}$ is the $\beta$-reduction rule. 
+  A global $\PP$-element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ is given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{\mathtt{I}}$ using \Cref{lem:global-element}. 
+  Yet, there are other global $\PP$-elements of $\boxtimes \top$ such as $(\mathtt{I}\,\mathtt{I}, \star, \beta)$ realised by $\qquote{\mathtt{I\,I}}$ where $\beta : \mathtt{I}\,\mathtt{I} \onereduce \mathtt{I}$ is the $\beta$-reduction rule. 
   Furthermore, the tracker of a global element might not even be a closed term but a open term. 
 \end{example}
-
-The above example shows that $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many representations for $\star : \Unit$, i.e.\ inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
-Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.\ltnote{Is it true?}
+\ltnote{say somewhere that $\boxtimes$ is not a $\PP$-functor.}
+The above example shows that $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
+Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.
+Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.
 
 \begin{theorem}[{\emph{cf}.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
   $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is an exposure of assemblies.
@@ -596,9 +582,8 @@ For any global element $a\colon \top \to \boxtimes X$ given by~\Cref{lem:global-
 \]
 
 \begin{remark} \label{re:boxtimes-is-not}
-One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\delta$ is also a natural transformation up to~$\sim$ satisfying comonad laws.
-However, unlike the exposure $\boxtimes_K$ introduced by Kavvos~\cite[Theorem~11]{Kavvos2017a}, these maps $\delta_X$ are unfortunately \emph{not} natural in~$X$.
-Indeed, for each trackable map $f\colon X \to Y$ the inhabitant 
+One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\delta$ is also a natural transformation up to~$\sim$ satisfying comonad laws, but these maps $\delta_X$ are \emph{not} natural in~$X$.
+In detail, for each trackable map $f\colon X \to Y$ the inhabitant 
 \[
   \delta_Y (\boxtimes f(M, x, r))
   \equiv \left(\qquote{F[M]}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \refl_{\twoheadrightarrow}\right)
@@ -614,25 +599,24 @@ Nevertheless we may consider a partial order induced by the reduction relation $
 In detail, for inhabitants of $\boxtimes X$ define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$, and
 accordingly define $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for any $x$.
 Then we have $\bproj{\boxtimes \boxtimes f \circ \delta_X} \leq \bproj{\delta_Y \circ \boxtimes f}$ instead.
-This kind of transformations $\delta$ are called \emph{lax natural transformations}.
+This kind of transformations $\delta$ are \emph{lax} natural transformations in a suitable sense.
 \end{remark}
 
 What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intension part of $\boxtimes f$ is applied verbatim.
 
 \begin{remark} \label{re:difference-boxtimes}
-  The exposure $\boxtimes_K$ defined for assemblies on a PCA is with the carrier and the realisability relation given by
+  The exposure $\boxtimes_K$ studied by Kavvos is defined for assemblies on a PCA where the carrier and the realisability relation are given by
   \[
-    \bproj{\boxtimes_K X} \defeq \{\,(M, x) \mid M \Vdash x \,\}
+    \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
     \quad\text{and}\quad
-    N \Vdash_{\boxtimes_K X} (M, x) \defeq N = M
+    b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
   \]
-  without the Gödel encoding. 
-  It gives rise to not only an exposure but also a comonadic exposure.
-  Moreover $\boxtimes_K$ preserves finite products including the terminal object $\top$.
-  Preserving finite products is considered \emph{unsatisfactory} because intensions are subject to extra equations already and identified on the level of PCA.
-  By taking $\lambda$-terms subject only to $\alpha$-equivalence as realisers, we are able to distinguish computationally equivalent intensions.
-
+  without the use of Gödel encoding.
+  It gives rise to a finite product-preserving comonadic exposure~\cite[Theorem~11]{Kavvos2017b}.
+  Preserving finite products is possible, since some computationally equivalent intensions have to be identified to satisfy equations of PCA.
+  Instead, by taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions.
 \hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
+\ltnote{better now?}
 
 \end{remark}
 
@@ -662,8 +646,6 @@ What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not al
   By naturality, $\bproj{\eta_{\Lambda}}\,M_0 \equiv \bproj{\eta_{\Lambda}} \left(\bproj{\widehat{M_0}}\,\star\right) =  \bproj{\boxtimes\widehat{M_0}}\,(\bproj{\eta_\top}\,\star) = (M_0, M_0, \refl_\twoheadrightarrow)$.
 
 \end{proof}
-
-It remains unclear to us if the existence of a transformation $\mathcal{I} \to \boxtimes_K$ can be refuted.
 
 %\begin{remark}\label{re:S4-modality}
 %  Recall that the modal type theory considered by Davies and Pfenning~\cite{Davies2001b} is a dual-context simple type theory extended with an \SFour modality $\Box$, a construct $\mathtt{box}$, a $\mathtt{let}$-expression for boxed terms, and typing rules below.
@@ -701,15 +683,15 @@ Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are sugg
 
 To untie the knot but to retain consistency and the understanding of $\Box A$ as code of type~$A$, we refine our interpretation with a notion of computation stages.
 In general, staged code is to be evaluated in a next stage while   $\boxtimes A$ is only a special case that next stages include the current one so that $\epsilon_X\colon {\boxtimes} X \to X$ is allowed.
-To express the notion of `later' without stage indexing, we work within guarded type theory.
+To express the notion of `next' stages without stage indexing, we work within guarded type theory.
 \hsnote{need a better story}
 \ltnote{use the story given in \Cref{sec:intro}}
 
 \subsubsection{Digression: Clocked Cubical Type Theory}
-The clocked cubical type theory~\cite{Kristensen2021}, CCTT for short, is a metalanguage extending HoTT we use to model the \GL modality.
+The clocked cubical type theory~\cite{Kristensen2021}, CCTT for short, is a metalanguage extending HoTT with a later modality and guarded recursion.
 It combines two extensions of dependent type theory.
 The first extension is the machinery to manipulate $n$-dimensional cubes such as paths, squares, cubes, etc., allowing us to prove Voevodsky’s univalence axiom and function extensionality.
-The second extension adds a sort $\clock$ with \emph{ticks}~\cite{Bahr2017} to support Nakano's later modality~$\laterp$ and guarded recursion~\cite{Nakano2000} also known as Löb induction.
+The second extension adds a sort $\clock$ with \emph{ticks}~\cite{Bahr2017} to support Nakano's later modality~$\laterp$ and guarded recursion also known as Löb induction.
 \ltnote{can we be more informal about CCTT so that we can remove this section?}
 
 Clocks are of a different sort $\clock$ from types, so usual type formers (such as `$\to$') are not applicable.
@@ -884,7 +866,7 @@ On the other hand, it is not possible to have a family of trackable maps $\epsil
 \end{theorem}
 \begin{proof}
   Assume $\epsilon_\bot \colon \bproj{\Box^\kappa \bot} \to \bproj{\bot}$ exists. 
-  We will show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by Löb induction a contradiction $\mathsf{fix}\,\mathsf{bang} : \Empty$ is derivable.
+  We will show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by guarded recursion a contradiction $\mathsf{fix}\,\mathsf{bang} : \Empty$ is derivable.
   
   First, let $x$ be an inhabitant of $\laterp \Empty$. We construct an inhabitant $(M, x, r)$ of
   \[
