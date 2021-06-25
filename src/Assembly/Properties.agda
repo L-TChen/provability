@@ -122,6 +122,12 @@ module Final {X : Asm 𝓤} where
   universality : Trackable X ⊤ₐ
   universality = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → lift -↠-refl
 
+  global-element′ : (x : ⟨ X ⟩) → MerelyTrackable ⊤ₐ X
+  global-element′ x = (λ _ → x) , rec isPropPropTrunc
+    (λ { (M , r) → ∣ ↑₁ M , (λ { _ → ⊩-respects-↠
+      (begin ↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ _ ⟩ M ∎) r}) ∣})
+    (⊩-right-total x)
+
   global-element : (M : Λ₀) → (x : ⟨ X ⟩) → M ⊩ x
     → Trackable ⊤ₐ X
   global-element M x M⊩x = (λ _ → x) , (↑₁ M) , λ _ → ⊩-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
@@ -194,7 +200,7 @@ _×ₐ_ {𝓤} X Y = (⟨ X ⟩ × ⟨ Y ⟩ , isSet× (X is-set) (Y is-set) ) ,
       (N , -↠-trans (·ₗ-cong L-↠L′) projᵣL-↠N , y⊩N)
 
     ⊩-right-total : _⊩_ IsRightTotal
-    ⊩-right-total (x , y) = rec2 propTruncIsProp
+    ⊩-right-total (x , y) = rec2 isPropPropTrunc
       (λ { (M , M⊩x) (N , N⊩y) → ∣ Λ.`⟨ M , N ⟩ , (M , β-projₗ , M⊩x) , N , β-projᵣ , N⊩y ∣ })
       (X.⊩-right-total x) (Y.⊩-right-total y)
 
@@ -266,7 +272,7 @@ _⇒_ {𝓤} X Y = (X⇒Y , X⇒YisProp) , _⊩_ , record
       module Y = AsmStr (str Y)
 
       X⇒Y = MerelyTrackable X Y
-      X⇒YisProp = isSetΣ (isSetΠ (λ _ → Y is-set)) λ _ → isProp→isSet propTruncIsProp
+      X⇒YisProp = isSetΣ (isSetΠ (λ _ → Y is-set)) λ _ → isProp→isSet isPropPropTrunc
 
       _⊩_ : Λ₀ → X⇒Y → 𝓤 ̇
       F ⊩ (f , _) = {M : Λ₀} {x : ⟨ X ⟩} → M X.⊩ x → (F · M Y.⊩ f x)
@@ -278,7 +284,7 @@ _⇒_ {𝓤} X Y = (X⇒Y , X⇒YisProp) , _⊩_ , record
       ⊩-respects-↠ {G} {F} G-↠F F⊩f M⊩x = Y.⊩-respects-↠ (·ₗ-cong G-↠F) (F⊩f M⊩x)
 
       ⊩-right-total : _⊩_ IsRightTotal
-      ⊩-right-total (f , ∃F⊩f) = rec propTruncIsProp
+      ⊩-right-total (f , ∃F⊩f) = rec isPropPropTrunc
         (λ { (F , F⊩f) → ∣ ƛ F , (λ {M} M⊩x → Y.⊩-respects-↠
           ((ƛ F) · M -→⟨ β ⟩ F [ M ] ∎) (F⊩f M⊩x)) ∣})
         ∃F⊩f
@@ -308,7 +314,7 @@ module Exponential (X Y : Asm 𝓤) where
   curry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
   curry {Z = Z} (f , F , 𝔣) = 
     (λ z →
-      (λ x → f (z , x)) , rec propTruncIsProp (λ { (L , t) → ∣ F ⟪ pair (↑₁ L) 0 ⟫ ,
+      (λ x → f (z , x)) , rec isPropPropTrunc (λ { (L , t) → ∣ F ⟪ pair (↑₁ L) 0 ⟫ ,
         (λ {M} {x} r → Y.⊩-respects-↠
           (begin
             F ⟪ pair (↑₁ L) 0 ⟫ [ M ]
