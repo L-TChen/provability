@@ -1,7 +1,7 @@
 \documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
 \numberwithin{equation}{section}
 
-%\usepackage{mlmodern}
+\usepackage{mlmodern}
 
 \makeatletter
 \def\renewtheorem#1{%
@@ -60,7 +60,7 @@
 
 \Copyright{Liang-Ting Chen and Hsiang-Shang Ko}
 \ccsdesc{Theory of computation~Type theory}
-\keywords{Löb's theorem, provability, guarded recursion, realisability, homotopy type theory, modal type theory, metaprogramming}
+\keywords{Löb's theorem, guarded recursion, realisability, modal type, metaprogramming}
 
 \relatedversion{} %optional, e.g. full version hosted on arXiv
 %\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
@@ -69,9 +69,10 @@
 
 \funding{This work was supported by the Ministry of Science and Technology of Taiwan under grant MOST~109-2222-E-001-002-MY3.}
 
-\acknowledgements{\ltnote{Alex Kavvos, Rasmus Ejlers Møgelberg, Churn-Jung Liau, Zulip@HoTT, Zulip@Agda}
-\ltnote{the aid of the community effort (the cubical library, PLFA, etc.}
-}
+\acknowledgements{%
+  We are grateful to Alex Kavvos and Tsung-Ju Chiang for insightful discussions.
+  Also we would like to thank Rasmus Ejlers Møgelberg, Churn-Jung Liau, Tom de Jong, Chad Nester, and Andrea Vezzosi for useful exchanges.}
+
 
 \nolinenumbers 
 
