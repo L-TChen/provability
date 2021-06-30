@@ -125,8 +125,8 @@ the (\textbf{T}) axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} 
 For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
 
 Recently, Kavvos proposed a `new' construct called \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ that is used to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
-In contrast to general recursion $(A \to A) \to A$, which also constructs a value recursively from its value (extension) only, intensional recursion alone does not lead to logical inconsistency.
-Intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability' in provability modal logic, and its computational behaviour mirrors Kleene's second recursion theorem.
+Logically, intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability' in provability modal logic, and computationally, its behaviour mirrors Kleene's second recursion theorem.
+In contrast to general recursion $(A \to A) \to A$, which constructs a value recursively from its value (extension), intensional recursion alone does not lead to logical inconsistency.
 Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}$ viewed as both \SFour~and~\GL modalities.
 Unfortunately, when $\mathtt{Code}$ is designed in this way, a contradiction is derivable, making it impossible to treat the type system as a logical foundation.
 
@@ -142,14 +142,14 @@ Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of 
 The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$ whose associated intensions are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$ of~$M$.
 The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from being natural in~$X$, that is, there is no generic internal quoting operation.
 \ltnote{Ask Kavvos}
-The difference between $\boxtimes X$ and $\Box X$ is, however, where extensions are from.
+The difference between $\boxtimes X$ and $\Box X$ is where extensions are from.
 \begin{itemize}
     \item For $\boxtimes X$, the extension part~$x$ in $(M, x)$ coincides with the values of the set~$\bproj{X}$.
     We can then validate the \SFour axioms, for example $\boxtimes X \to X$ (natural in~$X$) by just projection.
     
     \item For $\Box X$, the extension~$x$ does not come from~$\bproj{X}$ but a different set $\laterp \bproj{X}$ whose elements denote values of~$\bproj{X}$ that are available in a next, or \emph{later}, stage.
     This set $\laterp \bproj{X}$ can be conveniently expressed in a \emph{guarded type theory}, which features Nakano's later modality~$\laterp$ and \emph{guarded recursion}~\cite{Nakano2000}.
-    By working in guarded typed theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
+    By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
 The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually shown false.
 Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} fails to achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
@@ -163,7 +163,7 @@ Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also suppor
 %\paragraph*{Contributions}
 
 \paragraph*{Plan of the paper}
-After recalling preliminaries on untyped $\lambda$-calculus, homotopy type theory, and $\PP$-categories in \Cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\Cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\Cref{sec:provability}, and conclude with related and future work in~\Cref{sec:conclusion}.
+After recalling preliminaries on homotopy type theory, untyped $\lambda$-calculus, and $\PP$-categories in \Cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\Cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\Cref{sec:provability}, and conclude with related and future work in~\Cref{sec:conclusion}.
 
 \section{Preliminaries}\label{sec:preliminaries}
 
@@ -189,14 +189,14 @@ For any type~$A$, the \emph{propositional truncation} of~$A$ is a type~$\brck A$
 With truncation, we can obtain a classical version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sm{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sm{x : A} R(x)\right) \to P$.
 Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
-\emph{Sets} are types of~$\set$ whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
-It is easy to check that the types we work with in this paper are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem}~\cite[Section~7.2]{hottbook} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set.
+\emph{Sets} are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
+It is easy to check that the types we work with in this paper are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem}~\cite[Section~7.2]{hottbook} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set (which we will write as $A : \set$ for short).
 
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
 
-\subsection{\texorpdfstring{$\lambda$}{λ}-calculus, Gödel encoding, and the Second Recursion Theorem}
-For $\lambda$-calculus, we only fix notations where details can be found in the classic textbook by Barendregt~\cite{Barendregt1984a}.
+\subsection{\texorpdfstring{$\lambda$}{λ}-calculus, Gödel encoding, and the second recursion theorem}
+For $\lambda$-calculus we only fix notations, and the details are left to, for example, the classic textbook by Barendregt~\cite{Barendregt1984a}.
 Terms are defined informally by
 \[
   M \defeq \mathtt{x} \mid M\,N \mid \lambda \mathtt{x}.\, M
@@ -206,9 +206,8 @@ $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms with at mo
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
 Our formalisation uses the de Bruijn representation, where $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction.
 For the presentation in this paper, the variable with index~$i$ is written $\mathtt{x}_i$\,, and given $F : \Lambda_{n+1}$ we write $F[M]$ instead of $F[M/\mathtt{x}_0]$ for the substitution for the first free variable~$\mathtt{x}_0$.
-The set~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$.
-The set $M \reduce M$ has exactly one inhabitant---the empty sequence is understood as (the proof of) the reflexivity~$\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$.
-The type $\Lambda$ of terms has decidable equality as well as $M \reduce N$, so they are sets by Hedberg's theorem.
+The type~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$; as a special case, the type $M \reduce M$ has exactly one inhabitant $\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$, which can be understood as either the empty sequence or (the proof of) the reflexivity of reduction.
+The types $\Lambda$ and $M \reduce N$ have decidable equality, so they are sets by Hedberg's theorem.
 
 There is a function between $\lambda$-terms
   $\qquote{\cdot} : \Lambda \to \Lambda_0$
@@ -223,15 +222,14 @@ Moreover there are terms $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mat
                                                      & \mathtt{eval}[\,\qquote{M}\,] & \reduce M.
 \end{align*}
 This function $\qquote{\cdot}$ is called a \emph{Gödel encoding}.
-By convention a quoted term $\qquote{M}$ is called a Gödel \emph{number} since the encoding function $\qquote{\cdot}$ is defined by assigning a natural number $\#M$ represented as a Church numeral $\mathbf{c}_{\#M}$ to every term~$M$.
-By nature it does not have to be a number at all, so we refrain from calling $\qquote{M}$ a number. 
-Instead, $\qquote{M}$ is simply called a \emph{code} of $M$. 
+Traditionally, a quoted term $\qquote{M}$ is called a Gödel \emph{number} since the encoding function $\qquote{\cdot}$ is defined by assigning to every term~$M$ a natural number $\#M$ represented as a Church numeral $\mathbf{c}_{\#M}$.
+An encoding does not have to be a number at all, however, so we simply call $\qquote{M}$ a \emph{code} of~$M$ rather than a number.
 For details on the axiomatic characterisation of encoding, see Polonsky~\cite{Polonsky2011}.
 
 Note that the term $\mathtt{quote}$ can only compute the code of a term $\qquote{M}$ already in a quoted form.
-Indeed, no such term can compute the code of any arbitrary term.
+Indeed, no term can compute the code of any arbitrary term.
 \begin{proposition}\label{prop:no-quoting}
-  There is no $\mathtt{Q} : \Lambda_1$ such that $\mathtt{Q}[M] \reduce \qquote{M}$ for any $M : \Lambda$.
+  There is no $\mathtt{Q} : \Lambda_1$ such that $\mathtt{Q}[M] \reduce \qquote{M}$ for all $M : \Lambda$.
 \end{proposition}
 %\begin{proof}
 %  Assume such a term $\mathtt{Q}$ exists. 
@@ -242,13 +240,12 @@ Indeed, no such term can compute the code of any arbitrary term.
 
 Contrary to the well-known first recursion theorem, Kleene's second recursion theorem works for \emph{code} instead of values and will be used to model the \GL modality.
 
-\begin{theorem}[Second Recursion Theorem] \label{thm:SRT}
-  Every term $F : \Lambda$ has a closed term $M$ with $M \reduce F\,\qquote{M}$.
-  In particular every $F : \Lambda_1$ has $\mathsf{fix}\,F : \Lambda_0$ satisfying $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
+\begin{theorem}[Second recursion theorem] \label{thm:SRT}
+  For every $F : \Lambda_n$ there exists $M : \Lambda_n$ such that $M \reduce F\,\qquote{M}$.
 \end{theorem}
 
 \subsection{\texorpdfstring{$\PP$}{P}-Categories and exposures}
-Instead of ordinary categories, we work with $\PP$-categories pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a} where morphisms are equipped with an additional partial equivalence relation (PER) as another level of equality between morphisms.
+Instead of ordinary categories, we work with $\PP$-categories pioneered by \v{C}ubri\'c et al.~\cite{Cubric1998a}, where morphisms are equipped with an additional partial equivalence relation (PER) as another level of equality between morphisms.
 Kavvos~\cite{Kavvos2017b} recently advocated its use and introduced a construct called \emph{exposure}, which is similar to a ($\PP$-)functor but does not enforce the preservation of PERs of $\PP$-categories, to manifest the essence of intensionality.
 \hsnote{doesn’t really help with understanding what exposures are about}
 \ltnote{better now?}
@@ -273,7 +270,7 @@ It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed categor
   \end{romanenumerate}
 \end{definition}
 
-A $\PP$-category has two kinds of equality for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$, where the former is considered as the \emph{intensional equality} and the latter as the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
+A $\PP$-category has two kinds of equality for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$, where the former can be used to model the \emph{intensional equality} and the latter the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
 Having two different equalities $=$~and~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not vice versa.
 For categorical semantics, where terms are interpreted as morphisms, an interpretation into a $\PP$-category is able to discriminate these two kinds of equality, enabling us to model intensionality.
 The usual categorical notions such as functors and initiality are up to the intensional equality~$=$\,; when we want to use the notions up to the extensional equality~$\sim$, we will add the `$\PP$-' prefix and say $\PP$-functors, $\PP$-initiality, etc.
@@ -294,7 +291,7 @@ The precise definition is as follows.
 The \emph{identity exposure} $\mathcal{I}$ maps every object or morphism to itself.
 Composing two exposures in the usual way clearly gives us an exposure. 
 
-Similarly, the notion of natural transformations is introduced for exposures which shares the same idea of the ordinary natural transformation but up to~$\sim$.
+Similarly, the notion of natural transformations is introduced for exposures, sharing the same idea with ordinary natural transformations but only up to~$\sim$.
 \begin{definition}
   Given exposures $P, Q\colon \mathbf{C} \looparrowright \mathbf{D}$, a \emph{natural transformation of exposures} $t\colon P \to Q$ is a family of well-defined morphisms $t_X \colon PX \to QX$ such that $Qf \circ t_X \sim t_Y \circ Pf$ for every well-defined morphism~$f\colon X \to Y$. 
 \end{definition}
@@ -884,13 +881,14 @@ On the other hand, it is not possible to have a family of trackable maps $\epsil
 The pay-off for disallowing evaluation is to be able to derive intensional recursion, i.e.\ the deductive form of the Gödel-Löb axiom from the logical perspective.
 
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
-  Every function $\bproj{f} \colon \bproj{\Box^\kappa X} \to \bproj{X}$ tracked by some $F$ gives rise to a global element~$f^\dagger$ of $\Box^\kappa X$ tracked by $\qquote{\mathsf{fix}\,F}$.
+  Every function $\bproj{f} \colon \bproj{\Box^\kappa X} \to \bproj{X}$ tracked by some $F : \Lambda_1$ gives rise to a global element~$f^\dagger$ of $\Box^\kappa X$ tracked by $\qquote{\mathsf{fix}\,F}$, where $\mathsf{fix}\,F : \Lambda_0$ satisfies $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
 \end{theorem}
 
 \begin{proof}
-  Let $f$ be a trackable map from $\Box^\kappa X$ to $X$.
-  We prove this statement by Löb induction on a $\Sigma$-type (\Cref{coro:lob-induction-sum}). 
-  That is, assuming 
+  Let $f$~be a trackable map from $\Box^\kappa X$ to $X$ tracked by~$F : \Lambda_1$.
+  Applying \Cref{thm:SRT} to $\lambda\mathtt{x}_0.\,F : \Lambda_0$, we obtain a term $\mathsf{fix}\,F : \Lambda_0$ with $\mathsf{fix}\,F \reduce (\lambda\mathtt{x}_0.\,F)\,\qquote{\mathsf{fix}\,F} \onereduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
+  Now we prove the theorem statement by Löb induction on a $\Sigma$-type (\Cref{coro:lob-induction-sum}):
+  assuming 
   \[
     x : \laterp \bproj{X}
     \quad\text{and}\quad
@@ -904,17 +902,17 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
       \[
         \mathfrak{f} (\refl_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
       \]
-    since $F$ tracks $\bproj{f}$ and the set $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is judgementally equal to $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$ which is inhabited by~$\refl_\twoheadrightarrow$.
+    since $F$ tracks $\bproj{f}$ and the set $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is judgementally equal to $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$, which is inhabited by~$\refl_\twoheadrightarrow$.
 
-    \item By Löb induction, $\sm{x : \laterp \bproj{X}} \laterp (\alpha : \kappa).\, F[\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ has an inhabitant~$(x_0, r_0)$.
-    \item Therefore, by $\mathsf{fix}\,F \reduce F[\qquote{\mathsf{fix}\,F}]$ again, there is an inhabitant
+    \item By Löb induction, $\sm{x : \laterp \bproj{X}} \laterp (\alpha : \kappa).\, F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ has an inhabitant~$(x_0, r_0)$.
+    \item Therefore, by $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$ again, there is an inhabitant
       $(\mathsf{fix}\,F, x_0, r_0') : \Box^\kappa X$ where $r_0' : \laterp(\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x_0 [\alpha]$.
   \end{enumerate}
   Evidently $(\mathsf{fix}\,F, x_0, r_0')$ is realised by $\qquote{\mathsf{fix}\,F}$ and thus by \Cref{lem:global-element} it gives rise to a global element~$f^\dagger$ of $\Box X$, concluding our proof.
 \end{proof}
 
 We may wish to prove further that the global element $f^\dagger$ is indeed a fixpoint of $f$ in the sense that $f^\dagger \sim \Box(f \circ f^\dagger) \circ \bigstar$.
-This extensional equality, however, does not hold as they have different intensions ($\mathsf{fix}\,F$ versus $F[\qquote{\mathsf{fix}\,F}]$) in spite of sharing the same extension by the fixed point equality.
+This extensional equality, however, does not hold as they have different intensions ($\mathsf{fix}\,F$ versus $F[\,\qquote{\mathsf{fix}\,F}\,]$) in spite of sharing the same extension by the fixed point equality.
 
 \section{Related work}
 \cite{Visser2019,Beklemishev2006,Goris2009,Shamkanov2014,Shamkanov2016a}
