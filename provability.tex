@@ -1,7 +1,7 @@
 \documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
 \numberwithin{equation}{section}
 
-\usepackage{mlmodern}
+%\usepackage{mlmodern}
 
 \makeatletter
 \def\renewtheorem#1{%
@@ -419,6 +419,8 @@ We now investigate some of its basic properties.
   \end{romanenumerate}
   The finality follows from the function extensionality.
 \end{example}
+The construction of binary $\PP$-products is also straightforward, so we omit the details from the paper.
+It follows that $\Asm(\Lambda)$ has finite $\PP$-products.
 
 Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$, and distinct merely trackable maps can be separated by global elements of~$X$, which are morphisms to $X$ from the terminal object~$\top$.
 In $\Asm(\Lambda)$ where trackers are part of trackable maps, a global $\PP$-element has to be constructed by a pair of inhabitant $x : \bproj{X}$ and its realiser.
@@ -489,8 +491,6 @@ However, it has the type of \emph{merely} trackable maps as its carrier, since t
   It is routine to verify all details as well as the universality.
 \end{example}
 
-It is not hard to define the $\PP$-product of assemblies, so we omit the details from the paper.
-In short, we have classic properties of the $\PP$-category $\Asm(\Lambda)$:
 \begin{corollary}
   $\Asm(\Lambda)$ is a cartesian closed $\PP$-category with a strict $\PP$-initial object.
 \end{corollary}
