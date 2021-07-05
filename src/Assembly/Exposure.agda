@@ -1,7 +1,7 @@
 module Assembly.Exposure where
 
-open import Prelude           as 𝓤
-  hiding (id; _∘_; Sub)
+open import Prelude
+  hiding (id; _∘_)
 open import Calculus.Untyped
 
 open import Assembly.Base

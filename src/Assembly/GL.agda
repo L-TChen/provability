@@ -157,7 +157,7 @@ module _ (Q : Quoting) where
         where open -↠-Reasoning
 
   _† : Trackable (□ k X) X
-    → Trackable ⊤ₐ (□ k X)
+     → Trackable ⊤ₐ (□ k X)
   _† {k} {_} {X} (|f| , F , 𝔣) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf) (lift -↠-refl)
     where
       module X = AsmStr (str X)
@@ -201,7 +201,7 @@ module _ (Q : Quoting) where
   □′map₀ (|f| , F , F⊩f) (M , x) = F [ M ] , λ α → |f| (x α .fst) , F⊩f (x α .snd)
       
   _†′ : Trackable (□′ k X) X
-     → Trackable ⊤ₐ       (□′ k X)
+     →  Trackable ⊤ₐ       (□′ k X)
   _†′ {k} {_} {X} (|f| , F , F⊩f) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf′) (lift -↠-refl)
     where
       module X  = AsmStr (str X)

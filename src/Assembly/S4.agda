@@ -1,7 +1,7 @@
 module Assembly.S4 where
 
-open import Prelude           as 𝓤
-  hiding (id; _∘_; Sub)
+open import Prelude
+  hiding (id; _∘_)
 
 open import Calculus.Untyped
   
@@ -63,7 +63,8 @@ module _ (Q : Quoting) where
   ⊠id=id : (X : Asm 𝓤) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (id X) x ≡ x
   ⊠id=id X Mxr = refl
 
-  ⊠gf=⊠g⊠f : {X Y Z : Asm 𝓤} (f : Trackable X Y) (g : Trackable Y Z) → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (g ∘ f) x ≡ ⊠map₀ g ( ⊠map₀ f x)
+  ⊠gf=⊠g⊠f : {X Y Z : Asm 𝓤} (f : Trackable X Y) (g : Trackable Y Z)
+    → (x : ⟨ ⊠ X ⟩) → ⊠map₀ (g ∘ f) x ≡ ⊠map₀ g ( ⊠map₀ f x)
   ⊠gf=⊠g⊠f {𝓤} {Z = Z} (f , F , F⊩f) (g , G , G⊩g) (M , x , r) i =
     G[F[M]]=G[F][M] i , g (f x) , transport-filler (cong (Z._⊩ g (f x)) (G[F[M]]=G[F][M] ⁻¹)) (G⊩g (F⊩f r)) (~ i)
     where
@@ -132,6 +133,33 @@ module _ (Q : Quoting) where
       open -↠-Reasoning
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
+
+  K : (X Y : Asm 𝓤) → Trackable (⊠ (X ⇒ Y)) (⊠ X ⇒ ⊠ Y)
+  K X Y = k , ƛ App , λ { {H} {G , _} (lift H↠⌜G⌝) {N} {M , _} (lift t) → lift (begin
+    (ƛ App ⟪ exts (subst-zero H) ⟫) · N
+      -↠⟨ ·ᵣ-cong t ⟩
+    (ƛ App ⟪ exts (subst-zero H) ⟫) · ⌜ M ⌝
+      -↠⟨ ·ₗ-cong (ƛ-cong (reduce-subst App (extsσ-↠σ′ λ { fzero → H↠⌜G⌝ }))) ⟩
+    (ƛ App ⟪ exts (subst-zero ⌜ G ⌝) ⟫) · ⌜ M ⌝
+      -→⟨ β ⟩
+    App ⟪ exts (subst-zero ⌜ G ⌝) ⟫ [ ⌜ M ⌝ ]
+      -↠⟨ App-↠ ⟩
+    ⌜ G · M ⌝ ∎ )} 
+    where
+      open -↠-Reasoning
+      k : ⟨ ⊠ (X ⇒ Y) ⟩ → ⟨ ⊠ X ⇒ ⊠ Y ⟩
+      k (ƛF , (f , _) , 𝔣) = f· , f·-trackable
+        where
+          f· : ⟨ ⊠ X ⟩ → ⟨ ⊠ Y ⟩
+          f· (M , x , r) = (ƛF) · M , f x , 𝔣 r
+          f·-trackable : ∥ HasTracker (⊠ X) (⊠ Y) f· ∥
+          f·-trackable = 
+            ∣ App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ , (λ { {N} {M , x , r} s → lift (begin
+              App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ N ]
+                -↠⟨ reduce-ssubst (App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫) (lower s) ⟩
+              App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ ⌜ M ⌝ ]
+                -↠⟨ App-↠ ⟩
+              ⌜ (ƛF) · M ⌝ ∎)} ) ∣
 
   eval : (X : Asm 𝓤) → Trackable (⊠ X) X
   eval X  = (λ x → fst (snd x)) , Eval ,

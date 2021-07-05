@@ -1,26 +1,15 @@
 module Prelude where
 
-open import Agda.Builtin.FromNat                 public
+open import Agda.Builtin.FromNat                   public
   renaming (Number to HasFromNat)
 
-open import Agda.Primitive public
-  using (_⊔_)
-  renaming (lzero to 𝓤₀
-          ; lsuc to _⁺
-          ; Level to Universe
-          ; Setω to 𝓤ω
-          ; Set to Type
-          )
-infix  1 _̇
-
-open import Cubical.Foundations.Everything       public
-  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax; ⋆; ⟨_⟩; str; prop)
-open import Cubical.Relation.Nullary             public
+open import Cubical.Foundations.Everything         public
+  hiding (id; ℓ-max; _≡⟨_⟩_; _∎; ≡⟨⟩-syntax; ⋆; ⟨_⟩; str; prop; Sub)
+open import Cubical.Relation.Nullary               public
   hiding (⟪_⟫)
-open import Cubical.HITs.PropositionalTruncation public
+open import Cubical.HITs.PropositionalTruncation   public
   renaming (elim to truncElim; map to ∥-∥map)
 
-open import Cubical.Data.Sigma                     public
 open import Cubical.Data.Unit                      public
 open import Cubical.Data.Empty                     public
   renaming (rec to ⊥rec; elim to ⊥-elim)
@@ -34,24 +23,12 @@ open import Cubical.Data.FinData                   public
   using (Fin)
   renaming (zero to fzero; suc to fsuc)
 
-variable
-  𝓤 𝓥 𝓦 𝓣 𝓤' 𝓥' 𝓦' 𝓣' : Universe
+open import Prelude.Universe                       public
 
-_̇ : (𝓤 : Universe) → _
-𝓤 ̇ = Type 𝓤
-
-𝓤₁ = 𝓤₀ ⁺
-𝓤₂ = 𝓤₁ ⁺
-
-_⁺⁺ : Universe → Universe
-𝓤 ⁺⁺ = 𝓤 ⁺ ⁺
-
-universe-of : {𝓤 : Universe} → (X : 𝓤 ̇) → Universe
-universe-of {𝓤} X = 𝓤
 private
   variable
-    A B C : 𝓤 ̇
     n m   : ℕ
+    A B C : 𝓤 ̇
 
 infix  4  _≢_
 infixr -1 _➝_
@@ -66,6 +43,11 @@ x ≢ y = x ≡ y → ⊥
 syntax Π  {A = A} (λ x → b) = Π[ x ∶ A ] b
 syntax Σ′ {A = A} (λ x → b) = Σ[ x ∶ A ] b
 syntax ∃′ {A = A} (λ x → b) = ∃[ x ∶ A ] b
+
+_×_ : ∀ {ℓ ℓ'} (A : Type ℓ) (B : Type ℓ') → Type (ℓ ⊔ ℓ')
+A × B = Σ A (λ _ → B)
+
+infixr 5 _×_
 
 Π : (B : A → 𝓥 ̇) → (universe-of A) ⊔ 𝓥 ̇
 Π {A = A} B = (x : A) → B x
@@ -124,17 +106,15 @@ id = λ x → x
 ------------------------------------------------------------------------------
 -- 
 
--- SetWithStr : (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) → 𝓥 ⊔ 𝓤 ⁺ ̇
--- SetWithStr 𝓤 S = Σ[ X ∶ hSet 𝓤 ] S (fst X)
-
 record SetWithStr (𝓤 : Universe) (S : 𝓤 ̇ → 𝓥 ̇) : 𝓥 ⊔ 𝓤 ⁺ ̇  where
   constructor _,_
   field
     carrier   : hSet 𝓤
     structure : S (fst carrier)
+open SetWithStr
 
 ⟨_⟩ : {S : 𝓤 ̇ → 𝓥 ̇} → SetWithStr 𝓤 S → 𝓤 ̇
-⟨ X ⟩ = SetWithStr.carrier X .fst
+⟨ X ⟩ = carrier X .fst
 
 str : {S : 𝓤 ̇ → 𝓥 ̇} → (X : SetWithStr 𝓤 S) → S ⟨ X ⟩
 str (X , s) = s

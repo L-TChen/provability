@@ -1,7 +1,6 @@
 module Calculus.Untyped.Quoting where
 
 open import Prelude
-  hiding (Sub)
 
 open import Calculus.Untyped.Base
 open import Calculus.Untyped.Progress
