@@ -1,9 +1,9 @@
-{-# OPTIONS --without-K --cubical --guarded  #-}
+{-# OPTIONS --guarded  #-}
 
 module Assembly.ClockedExposure where
 
-open import Prelude           as 𝓤
-  hiding (id; _∘_; Sub)
+open import Prelude
+  hiding (id; _∘_)
 open import Later
 open import Calculus.Untyped
 

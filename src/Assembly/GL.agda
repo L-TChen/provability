@@ -2,8 +2,8 @@
 
 module Assembly.GL where
 
-open import Prelude           as 𝓤
-  hiding (id; _∘_; Sub; r)
+open import Prelude 
+  hiding (id; _∘_; r)
 open import Later
 
 open import Calculus.Untyped
