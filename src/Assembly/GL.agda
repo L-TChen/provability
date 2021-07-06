@@ -104,6 +104,30 @@ module _ (Q : Quoting) where
   □⊤ = Final.global-element ⌜ 𝑰 ⌝ (𝑰 , next tt* , next (lift -↠-refl)) (lift -↠-refl)
     where open -↠-Reasoning
 
+  K : (X Y : Asm 𝓤) → Trackable (□ k (X ⇒ Y)) (□ k X ⇒ □ k Y)
+  K X Y = kk , ƛ App , λ { {H} {G , _} (lift H↠⌜G⌝) {N} {M , _} (lift t)→ lift (begin
+    (ƛ App ⟪ exts (subst-zero H) ⟫) · N
+      -↠⟨ ·ᵣ-cong t ⟩
+    (ƛ App ⟪ exts (subst-zero H) ⟫) · ⌜ M ⌝
+      -↠⟨ ·ₗ-cong (ƛ-cong (reduce-subst App (extsσ-↠σ′ λ { fzero → H↠⌜G⌝ }))) ⟩
+    (ƛ App ⟪ exts (subst-zero ⌜ G ⌝) ⟫) · ⌜ M ⌝
+      -→⟨ β ⟩
+    App ⟪ exts (subst-zero ⌜ G ⌝) ⟫ [ ⌜ M ⌝ ]
+      -↠⟨ App-↠ ⟩
+    ⌜ G · M ⌝ ∎ )} 
+    where
+      open -↠-Reasoning
+      kk : ⟨ □ k (X ⇒ Y) ⟩ → ⟨ □ k X ⇒ □ k Y ⟩
+      kk (ƛF , f , 𝔣) =
+        ( λ{ (M , x , r) → ƛF · M , (λ α → f α .fst (x α)) , λ α → 𝔣 α (r α)})
+        , ∣ App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ , (λ { {N} {M , _ , _} s → lift (begin
+          App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ N ]
+            -↠⟨ reduce-ssubst (App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫) (lower s) ⟩
+          App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ ⌜ M ⌝ ]
+            -↠⟨ App-↠ ⟩
+          ⌜ (ƛF) · M ⌝ ∎)} ) ∣
+
+
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ k (⊥ₐ {𝓤}) ⟩ → ⊥* {𝓤}) → ▹ k ⊥* → ⊥*
   bang eval⊥ ▹x = eval⊥ (𝑰 , ▹x , λ α → ⊥*-elim (▹x α))
