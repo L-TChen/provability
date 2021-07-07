@@ -195,7 +195,8 @@ It is easy to check that the types we work with in this paper are sets: types co
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
 
-\subsection{\texorpdfstring{$\lambda$}{λ}-calculus, Gödel encoding, and the second recursion theorem}
+\subsection{\texorpdfstring{$\lambda$}{λ}-calculus, Gödel encoding, and the second recursion theorem}\label{sec:lambda}
+
 For $\lambda$-calculus we only fix notations, and the details are left to, for example, the classic textbook by Barendregt~\cite{Barendregt1984a}.
 Terms are defined informally by
 \[
@@ -496,54 +497,57 @@ However, it has the type of \emph{merely} trackable maps as its carrier, since t
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
 
-In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models an \SFour modality but is subtly different from the comonadic exposure $\boxtimes_K$ introduced by Kavvos~\cite{Kavvos2017b}.
-For example, $\boxtimes_K$ preserves finite products including the terminal object~$\top$, but ours does not.%
+In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models the \SFour modality but is subtly different from the comonadic exposure introduced by Kavvos~\cite[Definition~9]{Kavvos2017b}, which we denote by~$\boxtimes_K$ in this paper.
+For example, $\boxtimes_K$ preserves finite products, including the terminal object~$\top$, but ours does not.%
 \hsnote{forward reference to \Cref{re:boxtimes-is-not}}
-Most importantly, we are able to refute the existence of $X \to \boxtimes X$ being natural in~$X$, understood as a quoting function from the computational perspective, while we did not find a way to refute it with $\boxtimes_K$.
-Hitherto, we have reconstructed a similar but different model~$\boxtimes$ than the model~$\boxtimes_K$ based on a PCA.
+Most importantly, we are able to refute the existence of $X \to \boxtimes X$ (natural in~$X$), understood as a quoting function computationally, while we did not find a way to refute it with $\boxtimes_K$.
+Hitherto, we have reconstructed a model~$\boxtimes$ that is similar but different from the model~$\boxtimes_K$ based on a PCA.
 
-Thereafter, we move to guarded homotopy type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
-We will show that $\Box$ refutes not only the completeness principle by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$ which is valid for $\boxtimes$.
-Finally, we verify the deductive form of the Gödel-Löb axiom: given a trackable map $f : \Box X \to X$ tracked by~$F$ there is an inhabitant of $\Box X$ realised by~$\qquote{\mathsf{fix}\,F}$
-where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.
+Thereafter, we move to guarded type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
+The construction refutes not only the completeness principle $X \to \Box X$ by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$, which is valid for $\boxtimes$.
+Finally, we verify the deductive form of the Gödel-Löb axiom: given a trackable map $f : \Box X \to X$ tracked by~$F$, there is an inhabitant of $\Box X$ realised by~$\qquote{\mathsf{fix}\,F}$, where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.%
+\ltnote{update}
 
-\subsection{An exposure for \texorpdfstring{\SFour}{S4} modality}
-An assembly $X$ records the interplay between intensions (i.e.\ terms) and extensions, so it is possible to bring out intensions to the level of extensions by pairing $x : \bproj{X}$ with a term $M$ which realises $x$ as the carrier of $\boxtimes X$.
-A pair $(M, x, r)$ with $r : M \Vdash_X x$ should be thought as the extension $x$ along with its \emph{extensional} representation~$M$.
-Thus, we argue that $(M, x, r)$ shall be realised by terms which are $\beta$-equivalent to its code $\qquote{M}$, since terms $N$ with $N \reduce \qquote{M}$ are \emph{intensional} representations of $M$.%
-\hsnote{revise}
-In short, the carrier and the realisability relation are defined as
+\subsection{An exposure for the \texorpdfstring{\SFour}{S4} modality}
+Given an assembly~$X$, which describes a set of extensions merely realised by some intensions (i.e.\ terms), we can expose the intensions at the level of extensions by constructing an assembly $\boxtimes X$ where an element $(M, x, r) : \bproj{\boxtimes X}$ is an extension $x : \bproj{X}$ and a term $M : \Lambda_0$ that realises~$x$, witnessed by $r : M \Vdash_X x$.
+This term~$M$ becomes the main part of the extension (with respect to $\boxtimes X$) and should be (merely) realised by some intensional representation of~$M$; a natural choice of such representation is $\qquote{M}$, or indeed any term $\beta$-reducible to $\qquote{M}$.
+In short, the carrier and the realisability relation of $\boxtimes X$ are defined as
 \[
-  \bproj{\boxtimes X} \defeq \sm{M : \Lambda_0}{x : \bproj{X}} M \Vdash x
+  \bproj{\boxtimes X} \defeq \sm{M : \Lambda_0}{x : \bproj{X}} M \Vdash_X x
   \quad\text{and}\quad
   \left(N \Vdash_{\boxtimes X} (M, x, r)\right) \defeq N \reduce \qquote{M}
 \]
 respectively.
-It turns out that $\boxtimes X \defeq (\bproj{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly where $r_{\boxtimes X}$ and $t_{\boxtimes X}$ are the transitivity and the reflexivity of $\reduce$.
+It turns out that $\boxtimes X \defeq (\bproj{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly where $r_{\boxtimes X}$ and $t_{\boxtimes X}$ are the transitivity and the reflexivity of $\reduce$.%
+\hsnote{check}
 
-As for the mapping on morphisms, consider any trackable map $f$ from $X$ to $Y$ and define $\boxtimes f \defeq (\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)\colon \boxtimes X \to \boxtimes Y$ as follows.
+To make $\boxtimes$ an exposure, we should also define the mapping on morphisms.
+Consider any trackable map~$f$ from~$X$ to~$Y$ and define $\boxtimes f \defeq (\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)\colon {\boxtimes} X \to \boxtimes Y$ as follows.
 First define a function from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes Y}$ by
 \[
   \bproj{f}^\boxtimes\colon (M, x, r) \mapsto (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r).
 \]
-To give a tracker of $f^\boxtimes$ recall that there is a term $\mathtt{subst}$ performing term substitution on codes, so the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ because of
+To give a tracker of $f^\boxtimes$, recall that there is a term $\mathtt{subst}$ performing term substitution on codes (\Cref{sec:lambda}), and then the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ because
 \begin{align*}
   \mathtt{subst}\,\qquote{F}\,N 
   \reduce \mathtt{subst}\,\qquote{F}\,\qquote{M}
-  \reduce \qquote{F[M]} \Vdash_{\boxtimes Y} f^\boxtimes(M, x, r)
+  \reduce \qquote{F[M]} ~\Vdash_{\boxtimes Y} f^\boxtimes(M, x, r)
 \end{align*}
 completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
 
 \begin{example} \label{ex:global-element-of-unit}
   A global $\PP$-element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ is given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{\mathtt{I}}$ using \Cref{lem:global-element}. 
-  Yet, there are other global $\PP$-elements of $\boxtimes \top$ such as $(\mathtt{I}\,\mathtt{I}, \star, \beta)$ realised by $\qquote{\mathtt{I\,I}}$ where $\beta : \mathtt{I}\,\mathtt{I} \onereduce \mathtt{I}$ is the $\beta$-reduction rule. 
-  Furthermore, the tracker of a global element might not even be a closed term but a open term. 
+  Yet, there are other global $\PP$-elements of $\boxtimes \top$ such as $(\mathtt{I}\,\mathtt{I}, \star, \beta)$ realised by $\qquote{\mathtt{I\,I}}$ where $\beta : \mathtt{I}\,\mathtt{I} \onereduce \mathtt{I}$ is the $\beta$-reduction rule.%
+  \hsnote{So not $\PP$-functorial?}
+  Furthermore, the tracker of a global element might not even be a closed term but an open term.%
+  \hsnote{So?}
 \end{example}
 \ltnote{say somewhere that $\boxtimes$ is not a $\PP$-functor.}
 The above example shows that $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
 Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.
-Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.
+Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
+\hsnote{So more intensional and better?}
 
 \begin{theorem}[{\emph{cf}.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
   $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is an exposure of assemblies.
@@ -555,8 +559,8 @@ Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.
   For example, it follows by definition that $\idfunc[\bproj{X}]^\boxtimes (M, x, r) \equiv (\mathtt{x}[M], x, \pr_3\,M\,x\,r) \equiv (M, x, r)$.
 
   Now we show that $\boxtimes$ reflects the extensional equality.
-  Let $f$ and $g$ be trackable maps from $X$ to~$Y$.
-  By assumptions that $\boxtimes f \sim \boxtimes g$ and that there are merely $M : \Lambda_0$ with $r : M \Vdash_X x$, we can apply
+  Let $f$~and~$g$ be trackable maps from~$X$ to~$Y$.
+  By assumptions that $\boxtimes f \sim \boxtimes g$ and that there is merely $M : \Lambda_0$ with $r : M \Vdash_X x$, we can apply
   the recursion principle of propositional truncation to derive 
   \[
     \boxtimes f(M, x, r) = (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r)
@@ -566,15 +570,16 @@ Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.
   Therefore, we have $\prd{x : \bproj{X}} \bproj{f}\,x =_Y \bproj{g}\,x$.
   By function extensionality it then follows that $\left(\bproj{f} =_{\bproj{X} \to \bproj{Y}} \bproj{g}\right) \equiv f \sim g$.
 
-  As for the evaluator $\epsilon_X\colon \boxtimes X \to X$, recall the term $\mathtt{eval}$ which evaluates a code to its representing term. 
+  As for the evaluator $\epsilon_X\colon {\boxtimes} X \to X$, recall the term $\mathtt{eval}$ which evaluates a code (\Cref{sec:lambda}). 
   We simply define $\bproj{\epsilon_X}$ by $(M, x, r) \mapsto x$. 
-  Then, whenever given $N : \Lambda_0$ with $N \reduce \qquote{M}$, we have $\mathtt{eval}[N] \reduce \mathtt{eval}[\qquote{M}] \reduce M$ where $M \Vdash_X x$ is witnessed by~$r$.
+  Then, given $N : \Lambda_0$ with $N \reduce \qquote{M}$, we have $\mathtt{eval}[N] \reduce \mathtt{eval}[\,\qquote{M}\,] \reduce M$ where $M \Vdash_X x$ is witnessed by~$r$.
   That is, $\bproj{\epsilon_X}$ is tracked by~$\mathtt{eval}$.
   The naturality of $\epsilon$ follows by definition.
 \end{proof}
 
-In addition, there are functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes \boxtimes X}$ tracked by~$\mathtt{quote}$ corresponding to the quotation of a quoted term. 
-For any global element $a\colon \top \to \boxtimes X$ given by~\Cref{lem:global-element} whose tracker is indeed the quoted term~$\qquote{M}$, we can see that $\delta_X \circ a \colon \top \to \boxtimes \boxtimes X$ coincides with $\boxtimes a \circ \bigstar$ up to~$\sim$ as follows:
+In addition, there are functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$ corresponding to the quotation of a quoted term. 
+For any global element $a\colon \top \to \boxtimes X$ given by~\Cref{lem:global-element} whose tracker is indeed the quoted term~$\qquote{M}$, we can see that $\delta_X \circ a \colon \top \to {\boxtimes} {\boxtimes} X$ coincides with $\boxtimes a \circ \bigstar$ up to~$\sim$ as follows:%
+\hsnote{Why not a theorem? Why mention the global elements?}
 \[
   \bproj{\delta_X}(a(\star)) \equiv \bproj{\delta_X}(M, x, r) \equiv (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
   = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
@@ -587,21 +592,22 @@ In detail, for each trackable map $f\colon X \to Y$ the inhabitant
   \delta_Y (\boxtimes f(M, x, r))
   \equiv \left(\qquote{F[M]}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \refl_{\twoheadrightarrow}\right)
 \]
-of type $\boxtimes \boxtimes Y$ is not equal to
+of type ${\boxtimes} {\boxtimes} Y$ is not equal to
 \[
-  \boxtimes \boxtimes f (\delta_X(M, x, r))
+  {\boxtimes} {\boxtimes} f (\delta_X(M, x, r))
   \equiv (\mathsf{subst}\,\qquote{F}\,\qquote{M}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \mathsf{subst}_{\twoheadrightarrow})
 \]
 in spite that their extensions $(F[M], f\,x, \mathfrak{f}\,M\,x\,r)$ are the same
 where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction sequence $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
 Nevertheless we may consider a partial order induced by the reduction relation $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
 In detail, for inhabitants of $\boxtimes X$ define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$, and
-accordingly define $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for any $x$.
-Then we have $\bproj{\boxtimes \boxtimes f \circ \delta_X} \leq \bproj{\delta_Y \circ \boxtimes f}$ instead.
+accordingly define $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for all~$x$.
+Then we have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{\delta_Y \circ {\boxtimes} f}$ instead.
 This kind of transformations $\delta$ are \emph{lax} natural transformations in a suitable sense.
 \end{remark}
 
-What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intension part of $\boxtimes f$ is applied verbatim.
+What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intension part of $\boxtimes f$ is applied verbatim.%
+\hsnote{Is there more to say about the importance of lax naturality? Just how important is naturality (since we seem to imply naturality is essential for $\eta$)?}
 
 \begin{remark} \label{re:difference-boxtimes}
   The exposure $\boxtimes_K$ studied by Kavvos is defined for assemblies on a PCA where the carrier and the realisability relation are given by
