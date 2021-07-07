@@ -129,27 +129,21 @@ record Quoting : 𝓤₀ ̇ where
       -→⟨ β ⟩
     F [ ⌜ sfix F ⌝ ]
       ∎
+  igfix : Λ₁
+  igfix = ↑₁ Diag · (↑₁ Ap · ↑₁ ⌜ U ⌝ · 0)
   -- -- ⊢ □ (□ A `→ A) `→ □ A
   -- igfix : (A : 𝕋) → Prog (nat `→ nat)
   -- igfix A = ƛ ↑ Diag · (↑ Ap · ↑ ⌜ U A ⌝ · # 0)
 
-  -- igfix-⌜⌝ : (A : 𝕋) → (M : ∅ ⊢ nat `→ A)
-  --   → igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝
-  -- igfix-⌜⌝ A M = begin
-  --     igfix A · ⌜M⌝
-  --   -→⟨ β-ƛ· ⟩
-  --     (↑ Diag) [ ⌜M⌝ ] · (↑ Ap [ ⌜M⌝ ] · ↑ ⌜ U A ⌝ [ ⌜M⌝ ] · ⌜M⌝)
-  --   ≡[ i ]⟨ subst-↑ (subst-zero ⌜M⌝) Diag i · (subst-↑ (subst-zero ⌜M⌝) Ap i · subst-↑ (subst-zero ⌜M⌝) ⌜ U A ⌝ i · ⌜M⌝) ⟩
-  --     Diag · (Ap · ⌜ U A ⌝ · ⌜M⌝)
-  --   -↠⟨ ·ᵣ-↠ Ap-↠ ⟩
-  --     Diag · ⌜ Wₘ ⌝
-  --   -↠⟨ Diag-↠ ⟩
-  --     ⌜ Wₘ · ⌜ Wₘ ⌝ ⌝
-  --   ∎
-  --   where
-  --     Wₘ : ∅ ⊢ nat `→ A
-  --     Wₘ = W A M
-  --     ⌜M⌝ = ⌜ M ⌝
+  igfix-↠ : {M : Λ₀} → igfix [ ⌜ M ⌝ ] -↠ ⌜ gfix M ⌝
+  igfix-↠ {M} = begin
+    ↑₁ Diag [ ⌜ M ⌝ ] · (↑₁ Ap [ ⌜ M ⌝ ] · ↑₁ ⌜ U ⌝ [ ⌜ M ⌝ ] · ⌜ M ⌝)  
+      ≡⟨ cong₂ _·_ (subst-rename-∅ _ Diag) (cong (_· ⌜ M ⌝) (cong₂ _·_ (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ U ⌝))) ⟩
+    Diag · (Ap · ⌜ U ⌝ · ⌜ M ⌝)  
+      -↠⟨ ·ᵣ-cong Ap-↠  ⟩
+    Diag · ⌜ W M ⌝
+      -↠⟨ Diag-↠ ⟩
+    ⌜ W M · ⌜ W M ⌝ ⌝ ∎
 
   -- -- -- ⊢ □ A `→ A   `→   ⊢ A `→ A   `→   ⊢ A
   -- -- selfEval`→fixpoint

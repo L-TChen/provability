@@ -103,9 +103,21 @@ module _ (Q : Quoting) where
   □⊤ : Trackable (⊤ₐ {𝓤}) (□ k ⊤ₐ)
   □⊤ = Final.global-element ⌜ 𝑰 ⌝ (𝑰 , next tt* , next (lift -↠-refl)) (lift -↠-refl)
     where open -↠-Reasoning
+    
+  |K| : ⟨ □ k (X ⇒ Y) ⟩ → ⟨ □ k X ⇒ □ k Y ⟩
+  |K| (ƛF , f , 𝔣) =
+    ( λ{ (M , x , r) → ƛF · M , (λ α → f α .fst (x α)) , λ α → 𝔣 α (r α)})
+    , ∣ App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ , (λ { {N} {M , _ , _} s → lift (begin
+      App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ N ]
+        -↠⟨ reduce-ssubst (App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫) (lower s) ⟩
+      App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ ⌜ M ⌝ ]
+        -↠⟨ App-↠ ⟩
+      ⌜ (ƛF) · M ⌝ ∎)} ) ∣
+    where
+      open -↠-Reasoning
 
   K : (X Y : Asm 𝓤) → Trackable (□ k (X ⇒ Y)) (□ k X ⇒ □ k Y)
-  K X Y = kk , ƛ App , λ { {H} {G , _} (lift H↠⌜G⌝) {N} {M , _} (lift t)→ lift (begin
+  K X Y = |K| , ƛ App , λ { {H} {G , _} (lift H↠⌜G⌝) {N} {M , _} (lift t)→ lift (begin
     (ƛ App ⟪ exts (subst-zero H) ⟫) · N
       -↠⟨ ·ᵣ-cong t ⟩
     (ƛ App ⟪ exts (subst-zero H) ⟫) · ⌜ M ⌝
@@ -117,16 +129,6 @@ module _ (Q : Quoting) where
     ⌜ G · M ⌝ ∎ )} 
     where
       open -↠-Reasoning
-      kk : ⟨ □ k (X ⇒ Y) ⟩ → ⟨ □ k X ⇒ □ k Y ⟩
-      kk (ƛF , f , 𝔣) =
-        ( λ{ (M , x , r) → ƛF · M , (λ α → f α .fst (x α)) , λ α → 𝔣 α (r α)})
-        , ∣ App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ , (λ { {N} {M , _ , _} s → lift (begin
-          App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ N ]
-            -↠⟨ reduce-ssubst (App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫) (lower s) ⟩
-          App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ ⌜ M ⌝ ]
-            -↠⟨ App-↠ ⟩
-          ⌜ (ƛF) · M ⌝ ∎)} ) ∣
-
 
   -- Proposition. Every function |□ ⊥| → ⊥ gives rise to ▹ ⊥ → ⊥.
   bang : (⟨ □ k (⊥ₐ {𝓤}) ⟩ → ⊥* {𝓤}) → ▹ k ⊥* → ⊥*
@@ -185,7 +187,6 @@ module _ (Q : Quoting) where
   _† {k} {_} {X} (|f| , F , 𝔣) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf) (lift -↠-refl)
     where
       module X = AsmStr (str X)
-
       fold : (x : ▹ k ⟨ X ⟩) → ▹[ α ∶ k ] F [ ⌜ sfix F ⌝ ] X.⊩ x α
            → ▹[ α ∶ k ] sfix F X.⊩ x α
       fold x r α = X.⊩-respects-↠ sfix-↠ (r α)
@@ -197,6 +198,43 @@ module _ (Q : Quoting) where
       fixf : Σ[ x ∶ ▹ k ⟨ X ⟩ ] ▹[ α ∶ k ] sfix F X.⊩ x α
       fixf = dfixΣ h .fst , fold (dfixΣ h .fst) (dfixΣ h .snd)
 
+  run : (∀ k → ⟨ □ k X ⟩) → (k′ : Cl) → ⟨ X ⟩
+  run {X = X} x k′ = force x′ k′
+    where
+      x′ : ∀ k → ▹ k ⟨ X ⟩
+      x′ k α = x k .snd .fst α
+      
+  _‡ : Trackable (□ k X) X
+     → Trackable ⊤ₐ X
+  _‡ {k} {_} {X} (|f| , F , 𝔣) =
+    Final.global-element (sfix F) fixf fixr
+    where
+      module X = AsmStr (str X)
+      fold : (x : ▹ k ⟨ X ⟩) → ▹[ α ∶ k ] F [ ⌜ sfix F ⌝ ] X.⊩ x α
+           → ▹[ α ∶ k ] sfix F X.⊩ x α
+      fold x r α = X.⊩-respects-↠ sfix-↠ (r α)
+
+      h : Σ[ x ∶ ▹ k ⟨ X ⟩ ] ▹[ α ∶ k ] F [ ⌜ sfix F ⌝ ] X.⊩ x α
+        → Σ[ x ∶     ⟨ X ⟩ ]            F [ ⌜ sfix F ⌝ ] X.⊩ x
+      h (x , r) = |f| (sfix F , x , fold x r) , 𝔣 (lift -↠-refl)
+
+      fixf : ⟨ X ⟩
+      fixf = fixΣ h .fst
+
+      fixr : sfix F X.⊩ fixf
+      fixr = X.⊩-respects-↠ sfix-↠ (fixΣ h .snd)
+
+{-
+  □′ has a different but equivalent defininition from □.
+
+  The later modality now lives outside the second Σ-type:
+
+      |□X| = Σ[ M ∶ Λ₀ ] ▹ k (Σ[ x ∶ ⟨ X ⟩ ] M X.⊩ x)
+
+  instead of inside the second Σ-type:
+
+      |□X| = Σ[ M ∶ Λ₀ ] Σ[ ▹x ∶ ▹ k |X| ] ▹[ α ∶ k ] M X.⊩ ▹x α
+-}
   □′ : (k : Cl) → Asm 𝓤 → Asm 𝓤
   □′ {𝓤} k X = (|□X| , isSet□X) , _⊩_ , record
     { ⊩-respects-↠  = λ {x} {x′} {y} → ⊩-respect-↠ {x} {x′} {y}
@@ -224,39 +262,81 @@ module _ (Q : Quoting) where
     → ⟨ □′ k X ⟩ → ⟨ □′ k Y ⟩
   □′map₀ (|f| , F , F⊩f) (M , x) = F [ M ] , λ α → |f| (x α .fst) , F⊩f (x α .snd)
       
-  _†′ : Trackable (□′ k X) X
-     →  Trackable ⊤ₐ       (□′ k X)
-  _†′ {k} {_} {X} (|f| , F , F⊩f) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf′) (lift -↠-refl)
-    where
-      module X  = AsmStr (str X)
+  module _ {X : Asm 𝓤} where
+    module X = AsmStr (str X)
+  
+    _†′ : Trackable (□′ k X) X
+      →  Trackable ⊤ₐ       (□′ k X)
+    _†′ {k} (|f| , F , F⊩f) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf′) (lift -↠-refl)
+      where
+        backward : Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x → Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x
+        backward (x , r) = x , X.⊩-respects-↠ sfix-↠ r
 
-      backward : Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x → Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x
-      backward (x , r) = x , X.⊩-respects-↠ sfix-↠ r
+        h : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x)
+          →     Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x
+        h x = |f| (sfix F , ▹map backward x) , F⊩f (lift -↠-refl)
 
-      h : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x)
-         →     Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x
-      h x = |f| (sfix F , ▹map backward x) , F⊩f (lift -↠-refl)
-      
-      fixf′ : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x)
-      fixf′ α = backward (dfix h α)
+        fixf′ : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x)
+        fixf′ α = backward (dfix h α)
 
-      fixf′-path : Path ⟨ □′ k X ⟩ (sfix F , fixf′) (sfix F , λ _ → |f| (sfix F , fixf′) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl)))
-      fixf′-path = begin
-        sfix F , fixf′
-          ≡⟨ refl ⟩
-        sfix F , (λ α → backward (dfix h α))
-          ≡⟨ cong {B = λ _ → ⟨ □′ k X ⟩} (sfix F ,_) (λ i α → backward (pfix h i α)) ⟩
-        sfix F , (λ α → backward (h (dfix h)))
-          ≡⟨ refl ⟩
-        sfix F , (λ α → backward (|f| (sfix F , ▹map backward (dfix h)) , F⊩f (lift -↠-refl)))
-          ≡⟨ refl ⟩
-        sfix F , (λ α → |f| (sfix F , ▹map backward (dfix h)) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl)))
-          ≡⟨ refl ⟩
-        sfix F , (λ α → |f| (sfix F , fixf′) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl))) ∎
-        where open ≡-Reasoning
+        fixf′-path : Path ⟨ □′ k X ⟩ (sfix F , fixf′) (sfix F , λ _ → |f| (sfix F , fixf′) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl)))
+        fixf′-path = begin
+          sfix F , fixf′
+            ≡⟨ refl ⟩
+          sfix F , (λ α → backward (dfix h α))
+            ≡⟨ cong {B = λ _ → ⟨ □′ k X ⟩} (sfix F ,_) (λ i α → backward (pfix h i α)) ⟩
+          sfix F , (λ α → backward (h (dfix h)))
+            ≡⟨ refl ⟩
+          sfix F , (λ α → backward (|f| (sfix F , ▹map backward (dfix h)) , F⊩f (lift -↠-refl)))
+            ≡⟨ refl ⟩
+          sfix F , (λ α → |f| (sfix F , ▹map backward (dfix h)) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl)))
+            ≡⟨ refl ⟩
+          sfix F , (λ α → |f| (sfix F , fixf′) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl))) ∎
+          where open ≡-Reasoning
 
-  run : (∀ k → ⟨ □ k X ⟩) → (k′ : Cl) → ⟨ X ⟩
-  run {X = X} x k′ = force x′ k′
-    where
-      x′ : ∀ k → ▹ k ⟨ X ⟩
-      x′ k α = x k .snd .fst α
+    _‡′ : Trackable (□′ k X) X
+      → Trackable ⊤ₐ X 
+    _‡′ {k} (|f| , F , 𝔣) =
+      Final.global-element (sfix F) (fixf .fst) (fixf .snd)
+      where
+        backward : Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x → Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x
+        backward (x , r) = x , X.⊩-respects-↠ sfix-↠ r
+
+        h : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x)
+          →     Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x
+        h x = |f| (sfix F , ▹map backward x) , 𝔣 (lift -↠-refl)
+
+        fixf : Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x
+        fixf = backward (fix h)
+
+        fixf-path : (backward (fix h)) .fst ≡ |f| (sfix F , next (backward (fix h)))
+        fixf-path = begin
+          backward (fix h) .fst
+            ≡⟨ cong (λ x → backward x .fst) (fix-path h) ⟩
+          backward (h (next (fix h))) .fst 
+            ≡⟨ refl ⟩
+          backward (|f| (sfix F , ▹map backward (next (fix h))) , 𝔣 (lift -↠-refl)) .fst
+            ≡⟨ refl ⟩
+          |f| (sfix F , ▹map backward (next (fix h)))
+            ∎
+          where open ≡-Reasoning
+
+    |IGL| : ⟨ □′ k (□′ k X ⇒ X) ⟩ → ⟨ □′ k X ⟩
+    |IGL| {k} f@(ƛF , |f|) = gfix ƛF , λ α → backward (fix h α)
+      where
+        backward : Σ[ x ∶ ⟨ X ⟩ ] ƛF · ⌜ gfix ƛF ⌝ X.⊩ x → Σ[ x ∶ ⟨ X ⟩ ] gfix ƛF X.⊩ x
+        backward (x , r) = x , X.⊩-respects-↠ gfix-↠ r
+
+        h : ▹ k (▹ k (Σ[ x ∶ ⟨ X ⟩ ] ƛF · ⌜ gfix ƛF ⌝ X.⊩ x))
+          → ▹ k (Σ[ x ∶ ⟨ X ⟩ ] ƛF · ⌜ gfix ƛF ⌝ X.⊩ x)
+        h x α = |f| α .fst .fst (gfix ƛF , ▹map backward (x α))
+          , |f| α .snd (lift -↠-refl) 
+
+    IGL : Trackable (□′ k (□′ k X ⇒ X)) (□′ k X)
+    IGL = |IGL| , igfix , λ { {G} {ƛF , ▹f} (lift r) → lift (begin
+      igfix [ G ]
+        -↠⟨ reduce-ssubst igfix r ⟩
+      igfix [ ⌜ ƛF ⌝ ]
+        -↠⟨ igfix-↠ ⟩
+      ⌜ gfix ƛF ⌝ ∎)}
+       where open -↠-Reasoning
