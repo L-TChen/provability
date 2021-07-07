@@ -77,13 +77,13 @@ record Quoting : 𝓤₀ ̇ where
 
   -- ⊢ □ (ℕ `→ A) `→ □ A
   Diag : Λ₀
-  Diag = ƛ ↑ₗ Ap · 0 · (↑ₗ Num · 0)
+  Diag = ƛ ↑ Ap · 0 · (↑ Num · 0)
 
   Diag-↠ : Diag · ⌜ M ⌝ -↠ ⌜ M · ⌜ M ⌝ ⌝
   Diag-↠ {M = M} = begin
       Diag · ⌜ M ⌝
     -→⟨ β ⟩
-      ↑₁ Ap [ ⌜ M ⌝ ] · ⌜ M ⌝ · (↑₁ Num [ ⌜ M ⌝ ] · ⌜ M ⌝)
+      ↑ Ap [ ⌜ M ⌝ ] · ⌜ M ⌝ · (↑ Num [ ⌜ M ⌝ ] · ⌜ M ⌝)
     ≡⟨ cong₂ (λ N L → N · ⌜ M ⌝ · (L · ⌜ M ⌝)) (subst-rename-∅ _ Ap) (subst-rename-∅ _ Num) ⟩
       Ap · ⌜ M ⌝ · (Num · ⌜ M ⌝)
     -↠⟨ ·ᵣ-cong Num-↠ ⟩
@@ -92,7 +92,7 @@ record Quoting : 𝓤₀ ̇ where
       ⌜ M · ⌜ M ⌝ ⌝ ∎
 
   U : Λ₀
-  U = ƛ ƛ 1 · (↑ₗ Diag · 0)
+  U = ƛ ƛ 1 · (↑ Diag · 0)
 
   -- the β-redex is for (∅ ⊢ igfix A · ⌜ M ⌝ -↠ ⌜ gfix M ⌝) to be true
   W : Λ₀ → Λ₀
@@ -100,23 +100,19 @@ record Quoting : 𝓤₀ ̇ where
   -- ⊢ □ A `→ A   `→   ⊢ A
 
   gfix : Λ₀ → Λ₀
-  gfix F = Wₘ · ⌜ Wₘ ⌝
-    where Wₘ = W F
+  gfix F = W F · ⌜ W F ⌝
 
   gfix-↠ : gfix F -↠ F · ⌜ gfix F ⌝
   gfix-↠ {F = F} = begin
-      Wₘ · ⌜ Wₘ ⌝
+      W F · ⌜ W F ⌝
     -→⟨ ξₗ β ⟩
-      (ƛ ↑₁ F · (↑ₗ Diag ⟪ _ ⟫ · 0)) · ⌜ Wₘ ⌝
+      (ƛ ↑ F · (↑ Diag ⟪ _ ⟫ · 0)) · ⌜ W F ⌝
     -→⟨ β ⟩
-      ↑₁ F [ ⌜ Wₘ ⌝ ] · (↑ₗ Diag ⟪ _ ⟫ [ ⌜ Wₘ ⌝ ] · ⌜ Wₘ ⌝)
-    ≡⟨ cong₂ (λ N L → N · (L · ⌜ Wₘ ⌝)) (subst-rename-∅ _ F) (subst-assoc _ _ (↑ₗ Diag)) ⟩
-      F · (↑ₗ Diag ⟪ _ ⟫ · ⌜ Wₘ ⌝)
-    ≡⟨ cong (λ M → F · (M · ⌜ Wₘ ⌝)) (subst-rename-∅ _ Diag) ⟩
-      F · (Diag · ⌜ Wₘ ⌝)
+      ↑ F [ ⌜ W F ⌝ ] · (↑ Diag ⟪ _ ⟫ [ ⌜ W F ⌝ ] · ⌜ W F ⌝)
+    ≡⟨ cong₂ _·_ (subst-rename-∅ _ F) (cong (_· ⌜ W F ⌝) (subst-assoc _ _ (↑ Diag) ∙ subst-rename-∅ _ Diag)) ⟩ 
+      F · (Diag · ⌜ W F ⌝)
     -↠⟨ ·ᵣ-cong Diag-↠ ⟩
-      F · ⌜ Wₘ · ⌜ Wₘ ⌝ ⌝ ∎
-    where Wₘ = W F
+      F · ⌜ W F · ⌜ W F ⌝ ⌝ ∎
 
   sfix : Λ₁ → Λ₀
   sfix F = gfix (ƛ F)
@@ -130,14 +126,11 @@ record Quoting : 𝓤₀ ̇ where
     F [ ⌜ sfix F ⌝ ]
       ∎
   igfix : Λ₁
-  igfix = ↑₁ Diag · (↑₁ Ap · ↑₁ ⌜ U ⌝ · 0)
-  -- -- ⊢ □ (□ A `→ A) `→ □ A
-  -- igfix : (A : 𝕋) → Prog (nat `→ nat)
-  -- igfix A = ƛ ↑ Diag · (↑ Ap · ↑ ⌜ U A ⌝ · # 0)
+  igfix = ↑ Diag · (↑ Ap · ↑ ⌜ U ⌝ · 0)
 
   igfix-↠ : {M : Λ₀} → igfix [ ⌜ M ⌝ ] -↠ ⌜ gfix M ⌝
   igfix-↠ {M} = begin
-    ↑₁ Diag [ ⌜ M ⌝ ] · (↑₁ Ap [ ⌜ M ⌝ ] · ↑₁ ⌜ U ⌝ [ ⌜ M ⌝ ] · ⌜ M ⌝)  
+    ↑ Diag [ ⌜ M ⌝ ] · (↑ Ap [ ⌜ M ⌝ ] · ↑ ⌜ U ⌝ [ ⌜ M ⌝ ] · ⌜ M ⌝)  
       ≡⟨ cong₂ _·_ (subst-rename-∅ _ Diag) (cong (_· ⌜ M ⌝) (cong₂ _·_ (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ U ⌝))) ⟩
     Diag · (Ap · ⌜ U ⌝ · ⌜ M ⌝)  
       -↠⟨ ·ᵣ-cong Ap-↠  ⟩
@@ -145,45 +138,45 @@ record Quoting : 𝓤₀ ̇ where
       -↠⟨ Diag-↠ ⟩
     ⌜ W M · ⌜ W M ⌝ ⌝ ∎
 
-  -- -- -- ⊢ □ A `→ A   `→   ⊢ A `→ A   `→   ⊢ A
-  -- -- selfEval`→fixpoint
-  -- --   : Σ[ e ∈ ∅ ⊢ nat `→ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)
-  -- --   → (f : ∅ ⊢ A `→ A)
-  -- --   → Σ[ a ∈ ∅ ⊢ A ] (∅ ⊢ a -↠ f · a)
-  -- -- selfEval`→fixpoint {A = A} (e , e-⌜⌝-id) f = gfix f∘e ,
-  -- --   (begin
-  -- --     gfix f∘e
-  -- --   -↠⟨ gfix-spec ⟩
-  -- --     f∘e · ⌜ gfix f∘e ⌝
-  -- --   -→⟨ β-ƛ· ⟩
-  -- --     ↑ f ⟪ _ ⟫ · (↑ e ⟪ _ ⟫ · ⌜ gfix f∘e ⌝)
-  -- --   ≡⟨ P.cong₂ (λ M N → M · (N · ⌜ gfix (ƛ ↑ f · (↑ e · # 0)) ⌝)) (subst-↑ _ f) (subst-↑ _ e) ⟩
-  -- --     f · (e · ⌜ gfix f∘e ⌝)
-  -- --   -↠⟨ ·₂-↠ (e-⌜⌝-id (gfix f∘e))  ⟩
-  -- --     f · gfix (f∘e)
-  -- --   ∎)
-  -- --   where
-  -- --     open -↠-Reasoning
-  -- --     f∘e : ∅ ⊢ nat `→ A
-  -- --     f∘e = ƛ ↑ f · (↑ e · # 0)
+  -- -- ⊢ □ A `→ A   `→   ⊢ A `→ A   `→   ⊢ A
+  -- selfEval`→fixpoint
+  --   : Σ[ e ∈ ∅ ⊢ nat `→ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)
+  --   → (f : ∅ ⊢ A `→ A)
+  --   → Σ[ a ∈ ∅ ⊢ A ] (∅ ⊢ a -↠ f · a)
+  -- selfEval`→fixpoint {A = A} (e , e-⌜⌝-id) f = gfix f∘e ,
+  --   (begin
+  --     gfix f∘e
+  --   -↠⟨ gfix-spec ⟩
+  --     f∘e · ⌜ gfix f∘e ⌝
+  --   -→⟨ β-ƛ· ⟩
+  --     ↑ f ⟪ _ ⟫ · (↑ e ⟪ _ ⟫ · ⌜ gfix f∘e ⌝)
+  --   ≡⟨ P.cong₂ (λ M N → M · (N · ⌜ gfix (ƛ ↑ f · (↑ e · # 0)) ⌝)) (subst-↑ _ f) (subst-↑ _ e) ⟩
+  --     f · (e · ⌜ gfix f∘e ⌝)
+  --   -↠⟨ ·₂-↠ (e-⌜⌝-id (gfix f∘e))  ⟩
+  --     f · gfix (f∘e)
+  --   ∎)
+  --   where
+  --     open -↠-Reasoning
+  --     f∘e : ∅ ⊢ nat `→ A
+  --     f∘e = ƛ ↑ f · (↑ e · # 0)
 
-  -- -- -- ¬ ∀ A. □ A → A
-  -- -- ¬∃selfEval : (∀ A → Σ[ e ∈ ∅ ⊢ nat `→ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)) → ⊥
-  -- -- ¬∃selfEval e with selfEval`→fixpoint (e nat) (ƛ suc (# 0))
-  -- -- ... | a , a-↠suca = {! !}
+  -- -- ¬ ∀ A. □ A → A
+  -- ¬∃selfEval : (∀ A → Σ[ e ∈ ∅ ⊢ nat `→ A ] (∀ a → ∅ ⊢ e · ⌜ a ⌝ -↠ a)) → ⊥
+  -- ¬∃selfEval e with selfEval`→fixpoint (e nat) (ƛ suc (# 0))
+  -- ... | a , a-↠suca = {! !}
 
-  -- -- rice
-  -- --   : (d : ∅ ⊢ nat `→ nat) (a b : ∅ ⊢ A)
-  -- --   → ((x y : ∅ ⊢ A) → ∅ ⊢ x -↠ y → ∅ ⊢ d · ⌜ x ⌝ -↠ d · ⌜ y ⌝)
-  -- --   → ∅ ⊢ d · ⌜ a ⌝ -↠ zero
-  -- --   → ∅ ⊢ d · ⌜ b ⌝ -↠ (suc zero)
-  -- --   → ⊥
-  -- -- rice d a b d-ext da-↠0 db-↠1 = {! d · gfix (ƛ n → ) !} where
-  -- --   -- r = λ n. if d n then a else b
-  -- --   -- gnum r = gnum (λ x y n. if d n then x else y) `app` ()
-  -- --   --    d (gfix r)
-  -- --   -- -↠ d (gnum (r · (gfix r))
-  -- --   -- -↠ d (gnum (if d (gfix r) then a else b))
-  -- --   -- -↠ { d ⌜ a ⌝ -↠ 0   if d (gfix r) -↠ 1
-  -- --   --    ; d (gnum b) -↠ 1   if d (gfix r) -↠ 0
+  -- rice
+  --   : (d : ∅ ⊢ nat `→ nat) (a b : ∅ ⊢ A)
+  --   → ((x y : ∅ ⊢ A) → ∅ ⊢ x -↠ y → ∅ ⊢ d · ⌜ x ⌝ -↠ d · ⌜ y ⌝)
+  --   → ∅ ⊢ d · ⌜ a ⌝ -↠ zero
+  --   → ∅ ⊢ d · ⌜ b ⌝ -↠ (suc zero)
+  --   → ⊥
+  -- rice d a b d-ext da-↠0 db-↠1 = {! d · gfix (ƛ n → ) !} where
+  --   -- r = λ n. if d n then a else b
+  --   -- gnum r = gnum (λ x y n. if d n then x else y) `app` ()
+  --   --    d (gfix r)
+  --   -- -↠ d (gnum (r · (gfix r))
+  --   -- -↠ d (gnum (if d (gfix r) then a else b))
+  --   -- -↠ { d ⌜ a ⌝ -↠ 0   if d (gfix r) -↠ 1
+  --   --    ; d (gnum b) -↠ 1   if d (gfix r) -↠ 0
 

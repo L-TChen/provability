@@ -120,17 +120,17 @@ module Final {X : Asm 𝓤} where
   open -↠-Reasoning
 
   universality : Trackable X ⊤ₐ
-  universality = (λ _ → tt*) , (↑₁ 𝑰) , λ _ → lift -↠-refl
+  universality = (λ _ → tt*) , (↑ 𝑰) , λ _ → lift -↠-refl
 
   global-element′ : (x : ⟨ X ⟩) → MerelyTrackable ⊤ₐ X
   global-element′ x = (λ _ → x) , rec isPropPropTrunc
-    (λ { (M , r) → ∣ ↑₁ M , (λ { _ → ⊩-respects-↠
-      (begin ↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ _ ⟩ M ∎) r}) ∣})
+    (λ { (M , r) → ∣ ↑ M , (λ { _ → ⊩-respects-↠
+      (begin ↑ M [ _ ] ≡⟨ subst-rename-∅ _ _ ⟩ M ∎) r}) ∣})
     (⊩-right-total x)
 
   global-element : (M : Λ₀) → (x : ⟨ X ⟩) → M ⊩ x
     → Trackable ⊤ₐ X
-  global-element M x M⊩x = (λ _ → x) , (↑₁ M) , λ _ → ⊩-respects-↠ (↑₁ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
+  global-element M x M⊩x = (λ _ → x) , (↑ M) , λ _ → ⊩-respects-↠ (↑ M [ _ ] ≡⟨ subst-rename-∅ _ M ⟩ M ∎ ) M⊩x
 
   separator : (f g : Trackable X Y)
     → ((x : Trackable ⊤ₐ X) → f ∘ x ∼ g ∘ x)
@@ -213,15 +213,15 @@ module Product (X Y : Asm 𝓤) where
   
   
   projₗ : Trackable X×Y X
-  projₗ = (λ {(x , y) → x}) , 0 · ↑₁ 𝑻 , F⊩projₗ
+  projₗ = (λ {(x , y) → x}) , 0 · ↑ 𝑻 , F⊩projₗ
     where
-      F⊩projₗ : Tracks X×Y X (0 · ↑₁ 𝑻) fst
+      F⊩projₗ : Tracks X×Y X (0 · ↑ 𝑻) fst
       F⊩projₗ ((_ , πₗL-↠M , M⫣x) , _) = X.⊩-respects-↠ πₗL-↠M M⫣x
 
   projᵣ : Trackable X×Y Y
-  projᵣ = (λ {(x , y) → y}) , 0 · ↑₁ 𝑭 , F⊩projᵣ
+  projᵣ = (λ {(x , y) → y}) , 0 · ↑ 𝑭 , F⊩projᵣ
     where
-      F⊩projᵣ : Tracks X×Y Y (0 · ↑₁ 𝑭) snd
+      F⊩projᵣ : Tracks X×Y Y (0 · ↑ 𝑭) snd
       F⊩projᵣ (_ , _ , π₂L-↠N , N⫣y) = Y.⊩-respects-↠ π₂L-↠N N⫣y
       
   `⟨_,_⟩ : {Z : Asm 𝓤}
@@ -242,18 +242,18 @@ module Product (X Y : Asm 𝓤) where
           lem₁ = begin
             `projₗ (H [ L ])
               ≡⟨ refl ⟩
-            (ƛ 0 · ↑₁ F ⟪ exts (subst-zero L) ⟫ · ↑₁ G ⟪ exts (subst-zero L) ⟫) · 𝑻
+            (ƛ 0 · ↑ F ⟪ exts (subst-zero L) ⟫ · ↑ G ⟪ exts (subst-zero L) ⟫) · 𝑻
               ≡⟨ cong₂ (λ M N → (ƛ 0 · M · N) · 𝑻) (rename-exts (subst-zero L) F) (rename-exts (subst-zero L) G) ⟩
-            (ƛ 0 · ↑₁ (F [ L ]) · ↑₁ (G [ L ])) · 𝑻
+            (ƛ 0 · ↑ (F [ L ]) · ↑ (G [ L ])) · 𝑻
               -↠⟨ β-projₗ ⟩
             F [ L ] ∎
 
           lem₂ = begin
             `projᵣ (H [ L ])
               ≡⟨ refl ⟩
-            (ƛ 0 · ↑₁ F ⟪ exts (subst-zero L) ⟫ · ↑₁ G ⟪ exts (subst-zero L) ⟫) · 𝑭
+            (ƛ 0 · ↑ F ⟪ exts (subst-zero L) ⟫ · ↑ G ⟪ exts (subst-zero L) ⟫) · 𝑭
               ≡⟨ cong₂ (λ M N → (ƛ 0 · M · N) · 𝑭) (rename-exts (subst-zero L) F) (rename-exts (subst-zero L) G) ⟩
-            (ƛ 0 · ↑₁ (F [ L ]) · ↑₁ (G [ L ])) · 𝑭
+            (ƛ 0 · ↑ (F [ L ]) · ↑ (G [ L ])) · 𝑭
               -↠⟨ β-projᵣ ⟩
             G [ L ] ∎
 ------------------------------------------------------------------------------
@@ -295,32 +295,32 @@ module Exponential (X Y : Asm 𝓤) where
   X⇒Y = X ⇒ Y
   module X⇒Y = AsmStr (str X⇒Y)
 
-  lem : (M N : Λ₀) → (↑₁ (↑₁ M)) ⟪ exts (subst-zero N) ⟫ ≡ (↑₁ M)
+  lem : (M N : Λ₀) → (↑ ↑ M) ⟪ exts (subst-zero N) ⟫ ≡ (↑ M)
   lem M N = begin
-    (↑₁ (↑₁ M)) ⟪ exts (subst-zero N) ⟫
-      ≡⟨ rename-exts (subst-zero N) (↑₁ M) ⟩
-    ↑₁ (↑₁ M [ N ])
-      ≡⟨ cong ↑₁_ (subst-rename-∅ (subst-zero N) M) ⟩
-    ↑₁ M ∎
+    (↑ ↑ M) ⟪ exts (subst-zero N) ⟫
+      ≡⟨ rename-exts (subst-zero N) (↑ M) ⟩
+    ↑ (↑ M [ N ])
+      ≡⟨ cong ↑_ (subst-rename-∅ (subst-zero N) M) ⟩
+    ↑ M ∎
     where open ≡-Reasoning
     
   pair : ∀ {n} → Λ (suc n) → Λ (suc n) → Subst 1 (suc n)
   pair M N fzero = Λ.`⟨ M , N ⟩
 
   eval : Trackable (X⇒Y ×ₐ X) Y
-  eval = (λ where ((f , _) , x) → f x) , 0 · ↑₁ 𝑻 · (0 · ↑₁ 𝑭)  , λ where
+  eval = (λ where ((f , _) , x) → f x) , 0 · ↑ 𝑻 · (0 · ↑ 𝑭)  , λ where
     ((_ , red₁ , r₁) , (_ , red₂ , r₂)) → Y.⊩-respects-↠ (·-cong red₁ red₂) (r₁ r₂) 
     
   curry : {Z : Asm 𝓤} → Trackable (Z ×ₐ X) Y → Trackable Z X⇒Y
   curry {Z = Z} (f , F , 𝔣) = 
     (λ z →
-      (λ x → f (z , x)) , rec isPropPropTrunc (λ { (L , t) → ∣ F ⟪ pair (↑₁ L) 0 ⟫ ,
+      (λ x → f (z , x)) , rec isPropPropTrunc (λ { (L , t) → ∣ F ⟪ pair (↑ L) 0 ⟫ ,
         (λ {M} {x} r → Y.⊩-respects-↠
           (begin
-            F ⟪ pair (↑₁ L) 0 ⟫ [ M ]
+            F ⟪ pair (↑ L) 0 ⟫ [ M ]
               ≡⟨ subst-assoc _ (subst-zero M) F ⟩
-            F ⟪ pair (↑₁ L) 0 ⨟ subst-zero M ⟫
-              ≡⟨ subst-cong (λ { fzero → (cong (λ T → ƛ 0 · T · ↑₁ M) (lem L M)) }) F ⟩
+            F ⟪ pair (↑ L) 0 ⨟ subst-zero M ⟫
+              ≡⟨ subst-cong (λ { fzero → (cong (λ T → ƛ 0 · T · ↑ M) (lem L M)) }) F ⟩
             F [ Λ.`⟨ L , M ⟩ ]
             ∎)
           (𝔣 ((_ , β-projₗ , t) , _ , β-projᵣ , r))) ∣ })

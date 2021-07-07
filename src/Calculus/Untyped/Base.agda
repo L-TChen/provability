@@ -118,17 +118,19 @@ rename ρ (M · N) = rename ρ M · rename ρ N
 --     ρ (Z p) = Z p
 --     ρ (S x) = S ρ x
 
-↑ₗ_ : Λ n
+↑_ : Λ n
     → Λ (m + n)
-↑ₗ M = rename ρ M
+↑ M = rename ρ M
   where
     ρ : Rename n (m + n)
     ρ {m = zero}  x = x
     ρ {m = suc _} x = fsuc (ρ x)
 
 ↑₁_ : Λ n → Λ (suc n)
-↑₁_ = ↑ₗ_
+↑₁_ = ↑_
 
+↑₂_ : Λ n → Λ (2 + n)
+↑₂_ = ↑_
 ------------------------------------------------------------------------------
 -- Substitution
 

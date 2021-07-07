@@ -47,7 +47,7 @@ module _ (Q : Quoting) where
   □map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , ▹map f x , λ α → F⊩f (M⊩x α) 
 
   □map₁ : Λ₁ → Λ₁
-  □map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
+  □map₁ F = ↑ Sub · ↑ ⌜ F ⌝ · 0
 
   □map : (k : Cl) → Trackable X Y → Trackable (□ k X) (□ k Y)
   □map {𝓤} {X} {Y} _ Ff@(f , F , _) = □map₀ Ff , □map₁ F , 
@@ -56,7 +56,7 @@ module _ (Q : Quoting) where
       open -↠-Reasoning
       □F⊩□f : Tracks (□ k X) (□ k Y) (□map₁ F) (□map₀ Ff)
       □F⊩□f {_} {n̅} {M , _} (lift n̅-↠⌜M⌝) = lift (begin
-        ↑₁ Sub [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
+        ↑ Sub [ n̅ ] · ↑ ⌜ F ⌝ [ n̅ ] · n̅
           ≡[ i ]⟨ subst-rename-∅ {ρ = fsuc} (subst-zero n̅) Sub i · subst-rename-∅ {ρ = fsuc} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
         Sub · ⌜ F ⌝ · n̅
           -↠⟨ ·ᵣ-cong n̅-↠⌜M⌝ ⟩
@@ -95,7 +95,7 @@ module _ (Q : Quoting) where
   □F=□G→F=G F G □F=□G = ⌜⌝-injective (↑ₗ-injective (decode (encode □F=□G .fst .snd)))
     where
       postulate
-        ↑ₗ-injective : {n m : ℕ} {M N : Λ m} → ↑ₗ_ {m} {n} M ≡ ↑ₗ N → M ≡ N
+        ↑ₗ-injective : {n m : ℕ} {M N : Λ m} → ↑_ {m} {n} M ≡ ↑ N → M ≡ N
 
   □-exposure : CloExpo 𝓤
   □-exposure = exposure □ □map □-isExposure
@@ -162,7 +162,7 @@ module _ (Q : Quoting) where
           ≡⟨ naturality (*→Λ M) _ ⟩
         □map k (*→Λ M) .fst (qQ-at-⊤ k .fst tt*)
           ≡⟨ refl ⟩
-        ↑₁ M [ _ ]  , next M , (λ α → s α)
+        ↑ M [ _ ]  , next M , (λ α → s α)
           ≡[ i ]⟨ subst-rename-∅ _ M i , next M , transport-filler (cong (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M)) s i ⟩
         M , next M , subst (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M) s ∎
         where
@@ -309,7 +309,8 @@ module _ (Q : Quoting) where
         fixf : Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x
         fixf = backward (fix h)
 
-        fixf-path : (backward (fix h)) .fst ≡ |f| (sfix F , next (backward (fix h)))
+        -- fixpoint equation
+        fixf-path : fixf .fst ≡ |f| (sfix F , next fixf)
         fixf-path = begin
           backward (fix h) .fst
             ≡⟨ cong (λ x → backward x .fst) (fix-path h) ⟩

@@ -43,7 +43,7 @@ module _ (Q : Quoting) where
   ⊠map₀ (f , F , F⊩f) (M , x , M⊩x) = F [ M ] , f x , F⊩f M⊩x
 
   ⊠map₁ : Λ₁ → Λ₁
-  ⊠map₁ F = ↑₁ Sub · ↑₁ ⌜ F ⌝ · 0
+  ⊠map₁ F = ↑ Sub · ↑ ⌜ F ⌝ · 0
 
   ⊠map : {X Y : Asm 𝓤} → Trackable X Y → Trackable (⊠ X) (⊠ Y)
   ⊠map {𝓤} {X} {Y} Ff@(f , F , _) = ⊠map₀ Ff , ⊠map₁ F , 
@@ -52,7 +52,7 @@ module _ (Q : Quoting) where
       open -↠-Reasoning
       ⊠F⊩⊠f : Tracks (⊠ X) (⊠ Y) (⊠map₁ F) (⊠map₀ Ff)
       ⊠F⊩⊠f {n̅} {M , _} (lift n̅-↠⌜M⌝) = lift (begin
-        ↑₁ Sub [ n̅ ] · ↑₁ ⌜ F ⌝ [ n̅ ] · n̅
+        ↑ Sub [ n̅ ] · ↑ ⌜ F ⌝ [ n̅ ] · n̅
           ≡[ i ]⟨ subst-rename-∅ {ρ = fsuc} (subst-zero n̅) Sub i · subst-rename-∅ {ρ = fsuc} (subst-zero n̅) ⌜ F ⌝ i · n̅ ⟩
         Sub · ⌜ F ⌝ · n̅
           -↠⟨ ·ᵣ-cong n̅-↠⌜M⌝ ⟩
@@ -93,42 +93,42 @@ module _ (Q : Quoting) where
   ⊠F=⊠G→F=G : (F G : Λ₁) → ⊠map₁ F ≡ ⊠map₁ G → F ≡ G
   ⊠F=⊠G→F=G F G ⊠F=⊠G = ⌜⌝-injective (↑ₗ-injective (decode (encode ⊠F=⊠G .fst .snd)))
     where
-      postulate ↑ₗ-injective : ∀ {m n} {M N : Λ n} → ↑ₗ_ {n} {m} M ≡ ↑ₗ N → M ≡ N
+      postulate ↑ₗ-injective : ∀ {m n} {M N : Λ n} → ↑_ {n} {m} M ≡ ↑ N → M ≡ N
 
   ⊤→⊠⊤ : Trackable (⊤ₐ {𝓤}) (⊠ ⊤ₐ)
   ⊤→⊠⊤ = Final.global-element ⌜ 𝑰 ⌝ (𝑰 , tt* , lift -↠-refl) (lift -↠-refl)
   
   ⊠X×Y→⊠X : {X Y : Asm 𝓤} → Trackable (⊠ (X ×ₐ Y)) (⊠ X)
-  ⊠X×Y→⊠X {𝓤} {X} {Y} = (λ { (L , (x , _) , ((M , red , r) , _)) → ( (ƛ 0 · ↑₁ 𝑻) · L , x , X.⊩-respects-↠ (begin
-    (ƛ 0 · ↑₁ 𝑻) · L
+  ⊠X×Y→⊠X {𝓤} {X} {Y} = (λ { (L , (x , _) , ((M , red , r) , _)) → ( (ƛ 0 · ↑ 𝑻) · L , x , X.⊩-respects-↠ (begin
+    (ƛ 0 · ↑ 𝑻) · L
       -→⟨ β ⟩
-    L · ↑₁ 𝑻 [ L ]
+    L · ↑ 𝑻 [ L ]
       -↠⟨ red ⟩
     M ∎) r) }) ,
-    ↑₁ Ap · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑻 ⌝ · 0   , (λ { {M}  {L , _} r → lift (begin
-    ↑₁ Ap [ M ] · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑻  ⌝ [ M ] · M
-      ≡⟨ cong₂ (λ L N → L · N · M) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ ƛ 0 · ↑₁ 𝑻 ⌝) ⟩
-    Ap · ⌜ ƛ 0 · ↑₁ 𝑻 ⌝ · M
+    ↑ Ap · ↑ ⌜ ƛ 0 · ↑ 𝑻 ⌝ · 0   , (λ { {M}  {L , _} r → lift (begin
+    ↑ Ap [ M ] · ↑ ⌜ ƛ 0 · ↑ 𝑻  ⌝ [ M ] · M
+      ≡⟨ cong₂ (λ L N → L · N · M) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ ƛ 0 · ↑ 𝑻 ⌝) ⟩
+    Ap · ⌜ ƛ 0 · ↑ 𝑻 ⌝ · M
       -↠⟨ ·ᵣ-cong (lower r) ⟩
-    Ap · ⌜ ƛ 0 · ↑₁ 𝑻 ⌝ · ⌜ _ ⌝
+    Ap · ⌜ ƛ 0 · ↑ 𝑻 ⌝ · ⌜ _ ⌝
       -↠⟨ Ap-↠ ⟩
-    ⌜ (ƛ 0 · ↑₁ 𝑻) · L ⌝ ∎ )})
+    ⌜ (ƛ 0 · ↑ 𝑻) · L ⌝ ∎ )})
     where
       open -↠-Reasoning
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
 
   ⊠X×Y→⊠Y : {X Y : Asm 𝓤} → Trackable (⊠ (X ×ₐ Y)) (⊠ Y)
-  ⊠X×Y→⊠Y {𝓤} {X} {Y} = (λ { (L , (_ , y) , (_ , (N , red , s))) → ( (ƛ 0 · ↑₁ 𝑭) · L , y , Y.⊩-respects-↠ (begin
-    (ƛ 0 · ↑₁ 𝑭) · L -→⟨ β ⟩ L · ↑₁ 𝑭 [ L ] -↠⟨ red ⟩ N ∎) s) }) ,
-    ↑₁ Ap · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑭 ⌝ · 0   , (λ { {M}  {L , _} r → lift (begin
-    ↑₁ Ap [ M ] · ↑₁ ⌜ ƛ 0 · ↑₁ 𝑭  ⌝ [ M ] · M
-      ≡⟨ cong₂ (λ L N → L · N · M) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ ƛ 0 · ↑₁ 𝑭 ⌝) ⟩
-    Ap · ⌜ ƛ 0 · ↑₁ 𝑭 ⌝ · M
+  ⊠X×Y→⊠Y {𝓤} {X} {Y} = (λ { (L , (_ , y) , (_ , (N , red , s))) → ( (ƛ 0 · ↑ 𝑭) · L , y , Y.⊩-respects-↠ (begin
+    (ƛ 0 · ↑ 𝑭) · L -→⟨ β ⟩ L · ↑ 𝑭 [ L ] -↠⟨ red ⟩ N ∎) s) }) ,
+    ↑ Ap · ↑ ⌜ ƛ 0 · ↑ 𝑭 ⌝ · 0   , (λ { {M}  {L , _} r → lift (begin
+    ↑ Ap [ M ] · ↑ ⌜ ƛ 0 · ↑ 𝑭  ⌝ [ M ] · M
+      ≡⟨ cong₂ (λ L N → L · N · M) (subst-rename-∅ _ Ap) (subst-rename-∅ _ ⌜ ƛ 0 · ↑ 𝑭 ⌝) ⟩
+    Ap · ⌜ ƛ 0 · ↑ 𝑭 ⌝ · M
       -↠⟨ ·ᵣ-cong (lower r) ⟩
-    Ap · ⌜ ƛ 0 · ↑₁ 𝑭 ⌝ · ⌜ _ ⌝
+    Ap · ⌜ ƛ 0 · ↑ 𝑭 ⌝ · ⌜ _ ⌝
       -↠⟨ Ap-↠ ⟩
-    ⌜ (ƛ 0 · ↑₁ 𝑭) · L ⌝ ∎ )})
+    ⌜ (ƛ 0 · ↑ 𝑭) · L ⌝ ∎ )})
     where
       open -↠-Reasoning
       module X = AsmStr (str X)
@@ -215,7 +215,7 @@ module _ (Q : Quoting) where
               in begin
               qΛ M
                 ≡⟨ naturality _ _ (*→Λ M) _ ⟩
-              (↑₁ M [ _ ] , M , s) 
+              (↑ M [ _ ] , M , s) 
                 ≡[ i ]⟨ subst-rename-∅ _ M i , M , transport-filler (cong (_-↠ M) (subst-rename-∅ _ M)) s i ⟩ 
               (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎
 
@@ -224,10 +224,10 @@ module _ (Q : Quoting) where
 
   Λ-map : {X Y : Asm 𝓤₀} → Trackable X Y → Trackable (⊠ Λ₀ₐ) (⊠ Λ₀ₐ)
   Λ-map (f , F , _) = (λ { (M , N , r) → F [ M ] , F [ N ] , reduce-ssubst F r }) ,
-    ↑₁ Sub · (↑₁ ⌜ F ⌝) · 0 , λ { {M} {N , _} (lift M-↠N) → lift (begin
-      (↑₁ Sub · (↑₁ ⌜ F ⌝) · 0) [ M ]
+    ↑ Sub · (↑ ⌜ F ⌝) · 0 , λ { {M} {N , _} (lift M-↠N) → lift (begin
+      (↑ Sub · (↑ ⌜ F ⌝) · 0) [ M ]
         ≡⟨ refl ⟩
-      (↑₁ Sub) [ M ] · (↑₁ ⌜ F ⌝) [ M ] · M
+      (↑ Sub) [ M ] · (↑ ⌜ F ⌝) [ M ] · M
         ≡⟨ cong₂ (λ L N → L · N · M) (subst-rename-∅ _ Sub) (subst-rename-∅ _ ⌜ F ⌝) ⟩
       Sub · ⌜ F ⌝ · M
         -↠⟨ ·ᵣ-cong M-↠N ⟩
