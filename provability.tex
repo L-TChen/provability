@@ -509,7 +509,7 @@ Finally, we verify the deductive form of the Gödel-Löb axiom: given a trackabl
 \ltnote{update}
 
 \subsection{An exposure for the \texorpdfstring{\SFour}{S4} modality}
-Given an assembly~$X$, which describes a set of extensions merely realised by some intensions (i.e.\ terms), we can expose the intensions at the level of extensions by constructing an assembly $\boxtimes X$ where an element $(M, x, r) : \bproj{\boxtimes X}$ is an extension $x : \bproj{X}$ and a term $M : \Lambda_0$ that realises~$x$, witnessed by $r : M \Vdash_X x$.
+Given an assembly~$X$, which describes a set of extensions merely realised by some intensions (i.e.\ terms), we can expose the intensions at the level of extensions by constructing an assembly $\boxtimes X$ where an inhabitant $(M, x, r) : \bproj{\boxtimes X}$ is an extension $x : \bproj{X}$ and a term $M : \Lambda_0$ that realises~$x$, witnessed by $r : M \Vdash_X x$.
 This term~$M$ becomes the main part of the extension (with respect to $\boxtimes X$) and should be (merely) realised by some intensional representation of~$M$; a natural choice of such representation is $\qquote{M}$, or indeed any term $\beta$-reducible to $\qquote{M}$.
 In short, the carrier and the realisability relation of $\boxtimes X$ are defined as
 \[
@@ -518,8 +518,7 @@ In short, the carrier and the realisability relation of $\boxtimes X$ are define
   \left(N \Vdash_{\boxtimes X} (M, x, r)\right) \defeq N \reduce \qquote{M}
 \]
 respectively.
-It turns out that $\boxtimes X \defeq (\bproj{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly where $r_{\boxtimes X}$ and $t_{\boxtimes X}$ are the transitivity and the reflexivity of $\reduce$.%
-\hsnote{check}
+It turns out that $\boxtimes X \defeq (\bproj{\boxtimes X}, \Vdash_{\boxtimes X}, r_{\boxtimes X}, t_{\boxtimes X})$ is indeed an assembly where $r_{\boxtimes X}$ and $t_{\boxtimes X}$ are the transitivity and the reflexivity of $\reduce$.
 
 To make $\boxtimes$ an exposure, we should also define the mapping on morphisms.
 Consider any trackable map~$f$ from~$X$ to~$Y$ and define $\boxtimes f \defeq (\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)\colon {\boxtimes} X \to \boxtimes Y$ as follows.
@@ -536,15 +535,12 @@ To give a tracker of $f^\boxtimes$, recall that there is a term $\mathtt{subst}$
 completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
 
-\begin{example} \label{ex:global-element-of-unit}
-  A global $\PP$-element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ is given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{\mathtt{I}}$ using \Cref{lem:global-element}. 
-  Yet, there are other global $\PP$-elements of $\boxtimes \top$ such as $(\mathtt{I}\,\mathtt{I}, \star, \beta)$ realised by $\qquote{\mathtt{I\,I}}$ where $\beta : \mathtt{I}\,\mathtt{I} \onereduce \mathtt{I}$ is the $\beta$-reduction rule.%
-  \hsnote{So not $\PP$-functorial?}
-  Furthermore, the tracker of a global element might not even be a closed term but an open term.%
-  \hsnote{So?}
-\end{example}
+\begin{definition} \label{ex:global-element-of-unit}
+  A global $\PP$-element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ is given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{\mathtt{I}}$ by \Cref{lem:global-element}. 
+\end{definition}
+
 \ltnote{say somewhere that $\boxtimes$ is not a $\PP$-functor.}
-The above example shows that $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
+The assembly $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
 Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.
 Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
 \hsnote{So more intensional and better?}
@@ -577,14 +573,21 @@ Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
   The naturality of $\epsilon$ follows by definition.
 \end{proof}
 
-In addition, there are functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$ corresponding to the quotation of a quoted term. 
-For any global element $a\colon \top \to \boxtimes X$ given by~\Cref{lem:global-element} whose tracker is indeed the quoted term~$\qquote{M}$, we can see that $\delta_X \circ a \colon \top \to {\boxtimes} {\boxtimes} X$ coincides with $\boxtimes a \circ \bigstar$ up to~$\sim$ as follows:%
-\hsnote{Why not a theorem? Why mention the global elements?}
+\begin{proposition}
+\ltnote{K}  
+\end{proposition}
+
+\ltnote{insert an explanation of the following proposition}
+\hsnote{Why mention the global elements?}
+\begin{proposition}
+There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$. 
+Moreover, for any global $\PP$-element $a\colon \top \to \boxtimes X$ where $\bproj{a}(\star) = (M, x, r)$ and whose tracker is~$\qquote{M}$, the global $\PP$-element $\delta_X \circ a$ coincides with $\boxtimes a \circ \bigstar$ up to~$\sim$ as follows:%
 \[
   \bproj{\delta_X}(a(\star)) \equiv \bproj{\delta_X}(M, x, r) \equiv (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
   = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
 \]
 
+\end{proposition}
 \begin{remark} \label{re:boxtimes-is-not}
 One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\delta$ is also a natural transformation up to~$\sim$ satisfying comonad laws, but these maps $\delta_X$ are \emph{not} natural in~$X$.
 In detail, for each trackable map $f\colon X \to Y$ the inhabitant 
@@ -609,21 +612,6 @@ This kind of transformations $\delta$ are \emph{lax} natural transformations in 
 What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intension part of $\boxtimes f$ is applied verbatim.%
 \hsnote{Is there more to say about the importance of lax naturality? Just how important is naturality (since we seem to imply naturality is essential for $\eta$)?}
 
-\begin{remark} \label{re:difference-boxtimes}
-  The exposure $\boxtimes_K$ studied by Kavvos is defined for assemblies on a PCA where the carrier and the realisability relation are given by
-  \[
-    \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
-    \quad\text{and}\quad
-    b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
-  \]
-  without the use of Gödel encoding.
-  It gives rise to a finite product-preserving comonadic exposure~\cite[Theorem~11]{Kavvos2017b}.
-  Preserving finite products is possible, since some computationally equivalent intensions have to be identified to satisfy equations of PCA.
-  Instead, by taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions.
-\hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
-\ltnote{better now?}
-
-\end{remark}
 
 \begin{lemma}\label{lem:no-quoting}
   The function $\eta_\Lambda \colon \Lambda_0 \to \boxtimes \Lambda_0$ defined by 
@@ -638,6 +626,7 @@ What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not al
   In particular, it follows that $\mathtt{Q}[M] \reduce \qquote{M}$.
   By~\Cref{prop:no-quoting} such $\mathtt{Q}$ cannot exist.
 \end{proof}
+\ltnote{show that there is no lax natural transformation}
 
 \begin{theorem}\label{thm:S4-no-quoting}
   There is no natural transformation $\eta$ from $\mathcal{I}$ to $\boxtimes$.
@@ -858,6 +847,9 @@ It is straightforward to show that $\Box^\kappa$ is a clocked exposure by \Cref{
   $\Box^\kappa \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is a clocked exposure.
 \end{theorem}
 
+\begin{proposition}
+\ltnote{K}  
+\end{proposition}
 Similar to~\Cref{thm:S4-no-quoting}, there is no family of trackable maps $\eta_X\colon X \to \Box^\kappa X$ natural in $X$ by the non-existence of a term $\mathtt{Q}$ with $\mathtt{Q}\,M \reduce \qquote{M}$ for any arbitrary term $M$.
 \begin{theorem}\label{thm:GL-no-quoting}
   There is no natural transformation from $\mathcal{I}$ to $\Box^\kappa$ for any clock $\kappa$.
@@ -931,6 +923,21 @@ This extensional equality, however, does not hold as they have different intensi
     \item Relate to the open question posed by Kavvos~\cite{Kavvos2020}.
 \end{itemize}
 
+\begin{remark} \label{re:difference-boxtimes}
+  The exposure $\boxtimes_K$ studied by Kavvos is defined for assemblies on a PCA where the carrier and the realisability relation are given by
+  \[
+    \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
+    \quad\text{and}\quad
+    b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
+  \]
+  without the use of Gödel encoding.
+  It gives rise to a finite product-preserving comonadic exposure~\cite[Theorem~11]{Kavvos2017b}.
+  Preserving finite products is possible, since some computationally equivalent intensions have to be identified to satisfy equations of PCA.
+  Instead, by taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions.
+\hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
+\ltnote{better now?}
+
+\end{remark}
 \section{Conclusion}\label{sec:conclusion}
 In this paper we follow the inspiring work by Kavvos~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus developed and formalised in HoTT as a semantic foundation for intensionality, on which we modelled \SFour and \GL modalities.
