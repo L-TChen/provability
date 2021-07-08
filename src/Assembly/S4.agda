@@ -95,9 +95,21 @@ module _ (Q : Quoting) where
     where
       postulate ↑ₗ-injective : ∀ {m n} {M N : Λ n} → ↑_ {n} {m} M ≡ ↑ N → M ≡ N
 
-  ⊤→⊠⊤ : Trackable (⊤ₐ {𝓤}) (⊠ ⊤ₐ)
-  ⊤→⊠⊤ = Final.global-element ⌜ 𝑰 ⌝ (𝑰 , tt* , lift -↠-refl) (lift -↠-refl)
+  ≤⊠ : (X : Asm 𝓤)
+    → (x y : ⟨ ⊠ X ⟩) → 𝓤 ̇
+  ≤⊠ X (M , x , r) (N , y , s) = M -↠ N × (x ≡ y)
+
+  syntax ≤⊠ X x y = x ≤ y ∶⊠ X
   
+------------------------------------------------------------------------------
+-- Global element ★ of ⊠ ⊤
+
+  ★ : Trackable (⊤ₐ {𝓤}) (⊠ ⊤ₐ)
+  ★ = Final.global-element ⌜ 𝑰 ⌝ (𝑰 , tt* , lift -↠-refl) (lift -↠-refl)
+  
+------------------------------------------------------------------------------
+-- Projections
+
   ⊠X×Y→⊠X : {X Y : Asm 𝓤} → Trackable (⊠ (X ×ₐ Y)) (⊠ X)
   ⊠X×Y→⊠X {𝓤} {X} {Y} = (λ { (L , (x , _) , ((M , red , r) , _)) → ( (ƛ 0 · ↑ 𝑻) · L , x , X.⊩-respects-↠ (begin
     (ƛ 0 · ↑ 𝑻) · L
@@ -133,9 +145,26 @@ module _ (Q : Quoting) where
       open -↠-Reasoning
       module X = AsmStr (str X)
       module Y = AsmStr (str Y)
+------------------------------------------------------------------------
+-- Axiom K
+
+  |K| : ⟨ ⊠ (X ⇒ Y) ⟩ → ⟨ ⊠ X ⇒ ⊠ Y ⟩
+  |K| {X = X} {Y = Y} (ƛF , (f , _) , 𝔣) = f· , f·-trackable
+    where
+      open -↠-Reasoning
+      f· : ⟨ ⊠ X ⟩ → ⟨ ⊠ Y ⟩
+      f· (M , x , r) = (ƛF) · M , f x , 𝔣 r
+      f·-trackable : ∥ HasTracker (⊠ X) (⊠ Y) f· ∥
+      f·-trackable = 
+        ∣ App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ , (λ { {N} {M , x , r} s → lift (begin
+          App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ N ]
+            -↠⟨ reduce-ssubst (App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫) (lower s) ⟩
+          App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ ⌜ M ⌝ ]
+            -↠⟨ App-↠ ⟩
+          ⌜ (ƛF) · M ⌝ ∎)} ) ∣
 
   K : (X Y : Asm 𝓤) → Trackable (⊠ (X ⇒ Y)) (⊠ X ⇒ ⊠ Y)
-  K X Y = k , ƛ App , λ { {H} {G , _} (lift H↠⌜G⌝) {N} {M , _} (lift t) → lift (begin
+  K X Y = |K| , ƛ App , λ { {H} {G , _} (lift H↠⌜G⌝) {N} {M , _} (lift t) → lift (begin
     (ƛ App ⟪ exts (subst-zero H) ⟫) · N
       -↠⟨ ·ᵣ-cong t ⟩
     (ƛ App ⟪ exts (subst-zero H) ⟫) · ⌜ M ⌝
@@ -147,19 +176,9 @@ module _ (Q : Quoting) where
     ⌜ G · M ⌝ ∎ )} 
     where
       open -↠-Reasoning
-      k : ⟨ ⊠ (X ⇒ Y) ⟩ → ⟨ ⊠ X ⇒ ⊠ Y ⟩
-      k (ƛF , (f , _) , 𝔣) = f· , f·-trackable
-        where
-          f· : ⟨ ⊠ X ⟩ → ⟨ ⊠ Y ⟩
-          f· (M , x , r) = (ƛF) · M , f x , 𝔣 r
-          f·-trackable : ∥ HasTracker (⊠ X) (⊠ Y) f· ∥
-          f·-trackable = 
-            ∣ App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ , (λ { {N} {M , x , r} s → lift (begin
-              App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ N ]
-                -↠⟨ reduce-ssubst (App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫) (lower s) ⟩
-              App ⟪ exts (subst-zero ⌜ ƛF ⌝) ⟫ [ ⌜ M ⌝ ]
-                -↠⟨ App-↠ ⟩
-              ⌜ (ƛF) · M ⌝ ∎)} ) ∣
+
+------------------------------------------------------------------------
+-- Axiom T
 
   eval : (X : Asm 𝓤) → Trackable (⊠ X) X
   eval X  = (λ x → fst (snd x)) , Eval ,
@@ -172,8 +191,11 @@ module _ (Q : Quoting) where
   eval-nat : {𝓤 : Universe} → NaturalTransformation 𝓤 ⊠-exposure Id
   eval-nat = eval , λ _ _ f x → refl
 
-  quoting : {X : Asm 𝓤} → Trackable (⊠ X) (⊠ ⊠ X)
-  quoting {X = X} = (λ { y@(M , x , r) → ⌜ M ⌝ , y , lift -↠-refl }) , Quote , λ where
+------------------------------------------------------------------------
+-- Axiom 4
+
+  quoting : (X : Asm 𝓤) → Trackable (⊠ X) (⊠ ⊠ X)
+  quoting X = (λ { y@(M , x , r) → ⌜ M ⌝ , y , lift -↠-refl }) , Quote , λ where
     {N} {M , x , r} (lift N-↠⌜M⌝) → lift (begin
       Quote [ N ]
         -↠⟨ reduce-ssubst Quote N-↠⌜M⌝ ⟩
@@ -184,6 +206,13 @@ module _ (Q : Quoting) where
         open -↠-Reasoning
         module ⊠X  = AsmStr (str (⊠ X))
         module ⊠⊠X = AsmStr (str (⊠ ⊠ X))
+
+  reasonable-quoting : {X : Asm 𝓤} → (a : Trackable ⊤ₐ (⊠ X))
+    → ⊠map₀ a (★ .fst tt*) ≤ quoting X .fst (a .fst tt*) ∶⊠ (⊠ X)
+  reasonable-quoting (f , F , 𝔣) = lower (𝔣 (lift -↠-refl)) , refl
+
+------------------------------------------------------------------------
+-- Refuting X -→ ⊠ X
 
   quoting′-does-not-exist : (q : NaturalTransformation 𝓤₀ Id ⊠-exposure) → ⊥
   quoting′-does-not-exist (fun , naturality) = quoting′-not-definable (QΛ , QΛ-is-quoting)
@@ -199,25 +228,30 @@ module _ (Q : Quoting) where
       QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
       QΛ[M] = HasTracker.F⊩f (q-at-Λ .snd) 
 
+      lem : (M : Λ₀) → qΛ M ≡ (M , M , _)
+      lem M = begin
+        qΛ M
+          ≡⟨ naturality _ _ (*→Λ M) _ ⟩
+        (↑ M [ _ ] , M , s) 
+          ≡[ i ]⟨ subst-rename-∅ _ M i , M , transport-filler (cong (_-↠ M) (subst-rename-∅ _ M)) s i ⟩ 
+        (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎
+        where
+          open ≡-Reasoning
+          open HasTracker (*→Λ M .snd)
+          s = F⊩f (snd (snd (qQ-at-⊤ .fst tt*)))
+
       QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
-      QΛ-is-quoting M = let open -↠-Reasoning in begin
+      QΛ-is-quoting M = begin
         QΛ [ M ]
           -↠⟨ lower (QΛ[M] -↠-refl) ⟩
         ⌜ qΛ M .fst ⌝
         ≡[ i ]⟨ ⌜ lem M i .fst  ⌝ ⟩
         ⌜ M ⌝ ∎
         where
-          lem : (M : Λ₀) → qΛ M ≡ (M , M , _)
-          lem M =
-            let open ≡-Reasoning
-                open HasTracker (*→Λ M .snd)
-                s = F⊩f (snd (snd (qQ-at-⊤ .fst tt*)))
-              in begin
-              qΛ M
-                ≡⟨ naturality _ _ (*→Λ M) _ ⟩
-              (↑ M [ _ ] , M , s) 
-                ≡[ i ]⟨ subst-rename-∅ _ M i , M , transport-filler (cong (_-↠ M) (subst-rename-∅ _ M)) s i ⟩ 
-              (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎
+          open -↠-Reasoning
+
+------------------------------------------------------------------------
+-- Projecting the intension of ⊠ X into ⊠ Λ
 
   forgetful : {X : Asm 𝓤₀} → Trackable (⊠ X) (⊠ Λ₀ₐ)
   forgetful = (λ { (M , _) → M , M , -↠-refl }) , (0 , λ N-↠⌜M⌝ → N-↠⌜M⌝)

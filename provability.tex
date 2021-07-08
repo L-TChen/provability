@@ -298,8 +298,8 @@ Similarly, the notion of natural transformations is introduced for exposures, sh
 \end{definition}
 An \emph{evaluator} for an endo-exposure~$Q$ is a natural transformation from $Q$ to $\mathcal{I}$.
 
-To model the \SFour modality, we may further define the notion of comonadic exposures introduced by Kavvos~\cite{Kavvos2017b} as an endo-exposure equipped with an evaluator and a natural transformation~$\delta$ from $Q$ to $Q^2$ subject to comonad laws.
-In our setting, however, we observe that we would have to adopt \emph{lax} natural transformations for the comultiplication, where the naturality holds only up to $\reduce$.
+To model the \SFour modality, we may further define \emph{comonadic exposures} introduced by Kavvos~\cite{Kavvos2017b} as an endo-exposure equipped with an evaluator and a natural transformation~$\delta$ from $Q$ to $Q^2$ subject to comonad laws.
+In the presence of intensionality, however, we observe that the naturality is not always appropriate.
 We will revisit this issue in~\Cref{sec:provability}.
 
 \section{\texorpdfstring{$\PP$}{P}-Category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
@@ -539,7 +539,6 @@ In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\box
   A global $\PP$-element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ is given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{\mathtt{I}}$ by \Cref{lem:global-element}. 
 \end{definition}
 
-\ltnote{say somewhere that $\boxtimes$ is not a $\PP$-functor.}
 The assembly $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
 Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.
 Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
@@ -574,22 +573,29 @@ Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
 \end{proof}
 
 \begin{proposition}
-\ltnote{K}  
+There is a family of trackable maps
+from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1] \cdot x_0$.
 \end{proposition}
 
 \ltnote{insert an explanation of the following proposition}
 \hsnote{Why mention the global elements?}
-\begin{proposition}
-There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$. 
-Moreover, for any global $\PP$-element $a\colon \top \to \boxtimes X$ where $\bproj{a}(\star) = (M, x, r)$ and whose tracker is~$\qquote{M}$, the global $\PP$-element $\delta_X \circ a$ coincides with $\boxtimes a \circ \bigstar$ up to~$\sim$ as follows:%
-\[
-  \bproj{\delta_X}(a(\star)) \equiv \bproj{\delta_X}(M, x, r) \equiv (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
-  = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
-\]
 
+Given a global $\PP$-element~$a$ of~$X$, we define its \emph{quotation} as the element $\boxtimes a \circ \bigstar$ of~$\boxtimes X$.
+We then say that a trackable map $q\colon X \to \boxtimes X$ \emph{quotes} an element $a$ if $q \circ a$ is extensionally equal to~$\boxtimes a \circ \bigstar$.
+The (\textbf{4}) axiom then can be realised by a family of trackable maps which actually quote `well-behaved' global $\PP$-elements:
+\begin{proposition} \label{prop:four-rule}
+There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$. 
+Moreover, $\delta_X$ quotes any element $a$ of~$\boxtimes X$ given by~\Cref{lem:global-element}.
+%  \[
+%    \bproj{\delta_X}(a(\star)) \equiv \bproj{\delta_X}(M, x, r) \equiv (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
+%    = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
+%  \]
 \end{proposition}
+The map $\delta_X$ may fail to quote if the element $a$ is not given by \Cref{lem:global-element}, since in general the intension part of $\boxtimes a$ is applied only verbatim.
+That is, $\bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ is $ (F[\mathtt{I}], (M, x, r), s)$ where $F[\mathtt{I}]$ is not necessarily equal to~$\qquote{M}$.
+The subtlety goes on:
 \begin{remark} \label{re:boxtimes-is-not}
-One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\delta$ is also a natural transformation up to~$\sim$ satisfying comonad laws, but these maps $\delta_X$ are \emph{not} natural in~$X$.
+One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\delta$ is a natural transformation up to~$\sim$ satisfying comonad laws, but these maps $\delta_X$ are \emph{not} natural in~$X$.
 In detail, for each trackable map $f\colon X \to Y$ the inhabitant 
 \[
   \delta_Y (\boxtimes f(M, x, r))
@@ -602,16 +608,24 @@ of type ${\boxtimes} {\boxtimes} Y$ is not equal to
 \]
 in spite that their extensions $(F[M], f\,x, \mathfrak{f}\,M\,x\,r)$ are the same
 where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction sequence $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
-Nevertheless we may consider a partial order induced by the reduction relation $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
-In detail, for inhabitants of $\boxtimes X$ define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$, and
-accordingly define $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for all~$x$.
-Then we have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{\delta_Y \circ {\boxtimes} f}$ instead.
-This kind of transformations $\delta$ are \emph{lax} natural transformations in a suitable sense.
+Instead, we may consider an order induced by the reduction relation between inhabitants of $\boxtimes X$: define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$, and
+accordingly $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for all~$x$.
+Then we only have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{\delta_Y \circ {\boxtimes} f}$ instead.
 \end{remark}
 
-What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not always the right notion in the presence of intensionality, since the intension part of $\boxtimes f$ is applied verbatim.%
-\hsnote{Is there more to say about the importance of lax naturality? Just how important is naturality (since we seem to imply naturality is essential for $\eta$)?}
+In short, the naturality appears inappropriate for a family of trackable maps $\tau_X$ to hold in general.
+However any family $\eta$ of trackable maps to realise $A \to \boxtimes A$ should at least makes
+\[
+  \xymatrix{
+    \top \ar[d]_{a} \ar[r]^{\eta_\top} & \boxtimes \top \ar[d]^{\boxtimes a} \\
+    \Lambda \ar[r]_{\eta_\Lambda} & \boxtimes \Lambda
+  }
+\]
+commute for elements $a$ given by \Cref{lem:global-element} as in \Cref{prop:four-rule}.
+Yet, this limited form of naturality is still impossible to achieve.
+The key is the following lemma which relies on~\Cref{prop:no-quoting}. 
 
+\hsnote{Is there more to say about the importance of lax naturality? Just how important is naturality (since we seem to imply naturality is essential for $\eta$)?}
 
 \begin{lemma}\label{lem:no-quoting}
   The function $\eta_\Lambda \colon \Lambda_0 \to \boxtimes \Lambda_0$ defined by 
@@ -620,24 +634,25 @@ What \Cref{re:boxtimes-is-not} implies is that the ordinary naturality is not al
   \] 
   is not trackable by any term.
 \end{lemma}
-\begin{proof}
-  Suppose that $\eta_\Lambda$ is tracked by~$\mathtt{Q}$.
-  Being a tracker for a function from $\Lambda_0$ to $\boxtimes \Lambda_0$ means that $\mathtt{Q}[N]\reduce \qquote{M}$ whenever $N \reduce M$.
-  In particular, it follows that $\mathtt{Q}[M] \reduce \qquote{M}$.
-  By~\Cref{prop:no-quoting} such $\mathtt{Q}$ cannot exist.
-\end{proof}
-\ltnote{show that there is no lax natural transformation}
+%\begin{proof}
+%  Suppose that $\eta_\Lambda$ is tracked by~$\mathtt{Q}$.
+%  Being a tracker for a function from $\Lambda_0$ to $\boxtimes \Lambda_0$ means that $\mathtt{Q}[N]\reduce \qquote{M}$ whenever $N \reduce M$.
+%  In particular, it follows that $\mathtt{Q}[M] \reduce \qquote{M}$.
+%  By~\Cref{prop:no-quoting} such $\mathtt{Q}$ cannot exist.
+%\end{proof}
 
 \begin{theorem}\label{thm:S4-no-quoting}
-  There is no natural transformation $\eta$ from $\mathcal{I}$ to $\boxtimes$.
+  There are no trackable maps $\eta_\Lambda\colon \Lambda \to \boxtimes \Lambda$ and $\eta_\top\colon \top \to \boxtimes \top$ satisfying $\eta_\Lambda \circ a \sim \boxtimes a \circ \eta_\top$ for global $\PP$-elements~$a$ of $\Lambda$ given by \Cref{lem:global-element}.
+  In particular, there is no natural transformation $\eta$ from $\mathcal{I}$ to $\boxtimes$.
 \end{theorem}
 \begin{proof}
-  Assume that such a family of trackable maps $\eta_X\colon X \to \boxtimes X$ exist.
-  To prove the statement, it suffices to show that $\bproj{\eta_\Lambda}\,M_0$ is propositionally equal to $(M_0, M_0, \refl_{\twoheadrightarrow})$ so that this family $\eta$ cannot exist by \Cref{lem:no-quoting}.
-  By \Cref{lem:global-element}, every closed term $M_0$ gives a trackable map $\widehat{M_0} \defeq (\lambda x.\, M_0, M_0, \mathfrak{M_0}) \colon \top \to \Lambda$ where $\mathfrak{M_0}$ is propositionally equal to the constant function with the value $\refl_{\twoheadrightarrow} : M_0 \reduce M_0$.
-
-  Note that $\bproj{\boxtimes\widehat{M_0}}(M, x, r) = (M_0, M_0, \refl_\twoheadrightarrow)$ by definition for any inhabitant $(M, x, r)$ of type $\boxtimes \top$.
-  By naturality, $\bproj{\eta_{\Lambda}}\,M_0 \equiv \bproj{\eta_{\Lambda}} \left(\bproj{\widehat{M_0}}\,\star\right) =  \bproj{\boxtimes\widehat{M_0}}\,(\bproj{\eta_\top}\,\star) = (M_0, M_0, \refl_\twoheadrightarrow)$.
+  Assume $\eta_\Lambda$ and $\eta_\top$ satisfying that $\eta_X \circ a \sim \boxtimes a \circ \eta_\top$ for any $a \colon \top \to \Lambda$ given by \Cref{lem:global-element}.
+  Every closed term $M_0$ defines an element $\widehat{M_0} \defeq (\lambda x.\, M_0, M_0, \lambda N.\, \lambda y.\, \lambda s.\, \refl_\twoheadrightarrow)$ of $\Lambda$ and thus $\bproj{\boxtimes\widehat{M_0}}(N, y, s) = (M_0, M_0, \refl_\twoheadrightarrow)$ for any $(N, y, s) : \boxtimes \top$ by definition.
+  By assumption we have
+  \[
+    \bproj{\eta_{\Lambda}}\,M_0 \equiv \bproj{\eta_{\Lambda}} \left(\bproj{\widehat{M_0}}\,\star\right) =  \bproj{\boxtimes\widehat{M_0}}\,(\bproj{\eta_\top}\,\star) = (M_0, M_0, \refl_\twoheadrightarrow),
+  \]
+  but \Cref{lem:no-quoting} says that $\eta_\Lambda$ cannot be trackable, a contradiction.
 
 \end{proof}
 
@@ -848,9 +863,11 @@ It is straightforward to show that $\Box^\kappa$ is a clocked exposure by \Cref{
 \end{theorem}
 
 \begin{proposition}
-\ltnote{K}  
+There is a family of trackable maps
+from $\boxtimes^\kappa (X \Rightarrow Y)$ to $\boxtimes^\kappa X \Rightarrow \boxtimes^\kappa Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1] \cdot x_0$.
 \end{proposition}
-Similar to~\Cref{thm:S4-no-quoting}, there is no family of trackable maps $\eta_X\colon X \to \Box^\kappa X$ natural in $X$ by the non-existence of a term $\mathtt{Q}$ with $\mathtt{Q}\,M \reduce \qquote{M}$ for any arbitrary term $M$.
+
+Similar to~\Cref{thm:S4-no-quoting}, there is no family of trackable maps $\eta_X\colon X \to \Box^\kappa X$ natural in $X$ (or even just any morphisms $\eta_\top$ and $\eta_\Lambda$ satisfying $\eta_\Lambda \circ a \sim \boxtimes a \circ \eta_\top$ for elements of $\Lambda$) by the non-existence of a term $\mathtt{Q}$ with $\mathtt{Q}\,M \reduce \qquote{M}$ for any arbitrary term $M$.
 \begin{theorem}\label{thm:GL-no-quoting}
   There is no natural transformation from $\mathcal{I}$ to $\Box^\kappa$ for any clock $\kappa$.
 \end{theorem}

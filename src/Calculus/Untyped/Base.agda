@@ -182,37 +182,49 @@ data _-→_ {n : ℕ} : (M N : Λ n) → 𝓤₀ ̇ where
     → L · M -→ L · M′
 
 private
-  code→ : {M N N′ : Λ n} → (r : M -→ N) (s : M -→ N′) → 𝓤₀ ̇
-  code→ β      β      = Unit
-  code→ (ζ r)  (ζ s)  = code→ r s
-  code→ (ξₗ r) (ξₗ s) = code→ r s
-  code→ (ξᵣ r) (ξᵣ s) = code→ r s
+  code→ : {M M′ N N′ : Λ n} → (r : M -→ N) (s : M′ -→ N′) → 𝓤₀ ̇
+  code→ (β {L} {M})          (β {L′} {M′})  = code L L′ × code M M′
+  code→ (ζ {M} {M′} r)       (ζ {N} {N′} s) = code M N × code M′ N′ × code→ r s
+  code→ (ξₗ {L₁} {L₂} {M} r) (ξₗ {L₁′} {L₂′} {M′} s) =
+    code L₁ L₁′ × code L₂ L₂′ × code M M′ × code→ r s
+  code→ (ξᵣ {L₁} {L₂} {M} r) (ξᵣ {L₁′} {L₂′} {M′} s) =
+    code L₁ L₁′ × code L₂ L₂′ × code M M′ × code→ r s
   code→ β       _     = ⊥
   code→ (ξₗ r)  _     = ⊥
   code→ (ξᵣ r₁) _     = ⊥
+  code→ (ζ r)   _     = ⊥
 
-  toCodeΛ : {M N N′ : Λ n} (r : M -→ N) (s : M -→ N′) → code→ r s → code N N′
-  toCodeΛ (β {L} {M})     β      c = r (L [ M ]) 
-  toCodeΛ (ζ r)           (ζ s)  c = toCodeΛ r s c
-  toCodeΛ (ξₗ {M = M} r′) (ξₗ s) c = toCodeΛ r′ s c , r M
-  toCodeΛ (ξᵣ {L = L} r′) (ξᵣ s) c = r L , toCodeΛ r′ s c
+  toCodeΛᵣ : {M N M′ N′ : Λ n}
+    → (r : M -→ N) (s : M′ -→ N′) → code→ r s → code N N′
+  toCodeΛᵣ {n} (β {M} {N})    (β {M′} {N′}) (c , d)  = subst (code (M [ N ]))
+    (cong₂ {x = M} {y = M′} _[_] (decode c) {N} {N′} (decode d)) (r (M [ N ]))
+  toCodeΛᵣ (ζ r)  (ζ s)  (_ , d , _)     = d
+  toCodeΛᵣ (ξₗ r) (ξₗ s) (_ , c , d , _) = c , d
+  toCodeΛᵣ (ξᵣ r) (ξᵣ s) (_ , c , d , _) = d , c
+
+  toCodeΛₗ : {M N M′ N′ : Λ n}
+    → (r : M -→ N) (s : M′ -→ N′) → code→ r s → code M M′
+  toCodeΛₗ β       β      (c , d)         = c , d
+  toCodeΛₗ (ζ r)  (ζ s)   (c , _)         = c
+  toCodeΛₗ (ξₗ r₁) (ξₗ s) (c , _ , d , _) = c , d
+  toCodeΛₗ (ξᵣ r₁) (ξᵣ s) (c , _ , d , _) = d , c
 
   r→ : (r : M -→ N) → code→ r r
-  r→ (β {M} {N}) = tt
-  r→ (ζ red)     = r→ red
-  r→ (ξₗ red)    = r→ red
-  r→ (ξᵣ red)    = r→ red
+  r→ (β {M} {N}) = r M , r N
+  r→ (ζ {M} {M′} red)      = r M , r M′ , r→ red
+  r→ (ξₗ {N} {N′} {L} red) = r N , r N′ , r L , r→ red
+  r→ (ξᵣ {M} {M′} {L} red) = r M , r M′ , r L , r→ red
 
 {-
--- TODO: Show that M -→ N is discrete
-  decode→ : {M N N′ : Λ n} {r : M -→ N} {s : M -→ N′} → (c : code→ r s)
-    → PathP (λ i → M -→ (decode {_} {_} {N} (toCodeΛ r s c) i)) r s
-  decode→ {r = β {L} {M}} {β} tt = {!!}
-  decode→ {r = ζ r}  {ζ s}  c i = ζ (decode→ {r = r} c i) 
+ -- TODO: Show that M -→ N is discrete
+  decode→ : {M M′ N N′ : Λ n} {r : M -→ N} {s : M′ -→ N′}
+    → (c : code→ r s) 
+    → PathP (λ i → decode {a = M} {M′} (toCodeΛₗ r s c) i -→ decode {a = N} {N′} (toCodeΛᵣ r s c) i) r s
+  decode→ {r = β} {β} (c , d) = {!!}
+  decode→ {r = ζ r}  {ζ s} (c , d , e) i = ζ {!!}
   decode→ {r = ξₗ r} {ξₗ s} c = {!!}
   decode→ {r = ξᵣ r} {ξᵣ s} c = {!!}
--}
-  
+ -} 
 ------------------------------------------------------------------------------
 -- Multi-step beta-reduction
 
@@ -272,6 +284,7 @@ module -↠-Reasoning where
       ----------
     → L -↠ N
   -↠-trans L-↠M M-↠N = _ -↠⟨ L-↠M ⟩ M-↠N
+  
 
   ƛ-cong
     : M -↠ M′
@@ -307,10 +320,27 @@ module -↠-Reasoning where
       -↠⟨ ·ᵣ-cong N-↠N′ ⟩
     _ · _ ∎
 
+  code-↠ : {M N M′ N′ : Λ n}
+    → (r : M -↠ N) (s : M′ -↠ N′) → 𝓤₀ ̇
+  code-↠ (M ∎)          (N ∎)          = code M N
+  code-↠ (_ -→⟨ r ⟩ rs) (_ -→⟨ s ⟩ ss) = code→ r s × code-↠ rs ss 
+  code-↠ (_ ∎)          (_ -→⟨ _ ⟩ _) = ⊥
+  code-↠ (_ -→⟨ _ ⟩ _)  (_ ∎)         = ⊥
   
 open -↠-Reasoning using (_-↠_; -↠-refl; -↠-trans; -→to-↠; ·-cong; ·ₗ-cong; ·ᵣ-cong) public
 
+trans-refl≡id : (t : M -↠ N) → -↠-trans t -↠-refl ≡ t
+trans-refl≡id (_ -↠-Reasoning.∎)             = refl
+trans-refl≡id (M -↠-Reasoning.-→⟨ M→N ⟩ N↠L) = 
+  -↠-trans (M -↠-Reasoning.-→⟨ M→N ⟩ N↠L) -↠-refl
+    ≡⟨ cong (_-↠_._-→⟨_⟩_ _ _) (trans-refl≡id N↠L) ⟩
+  M -↠-Reasoning.-→⟨ M→N ⟩ N↠L ∎
+  where
+    open ≡-Reasoning
+
+
 postulate
-  -→isSet : isSet (M -→ N)
-  -↠isSet : isSet (M -↠ N)
+  -→isSet  : isSet (M -→ N)
+  -↠isSet  : isSet (M -↠ N)
+  ∎-isProp : isProp (M -↠ M)
 

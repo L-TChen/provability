@@ -340,8 +340,3 @@ module Exponential (X Y : Asm 𝓤) where
     where
       open -↠-Reasoning
       module Z = AsmStr (str Z)
-
-   
-
-
-
