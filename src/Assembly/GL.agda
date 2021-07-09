@@ -267,32 +267,17 @@ module _ (Q : Quoting) where
   
     _†′ : Trackable (□′ k X) X
       →  Trackable ⊤ₐ       (□′ k X)
-    _†′ {k} (|f| , F , F⊩f) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf′) (lift -↠-refl)
+    _†′ {k} (|f| , F , 𝔣) = Final.global-element ⌜ sfix F ⌝ (sfix F , fixf′) (lift -↠-refl)
       where
         backward : Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x → Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x
         backward (x , r) = x , X.⊩-respects-↠ sfix-↠ r
 
         h : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x)
           →     Σ[ x ∶ ⟨ X ⟩ ] F [ ⌜ sfix F ⌝ ] X.⊩ x
-        h x = |f| (sfix F , ▹map backward x) , F⊩f (lift -↠-refl)
+        h x = |f| (sfix F , ▹map backward x) , 𝔣 (lift -↠-refl)
 
         fixf′ : ▹ k (Σ[ x ∶ ⟨ X ⟩ ] sfix F X.⊩ x)
         fixf′ α = backward (dfix h α)
-
-        fixf′-path : Path ⟨ □′ k X ⟩ (sfix F , fixf′) (sfix F , λ _ → |f| (sfix F , fixf′) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl)))
-        fixf′-path = begin
-          sfix F , fixf′
-            ≡⟨ refl ⟩
-          sfix F , (λ α → backward (dfix h α))
-            ≡⟨ cong {B = λ _ → ⟨ □′ k X ⟩} (sfix F ,_) (λ i α → backward (pfix h i α)) ⟩
-          sfix F , (λ α → backward (h (dfix h)))
-            ≡⟨ refl ⟩
-          sfix F , (λ α → backward (|f| (sfix F , ▹map backward (dfix h)) , F⊩f (lift -↠-refl)))
-            ≡⟨ refl ⟩
-          sfix F , (λ α → |f| (sfix F , ▹map backward (dfix h)) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl)))
-            ≡⟨ refl ⟩
-          sfix F , (λ α → |f| (sfix F , fixf′) , X.⊩-respects-↠ sfix-↠ (F⊩f (lift -↠-refl))) ∎
-          where open ≡-Reasoning
 
     _‡′ : Trackable (□′ k X) X
       → Trackable ⊤ₐ X 
@@ -310,6 +295,8 @@ module _ (Q : Quoting) where
         fixf = backward (fix h)
 
         -- fixpoint equation
+        -- f ‡ ∼ f ∘ □ᵏ f ‡ ∘ ★
+
         fixf-path : fixf .fst ≡ |f| (sfix F , next fixf)
         fixf-path = begin
           backward (fix h) .fst
