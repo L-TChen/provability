@@ -140,9 +140,9 @@ To distinguish between intensions and extensions, we build upon the previous wor
 We revisit elements of realisability and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
 Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term (the existence of such an intension is merely a property that the extension should hold), while trackable maps are pairs of a function and one of its intensions, and can be equipped with both extensional and intensional equalities (taking only the function part or both parts into account).
 The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$ whose associated intensions are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$ of~$M$.
-The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from being natural in~$X$, that is, there is no generic internal quoting operation.
+The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from having any computational meaning, that is, there is no generic internal quoting operation.
 \ltnote{Ask Kavvos}
-The difference between $\boxtimes X$ and $\Box X$ is where extensions are from.
+The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
 \begin{itemize}
     \item For $\boxtimes X$, the extension part~$x$ in $(M, x)$ coincides with the values of the set~$\bproj{X}$.
     We can then validate the \SFour axioms, for example $\boxtimes X \to X$ (natural in~$X$) by just projection.
@@ -151,8 +151,8 @@ The difference between $\boxtimes X$ and $\Box X$ is where extensions are from.
     This set $\laterp \bproj{X}$ can be conveniently expressed in a \emph{guarded type theory}, which features Nakano's later modality~$\laterp$ and \emph{guarded recursion}~\cite{Nakano2000}.
     By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
-The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually shown false.
-Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} fails to achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
+The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually false.
+Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} fails to achieve, our denotational semantics is more intensional such that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
 \ltnote{alternative word for precise}
 
 We use homotopy type theory (HoTT)~\cite{hottbook} as our metalanguage, although this is mainly for convenience.
@@ -421,20 +421,22 @@ The construction of binary $\PP$-products is also straightforward, so we omit th
 It follows that $\Asm(\Lambda)$ has finite $\PP$-products.
 \hsnote{need to give a bit of detail for the exponential construction to make sense}
 
-Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$, and distinct merely trackable maps can be separated by global elements of~$X$, which are morphisms to $X$ from the terminal object~$\top$.
-In $\Asm(\Lambda)$, where trackers are part of trackable maps, a global $\PP$-element has to be constructed by a pair of an inhabitant $x : \bproj{X}$ and its realiser.
+Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$, and distinct merely trackable maps can be separated by (global) elements of~$X$, which are morphisms to $X$ from the terminal object~$\top$.
+In $\Asm(\Lambda)$, where trackers are part of trackable maps, a ($\PP$-)element has to be constructed with an intension.
 \begin{lemma}\label{lem:global-element}
   Let $X$ be an assembly. Then the following statements hold:
   \begin{enumerate}
     \item Every inhabitant $x : \bproj{X}$ corresponds to a merely trackable map from $\top$ to $X$.
-    \item Every pair of $x : \bproj{X}$ and $M : \Lambda_0$ with $r : M \Vdash_X x$ defines a global element of $X$, i.e.\ a trackable map from $\top$ to $X$.
+    \item Every pair of $x : \bproj{X}$ and $M : \Lambda_0$ with $r : M \Vdash_X x$ defines a element of $X$, i.e.\ a trackable map $(\lambda\_.\, x, M, \lambda\_.\,\lambda\_.\, \lambda\_.\, r)$ from $\top$ to $X$.
   \end{enumerate}
 \end{lemma}
 
-As expected, the $\PP$-terminal object $\top$ in~$\Asm(\Lambda)$ is a $\PP$-separator in the sense that for any two trackable maps $f_1$ and $f_2$ we have $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every global element~$x$ of $X$.
+As expected, the $\PP$-terminal object $\top$ in~$\Asm(\Lambda)$ is a $\PP$-separator in the sense that for any two trackable maps $f_1$ and $f_2$ we have $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every element~$x$ of $X$.
+Even further, we can restrict to \emph{closed} elements, which are elements given by~\Cref{lem:global-element}.
 This property relies on the property that the carrier $\bproj{X}$ is a set.
 \begin{proposition}
-  The $\PP$-terminal object $\top$ is a $\PP$-separator in $\Asm(\Lambda)$.
+  Two two trackable maps $f, g\colon X \to Y$ are extensionally equal if and only if $f \circ x \sim g \circ x$ for every closed element~$x\colon \top \to X$.
+  In particular, the $\PP$-terminal object $\top$ is a $\PP$-separator in $\Asm(\Lambda)$.
 \end{proposition}
 \begin{proof}[Proof sketch]
   Let $f_1$ and $f_2$ be two trackable maps.
@@ -493,20 +495,13 @@ However, it has the type of \emph{merely} trackable maps as its carrier, since t
 \begin{corollary}
   $\Asm(\Lambda)$ is a cartesian closed $\PP$-category with a strict $\PP$-initial object.
 \end{corollary}
-\ltnote{shall we show that $\Asm(\Lambda)$ has a natural number object? The role is replaced by~$\Lambda$ instead.}
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
-
-In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models the \SFour modality but is subtly different from the comonadic exposure introduced by Kavvos~\cite[Definition~9]{Kavvos2017b}, which we denote by~$\boxtimes_K$ in this paper.
-For example, $\boxtimes_K$ preserves finite products, including the terminal object~$\top$, but ours does not.%
-\hsnote{forward reference to \Cref{re:boxtimes-is-not}}
-Most importantly, we are able to refute the existence of $X \to \boxtimes X$ (natural in~$X$), understood as a quoting function computationally, while we did not find a way to refute it with $\boxtimes_K$.
-Hitherto, we have reconstructed a model~$\boxtimes$ that is similar but different from the model~$\boxtimes_K$ based on a PCA.
-
+In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models the \SFour modality. 
+We show that $X \to \boxtimes X$ cannot have any computational meaning for arbitrary~$X$, understood as a generic quoting function.
 Thereafter, we move to guarded type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
-The construction refutes not only the completeness principle $X \to \Box X$ by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$, which is valid for $\boxtimes$.
-Finally, we verify the deductive form of the Gödel-Löb axiom: given a trackable map $f : \Box X \to X$ tracked by~$F$, there is an inhabitant of $\Box X$ realised by~$\qquote{\mathsf{fix}\,F}$, where $\mathsf{fix}\,F$ is the fixpoint given by the Second Recursion Theorem.%
-\ltnote{update}
+The construction refutes not only the completeness principle $X \to \Box X$ by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$.
+Finally, we derive the (\GL) axiom as well as its deductive form.
 
 \subsection{An exposure for the \texorpdfstring{\SFour}{S4} modality}
 Given an assembly~$X$, which describes a set of extensions merely realised by some intensions (i.e.\ terms), we can expose the intensions at the level of extensions by constructing an assembly $\boxtimes X$ where an inhabitant $(M, x, r) : \bproj{\boxtimes X}$ is an extension $x : \bproj{X}$ and a term $M : \Lambda_0$ that realises~$x$, witnessed by $r : M \Vdash_X x$.
@@ -536,12 +531,12 @@ completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
 
 \begin{definition} \label{ex:global-element-of-unit}
-  A global $\PP$-element $\bigstar\colon \top \to \boxtimes \top$ corresponding to the designated inhabitant~$\star : \Unit$ is given by $(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ with a realiser $\qquote{\mathtt{I}}$ by \Cref{lem:global-element}. 
+  By $\bigstar$ we denote a closed element of~$\boxtimes \top$ given by \Cref{lem:global-element} with $(\mathtt{I}, \star, \refl_\twoheadrightarrow) : \bproj{\boxtimes \top}$ and its realiser $\qquote{\mathtt{I}}$.
 \end{definition}
 
 The assembly $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
 Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.
-Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
+It follows that the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
 \hsnote{So more intensional and better?}
 
 \begin{theorem}[{\emph{cf}.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
@@ -572,67 +567,59 @@ Therefore, the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
   The naturality of $\epsilon$ follows by definition.
 \end{proof}
 
+The normality condition is realised exactly by~$\mathtt{ap}$:
 \begin{proposition}
 There is a family of trackable maps
 from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1] \cdot x_0$.
 \end{proposition}
 
-\ltnote{insert an explanation of the following proposition}
-\hsnote{Why mention the global elements?}
+\hsnote{Why mention the elements?}
 
-Given a global $\PP$-element~$a$ of~$X$, we define its \emph{quotation} as the element $\boxtimes a \circ \bigstar$ of~$\boxtimes X$.
-We then say that a trackable map $q\colon X \to \boxtimes X$ \emph{quotes} an element $a$ if $q \circ a$ is extensionally equal to~$\boxtimes a \circ \bigstar$.
-The (\textbf{4}) axiom then can be realised by a family of trackable maps which actually quote `well-behaved' global $\PP$-elements:
+Given an element~$a$ of~$X$, we define its \emph{quotation} as the element $\boxtimes a \circ \bigstar$ of~$\boxtimes X$.
+We say that a trackable map $q\colon X \to \boxtimes X$ \emph{quotes} an element $a$ of~$X$ if
+\[
+  \xymatrix{
+    \top \ar[d]_{a} \ar[r]^{\bigstar} & \boxtimes \top \ar[d]^{\boxtimes a} \\
+    X \ar[r]_{q} & {\boxtimes} X.
+  }
+\]
+The (\textbf{4}) axiom can be realised by a family of trackable maps which quote closed elements:
 \begin{proposition} \label{prop:four-rule}
-There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$. 
-Moreover, $\delta_X$ quotes any element $a$ of~$\boxtimes X$ given by~\Cref{lem:global-element}.
+There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$ which quotes closed elements of~$\boxtimes X$.
 %  \[
 %    \bproj{\delta_X}(a(\star)) \equiv \bproj{\delta_X}(M, x, r) \equiv (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
 %    = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
 %  \]
 \end{proposition}
-The map $\delta_X$ may fail to quote if the element $a$ is not given by \Cref{lem:global-element}, since in general the intension part of $\boxtimes a$ is applied only verbatim.
-That is, $\bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ is $ (F[\mathtt{I}], (M, x, r), s)$ where $F[\mathtt{I}]$ is not necessarily equal to~$\qquote{M}$.
+The fact that $\delta_X$ quotes closed elements, thoughts as a reduction $\mathtt{quote}[a/x] \mapsto \qquote{a}$, justifies the computational meaning categorically.
+Yet, $\delta_X$ may fail to quote if the element $a$ is not closed, since in general the intension part of $\boxtimes a$ is applied only verbatim.
+That is, $\bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ is $ (F[\mathtt{I}], (M, x, r), s)$ where $F[\mathtt{I}]$ is not necessarily $\alpha$-equivalent to~$\qquote{M}$.
 The subtlety goes on:
-\begin{remark} \label{re:boxtimes-is-not}
+\begin{remark} \label{re:naturality}
 One may expect that $(\boxtimes, \epsilon, \delta)$ is comonadic in the sense that $\delta$ is a natural transformation up to~$\sim$ satisfying comonad laws, but these maps $\delta_X$ are \emph{not} natural in~$X$.
 In detail, for each trackable map $f\colon X \to Y$ the inhabitant 
 \[
   \delta_Y (\boxtimes f(M, x, r))
-  \equiv \left(\qquote{F[M]}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \refl_{\twoheadrightarrow}\right)
+  \equiv \left(\qquote{F[M]}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \refl_{\twoheadrightarrow}\right) : {\boxtimes} {\boxtimes} Y
 \]
-of type ${\boxtimes} {\boxtimes} Y$ is not equal to
+ is not equal to
 \[
   {\boxtimes} {\boxtimes} f (\delta_X(M, x, r))
-  \equiv (\mathsf{subst}\,\qquote{F}\,\qquote{M}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \mathsf{subst}_{\twoheadrightarrow})
+  \equiv (\mathsf{subst}\,\qquote{F}\,\qquote{M}, (F[M], f\,x, \mathfrak{f}\,M\,x\,r), \mathsf{subst}_{\twoheadrightarrow}) : {\boxtimes} {\boxtimes} Y
 \]
-in spite that their extensions $(F[M], f\,x, \mathfrak{f}\,M\,x\,r)$ are the same
-where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction sequence $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
-Instead, we may consider an order induced by the reduction relation between inhabitants of $\boxtimes X$: define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$, and
-accordingly $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for all~$x$.
-Then we only have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{\delta_Y \circ {\boxtimes} f}$ instead.
+in spite that their extensions are the same where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction sequence $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
+If we define $(M, x, r) \leq (N, y, s)$ whenever $M \reduce N$ and $x = y$ and $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for all~$x$.
+Then we only have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{\delta_Y \circ {\boxtimes} f}$.
+In general, the naturality axiom appears inappropriate in the presence of intensionality.
 \end{remark}
 
-In short, the naturality appears inappropriate for a family of trackable maps $\tau_X$ to hold in general.
-However any family $\eta$ of trackable maps to realise $A \to \boxtimes A$ should at least makes
-\[
-  \xymatrix{
-    \top \ar[d]_{a} \ar[r]^{\eta_\top} & \boxtimes \top \ar[d]^{\boxtimes a} \\
-    \Lambda \ar[r]_{\eta_\Lambda} & \boxtimes \Lambda
-  }
-\]
-commute for elements $a$ given by \Cref{lem:global-element} as in \Cref{prop:four-rule}.
-Yet, this limited form of naturality is still impossible to achieve.
+On the other hand, it is impossible to give a computational meaning of the rule $A \to \boxtimes A$ to hold for arbitrary~$A$.
 The key is the following lemma which relies on~\Cref{prop:no-quoting}. 
 
-\hsnote{Is there more to say about the importance of lax naturality? Just how important is naturality (since we seem to imply naturality is essential for $\eta$)?}
+\hsnote{Just how important is naturality (since we seem to imply naturality is essential for $\eta$)?}
 
 \begin{lemma}\label{lem:no-quoting}
-  The function $\eta_\Lambda \colon \Lambda_0 \to \boxtimes \Lambda_0$ defined by 
-  \[
-    M \mapsto (M, M, \refl_\twoheadrightarrow)
-  \] 
-  is not trackable by any term.
+  The function $\eta_\Lambda \colon \Lambda_0 \to \boxtimes \Lambda_0$ defined by $M \mapsto (M, M, \refl_\twoheadrightarrow)$ cannot be tracked by any term.
 \end{lemma}
 %\begin{proof}
 %  Suppose that $\eta_\Lambda$ is tracked by~$\mathtt{Q}$.
@@ -642,7 +629,7 @@ The key is the following lemma which relies on~\Cref{prop:no-quoting}.
 %\end{proof}
 
 \begin{theorem}\label{thm:S4-no-quoting}
-  There are no trackable maps $\eta_\Lambda\colon \Lambda \to \boxtimes \Lambda$ and $\eta_\top\colon \top \to \boxtimes \top$ satisfying $\eta_\Lambda \circ a \sim \boxtimes a \circ \eta_\top$ for global $\PP$-elements~$a$ of $\Lambda$ given by \Cref{lem:global-element}.
+  There are no trackable maps $\eta_\Lambda\colon \Lambda \to \boxtimes \Lambda$ and $\eta_\top\colon \top \to \boxtimes \top$ satisfying $\eta_\Lambda \circ a \sim \boxtimes a \circ \eta_\top$ for closed elements~$a$ of $\Lambda$.
   In particular, there is no natural transformation $\eta$ from $\mathcal{I}$ to $\boxtimes$.
 \end{theorem}
 \begin{proof}
