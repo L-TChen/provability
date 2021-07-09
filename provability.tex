@@ -1,7 +1,7 @@
-\documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate,draft]{lipics-v2021}
+\documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
 \numberwithin{equation}{section}
 
-%\usepackage{mlmodern}
+\usepackage{mlmodern}
 
 \makeatletter
 \def\renewtheorem#1{%
@@ -919,14 +919,15 @@ The (\GL) axiom can be realised by a similar construction, too.
 \end{theorem}
 
 \section{Related work}
-\cite{Visser2019,Beklemishev2006,Goris2009,Shamkanov2014,Shamkanov2016a}
-\cite{Kavvos2020}
-\cite{Litak2014}
 
-\begin{itemize}
-    \item  classic theory of categorical realisability is based on some partial combinatory algebra.
-    \item Relate to the open question posed by Kavvos~\cite{Kavvos2020}.
-\end{itemize}
+\begin{enumerate}
+  \item Compare $\boxtimes$ with $\boxtimes_K$ (\cite{Kavvos2017b}). 
+  \item Discuss logic of proofs and provability logic \cite{Beklemishev2006, Goris2009, Shamkanov2014, Shamkanov2016a, Visser2019}.
+\end{enumerate}
+
+$\boxtimes$ is subtly different from the comonadic exposure introduced by Kavvos~\cite[Definition~9]{Kavvos2017b}, which we denote by~$\boxtimes_K$ in this paper.
+For example, $\boxtimes_K$ preserves finite products, including the terminal object~$\top$, but ours does not.%
+Hitherto, we have reconstructed a model~$\boxtimes$ that is similar but different from the model~$\boxtimes_K$ based on a PCA.
 
 \begin{remark} \label{re:difference-boxtimes}
   The exposure $\boxtimes_K$ studied by Kavvos is defined for assemblies on a PCA where the carrier and the realisability relation are given by
