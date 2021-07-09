@@ -567,16 +567,12 @@ It follows that the exposure $\boxtimes$ does not preserve finite $\PP$-products
   The naturality of $\epsilon$ follows by definition.
 \end{proof}
 
-The normality condition is realised exactly by~$\mathtt{ap}$:
-\begin{proposition}
-There is a family of trackable maps
-from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1] \cdot x_0$.
-\end{proposition}
 
 \hsnote{Why mention the elements?}
 
-Given an element~$a$ of~$X$, we define its \emph{quotation} as the element $\boxtimes a \circ \bigstar$ of~$\boxtimes X$.
-We say that a trackable map $q\colon X \to \boxtimes X$ \emph{quotes} an element $a$ of~$X$ if
+Given an element~$a$ of~$X$, define its \emph{quotation} as the element $\boxtimes a \circ \bigstar$ of~$\boxtimes X$.
+The choice of $\bigstar$ does not matter if $a$ is closed, since $\boxtimes a \circ \bigstar' \sim \boxtimes a \circ \bigstar$ for any element~$\bigstar'$ of $\boxtimes \top$.  
+We say that a trackable map $q\colon X \to \boxtimes X$ \emph{quotes} an element $a$ of~$X$, thoughts as a reduction $\mathtt{q}[a/x] \mapsto \qquote{a}$ whenever
 \[
   \xymatrix{
     \top \ar[d]_{a} \ar[r]^{\bigstar} & \boxtimes \top \ar[d]^{\boxtimes a} \\
@@ -591,7 +587,7 @@ There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M
 %    = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
 %  \]
 \end{proposition}
-The fact that $\delta_X$ quotes closed elements, thoughts as a reduction $\mathtt{quote}[a/x] \mapsto \qquote{a}$, justifies the computational meaning categorically.
+The fact that $\delta_X$ quotes closed elements justifies the computational meaning categorically.
 Yet, $\delta_X$ may fail to quote if the element $a$ is not closed, since in general the intension part of $\boxtimes a$ is applied only verbatim.
 That is, $\bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow)$ is $ (F[\mathtt{I}], (M, x, r), s)$ where $F[\mathtt{I}]$ is not necessarily $\alpha$-equivalent to~$\qquote{M}$.
 The subtlety goes on:
@@ -613,7 +609,13 @@ Then we only have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{
 In general, the naturality axiom appears inappropriate in the presence of intensionality.
 \end{remark}
 
-On the other hand, it is impossible to give a computational meaning of the rule $A \to \boxtimes A$ to hold for arbitrary~$A$.
+The normality condition is realised exactly by~$\mathtt{ap}$ without naturality:
+\begin{proposition}
+There is a family of trackable maps
+from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1] \cdot x_0$.
+\end{proposition}
+
+On the other hand, it is impossible to give a computational meaning of the rule $A \to \boxtimes A$ for arbitrary~$A$.
 The key is the following lemma which relies on~\Cref{prop:no-quoting}. 
 
 \hsnote{Just how important is naturality (since we seem to imply naturality is essential for $\eta$)?}
@@ -629,11 +631,12 @@ The key is the following lemma which relies on~\Cref{prop:no-quoting}.
 %\end{proof}
 
 \begin{theorem}\label{thm:S4-no-quoting}
-  There are no trackable maps $\eta_\Lambda\colon \Lambda \to \boxtimes \Lambda$ and $\eta_\top\colon \top \to \boxtimes \top$ satisfying $\eta_\Lambda \circ a \sim \boxtimes a \circ \eta_\top$ for closed elements~$a$ of $\Lambda$.
-  In particular, there is no natural transformation $\eta$ from $\mathcal{I}$ to $\boxtimes$.
+  There is no trackable map $\eta_\Lambda\colon \Lambda \to \boxtimes \Lambda$ which quotes closed elements of~$\Lambda$.
+  %$\eta_\Lambda \circ a \sim \boxtimes a \circ \eta_\top$ for closed elements~$a$ of $\Lambda$.
+%  In particular, there is no natural transformation $\eta$ from $\mathcal{I}$ to $\boxtimes$.
 \end{theorem}
 \begin{proof}
-  Assume $\eta_\Lambda$ and $\eta_\top$ satisfying that $\eta_X \circ a \sim \boxtimes a \circ \eta_\top$ for any $a \colon \top \to \Lambda$ given by \Cref{lem:global-element}.
+  Assume $\eta_\Lambda$ with that $\eta_X \circ a \sim \boxtimes a \circ \bigstar$ for any $a \colon \top \to \Lambda$ given by \Cref{lem:global-element}.
   Every closed term $M_0$ defines an element $\widehat{M_0} \defeq (\lambda x.\, M_0, M_0, \lambda N.\, \lambda y.\, \lambda s.\, \refl_\twoheadrightarrow)$ of $\Lambda$ and thus $\bproj{\boxtimes\widehat{M_0}}(N, y, s) = (M_0, M_0, \refl_\twoheadrightarrow)$ for any $(N, y, s) : \boxtimes \top$ by definition.
   By assumption we have
   \[
