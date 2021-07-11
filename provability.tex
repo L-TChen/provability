@@ -305,7 +305,7 @@ the technical foundation for~\Cref{sec:provability}.
 
 \subsection{Assembly and trackable map}
 Traditionally, an assembly on natural numbers is a set $\bproj{X}$ with a realisability relation $\mathord{\Vdash} \subseteq \mathbb{N} \times |X|$ such that for every $x$ in $\bproj{X}$ there exists some $a$ with $a \Vdash x$, where $a$ is said to \emph{realise} $x$ or $a$ is a \emph{realiser} of $x$.
-The modern notion of assemblies~\cite{Oosten2008} is often defined on a partial  combinatory algebra~$(A, \cdot)$, called \emph{PCA} for short.
+The modern notion of assemblies~\cite{Oosten2008} is often defined on a partial  combinatory algebra~$(A, \cdot)$, called \emph{PCA} for short, where $\cdot$ is a partial binary operation.
 For the sake of formalisation and potential applications in programming language design, we base our definition on $\lambda$-calculus subject to $\alpha$-equivalence, which is more akin to the one based on an ordered PCA~\cite{Hofstra2003}. 
 
 \begin{definition}\label{def:assembly}
@@ -361,7 +361,7 @@ It is noted by Kavvos~\cite{Kavvos2017b} that to bring out intensionality the tr
   A \emph{merely trackable map} is an inhabitant of $\sm{\bproj{f} : |X| \to |Y|} \exis{F : \Lambda_1}\mathsf{Tracks}_{X, Y}(F, \bproj{f})$. 
 \end{definition}
 
-By definition, a trackable map~$f$ consists of not only a function~$\bproj{f}$ between carriers but also its tracker~$F$ and a transformation~$\mathfrak{f}$ of realisability.
+By definition, a trackable map~$f \equiv (f, F, \mathfrak{f})$ consists of not only a function~$\bproj{f}$ between carriers but also its tracker~$F$ and a transformation~$\mathfrak{f}$ of realisability.
 
 \begin{example}
   Every assembly $X$ has an identity map $\iid_X \defeq (\idfunc[\bproj{X}], \mathtt{x}_0, \pr_3)$
@@ -401,9 +401,9 @@ We now investigate some of its basic properties.
   The unit $\top \defeq (\Unit, \Vdash_\top, r_\top, t_\top)$ is $\PP$-terminal where 
   \begin{romanenumerate}
     \item $\Unit$ is the unit type,  
-    \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{\lambda x.\, x}$, 
+    \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{I}$ where $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$, 
     \item $r_\top : (M \reduce N) \to (N \reduce L) \to (M \reduce L)$ given by the transitivity of $\reduce$,
-    \item and $t_\top$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{\lambda x.\, x}$ (by reflexivity).
+    \item and $t_\top$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{I}$ (by reflexivity).
   \end{romanenumerate}
   The finality follows from function extensionality.
 \end{example}
@@ -914,34 +914,39 @@ The (\GL) axiom can be realised by a similar construction, too.
 \end{theorem}
 
 \section{Related work}
-
-\begin{enumerate}
-  \item Compare $\boxtimes$ with $\boxtimes_K$ (\cite{Kavvos2017b}). 
-  \item Discuss logic of proofs and provability logic \cite{Beklemishev2006, Goris2009, Shamkanov2014, Shamkanov2016a, Visser2019}.
-\end{enumerate}
-
-$\boxtimes$ is subtly different from the comonadic exposure introduced by Kavvos~\cite[Definition~9]{Kavvos2017b}, which we denote by~$\boxtimes_K$ in this paper.
-For example, $\boxtimes_K$ preserves finite products, including the terminal object~$\top$, but ours does not.%
-Hitherto, we have reconstructed a model~$\boxtimes$ that is similar but different from the model~$\boxtimes_K$ based on a PCA.
-
+Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.
+Apart from the use of set theory as the metalangauge for his development, the exposure $\boxtimes_K$ is different from~$\boxtimes$ in a number of ways:
 \begin{remark} \label{re:difference-boxtimes}
-  The exposure $\boxtimes_K$ studied by Kavvos is defined for assemblies on a PCA where the carrier and the realisability relation are given by
+  For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defined by
   \[
     \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
     \quad\text{and}\quad
     b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
   \]
-  without the use of Gödel encoding.
-  It gives rise to a finite product-preserving comonadic exposure~\cite[Theorem~11]{Kavvos2017b}.
-  Preserving finite products is possible, since some computationally equivalent intensions have to be identified to satisfy equations of PCA.
-  Instead, by taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions.
-\hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
-\ltnote{better now?}
-
+  as the carrier set and its realisability relation, without the use of Gödel encoding.
+  The mapping on morphisms is similar to~$\boxtimes$.
+  First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
+  Some computationally equivalent intensions have to be identified to satisfy equations of PCA, so for example
+  $\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$ and thus $\bproj{\boxtimes \top}$ has only one element $(\star, \mathtt{I})$. 
+  Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
+  Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
+  By taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions, and thus $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved properties.
 \end{remark}
+
+\hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
+
+Artemov and Beklemishev~\cite{Artemov2005} pointed out that
+Gödel attempted to use classical \SFour modal logic to model provability for Peano arithmetic but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
+Löb lately found the well-known \GL axiom for provability and
+Solovay showed that \GL is indeed complete for~$\mathbf{PA}$.
+On the other hand, Artemov~\cite{Artemov2001} proposed \emph{logic of proofs} extending \SFour and argued that \SFour is for \emph{explicit proofs}.
+Goris~\cite{Goris2009} discussed two modalities \GL and \SFour over classical logic and provides a Kripke semantics for both.
+We took Goris' notation for \GL and \SFour modalities, $\Box$ and $\boxtimes$, respectively.
+
+\nocite{Shamkanov2014, Shamkanov2016a}
 \section{Conclusion}\label{sec:conclusion}
-In this paper we follow the inspiring work by Kavvos~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
-We have studied the $\PP$-category of assemblies on untyped $\lambda$-calculus developed and formalised in HoTT as a semantic foundation for intensionality, on which we modelled \SFour and \GL modalities.
+In this paper we follow the principle of modality-as-intension~\cite{Davies2001b} and the $\PP$-categorical semantics~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
+We have studied the $\PP$-category of assemblies on $\lambda$-calculus developed and formalised in HoTT as a semantic foundation for intensionality, on which we modelled \SFour and \GL modalities.
 Notably, our denotational semantics of the \SFour modality~$\boxtimes$ is more intensional than that of Kavvos' $\boxtimes_K$ because of \Cref{thm:S4-no-quoting} and \Cref{re:difference-boxtimes}.
 For the \GL modality~$\Box$, we have given the \emph{first} denotational semantics, which is shown~(\Cref{thm:GL-recursion}) to satisfy the deductive form of the Gödel-Löb axiom---the intensional recursion---using guarded type theory.
 
