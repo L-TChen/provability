@@ -35,21 +35,6 @@ id-∘ {X = X} {Y} {f , F , F⊩f} i = (λ x → f x) , F , λ {M} {x} r → lem
       lem : {M : Λ₀} {x : ⟨ X ⟩} (r : M X.⊩ x)
         → Path (F [ M ] Y.⊩ f x) (subst (Y._⊩ (f x)) (∘-ssubst-ssubst 0 F M ⁻¹) (F⊩f r)) (F⊩f r) 
 
-{-
-∘-ass : {A : ASM (universe-of ⟨ X ⟩)} {f : Trackable X Y} {g : Trackable Y Z} {h : Trackable Z A}
-  → (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
-∘-ass {X = X} {Y = Y} {Z = Z} {A = A} {f = f , F , F⊩f} {g , G , G⊩g} {h , H , H⊩h} i = (λ x → h (g (f x))) , ∘′-assoc H G F i ,
-  λ r → lem r i
-  where
-    module X = AsmStr (str X)
-    module Y = AsmStr (str Y)
-    module Z = AsmStr (str Z)
-    module A = AsmStr (str A)
-    lem : {M : Λ₀} {x : ⟨ X ⟩} (r : M X.⊩ x)
-      → PathP (λ i → ∘′-assoc H G F i [ M ] A.⊩ h (g (f x))) {!!} {!!} -- (H⊩h (G⊩g (F⊩f r)))
-    lem = {!!}
--}
-
 ∇_ : (X : hSet 𝓤) → Asm 𝓤
 ∇ X = X , (λ _ _ → Unit*) , record
   { ⊩-respects-↠  = λ _ _ → tt*

@@ -138,49 +138,23 @@ module _ (Q : Quoting) where
   eval-does-not-exist : Trackable {𝓤} (□ k ⊥ₐ) ⊥ₐ → ⊥*
   eval-does-not-exist e = fix (bang (e .fst))
 
-  -- Theorem: There is no natural transformation q : I ⇒ □.
-  -- Proof sketch: By naturality, qΛ is determined by its component at the terminal object ⊤ₐ. 
-  
-  quoting-does-not-exist : Cl → (q : NaturalTransformation {𝓤₀} Id □-exposure) → ⊥
-  quoting-does-not-exist k′ (fun , naturality) = quoting′-not-definable (QΛ k′ , QΛ-is-quoting k′)
+  no-quoting : (η : Trackable Λ₀ₐ (□ k Λ₀ₐ))
+    → ((M : Λ₀) → η .fst M ≡ □map₀ (Final.global-element {𝓤₀} {Λ₀ₐ} M M -↠-refl) (𝑰 , next tt* , next (lift -↠-refl)))
+    → ⊥
+  no-quoting η hyp = quoting′-not-definable
+    (Qη , Qη-is-quoting)
     where
-      -- qQ-at-Λ : (k : Cl) → Trackable Λ₀ₐ (□ k Λ₀ₐ)
-      qQ-at-Λ = λ (k : Cl) → fun k Λ₀ₐ
-      qQ-at-⊤ = λ (k : Cl) → fun k ⊤ₐ
-
-      qΛ = λ (k : Cl) → qQ-at-Λ k .fst
-      QΛ = λ (k : Cl) → HasTracker.F (qQ-at-Λ k .snd)
-     
-      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ k [ N ] -↠ ⌜ qΛ k M .fst ⌝)
-      QΛ[M] = HasTracker.F⊩f (qQ-at-Λ _ .snd) 
-
-      lem : (k : Cl) → (M : Λ₀) → qΛ k M ≡ (M , next M , _)
-      lem k M = begin
-        qΛ k M
-          ≡⟨ refl ⟩
-        qΛ k (*→Λ M .fst _)
-          ≡⟨ naturality (*→Λ M) _ ⟩
-        □map k (*→Λ M) .fst (qQ-at-⊤ k .fst tt*)
-          ≡⟨ refl ⟩
-        ↑ M [ _ ]  , next M , (λ α → s α)
-          ≡[ i ]⟨ subst-rename-∅ _ M i , next M , transport-filler (cong (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M)) s i ⟩
-        M , next M , subst (λ N → ▹ k (N -↠ M)) (subst-rename-∅ _ M) s ∎
-        where
-          open ≡-Reasoning
-          open HasTracker (*→Λ M .snd)
-          f : Unit* → ⟨ □ k ⊤ₐ ⟩
-          f = qQ-at-⊤ k .fst
-          s = ▹map F⊩f (f tt* .snd .snd)
-  
-      QΛ-is-quoting : (k : Cl)
-        → (M : Λ₀) → QΛ k [ M ] -↠ ⌜ M ⌝
-      QΛ-is-quoting k M = begin
-        QΛ k [ M ]
-          -↠⟨ lower (QΛ[M] -↠-refl) ⟩
-        ⌜ qΛ k M .fst ⌝
-        ≡[ i ]⟨ ⌜ lem k M i .fst  ⌝ ⟩
+      open -↠-Reasoning
+      Qη = η .snd .HasTracker.F
+      Qη-is-quoting : (M : Λ₀) → Qη [ M ] -↠ ⌜ M ⌝
+      Qη-is-quoting M = begin
+        Qη [ M ]
+          -↠⟨ (η .snd .HasTracker.F⊩f) -↠-refl .lower  ⟩
+        ⌜ η .fst M .fst ⌝
+        ≡⟨ cong ⌜_⌝ (cong fst (hyp M)) ⟩
+        ⌜ ↑ M [ _ ]  ⌝
+          ≡⟨ cong ⌜_⌝ (subst-rename-∅ _ M)  ⟩
         ⌜ M ⌝ ∎
-        where open -↠-Reasoning
 
   _† : Trackable (□ k X) X
      → Trackable ⊤ₐ (□ k X)

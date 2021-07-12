@@ -221,41 +221,23 @@ module _ (Q : Quoting) where
 -- 
 -- quote (a) ≠ ⌜ a ⌝
 
-  quoting′-does-not-exist : (q : NaturalTransformation 𝓤₀ Id ⊠-exposure) → ⊥
-  quoting′-does-not-exist (fun , naturality) = quoting′-not-definable (QΛ , QΛ-is-quoting)
+  no-quoting : (η : Trackable Λ₀ₐ (⊠ Λ₀ₐ))
+    → ((M : Λ₀) → η .fst M ≡ ⊠map₀ (Final.global-element {𝓤₀} {Λ₀ₐ} M M -↠-refl) (★ .fst tt*))
+    → ⊥
+  no-quoting η hyp = quoting′-not-definable
+    (Qη , Qη-is-quoting)
     where
-      qQ-at-⊤ = fun ⊤ₐ
-      q-at-Λ  = fun Λ₀ₐ
-
-      qΛ : Λ₀ → Σ[ N ∶ Λ₀ ] Σ[ M ∶ Λ₀ ] N -↠ M
-      qΛ = q-at-Λ .fst
-
-      QΛ = HasTracker.F (q-at-Λ .snd)
-
-      QΛ[M] : {N M : Λ₀} → N -↠ M → Lift (QΛ [ N ] -↠ ⌜ qΛ M .fst ⌝)
-      QΛ[M] = HasTracker.F⊩f (q-at-Λ .snd) 
-
-      lem : (M : Λ₀) → qΛ M ≡ (M , M , _)
-      lem M = begin
-        qΛ M
-          ≡⟨ naturality _ _ (*→Λ M) _ ⟩
-        (↑ M [ _ ] , M , s) 
-          ≡[ i ]⟨ subst-rename-∅ _ M i , M , transport-filler (cong (_-↠ M) (subst-rename-∅ _ M)) s i ⟩ 
-        (M , M , subst (_-↠ M) (subst-rename-∅ _ M) s) ∎
-        where
-          open ≡-Reasoning
-          open HasTracker (*→Λ M .snd)
-          s = F⊩f (snd (snd (qQ-at-⊤ .fst tt*)))
-
-      QΛ-is-quoting : (M : Λ₀) → QΛ [ M ] -↠ ⌜ M ⌝
-      QΛ-is-quoting M = begin
-        QΛ [ M ]
-          -↠⟨ lower (QΛ[M] -↠-refl) ⟩
-        ⌜ qΛ M .fst ⌝
-        ≡[ i ]⟨ ⌜ lem M i .fst  ⌝ ⟩
+      open -↠-Reasoning
+      Qη = η .snd .HasTracker.F
+      Qη-is-quoting : (M : Λ₀) → Qη [ M ] -↠ ⌜ M ⌝
+      Qη-is-quoting M = begin
+        Qη [ M ]
+          -↠⟨ (η .snd .HasTracker.F⊩f) -↠-refl .lower  ⟩
+        ⌜ η .fst M .fst ⌝
+        ≡⟨ cong ⌜_⌝ (cong fst (hyp M)) ⟩
+        ⌜ ↑ M [ _ ]  ⌝
+          ≡⟨ cong ⌜_⌝ (subst-rename-∅ _ M)  ⟩
         ⌜ M ⌝ ∎
-        where
-          open -↠-Reasoning
 
 ------------------------------------------------------------------------
 -- Projecting the intension of ⊠ X into ⊠ Λ
