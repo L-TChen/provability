@@ -737,7 +737,7 @@ This tick~$\diamond$ is needed to type Atkey and McBride's~\cite{Atkey2013b} ope
   $\mathsf{force} \defeq \lambda x.\, \Lambda \kappa.\, x[\kappa][\diamond]
   : (\forall \kappa.\, \laterp^\kappa A) \to \forall \kappa.\, A$.
 
-  Finally, every function $t : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics); this is called \emph{guarded recursion}, also known as \emph{Löb induction}:
+  Finally, every function $t : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics); this is guarded recursion, also known as Löb induction:
 \[
   \begin{minipage}{0.47\linewidth}
     \begin{prooftree}
@@ -763,7 +763,8 @@ The proof is based on the fact that tick variables cannot be exchanged in a cont
 \end{lemma}
 
 The later modality distributes over a $\Sigma$-type.
-It follows from the fact that the function from $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B\,(x[\alpha])$ to $\laterp^\kappa \left(\sm{x : A} B\,x\right)$ mapping $(x, y)$ to $\lambda (\alpha : \kappa).\, (x[\alpha], y[\alpha])$ has a quasi-inverse, which entails an equivalence between the types.
+It follows from the fact that the function from $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B\,(x[\alpha])$ to $\laterp^\kappa \left(\sm{x : A} B\,x\right)$ mapping $(x, y)$ to $\lambda (\alpha : \kappa).\, (x[\alpha], y[\alpha])$ has a quasi-inverse, which entails an equivalence between the types.%
+\hsnote{Say in preliminaries?}
 \begin{lemma}\label{lem:later-sum}
   For $A : \UU$ and $B : A \to \UU$, there is an equivalence
   \begin{equation}\label{eq:later-sum}
@@ -771,7 +772,7 @@ It follows from the fact that the function from $\sm{x : \laterp^\kappa A} \late
   \end{equation}
 \end{lemma}
 
-By univalence, guarded recursion has a particular form for $\Sigma$-types:
+Therefore guarded recursion has a particular form for $\Sigma$-types:
 \begin{corollary} \label{coro:lob-induction-sum}
   Suppose that the type $\sm{x : \laterp A} \laterp (\alpha : \kappa).\,B\,(x[\alpha]) \to \sm{x : A} B\,x$ is inhabited.
   Then $\sm{x : A} B\,x$ is inhabited.
@@ -918,23 +919,21 @@ The (\GL) axiom can be realised by a similar construction, too.
 
 \section{Related work}
 Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.
-Apart from the use of set theory as the metalangauge for his development, the exposure $\boxtimes_K$ is different from~$\boxtimes$ in a number of ways:
-\begin{remark} \label{re:difference-boxtimes}
-  For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defined by
-  \[
-    \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
-    \quad\text{and}\quad
-    b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
-  \]
-  as the carrier set and its realisability relation, without the use of Gödel encoding.
-  The mapping on morphisms is similar to~$\boxtimes$.
-  First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
-  Some computationally equivalent intensions have to be identified to satisfy equations of PCA, so for example
-  $\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$ and thus $\bproj{\boxtimes \top}$ has only one element $(\star, \mathtt{I})$. 
-  Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
-  Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
-  By taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions, and thus $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved properties.
-\end{remark}
+Apart from the use of set theory as the metalanguage for his development, the exposure $\boxtimes_K$ is different from~$\boxtimes$ in a number of ways.
+For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defined by
+\[
+\bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
+\quad\text{and}\quad
+b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
+\]
+as the carrier set and its realisability relation, without the use of Gödel encoding.
+The mapping on morphisms is similar to~$\boxtimes$.
+First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
+Some computationally equivalent intensions have to be identified to satisfy equations of PCA, so for example
+$\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$ and thus $\bproj{\boxtimes \top}$ has only one element $(\star, \mathtt{I})$. 
+Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
+Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
+By taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions, and thus $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved properties.
 
 \hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
 
@@ -950,7 +949,7 @@ We took Goris' notation for \GL and \SFour modalities, $\Box$ and $\boxtimes$, r
 \section{Conclusion}\label{sec:conclusion}
 In this paper we follow the principle of modality-as-intension~\cite{Davies2001b} and the $\PP$-categorical semantics~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on $\lambda$-calculus developed and formalised in HoTT as a semantic foundation for intensionality, on which we modelled \SFour and \GL modalities.
-Notably, our denotational semantics of the \SFour modality~$\boxtimes$ is more intensional than that of Kavvos' $\boxtimes_K$ because of \Cref{thm:S4-no-quoting} and \Cref{re:difference-boxtimes}.
+Notably, our denotational semantics of the \SFour modality~$\boxtimes$ is more intensional than that of Kavvos' $\boxtimes_K$.
 For the \GL modality~$\Box$, we have given the \emph{first} denotational semantics, which is shown~(\Cref{thm:GL-recursion}) to satisfy the deductive form of the Gödel-Löb axiom---the intensional recursion---using guarded type theory.
 
 As future work, an important issue we have not discussed yet is the connection between $\boxtimes$~and~$\Box$---for example, it is easy to construct a family of trackable maps from $\boxtimes X$ to $\Box X$ natural in $X$ by deferring the extension part of $(M, x)$ to a later stage, and Goris' bi-modal provability logic~\cite{Goris2009} suggests that there are more rules to discover.
