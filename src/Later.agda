@@ -164,3 +164,15 @@ pfixΣ f = {!!}
   → isSet' (▹[ α ∶ k ] (A α))
 ▹isSet'→isSet'▹ hyp p q r s i j α = hyp α
   (λ i → p i α) (λ i → q i α) (λ j → r j α) (λ j → s j α) i j
+
+▹x=▹y→▹x=y : (x y : ▹ k A)
+  → (x ≡ y)
+    -------------------------
+  → ▹[ α ∶ k ] x α ≡ y α
+▹x=▹y→▹x=y x y eq α i = eq i α
+
+▹x=y→▹x=▹y : (x y : ▹ k A)
+  → ▹[ α ∶ k ] x α ≡ y α
+    -------------------------
+  → x ≡ y
+▹x=y→▹x=▹y x y eq i α = eq α i
