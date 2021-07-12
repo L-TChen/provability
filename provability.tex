@@ -146,7 +146,7 @@ The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
     
     \item For $\Box X$, the extension~$x$ does not come from~$\bproj{X}$ but a different set $\laterp \bproj{X}$ whose elements denote values of~$\bproj{X}$ that are available in a next, or \emph{later}, stage.
     This set $\laterp \bproj{X}$ can be conveniently expressed in a \emph{guarded type theory}, which features Nakano's later modality~$\laterp$ and \emph{guarded recursion}~\cite{Nakano2000}.
-    By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
+    By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is only available later) and is actually impossible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
 The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually false.
 Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} did not achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
@@ -186,7 +186,7 @@ With truncation, we can obtain a classical version of existential quantification
 Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
 \emph{Sets} are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
-It is easy to check that the types we work with in this paper are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem}~\cite[Section~7.2]{hottbook} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set (which we will write as $A : \set$ for short).
+It is easy to check that the types we work with in this paper are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set (which we will write as $A : \set$ for short).
 
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
@@ -211,7 +211,6 @@ There is a function between $\lambda$-terms
 mapping any term $M$ to a closed term $\qquote{M}$ such that $\qquote{M}$ is normal and
 $M \equiv_\alpha N$ whenever $\qquote{M} \equiv_\alpha \qquote{N}$.
 Moreover there are terms $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mathtt{quote}$, $\mathtt{eval} \in \Lambda_1$ satisfying
-
 \begin{align*}
   \mathtt{ap}[\,\qquote{M}\,][\,\qquote{N}\,] & \reduce \qquote{M\,N}
                                                                 & \mathtt{subst}[\,\qquote{F}\,][\,\qquote{N}\,] & \reduce \qquote{F[N]} \\
@@ -236,7 +235,7 @@ Indeed, no term can compute the code of any arbitrary closed term.
 
 Contrary to the well-known first recursion theorem, Kleene's second recursion theorem works for \emph{code} instead of values and will be used to model the \GL modality.
 
-\begin{theorem}[Second recursion theorem] \label{thm:SRT}
+\begin{theorem}[SRT] \label{thm:SRT}
   For every $F : \Lambda_n$ there exists $M : \Lambda_n$ such that $M \reduce F\,\qquote{M}$.
 \end{theorem}
 
@@ -443,10 +442,10 @@ In addition, one can show that $\bot$ is even a \emph{strict} $\PP$-initial obje
 \begin{proposition}\label{prop:strict-initial}
   Any trackable map from some assembly $X$ to $\bot$ is a $\PP$-isomorphism. 
 \end{proposition}
-The strictness of $\bot$ follows easily from the fact that, for any type~$X$ with a function $X \to \Empty$, one can show the equivalence $\eqv{\Empty}{X}$ in HoTT.
-From the strictness of the initial object, no morphism from $\top$ to $\bot$ could exist, since $\top$ is not equivalent to $\bot$.
+%The strictness of $\bot$ follows easily from the fact that, for any type~$X$ with a function $X \to \Empty$, one can show the equivalence $\eqv{\Empty}{X}$ in HoTT.
+From the strictness of the initial object, no morphism from $\top$ to $\bot$ could exist.
 
-The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious where, perhaps surprisingly, $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier.
+The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious and, perhaps surprisingly, $X \Rightarrow Y$ has the type of \emph{merely} trackable maps as its carrier.
 %since the carrier is meant to be the type of \emph{extensions} of trackable maps.
 %With the definition of trackable maps, we may expect the $\PP$-exponential $X \Rightarrow Y$ to consist of trackable maps.
 \begin{example}[$\PP$-Exponential]
@@ -456,12 +455,12 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious where
   \end{align*}
   with $L \Vdash_{X \Rightarrow Y} (f, \star) \defeq \prd{M : \Lambda_0}{x : |X|} \left( M \Vdash_X x\right) \to \left(L\,M \Vdash_Y f\,x\right)$.
 
-  It remains to construct $r_{X\Rightarrow Y}$ and $t_{X \Rightarrow Y}$. 
+  It remains to construct $r_{X\Rightarrow Y}$ and $t_{X \Rightarrow Y}$: 
   We know that $L' \reduce L$ implies $L'\,M \reduce L\,M$, so $L'$ realises $(f, \star)$ whenever $L$ realises $(f, \star)$ and $L' \reduce L$ by $r_Y$.
   For every $(f, \star) : |X \Rightarrow Y|$, there merely exists a tracker of $f$, say $F$.
   We see that $L \defeq \left(\mathtt{\lambda x}.\,F\right)$ realises $(f, \star)$, since
   $\left(\mathtt{\lambda x}.\,F\right)\,M \onereduce F[M]$ for any $M$ and $F[M] \Vdash_Y f\,x$ whenever $M \Vdash_X x$.
-  By applying the recursion principle of the truncated type $\brck{\sm{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f) }$ to the second component of $(f, \star)$, there merely exists a realiser of $(f, \star)$, i.e.\ an inhabitant $t_{X \Rightarrow Y}$ for the right totality.
+  By applying the recursion principle of the truncated type $\brck{\sm{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f) }$ to the second component of $(f, \star)$, there merely exists a realiser of $(f, \star)$ for the right totality.
 
   The \emph{evaluation map} $(X \Rightarrow Y) \times X \xrightarrow{ev_{X, Y}} Y$ natural in $X$ and $Y$ consists of a function
   $((f, \star) , x) \mapsto f\,x$ and its tracker $(\mathtt{proj}_1\, \mathtt{x}_0)\,(\mathtt{proj}_2\, \mathtt{x}_0) : \Lambda_1$ where $\mathtt{x}_0$ is the free variable (thought of as a pair of realisers for a function and its argument) and $\mathtt{proj}_i$ the projection function between $\lambda$-terms.
@@ -476,7 +475,7 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious where
         \left(\lambda \mathtt{x}_0, F[\left< L , \mathtt{x}_0 \right>]\right)\,M \onereduce F[\left< L , M \right>]
       \]
       and that $F$ is indeed a tracker of~$f\colon \bproj{Z \times X} \to \bproj{Y}$. 
-  It is routine to verify all details as well as the universality.
+  It is routine to verify remaining details.
 \end{example}
 
 \begin{corollary}
@@ -484,10 +483,10 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious where
 \end{corollary}
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
-In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models the \SFour modality and show that a generic quoting function $X \to \boxtimes X$ cannot exist.%
+In this section, we introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling the \SFour modality and show that a generic quoting $X \to \boxtimes X$ cannot exist.%
 \hsnote{revise}
-Thereafter, we move to guarded type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
-The construction refutes not only $X \to \Box X$ by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$.
+Then, we move to guarded type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
+The construction refutes $X \to \Box X$ by the same argument for $\boxtimes$ and the reflection principle $\Box X \to X$.
 Finally, we derive the (\GL) axiom as well as its deductive form.
 
 \subsection{An exposure for the \texorpdfstring{\SFour}{S4} modality}
@@ -852,7 +851,7 @@ Similar to~\Cref{thm:S4-no-quoting}, no morphism $\Lambda_0 \to \Box^\kappa \Lam
   There is no trackable map from $\Lambda_0$ to~$\Box^\kappa \Lambda_0$ which quotes closed elements.
 \end{theorem}
 
-It is also not possible to have a family of trackable maps $\epsilon_X$ from $\Box^\kappa X$ to $X$ natural in $X$ (including its computational meaning), since the extension part of an inhabitant of $\Box^\kappa X$ can only be projected in a time step away from now.%
+It is also not possible to have a family of trackable maps $\epsilon_X$ from $\Box^\kappa X$ to $X$ natural in $X$, since the extension of $(M, x, r)$ can only be projected in a time step away from now.%
 \hsnote{Don't mention naturality?}
 \begin{theorem}\label{thm:GL-no-eval}
   There is no function from $\bproj{\Box^\kappa \bot}$ to $\bproj{\bot}$.
@@ -904,7 +903,7 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
     \item Therefore, by $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$ again, there is an inhabitant
       $(\mathsf{fix}\,F, x_0, r_0') : \bproj{\Box^\kappa X}$ where $r_0' : \laterp(\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x_0 [\alpha]$.
   \end{enumerate}
-  Evidently $(\mathsf{fix}\,F, x_0, r_0')$ is realised by $\qquote{\mathsf{fix}\,F}$, and thus by \Cref{lem:global-element} it gives rise to a global element~$f^\dagger$ of $\Box X$.
+  Clearly $(\mathsf{fix}\,F, x_0, r_0')$ is realised by $\qquote{\mathsf{fix}\,F}$, and by \Cref{lem:global-element} it gives an element~$f^\dagger$ of $\Box X$.
 
   To construct the second element~$f^\ddagger$, we follow the same steps except the third: we conclude $(x_0, r_0) : \sm{x : \bproj{X}} F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ without any delay and thus $x_0 : \bproj{X}$ is realised by $r_0' : \mathsf{fix}\,F \Vdash x_0$.
   The equation $f^\ddagger \sim f\circ \Box^\kappa(f^\ddagger) \circ \bigstar$ follows from the fixed point equation for guarded recursion. 
