@@ -657,27 +657,28 @@ On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute 
 %\hsnote{a brief recap on the `omitted congruence rule'}
 %\end{remark}
 
-\subsection{An exposure for \texorpdfstring{\GL}{GL} modality}
+\subsection{An exposure for the \texorpdfstring{\GL}{GL} modality}
 It is known that the Gödel-Löb axiom $\Box(\Box A \to A) \to \Box A$ is incompatible with the reflection principle $\Box A \to A$.
 Indeed, let $A$ be the falsity $\bot$ for both laws. Then, we have $\Box(\Box \bot \to \bot) \to \Box \bot$ and $\Box \bot \to \bot$.
 By the necessitation rule we can derive $\Box (\Box \bot \to \bot)$ and thus by modus ponens we can derive $\Box \bot$ and finally $\bot$.
 Therefore, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the Gödel-Löb axiom.
-Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood as also the type of code of type~$A$ and as intensional recursion respectively from the computational perspective~\cite{Kavvos2017b}.
+Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood as also the type of code of type~$A$ and as intensional recursion respectively from the computational perspective~\cite{Kavvos2017b}.%
+\hsnote{Why mysterious?}
 
 To untie the knot but to retain consistency and the understanding of $\Box A$ as code of type~$A$, we refine our interpretation with a notion of computation stages.
 In general, staged code is to be evaluated in a next stage while   $\boxtimes A$ is only a special case that next stages include the current one so that $\epsilon_X\colon {\boxtimes} X \to X$ is allowed.
 To express the notion of `next' stages without stage indexing, we work within guarded type theory.
-\hsnote{need a better story}
-\ltnote{use the story given in \Cref{sec:intro}}
+\hsnote{emphasise code unrolling in stages}
 
 \subsubsection{Digression: Clocked Cubical Type Theory}
-The clocked cubical type theory~\cite{Kristensen2021}, CCTT for short, is a metalanguage extending HoTT with a later modality and guarded recursion.
+Clocked cubical type theory~\cite{Kristensen2021}, CCTT for short, is a metalanguage extending HoTT with a later modality and guarded recursion.
 It combines two extensions of dependent type theory.
 The first extension is the machinery to manipulate $n$-dimensional cubes such as paths, squares, cubes, etc., allowing us to prove Voevodsky’s univalence axiom and function extensionality.
-The second extension adds a sort $\clock$ with \emph{ticks}~\cite{Bahr2017} to support Nakano's later modality~$\laterp$ and guarded recursion also known as \emph{Löb induction}.
+The second extension adds a sort $\clock$ with \emph{ticks}~\cite{Bahr2017} to support Nakano's later modality~$\laterp$ and guarded recursion, where the latter is also known as \emph{Löb induction}.
 \ltnote{can we be more informal about CCTT so that we can remove this section?}
+\hsnote{Maybe we could just do it `synthetically' or `on demand', stating/highlighting only the constructs and properties we need.}
 
-Clocks are of a different sort $\clock$ from types, so usual type formers (such as `$\to$') are not applicable.
+Clocks are of a different sort $\clock$ from types, so the usual type formers (such as `$\to$') are not applicable.
 A clock~$\kappa$ is introduced by a clock quantification~$\forall \kappa.\, A$ into a context with rules similar to those for $\Pi$-types:
 \[
   \begin{minipage}{0.47\linewidth}
@@ -697,7 +698,7 @@ A clock~$\kappa$ is introduced by a clock quantification~$\forall \kappa.\, A$ i
 For convenience, a clock constant~$\kappa_0$ is presumed in the type theory.%
 \hsnote{Just for convenience?}
 
-A new type $\laterp (\alpha : \kappa). A$ on a clock~$\kappa$ is introduced as a type of suspended computations requiring a tick~$\alpha$ to compute inhabitants of~$A$.
+A new type $\laterp (\alpha : \kappa).\, A$ is introduced as a type of suspended computations requiring a tick~$\alpha$ on a clock~$\kappa$ to compute inhabitants of~$A$.
 For convenience, $\laterp (\alpha : \kappa).\,A$ is written as $\laterp^\kappa\, A$ if the tick variable is not referred to.
 Formally, the rules for ticks are as follows:
 \[
@@ -722,7 +723,8 @@ is not typable (because $\alpha$~is wrongly used twice) but the following term i
 \[
   \Lambda \kappa.\, \lambda f.\,\lambda x.\,\lambda \alpha.\, f[\alpha]\,(x[\alpha]) : \forall \kappa.\, \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
 \]
-An inhabitant of $A$ is available in a time step given by $\mathtt{next} \defeq \Lambda \kappa.\, \lambda x.\,\lambda \alpha.\, x \colon \forall \kappa.\, A \to \laterp^\kappa A$. 
+An inhabitant of $A$ is available in a time step given by $\mathtt{next} \defeq \Lambda \kappa.\, \lambda x.\,\lambda \alpha.\, x \colon \forall \kappa.\, A \to \laterp^\kappa A$.%
+\hsnote{later type, abstraction, and application, using $\mathtt{ap}$ and $\mathtt{next}$ as examples; then stage distinction (which is good) but no injectivity of $\mathtt{next}$ (which is not good), hence the introduction of clocks; goes on to guarded recursion, and the properties needed}
 
 An inhabitant of $\laterp (\alpha : \kappa).\, A$ can tick on a different clock by a constant tick~$\diamond$ stated by 
 \begin{prooftree}
@@ -735,33 +737,33 @@ This tick~$\diamond$ is needed to type Atkey and McBride's~\cite{Atkey2013b} ope
   $\mathsf{force} \defeq \lambda x.\, \Lambda \kappa.\, x[\kappa][\diamond]
   : (\forall \kappa.\, \laterp^\kappa A) \to \forall \kappa.\, A$.
 
-  Finally, every function $t : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics), called \emph{guarded recursion} also known as \emph{Löb induction}:
+  Finally, every function $t : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics); this is called \emph{guarded recursion}, also known as \emph{Löb induction}:
 \[
   \begin{minipage}{0.47\linewidth}
     \begin{prooftree}
       \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
-      \UnaryInfC{$\Gamma \vdash \mathsf{dfix}\,t : \laterp^\kappa A$}
+      \UnaryInfC{$\Gamma \vdash \mathsf{dfix}^\kappa\,t : \laterp^\kappa A$}
     \end{prooftree}
   \end{minipage}
   \begin{minipage}{0.47\linewidth}
     \begin{prooftree}
       \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
-      \UnaryInfC{$\Gamma \vdash \mathsf{pfix}^\kappa t : \left(\mathsf{dfix}\,t[\alpha]\right) \equiv_A \left(t(\mathsf{dfix}\,t)\right)$}
+      \UnaryInfC{$\Gamma \vdash \mathsf{pfix}^\kappa\,t : (\mathsf{dfix}^\kappa\,t)[\alpha] =_A t(\mathsf{dfix}^\kappa\,t)$}
     \end{prooftree}
   \end{minipage}
 \]
-We can further derive the fixed point $t(\mathsf{dfix}\,t) : A$ without any delay.
+We can further derive the fixed point $t(\mathsf{dfix}^\kappa\,t) : A$ without any delay.
 
 We now list properties needed for~\Cref{sec:GL}.
-Being a proposition is irrelevant to ticks and clocks, so is being a set.
-The proof is based on the fact that tick variables cannot be exchanged in a context with ordinary variables but  variables of the interval~$\mathbb{I}$.
+Being a proposition is irrelevant to ticks and clocks, and so is being a set.
+The proof is based on the fact that tick variables cannot be exchanged in a context with ordinary variables but variables of the interval~$\mathbb{I}$.
 \begin{lemma}
   If $\laterp (\alpha : \kappa).\, \mathsf{isProp}\,(A [\alpha])$ is inhabited, then so is $\mathsf{isProp}\,(\laterp(\alpha: \kappa).\, A [\alpha])$. 
-  Similarly, if $\laterp (\alpha : \kappa).\, \mathsf{isSet}\,(A [\alpha])$ is inhabited, then so is $\mathsf{isSet}\,\laterp(\alpha: \kappa).\, A [\alpha]$. 
+  Similarly, if $\laterp (\alpha : \kappa).\, \mathsf{isSet}\,(A [\alpha])$ is inhabited, then so is $\mathsf{isSet}\,(\laterp(\alpha: \kappa).\, A [\alpha])$. 
 \end{lemma}
 
 The later modality distributes over a $\Sigma$-type.
-It follows from that the function from $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B\,(x[\alpha])$ to $\laterp^\kappa \left(\sm{x : A} B\,x\right)$ mapping $(x, y)$ to $\lambda (\alpha : \kappa).\, (x[\alpha], y[\alpha])$ has a quasi-inverse which entails equivalence between types.
+It follows from the fact that the function from $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B\,(x[\alpha])$ to $\laterp^\kappa \left(\sm{x : A} B\,x\right)$ mapping $(x, y)$ to $\lambda (\alpha : \kappa).\, (x[\alpha], y[\alpha])$ has a quasi-inverse, which entails an equivalence between the types.
 \begin{lemma}\label{lem:later-sum}
   For $A : \UU$ and $B : A \to \UU$, there is an equivalence
   \begin{equation}\label{eq:later-sum}
@@ -775,22 +777,28 @@ By univalence, guarded recursion has a particular form for $\Sigma$-types:
   Then $\sm{x : A} B\,x$ is inhabited.
 \end{corollary}
 
-The $\mathtt{force}$ operator is an inverse of~$\mathtt{next}$ in the following sense:
+The $\mathtt{force}$ operator is an inverse of~$\mathtt{next}$ in the following sense:%
+\hsnote{Purely for proving the proposition below? (No other use of $\mathtt{force}$?)}
 \begin{lemma}
   Let $x$ be an inhabitant of $\forall \kappa.\, A$. Then, 
   $\mathtt{force}\,(\lambda \kappa.\,\lambda (\alpha : \kappa).\, x [\kappa])\,\kappa = x\,\kappa$ is inhabited for any clock $\kappa$.
 \end{lemma}
 
 It follows that a path between two inhabitants $\mathtt{next}\,x_i$ in a time step gives rise to a path now.
-In other words, paths are timeless.
+In other words, paths are timeless.%
+\hsnote{What's the role of this proposition?}
 \begin{proposition}\label{lem:later-identity}
   Let $x$ and $y$ be inhabitants of $A$. Then, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right)$ implies $x_1 = x_2$.
 \end{proposition}
 Be aware of the scope of clock quantification.
 The above proposition cannot hold within the same clock, that is, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2 \to x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
-In order to formulate the faithfulness of an exposure, the definition is adapted with a clock variable accordingly.
+
+\subsubsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
+
+In order to formulate the faithfulness of an exposure, the definition is adapted with a clock variable accordingly.%
+\hsnote{revise}
 \begin{definition}[Clocked exposure]
-  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ and \emph{(b)} for each clock $\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
+  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ and \emph{(b)} for each clock~$\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
   \begin{romanenumerate}
     \item $Q^\kappa \iid_X \sim \iid_{QX}$,
     \item $Q^\kappa (g \circ f) \sim Q^\kappa g \circ Q^\kappa f$, and
@@ -799,8 +807,6 @@ In order to formulate the faithfulness of an exposure, the definition is adapted
 \end{definition}
 \Cref{thm:GL-exposure} gives an example of clocked exposure.
 
-\subsubsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
-
 Now we introduce the clocked exposure $\Box^\kappa \colon \Asm(\Lambda) \to \Asm(\Lambda)$ modelling the \GL modality. 
 For an assembly $X$, the carrier $\bproj{\Box^\kappa X}$ and its realisability relation $\Vdash_{\Box^\kappa}$ are defined as
 \[
@@ -808,20 +814,21 @@ For an assembly $X$, the carrier $\bproj{\Box^\kappa X}$ and its realisability r
   \quad\text{and}\quad
   \left(N \Vdash_{\Box^\kappa X} (M, x, \star) \right) \defeq N \reduce \qquote{M}
 \]
-where $\Vdash_{\Box^\kappa X}$ is defined as the same as the exposure~$\boxtimes$.
-The only difference between carriers $\bproj{\Box^\kappa X}$ and $\bproj{\boxtimes X}$ is that the type $\bproj{X}$ as what the intension denotes becomes $\laterp^\kappa \bproj{X}$.
-That is, the extension $x$ is available in a next stage but not earlier (within the clock $\kappa$), but the intension $M$ remains the same type.
+where $\Vdash_{\Box^\kappa X}$ is defined in the same way as the exposure~$\boxtimes$.
+The main difference between the carriers $\bproj{\boxtimes X}$ and $\bproj{\Box^\kappa X}$ is that the extension part $\bproj{X}$ becomes $\laterp^\kappa \bproj{X}$.
+That is, the extension $x$ is available in a next stage but not earlier (with respect to the clock~$\kappa$), but the intension $M$ remains the same type.
 Similarly, $\Box^\kappa X \defeq (\bproj{\Box^\kappa X}, \Vdash_{\Box^\kappa X}, r_{\Box^\kappa X}, t_{\Box^\kappa X})$ is an assembly where $r_{\Box^\kappa X}$ and $t_{\Box^\kappa X}$ are given by the transitivity and the reflexivity of $\reduce$. 
 
 %\begin{notation*}
 %  To avoid clumsy notations, the superscript of $\Box^\kappa$ is suppressed when appropriate.
 %\end{notation*}
 
-For any trackable map $f$ from $X$ to $Y$, also define $\Box^\kappa f$ as the same as $\boxtimes f$ except that a later modality is involved: 
+For any trackable map $f$ from $X$ to $Y$, also define $\Box^\kappa f$ in the same way as $\boxtimes f$ except that a later modality is involved: 
 \[
   \bproj{\Box^\kappa f}(M, x, r) \defeq (F[M], \laterp^\kappa \bproj{f}\, x, \lambda \alpha.\, \mathfrak{f}\,M\,(x[\alpha])\,(r[\alpha]))
 \]
-where $(\laterp^\kappa f\, x)[\alpha]$ is judgementally equal to $f(x[\alpha])$, and $\laterp^\kappa \bproj{f} : \laterp^\kappa \bproj{X} \to \laterp^\kappa \bproj{Y}$ is given by the functoriality of the later modality~$\mathord{\laterp}^\kappa$.
+where $\laterp^\kappa \bproj{f} : \laterp^\kappa \bproj{X} \to \laterp^\kappa \bproj{Y}$ is given by the functoriality of the later modality~$\mathord{\laterp}^\kappa$.
+%with $(\laterp^\kappa \bproj{f}\, x)[\alpha]$ being judgementally equal to $|f|(x[\alpha])$.
 The very same argument for $\boxtimes f$ shows that $\Box^\kappa f$ is indeed a trackable map from $\bproj{\Box^\kappa X}$ to $\bproj{\Box^\kappa Y}$.
 
 \begin{remark*}
@@ -837,42 +844,38 @@ It is straightforward to show that $\Box^\kappa$ is a clocked exposure by \Cref{
 
 \begin{proposition}
 There is a family of trackable maps
-from $\boxtimes^\kappa (X \Rightarrow Y)$ to $\boxtimes^\kappa X \Rightarrow \boxtimes^\kappa Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1] \cdot x_0$.
+from $\boxtimes^\kappa (X \Rightarrow Y)$ to $\boxtimes^\kappa X \Rightarrow \boxtimes^\kappa Y$  tracked by $\lambda \mathtt{x}_0.\, \mathtt{ap}[\mathtt{x}_1] \, \mathtt{x}_0$.
 \end{proposition}
 
-Similar to~\Cref{thm:S4-no-quoting}, by the non-existence of a term $\mathtt{Q}$ with $\mathtt{Q}\,M \reduce \qquote{M}$ for any arbitrary term $M$, the rule $A \to \Box A$ cannot be given any computational meaning:
+Similar to~\Cref{thm:S4-no-quoting}, the computational meaning of $A \to \Box^\kappa A$ cannot be quoting.
 \begin{theorem}\label{thm:GL-no-quoting}
-  There is no trackable map from $\Lambda$ to~$\Box \Lambda$ which quotes closed elements.
+  There is no trackable map from $\Lambda_0$ to~$\Box^\kappa \Lambda_0$ which quotes closed elements.
 \end{theorem}
 
-It is also not possible to have a family of trackable maps $\epsilon_X$ from $\Box^\kappa X$ to $X$ natural in $X$ (including its computational meaning), since the extension part of an inhabitant of $\Box^\kappa X$ can only be projected in a time step away from now.
+It is also not possible to have a family of trackable maps $\epsilon_X$ from $\Box^\kappa X$ to $X$ natural in $X$ (including its computational meaning), since the extension part of an inhabitant of $\Box^\kappa X$ can only be projected in a time step away from now.%
+\hsnote{Don't mention naturality?}
 \begin{theorem}\label{thm:GL-no-eval}
   There is no function from $\bproj{\Box^\kappa \bot}$ to $\bproj{\bot}$.
   In particular, there is no natural transformation from $\Box^\kappa$ to $\mathcal{I}$ for any $\kappa$.
 \end{theorem}
 \begin{proof}
   Assume $\epsilon_\bot \colon \bproj{\Box^\kappa \bot} \to \bproj{\bot}$ exists. 
-  We will show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by guarded recursion a contradiction $\mathsf{fix}\,\mathsf{bang} : \Empty$ is derivable.
-  
-  First, let $x$ be an inhabitant of $\laterp \Empty$. We construct an inhabitant $(M, x, r)$ of $\Box^\kappa \bot$
+  We show that there is $\mathsf{bang}\colon \laterp \Empty \to \Empty$, so by guarded recursion a contradiction $\mathsf{fix}\,\mathsf{bang} : \Empty$ is derivable.
+  Let $x$~be an inhabitant of $\laterp \Empty$. We construct an inhabitant $(M, x, r)$ of $\Box^\kappa \bot$
 %  \[
 %    \Box^\kappa \bot \equiv \sm{M : \Lambda_0}{x : {\laterp \Empty}} \laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]
 %  \]
   so that the function $\bproj{\epsilon_\bot}$ from $\bproj{\Box^\kappa \bot}$ to $\bproj{\bot} \equiv \Empty$ can be applied.
-  For arbitrary closed term $M$, say $\mathtt{\lambda x.\, x}$, we apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ after a time step, so 
-  \[
-    r \defeq \lambda \alpha.\, \mathsf{rec}_{\Empty}\,(M \Vdash_\bot x[\alpha])\,x[\alpha]
-  \]
-  is an inhabitant of $\laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]$ and thus $(M, x, r)$ is of type $\bproj{\Box^\kappa \bot}$. 
+  Choose an arbitrary closed term~$M$, say $\mathtt{\lambda x.\, x}$, and apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ in a time step to get $r \defeq \lambda \alpha.\, \mathsf{rec}_{\Empty}\,(M \Vdash_\bot x[\alpha])\,x[\alpha]$, which is an inhabitant of $\laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]$, so $(M, x, r)$ is of type $\bproj{\Box^\kappa \bot}$. 
 \end{proof}
 
 The pay-off for disallowing evaluation is to be able to derive intensional recursion, which is logically the deductive form(s) of the Gödel-Löb axiom, as well as the (\GL) axiom.
 
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
-  For every function $\bproj{f} \colon \bproj{\Box^\kappa X} \to \bproj{X}$ tracked by some $F : \Lambda_1$, there are
+  For every trackable map $f \colon \Box^\kappa X \to X$, there are
   \begin{enumerate}
     \item an element~$f^\dagger$ of $\Box^\kappa X$ tracked by $\qquote{\mathsf{fix}\,F}$, and
-    \item an element~$f^\ddagger$ of $X$ tracked by~$\mathsf{fix}\,F$ with $f^\ddagger \sim f \circ \Box^\kappa f^\ddagger \circ \bigstar$.
+    \item an element~$f^\ddagger$ of $X$ tracked by~$\mathsf{fix}\,F$ with $f^\ddagger \sim f \circ \Box^\kappa f^\ddagger \circ \bigstar$
   \end{enumerate}
   where $\mathsf{fix}\,F : \Lambda_0$ satisfies $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
 \end{theorem}
@@ -891,7 +894,7 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
   \begin{enumerate}
     \item First,
       $\laterp(\alpha : \kappa).\left( \mathsf{fix}\,F \Vdash x [\alpha]\right)$ has an inhabitant, say $r'$, since $\mathsf{fix}\,F$ reduces to $F[\,\qquote{\mathsf{fix}\,F}\,]$. 
-    \item Then, we derive an inhabitant of type $\bproj{X}$ realised by~$F[\qquote{\mathsf{fix}\,F}$ as witnessed by
+    \item Then, we derive an inhabitant of type $\bproj{X}$ realised by~$F[\,\qquote{\mathsf{fix}\,F}\,]$ as witnessed by
       \[
         \mathfrak{f} (\refl_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
       \]
@@ -901,9 +904,9 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
     \item Therefore, by $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$ again, there is an inhabitant
       $(\mathsf{fix}\,F, x_0, r_0') : \bproj{\Box^\kappa X}$ where $r_0' : \laterp(\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x_0 [\alpha]$.
   \end{enumerate}
-  Evidently $(\mathsf{fix}\,F, x_0, r_0')$ is realised by $\qquote{\mathsf{fix}\,F}$ and thus by \Cref{lem:global-element} it gives rise to a global element~$f^\dagger$ of $\Box X$, concluding our proof.
+  Evidently $(\mathsf{fix}\,F, x_0, r_0')$ is realised by $\qquote{\mathsf{fix}\,F}$, and thus by \Cref{lem:global-element} it gives rise to a global element~$f^\dagger$ of $\Box X$.
 
-  To construct the second element~$f^\ddagger$, we follow the same steps but the third: we conclude $(x_0, r_0) : \sm{x : \bproj{X}} F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ without any delay and thus $x_0 : \bproj{X}$ is realised by $r_0' : \mathsf{fix}\,F \Vdash x_0$.
+  To construct the second element~$f^\ddagger$, we follow the same steps except the third: we conclude $(x_0, r_0) : \sm{x : \bproj{X}} F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ without any delay and thus $x_0 : \bproj{X}$ is realised by $r_0' : \mathsf{fix}\,F \Vdash x_0$.
   The equation $f^\ddagger \sim f\circ \Box^\kappa(f^\ddagger) \circ \bigstar$ follows from the fixed point equation for guarded recursion. 
 \end{proof}
 
