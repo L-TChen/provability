@@ -126,7 +126,7 @@ Recently, Kavvos proposed \emph{intensional recursion}~\cite{Kavvos2017a} for $\
 Logically, intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability', and computationally its behaviour mirrors Kleene's second recursion theorem.
 In contrast to general recursion $(A \to A) \to A$, which constructs a value recursively from its value (extension), intensional recursion alone does not lead to logical inconsistency.
 Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}$ viewed as both \SFour~and~\GL modalities.
-Unfortunately, when $\mathtt{Code}$ is designed in this way, a contradiction is derivable, making it impossible to treat the type system as a logical foundation.
+Unfortunately, when $\mathtt{Code}$ is designed in this way, the type system is inconsistent so that it cannot be treated as a logical foundation.
 
 To make \SFour and \GL coexist in a single system while maintaining logical consistency, our approach is to keep the two modalities $\boxtimes$~and~$\Box$ separate.
 Intuitively, while both modalities model code and appear similar, there are crucial differences:
