@@ -104,8 +104,7 @@ Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
 Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
 For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `next' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
-Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence and the completeness principle $A \to \Box A$ in provability logic as well as $A \to \boxtimes A$.
-That is, in our model, two extensionally equal terms may not be intensionally equal, and there is no internal quoting operation.
+Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the internal quoting $A \to \Box A$ as well as $A \to \boxtimes A$.
 Our results are developed in (guarded) homotopy type theory and formalised in Agda.
 \end{abstract}
 
@@ -139,7 +138,7 @@ To distinguish between intensions and extensions, we build upon the previous wor
 We revisit elements of realisability and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
 Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term (the existence of such an intension is merely a property that the extension should hold), while trackable maps are pairs of a function and one of its intensions, and can be equipped with both extensional and intensional equalities (taking only the function part or both parts into account).
 The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$ whose associated intensions are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$ of~$M$.
-The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from having any computational meaning uniformly, that is, there is no generic internal quoting.
+The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from having a generic internal quoting.
 The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
 \begin{itemize}
     \item For $\boxtimes X$, the extension part~$x$ in $(M, x)$ coincides with the values of the set~$\bproj{X}$.
@@ -150,7 +149,7 @@ The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
     By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is available later rather than now) and is, in fact, not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
 The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually false.
-Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} fails to achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
+Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} did not achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
 
 We use homotopy type theory (HoTT)~\cite{hottbook} as our metalanguage, although this is mainly for convenience.
 More specifically, our work is built upon the reformulated set theory and logic within HoTT, which enable us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence (for example, within HoTT we can easily distinguish between `pairs of an extension and an intension' and `extensions associated with at least an intension').
@@ -485,11 +484,10 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious where
 \end{corollary}
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
-In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models the \SFour modality. 
-We show that $X \to \boxtimes X$ cannot have any computational meaning for arbitrary~$X$, understood as a generic quoting function.%
+In this section, we first introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ which models the \SFour modality and show that a generic quoting function $X \to \boxtimes X$ cannot exist.%
 \hsnote{revise}
 Thereafter, we move to guarded type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
-The construction refutes not only the completeness principle $X \to \Box X$ by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$.
+The construction refutes not only $X \to \Box X$ by the same argument for $\boxtimes$ but also the reflection principle $\Box X \to X$.
 Finally, we derive the (\GL) axiom as well as its deductive form.
 
 \subsection{An exposure for the \texorpdfstring{\SFour}{S4} modality}
@@ -605,7 +603,7 @@ There is a family of trackable maps
 from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1]\; x_0$.
 \end{proposition}
 
-On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute quotations, since this is already impossible for the particular case of $\Lambda_0 \to {\boxtimes} \Lambda_0$.
+On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute quotations for arbitrary~$A$, since this is already impossible for the particular case of $\Lambda_0 \to {\boxtimes} \Lambda_0$.
 %The key is the following lemma which relies on~\Cref{prop:no-quoting}.
 
 %\begin{lemma}\label{lem:no-quoting}
@@ -656,6 +654,8 @@ On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute 
 %Following \Cref{thm:S4-exposure,thm:S4-no-quoting}, we anticipate an interpretation of $\Box$ to justify the `omitted congruence rule' for the $\mathtt{box}$ construct~\cite[Section~2.5]{Davies2001b} and the absence of quoting function $A \to \Box A$ in their system.
 %\hsnote{a brief recap on the `omitted congruence rule'}
 %\end{remark}
+As the choice of $\bigstar$ does not matter for closed elements~$a$, the above theorem shows that a very limited form of naturality for any two morphisms $\eta_{\Lambda_0}$ and $\eta_\top$ satisfying $\eta_{\Lambda_0} \circ a \sim \boxtimes{a} \circ \eta_{\top}$ for any closed~$a$ remains impossible. 
+It is not clear how to state `parametricity' for~$\boxtimes$ so that any family of morphisms from $A$ to $\boxtimes A$, satisfying a reasonable naturality, can be rejected. 
 
 \subsection{An exposure for the \texorpdfstring{\GL}{GL} modality}
 It is known that the Gödel-Löb axiom $\Box(\Box A \to A) \to \Box A$ is incompatible with the reflection principle $\Box A \to A$.
@@ -847,7 +847,7 @@ There is a family of trackable maps
 from $\boxtimes^\kappa (X \Rightarrow Y)$ to $\boxtimes^\kappa X \Rightarrow \boxtimes^\kappa Y$  tracked by $\lambda \mathtt{x}_0.\, \mathtt{ap}[\mathtt{x}_1] \, \mathtt{x}_0$.
 \end{proposition}
 
-Similar to~\Cref{thm:S4-no-quoting}, the computational meaning of $A \to \Box^\kappa A$ cannot be quoting.
+Similar to~\Cref{thm:S4-no-quoting}, no morphism $\Lambda_0 \to \Box^\kappa \Lambda_0$ can be quoting.
 \begin{theorem}\label{thm:GL-no-quoting}
   There is no trackable map from $\Lambda_0$ to~$\Box^\kappa \Lambda_0$ which quotes closed elements.
 \end{theorem}
@@ -937,12 +937,13 @@ By taking $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qqu
 
 Artemov and Beklemishev~\cite{Artemov2005} pointed out that
 Gödel attempted to use classical \SFour modal logic to model provability for Peano Arithmetic ($\mathbf{PA}$) but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
-Löb lately found the well-known \GL axiom for provability and
+Löb found the well-known \GL axiom for provability and
 Solovay showed that \GL is complete for~$\mathbf{PA}$.
 On the other hand, Artemov~\cite{Artemov2001} proposed \emph{logic of proofs} extending \SFour and argued that \SFour is for \emph{explicit proofs}.
 Goris~\cite{Goris2009} discussed two modalities \GL and \SFour over classical logic and provides a Kripke semantics for both.
 We took Goris' notation for the \SFour modality $\boxtimes$.
-Our work is also partly inspired by Shamkanov's~\cite{Shamkanov2014, Shamkanov2016a} provability semantics for \GL using circular proofs.
+Our work is partly inspired by Shamkanov's~\cite{Shamkanov2014, Shamkanov2016a} provability semantics for \GL using circular proofs.
+
 \section{Conclusion}\label{sec:conclusion}
 In this paper we follow the principle of modality-as-intension~\cite{Davies2001b} and the $\PP$-categorical semantics~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on $\lambda$-calculus developed and formalised in HoTT as a semantic foundation for intensionality, on which we modelled \SFour and \GL modalities.
