@@ -122,11 +122,11 @@ More specifically, the (\textbf{4}) axiom $\boxtimes A \to {\boxtimes} {\boxtime
 the (\textbf{T}) axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
 For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
 
-Recently, Kavvos proposed a `new' construct called \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ that is used to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
-Logically, intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability' in provability modal logic, and computationally, its behaviour mirrors Kleene's second recursion theorem.
+Recently, Kavvos proposed \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
+Logically, intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability', and computationally its behaviour mirrors Kleene's second recursion theorem.
 In contrast to general recursion $(A \to A) \to A$, which constructs a value recursively from its value (extension), intensional recursion alone does not lead to logical inconsistency.
 Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}$ viewed as both \SFour~and~\GL modalities.
-Unfortunately, when $\mathtt{Code}$ is designed in this way, a contradiction is derivable, making it impossible to treat the type system as a logical foundation.
+Unfortunately, when $\mathtt{Code}$ is designed in this way, a contradiction is derivable, making it impossible to treat it as a logical foundation.
 
 To make \SFour and \GL coexist in a single system while maintaining logical consistency, our approach is to keep the two modalities $\boxtimes$~and~$\Box$ separate.
 Intuitively, while both modalities model code and appear similar, there are crucial differences:
@@ -135,9 +135,9 @@ On the other hand, a program constructed with \GL can recursively refer to its o
 
 To illuminate the difference, we present in this paper a denotational semantics of two types of code---a type $\boxtimes A$ of code that can be evaluated in the current stage and a type $\Box A$ of code to be evaluated in a next stage.
 To distinguish between intensions and extensions, we build upon the previous work using $\PP$-categories~\cite{Cubric1998a,Kavvos2017b}, which have an additional partial equivalence relation on morphisms that models extensional equality, while the underlying equality on morphisms models intensional equality.
-We revisit elements of realisability and construct a $\PP$-category of assemblies on $\lambda$-calculus and trackable maps.
-Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term (the existence of such an intension is merely a property that the extension should hold), while trackable maps are pairs of a function and one of its intensions, and can be equipped with both extensional and intensional equalities (taking only the function part or both parts into account).
-The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$ whose associated intensions are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$ of~$M$.
+We revisit elements of realisability and construct a $\PP$-category of assemblies on $\lambda$-calculus.
+Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term (the existence of such an intension is merely a property that the extension hold), while trackable maps are pairs of a function and one of its intensions, and can be equipped with both extensional and intensional equalities (taking only the function part or both parts into account).
+The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$ whose associated intensions are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$.
 The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from having a generic internal quoting.
 The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
 \begin{itemize}
@@ -145,8 +145,8 @@ The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
     We can then validate the \SFour axioms, for example $\boxtimes X \to X$ (natural in~$X$) by just projection.
     
     \item For $\Box X$, the extension~$x$ does not come from~$\bproj{X}$ but a different set $\laterp \bproj{X}$ whose elements denote values of~$\bproj{X}$ that are available in a next, or \emph{later}, stage.
-    This set $\laterp \bproj{X}$ can be conveniently expressed in a \emph{guarded type theory}, which features Nakano's later modality~$\laterp$ and \emph{guarded recursion}~\cite{Nakano2000}.
-    By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because the value~$x$ from $(M, x)$ is only available later) and is actually impossible; also intensional recursion can be modelled by guarded recursion.
+    This set $\laterp \bproj{X}$ can be expressed directly in a \emph{guarded type theory} which features Nakano's later modality~$\laterp$ and \emph{guarded recursion}~\cite{Nakano2000}.
+    By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because~$x$ from $(M, x)$ is available later rather than now) and is actually not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
 The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually false.
 Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} did not achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
@@ -159,26 +159,25 @@ Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also suppor
 %\paragraph*{Contributions}
 
 \paragraph*{Plan of the paper}
-After recalling preliminaries on homotopy type theory, untyped $\lambda$-calculus, and $\PP$-categories in \Cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\Cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\Cref{sec:provability}, and conclude with related and future work in~\Cref{sec:conclusion}.
+After recalling preliminaries on homotopy type theory, untyped $\lambda$-calculus, and $\PP$-categories in \Cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\Cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\Cref{sec:provability}, and discuss related work in \Cref{sec:related-work} and future work in~\Cref{sec:conclusion}.
 
 \section{Preliminaries}\label{sec:preliminaries}
-
-Most, if not all, of the materials in this section are standard, so we do not go into details but only recall what we need.
+Most, if not all, of the materials in this section are standard, so we do not go into details.
 
 \subsection{Homotopy type theory}
-
 In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $x =_A y$ of proofs that $x$~and~$y$ are equal; given an equality proof $p : x =_A y$, any $z : B(x)$ can be converted to $\mathsf{transport}(p, z) : B(y)$.
 Between equality proofs $p$, $q : x =_A y$ there is again a higher-dimensional equality type $p =_{x\,{=_A}\,y} q$, and so on.
 Homotopy type theory (HoTT) identifies this infinite-dimensional structure of equality types as an abstract form of homotopy theory, where types are interpreted as spaces and equality proofs as paths; in particular, equality types are path spaces, and paths between paths are homotopies.
 We do not make use of the full generality of HoTT, however, and work exclusively with \emph{propositions} and \emph{sets}, whose equality structure degenerates at higher dimensions.
 
-A \emph{proposition}~$P$ is a type whose equality types (types $x =_P y$ where $x$,~$y : P$) are all inhabited---that is, all inhabitants of~$P$ are deemed equal, so all we care about~$P$ is whether it is inhabited, not its specific inhabitants, and we will simply write~$\star$ when referring to an inhabitant of any proposition.
+A \emph{proposition}~$P$ is a type whose equality types $x =_P y$, for $x$ and $y : P$, are all inhabited---all inhabitants of~$P$ are deemed equal, so all we care about~$P$ is whether it is inhabited, not its specific inhabitants.
+Hence, we will simply write~$\star$ when referring to an inhabitant of any proposition.
 If $P$~and~$Q$ are propositions, then their product $P \times Q$ is also a proposition.
 Similarly, if a family $R(x)$ of types indexed by $x : A$ (where $A$~is any type) are all propositions, then the product $\prd{x : A} R(x)$ is also a proposition.
 Logically these give us conjunction and universal quantification; therefore we sometimes write $\fall{x : A} R(x)$ in place of $\prd{x : A} R(x)$.
 Function types $A \to P$ are a special case of~$\prod$, so we have implication too.
 On the other hand, the disjoint sums $P + Q$ and $\sm{x : A} R(x)$ are usually not propositions.
-This reflects the fact that they are constructive versions of disjunction and existential quantification.
+This reflects the fact that they are constructive disjunction and existential quantification.
 In particular, from a proof of $\sm{x : A} R(x)$ we can project a witness $x : A$ and a proof of $R(x)$.
 
 For any type~$A$, the \emph{propositional truncation} of~$A$ is a type~$\brck A$ for which there is an introduction rule that wraps any $a : A$ into $\bproj{a} : \brck A$, and a higher one that introduces an inhabitant of $\bproj{a} =_{\brck A} \bproj{b}$ for any $a$,~$b : A$, equating all inhabitants of~$\brck A$ and making~$\brck A$ a proposition; its recursion principle maps $\brck A$ to a proposition~$P$ provided that $A \to P$.
@@ -193,7 +192,8 @@ It is easy to check that the types we work with in this paper are sets: types co
 
 \subsection{\texorpdfstring{$\lambda$}{λ}-calculus, Gödel encoding, and the second recursion theorem}\label{sec:lambda}
 
-For $\lambda$-calculus we only fix notations, and the details are left to, for example, the classic textbook by Barendregt~\cite{Barendregt1984a}.
+For $\lambda$-calculus we only fix notations.
+The details are left to, for example, the classic textbook by Barendregt~\cite{Barendregt1984a}.
 Terms are defined informally by
 \[
   M \defeq \mathtt{x} \mid M\,N \mid \lambda \mathtt{x}.\, M
@@ -201,16 +201,14 @@ Terms are defined informally by
 where variables $\mathtt{x}$'s are in the typewriter font.
 $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms with at most $n$ free variables.
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
-Our formalisation uses the de Bruijn representation, where $\alpha$-equivalent terms are identified, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction.
+Our formalisation uses the de Bruijn representation, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction.
 For the presentation in this paper, the variable with index~$i$ is written $\mathtt{x}_i$\,, and given $F : \Lambda_{n+1}$ we write $F[M]$ instead of $F[M/\mathtt{x}_0]$ for the substitution for the first free variable~$\mathtt{x}_0$.
 The type~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$; as a special case, the type $M \reduce M$ has exactly one inhabitant $\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$, which can be understood as either the empty sequence or (the proof of) the reflexivity of reduction.
 The types $\Lambda$ and $M \reduce N$ have decidable equality, so they are sets by Hedberg's theorem.
 
-There is a function between $\lambda$-terms
-  $\qquote{\cdot} : \Lambda \to \Lambda_0$
-mapping any term $M$ to a closed term $\qquote{M}$ such that $\qquote{M}$ is normal and
+There is a function between $\lambda$-terms $\qquote{\cdot} : \Lambda \to \Lambda_0$ such that $\qquote{M}$ is normal and
 $M \equiv_\alpha N$ whenever $\qquote{M} \equiv_\alpha \qquote{N}$.
-Moreover there are terms $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mathtt{quote}$, $\mathtt{eval} \in \Lambda_1$ satisfying
+Moreover, there are $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mathtt{quote}$, $\mathtt{eval} \in \Lambda_1$ satisfying
 \begin{align*}
   \mathtt{ap}[\,\qquote{M}\,][\,\qquote{N}\,] & \reduce \qquote{M\,N}
                                                                 & \mathtt{subst}[\,\qquote{F}\,][\,\qquote{N}\,] & \reduce \qquote{F[N]} \\
@@ -218,11 +216,11 @@ Moreover there are terms $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mat
                                                      & \mathtt{eval}[\,\qquote{M}\,] & \reduce M.
 \end{align*}
 This function $\qquote{\cdot}$ is called a \emph{Gödel encoding}.
-Traditionally, a quoted term $\qquote{M}$ is called a Gödel \emph{number} since the encoding function $\qquote{\cdot}$ is defined by assigning to every term~$M$ a natural number $\#M$ represented as a Church numeral $\mathbf{c}_{\#M}$.
-An encoding does not have to be a number at all, however, so we simply call $\qquote{M}$ a \emph{code} of~$M$ rather than a number.
+Traditionally, a quoted term $\qquote{M}$ is called a Gödel \emph{number} since the encoding $\qquote{\cdot}$ assigns to every term~$M$ a Church numeral $\mathbf{c}_{\#M}$.
+An encoding needs not be a number at all, however, so we simply call $\qquote{M}$ a \emph{code} of~$M$ rather than a number.
 For details on the axiomatic characterisation of encoding, see Polonsky~\cite{Polonsky2011}.
 
-Note that the term $\mathtt{quote}$ can only compute the code of a term $\qquote{M}$ already in a quoted form.
+Note that the term $\mathtt{quote}$ can only compute the code of a term $\qquote{M}$ which is already in quoted form.
 Indeed, no term can compute the code of any arbitrary closed term.
 \begin{proposition}\label{prop:no-quoting}
   There is no $\mathtt{Q} : \Lambda_1$ such that $\mathtt{Q}[M] \reduce \qquote{M}$ for all $M : \Lambda_0$.
@@ -394,7 +392,6 @@ We define the partial equivalence relation $\sim$, referred to as the extensiona
 \end{proposition}
 
 We now investigate some of its basic properties.
-
 \begin{example}[$\PP$-Terminal object]
   The unit $\top \defeq (\Unit, \Vdash_\top, r_\top, t_\top)$ is $\PP$-terminal where 
   \begin{romanenumerate}
@@ -408,8 +405,8 @@ We now investigate some of its basic properties.
 The construction of binary $\PP$-products is also typical---the carrier of a product is the cartesian product and a pair $(x, y)$ is realised by $M$ if its Church-encoded projections realise $x$ and $y$.
 It follows that $\Asm(\Lambda)$ has finite $\PP$-products.
 
-Every inhabitant of (the carrier of) an assembly $X$ corresponds to a merely trackable map from $\top$ to $X$, and distinct merely trackable maps can be separated by (global) elements of~$X$, which are morphisms to $X$ from the terminal object~$\top$.
-In $\Asm(\Lambda)$, where trackers are part of trackable maps, a ($\PP$-)element has to be constructed with an intension.
+Every inhabitant of an assembly $X$ corresponds to a merely trackable map to $X$ from the terminal object $\top$, which are called \emph{(global) elements} of~$X$, and distinct merely trackable maps can be separated by elements of~$X$.
+In $\Asm(\Lambda)$, as trackers are part of trackable maps, an element has to be constructed with an intension.
 \begin{lemma}\label{lem:global-element}
   Let $X$ be an assembly. Then the following statements hold:
   \begin{enumerate}
@@ -419,7 +416,7 @@ In $\Asm(\Lambda)$, where trackers are part of trackable maps, a ($\PP$-)element
 \end{lemma}
 
 As expected, the $\PP$-terminal object $\top$ in~$\Asm(\Lambda)$ is a $\PP$-separator in the sense that for any two trackable maps $f_1$ and $f_2$ we have $f_1 \sim f_2$ if $f_1 \circ x \sim f_2 \circ x$ for every element~$x$ of~$X$.
-Even further, we can restrict to closed elements as given by~\Cref{lem:global-element}.
+Even further, we can restrict to closed elements.
 %This restriction relies on the property that the carrier $\bproj{X}$ is a set.
 \begin{proposition}
   Two trackable maps $f_1, f_2\colon X \to Y$ are extensionally equal if and only if $f_1 \circ x \sim f_2 \circ x$ for every closed element~$x\colon \top \to X$.
@@ -883,7 +880,7 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
   Let $f$~be a trackable map from $\Box^\kappa X$ to $X$ tracked by~$F : \Lambda_1$.
   Applying \Cref{thm:SRT} to $\lambda\mathtt{x}_0.\,F : \Lambda_0$, we obtain a term $\mathsf{fix}\,F : \Lambda_0$ with $\mathsf{fix}\,F \reduce (\lambda\mathtt{x}_0.\,F)\,\qquote{\mathsf{fix}\,F} \onereduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
   Now we construct the first element by Löb induction on a $\Sigma$-type (\Cref{coro:lob-induction-sum}):
-  assuming 
+  assuming%
   \[
     x : \laterp \bproj{X}
     \quad\text{and}\quad
@@ -893,16 +890,16 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
   \begin{enumerate}
     \item First,
       $\laterp(\alpha : \kappa).\left( \mathsf{fix}\,F \Vdash x [\alpha]\right)$ has an inhabitant, say $r'$, since $\mathsf{fix}\,F$ reduces to $F[\,\qquote{\mathsf{fix}\,F}\,]$. 
-    \item Then, we derive an inhabitant of type $\bproj{X}$ realised by~$F[\,\qquote{\mathsf{fix}\,F}\,]$ as witnessed by
+    \item Then, we derive an inhabitant of type $\bproj{X}$ realised by~$F[\,\qquote{\mathsf{fix}\,F}\,]$ as witnessed by%
       \[
         \mathfrak{f} (\refl_{\twoheadrightarrow}\qquote{\mathsf{fix}\,F}) : F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash \bproj{f}(\mathsf{fix}\,F, x, r')
       \]
     since $F$ tracks $\bproj{f}$ and the set $\qquote{\mathsf{fix}\,F} \Vdash_{\Box^\kappa X} (\mathsf{fix}\,F, x, r')$ is judgementally equal to $\qquote{\mathsf{fix}\,F} \reduce \qquote{\mathsf{fix}\,F}$, which is inhabited by~$\refl_\twoheadrightarrow$.
 
     \item By Löb induction, $\sm{x : \laterp \bproj{X}} \laterp (\alpha : \kappa).\, F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ has an inhabitant~$(x_0, r_0)$.
-    \item Therefore, by $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$ again, there is an inhabitant
+    \item By $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$, we have 
       $(\mathsf{fix}\,F, x_0, r_0') : \bproj{\Box^\kappa X}$ where $r_0' : \laterp(\alpha : \kappa).\, \mathsf{fix}\,F \Vdash x_0 [\alpha]$.
-  \end{enumerate}
+  \end{enumerate}%
   Clearly $(\mathsf{fix}\,F, x_0, r_0')$ is realised by $\qquote{\mathsf{fix}\,F}$, and by \Cref{lem:global-element} it gives an element~$f^\dagger$ of $\Box X$.
 
   To construct the second element~$f^\ddagger$, we follow the same steps except the third: we conclude $(x_0, r_0) : \sm{x : \bproj{X}} F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ without any delay and thus $x_0 : \bproj{X}$ is realised by $r_0' : \mathsf{fix}\,F \Vdash x_0$.
@@ -910,29 +907,30 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
 \end{proof}
 
 The (\GL) axiom can be realised by a similar construction, too.
-\begin{theorem}
+\begin{theorem}\label{thm:internal-gl}
   There is a family of trackable maps from 
   $\Box^\kappa (\Box^\kappa X \Rightarrow X)$ to $\Box^\kappa X$.
 \end{theorem}
 
-\section{Related work}
+\section{Related work}\label{sec:related-work}
 Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.
-For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defined by
+For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defined by%
 \[
 \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
 \quad\text{and}\quad
-b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
+b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b,
 \]
-as the carrier set and its realisability relation, without the use of Gödel encoding.
+without the use of Gödel encoding.
 The mapping on morphisms is similar to~$\boxtimes$.
-Apart from the use of set theory as the metalanguage for his development, the exposure $\boxtimes_K$ is different from~$\boxtimes$ in a number of ways.
+Besides the use of set theory as the metalanguage for the development, the exposure $\boxtimes_K$ differs from~$\boxtimes$ in a many ways.
 First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
-Some computationally equivalent intensions have to be identified to satisfy equations of PCA, so for example
-$\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$ and thus $\bproj{\boxtimes \top}$ has only one element $(\star, \mathtt{I})$. 
+Some $\beta$-equivalent intensions have to be identified to satisfy equations of PCA.
+For example
+$\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$, so $\bproj{\boxtimes_K \top}$ has only one element $(\star, \mathtt{I})$, too. 
 Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
 Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
-Finally, it is not clear how to refute the existence of internal quoting for $\boxtimes_K$.
-By taking $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r) : \bproj{\boxtimes X}$, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions, and thus $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved extensional properties.
+Finally, it is not clear how to refute the internal quoting for $\boxtimes_K$.
+Using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$, the exposure~$\boxtimes$ is able to distinguish $\beta$-equivalent intensions, so $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved extensional properties.
 
 Artemov and Beklemishev~\cite{Artemov2005} pointed out that
 Gödel attempted to use classical \SFour modal logic to model provability for Peano Arithmetic ($\mathbf{PA}$) but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
@@ -947,7 +945,7 @@ Our work is partly inspired by Shamkanov's~\cite{Shamkanov2014, Shamkanov2016a} 
 In this paper we follow the principle of modality-as-intension~\cite{Davies2001b} and the $\PP$-categorical semantics~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on $\lambda$-calculus developed and formalised in HoTT as a semantic foundation for intensionality, on which we modelled \SFour and \GL modalities.
 Notably, our denotational semantics of the \SFour modality~$\boxtimes$ is more intensional than that of Kavvos' $\boxtimes_K$.
-For the \GL modality~$\Box$, we have given the \emph{first} denotational semantics, which is shown~(\Cref{thm:GL-recursion}) to satisfy the deductive form of the Gödel-Löb axiom---the intensional recursion---using guarded type theory.
+For the \GL modality~$\Box$, we have given the \emph{first} denotational semantics, which is shown~(\Cref{thm:GL-recursion} and \Cref{thm:internal-gl}) to satisfy the Gödel-Löb axiom and its deductive form---the intensional recursion---using guarded type theory.
 
 As future work, an important issue we have not discussed yet is the connection between $\boxtimes$~and~$\Box$---for example, it is easy to construct a family of trackable maps from $\boxtimes X$ to $\Box X$ natural in $X$ by deferring the extension part of $(M, x)$ to a later stage, and Goris' bi-modal provability logic~\cite{Goris2009} suggests that there are more rules to discover.
 In the long term, based on the $\PP$-category of assemblies and the denotational semantics of modalities, we intend to design a type theory with two modes of $\mathtt{Code}$ and prove its meta-properties such as consistency, confluence, and decidability of type checking by interpreting judgements into~$\Asm(\Lambda)$.
