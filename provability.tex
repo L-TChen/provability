@@ -662,8 +662,7 @@ It is known that the Gödel-Löb axiom $\Box(\Box A \to A) \to \Box A$ is incomp
 Indeed, let $A$ be the falsity $\bot$ for both laws. Then, we have $\Box(\Box \bot \to \bot) \to \Box \bot$ and $\Box \bot \to \bot$.
 By the necessitation rule we can derive $\Box (\Box \bot \to \bot)$ and thus by modus ponens we can derive $\Box \bot$ and finally $\bot$.
 Therefore, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the Gödel-Löb axiom.
-Mysteriously, the provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood as also the type of code of type~$A$ and as intensional recursion respectively from the computational perspective~\cite{Kavvos2017b}.%
-\hsnote{Why mysterious?}
+The provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood as also the type of code of type~$A$ and as intensional recursion respectively from the computational perspective~\cite{Kavvos2017b}.
 
 To untie the knot but to retain consistency and the understanding of $\Box A$ as code of type~$A$, we refine our interpretation with a notion of computation stages.
 In general, staged code is to be evaluated in a next stage while   $\boxtimes A$ is only a special case that next stages include the current one so that $\epsilon_X\colon {\boxtimes} X \to X$ is allowed.
@@ -919,7 +918,6 @@ The (\GL) axiom can be realised by a similar construction, too.
 
 \section{Related work}
 Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.
-Apart from the use of set theory as the metalanguage for his development, the exposure $\boxtimes_K$ is different from~$\boxtimes$ in a number of ways.
 For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defined by
 \[
 \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
@@ -928,24 +926,23 @@ b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b
 \]
 as the carrier set and its realisability relation, without the use of Gödel encoding.
 The mapping on morphisms is similar to~$\boxtimes$.
+Apart from the use of set theory as the metalanguage for his development, the exposure $\boxtimes_K$ is different from~$\boxtimes$ in a number of ways.
 First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
 Some computationally equivalent intensions have to be identified to satisfy equations of PCA, so for example
 $\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$ and thus $\bproj{\boxtimes \top}$ has only one element $(\star, \mathtt{I})$. 
 Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
 Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
-By taking $\lambda$-terms subject to $\alpha$-equivalence as realisers, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions, and thus $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved properties.
-
-\hsnote{which is unsatisfactory because\ldots How does $\boxtimes$ avoid the problem?}
+Finally, it is not clear how to refute the existence of internal quoting for $\boxtimes_K$.
+By taking $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r) : \bproj{\boxtimes X}$, the exposure~$\boxtimes$ is able to distinguish computationally equivalent intensions, and thus $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved extensional properties.
 
 Artemov and Beklemishev~\cite{Artemov2005} pointed out that
-Gödel attempted to use classical \SFour modal logic to model provability for Peano arithmetic but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
+Gödel attempted to use classical \SFour modal logic to model provability for Peano Arithmetic ($\mathbf{PA}$) but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
 Löb lately found the well-known \GL axiom for provability and
-Solovay showed that \GL is indeed complete for~$\mathbf{PA}$.
+Solovay showed that \GL is complete for~$\mathbf{PA}$.
 On the other hand, Artemov~\cite{Artemov2001} proposed \emph{logic of proofs} extending \SFour and argued that \SFour is for \emph{explicit proofs}.
 Goris~\cite{Goris2009} discussed two modalities \GL and \SFour over classical logic and provides a Kripke semantics for both.
-We took Goris' notation for \GL and \SFour modalities, $\Box$ and $\boxtimes$, respectively.
-
-\nocite{Shamkanov2014, Shamkanov2016a}
+We took Goris' notation for the \SFour modality $\boxtimes$.
+Our work is also partly inspired by Shamkanov's~\cite{Shamkanov2014, Shamkanov2016a} provability semantics for \GL using circular proofs.
 \section{Conclusion}\label{sec:conclusion}
 In this paper we follow the principle of modality-as-intension~\cite{Davies2001b} and the $\PP$-categorical semantics~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
 We have studied the $\PP$-category of assemblies on $\lambda$-calculus developed and formalised in HoTT as a semantic foundation for intensionality, on which we modelled \SFour and \GL modalities.
