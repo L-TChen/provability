@@ -933,11 +933,11 @@ Finally, it is not clear how to refute the internal quoting for $\boxtimes_K$.
 Using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$, the exposure~$\boxtimes$ is able to distinguish $\beta$-equivalent intensions, so $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved extensional properties.
 
 Artemov and Beklemishev~\cite{Artemov2005} pointed out that
-Gödel attempted to use classical \SFour modal logic to model provability for Peano Arithmetic ($\mathbf{PA}$) but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
-Löb found the well-known \GL axiom for provability and
-Solovay showed that \GL is complete for~$\mathbf{PA}$.
+Gödel attempted to use classical \SFour modal logic to capture provability for Peano Arithmetic ($\mathbf{PA}$) but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
+Löb found the well-known \GL axiom and
+Solovay showed that \GL is complete with respect to~$\mathbf{PA}$.
 On the other hand, Artemov~\cite{Artemov2001} proposed \emph{logic of proofs} extending \SFour and argued that \SFour is for \emph{explicit proofs}.
-Goris~\cite{Goris2009} discussed two modalities \GL and \SFour over classical logic and provides a Kripke semantics for both.
+Goris~\cite{Goris2009} discussed two modalities \GL and \SFour over classical logic by presenting a bi-modal logic and provides a Kripke semantics for both.
 We took Goris' notation for the \SFour modality $\boxtimes$.
 Our work is partly inspired by Shamkanov's~\cite{Shamkanov2014, Shamkanov2016a} provability semantics for \GL using circular proofs.
 
@@ -947,7 +947,7 @@ We have studied the $\PP$-category of assemblies on $\lambda$-calculus developed
 Notably, our denotational semantics of the \SFour modality~$\boxtimes$ is more intensional than that of Kavvos' $\boxtimes_K$.
 For the \GL modality~$\Box$, we have given the \emph{first} denotational semantics, which is shown~(\Cref{thm:GL-recursion} and \Cref{thm:internal-gl}) to satisfy the Gödel-Löb axiom and its deductive form---the intensional recursion---using guarded type theory.
 
-As future work, an important issue we have not discussed yet is the connection between $\boxtimes$~and~$\Box$---for example, it is easy to construct a family of trackable maps from $\boxtimes X$ to $\Box X$ natural in $X$ by deferring the extension part of $(M, x)$ to a later stage, and Goris' bi-modal provability logic~\cite{Goris2009} suggests that there are more rules to discover.
+As future work, an important issue we have not discussed yet is the connection between $\boxtimes$~and~$\Box$---for example, it is easy to construct a family of trackable maps from $\boxtimes X$ to $\Box X$ natural in $X$ by deferring the extension part of $(M, x)$ to a later stage, and Goris' bi-modal logic~\cite{Goris2009} suggests that there are more rules to discover.
 In the long term, based on the $\PP$-category of assemblies and the denotational semantics of modalities, we intend to design a type theory with two modes of $\mathtt{Code}$ and prove its meta-properties such as consistency, confluence, and decidability of type checking by interpreting judgements into~$\Asm(\Lambda)$.
 
 %\paragraph*{Future work}
