@@ -1,4 +1,4 @@
-\documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
+\documentclass[draft,a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
 \numberwithin{equation}{section}
 
 %\usepackage{mlmodern}
@@ -665,146 +665,191 @@ In general, staged code is to be evaluated in a next stage while   $\boxtimes A$
 To express the notion of `next' stages without stage indexing, we work within guarded type theory.
 \hsnote{emphasise code unrolling in stages}
 
-\subsubsection{Digression: Clocked Cubical Type Theory}
-Clocked cubical type theory~\cite{Kristensen2021}, CCTT for short, is a metalanguage extending HoTT with a later modality and guarded recursion.
-It combines two extensions of dependent type theory.
-The first extension is the machinery to manipulate $n$-dimensional cubes such as paths, squares, cubes, etc., allowing us to prove Voevodsky’s univalence axiom and function extensionality.
-The second extension adds a sort $\clock$ with \emph{ticks}~\cite{Bahr2017} to support Nakano's later modality~$\laterp$ and guarded recursion, where the latter is also known as \emph{Löb induction}.
-\ltnote{can we be more informal about CCTT so that we can remove this section?}
-\hsnote{Maybe we could just do it `synthetically' or `on demand', stating/highlighting only the constructs and properties we need.}
+\subsubsection{Digression: Clocked cubical type theory}
 
-Clocks are of a different sort $\clock$ from types, so the usual type formers (such as `$\to$') are not applicable.
-A clock~$\kappa$ is introduced by a clock quantification~$\forall \kappa.\, A$ into a context with rules similar to those for $\Pi$-types:
+The particular version of guarded type theory we use is \emph{clocked cubical type theory} (CCTT for short)~\cite{Kristensen2021}, which is a metalanguage extending HoTT with a later modality $\laterp^\kappa$ parametrised by a `clock'~$\kappa$ and guarded recursion.
+Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in Agda.
+
+%It combines two extensions of dependent type theory.
+%The first extension is the machinery to manipulate $n$-dimensional cubes such as paths, squares, cubes, etc., allowing us to prove Voevodsky’s univalence axiom and function extensionality.
+%The second extension adds a sort $\clock$ with \emph{ticks}~\cite{Bahr2017} to support Nakano's later modality~$\laterp$ and guarded recursion, where the latter is also known as \emph{Löb induction}.
+%\ltnote{can we be more informal about CCTT so that we can remove this section?}
+%\hsnote{Maybe we could just do it `synthetically' or `on demand', stating/highlighting only the constructs and properties we need.}
+
+%Clocks are of a different sort $\clock$ from types, so the usual type formers (such as `$\to$') are not applicable.
+%A clock~$\kappa$ is introduced by a clock quantification~$\forall \kappa.\, A$ into a context with rules similar to those for $\Pi$-types:
+%\[
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma, \kappa : \clock \vdash t : A$}
+%      \UnaryInfC{$\Gamma \vdash \Lambda \kappa.\, t : \forall \kappa.\, A $}
+%    \end{prooftree}
+%  \end{minipage}
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma \vdash t : \forall \kappa.\, A$}
+%      \AxiomC{$\Gamma \vdash \kappa' : \clock $}
+%      \BinaryInfC{$\Gamma \vdash t[\kappa'/\kappa] : A[\kappa'/\kappa]$}
+%    \end{prooftree}
+%  \end{minipage}
+%\]
+%For convenience, a clock constant~$\kappa_0$ is presumed in the type theory.%
+%\hsnote{Just for convenience?}
+
+CCTT features a new type $\laterp (\alpha : \kappa).\, A$ of suspended computations that take in a tick~$\alpha$ on a clock~$\kappa$ to produce an inhabitant of~$A$ in a next stage.
+(Clocks will be discussed towards the end and can be ignored for now.)
+An inhabitant of $\laterp (\alpha : \kappa).\, A$ therefore resembles a function computationally, and can be introduced as a $\lambda$-expression $\lambda(\alpha : \kappa).\,t$ (often abbreviated to $\lambda\alpha.\,t$) where $t : A$, or eliminated by application to a tick, denoted by $f[\alpha] : A$ where $f : \laterp (\alpha : \kappa).\, A$ and $\alpha : \kappa$.
+For brevity, $\laterp (\alpha : \kappa).\,A$ is written as $\laterp^\kappa\, A$ if $\alpha$~is not referred to in~$A$.
+For example, the following term implements the normality axiom for $\laterp^\kappa$:
 \[
-  \begin{minipage}{0.47\linewidth}
-    \begin{prooftree}
-      \AxiomC{$\Gamma, \kappa : \clock \vdash t : A$}
-      \UnaryInfC{$\Gamma \vdash \Lambda \kappa.\, t : \forall \kappa.\, A $}
-    \end{prooftree}
-  \end{minipage}
-  \begin{minipage}{0.47\linewidth}
-    \begin{prooftree}
-      \AxiomC{$\Gamma \vdash t : \forall \kappa.\, A$}
-      \AxiomC{$\Gamma \vdash \kappa' : \clock $}
-      \BinaryInfC{$\Gamma \vdash t[\kappa'/\kappa] : A[\kappa'/\kappa]$}
-    \end{prooftree}
-  \end{minipage}
+  \mathtt{ap}^\kappa \defeq \lambda f.\,\lambda x.\,\lambda \alpha.\, f[\alpha]\,(x[\alpha]) : \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
 \]
-For convenience, a clock constant~$\kappa_0$ is presumed in the type theory.%
-\hsnote{Just for convenience?}
-
-A new type $\laterp (\alpha : \kappa).\, A$ is introduced as a type of suspended computations requiring a tick~$\alpha$ on a clock~$\kappa$ to compute inhabitants of~$A$.
-For convenience, $\laterp (\alpha : \kappa).\,A$ is written as $\laterp^\kappa\, A$ if the tick variable is not referred to.
-Formally, the rules for ticks are as follows:
+Viewed as a function, $\mathtt{ap}^\kappa$ takes $f : \laterp^\kappa(A \to B)$ and $x : \laterp^\kappa A$ as arguments, both of which are values that can be used in a next stage, and should produce a result of type~$\laterp^\kappa B$, that is, a value of type~$B$ in a next stage; this result is constructed by first taking in a tick~$\alpha$---after which the rest of the term describes a construction in the next stage---and then applying both $f$~and~$x$ to~$\alpha$ to produce $f[\alpha] : A \to B$, $x[\alpha] : A$, and eventually $f[\alpha]\,(x[\alpha]) : B$ in the next stage.
+Another important example is delaying a value to a next stage:
 \[
-  \begin{minipage}{0.47\linewidth}
-    \begin{prooftree}
-      \AxiomC{$\Gamma, \alpha : \kappa \vdash t : A$}
-      \UnaryInfC{$\Gamma \vdash \lambda (\alpha : \kappa).\, t : \laterp (\alpha : \kappa).\, A$}
-    \end{prooftree}
-  \end{minipage}
-  \begin{minipage}{0.47\linewidth}
-    \begin{prooftree}
-      \AxiomC{$\Gamma \vdash t : \laterp (\alpha : \kappa).\, A$}
-      \AxiomC{$\Gamma, \beta : \kappa, \Gamma' \vdash$}
-      \BinaryInfC{$\Gamma, \beta : \kappa , \Gamma' \vdash t[\beta] : A[\beta/\alpha]$}
-    \end{prooftree}
-  \end{minipage}
+  \mathtt{next}^\kappa \defeq \lambda x.\,\lambda \alpha.\, x : A \to \laterp^\kappa A.
 \]
-where the elimination rule separates variables occurring before and after $\alpha$ in a context. 
-The elimination rule reflects the intuition that a tick is a kind of resource.
-For example, $\lambda (x : \laterp^\kappa\,\laterp^\kappa\,A).\, \lambda (\alpha : \kappa).\, x [\alpha][\alpha]$
-is not typable (because $\alpha$~is wrongly used twice) but the following term is:
-\[
-  \Lambda \kappa.\, \lambda f.\,\lambda x.\,\lambda \alpha.\, f[\alpha]\,(x[\alpha]) : \forall \kappa.\, \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
-\]
-An inhabitant of $A$ is available in a time step given by $\mathtt{next} \defeq \Lambda \kappa.\, \lambda x.\,\lambda \alpha.\, x \colon \forall \kappa.\, A \to \laterp^\kappa A$.%
-\hsnote{later type, abstraction, and application, using $\mathtt{ap}$ and $\mathtt{next}$ as examples; then stage distinction (which is good) but no injectivity of $\mathtt{next}$ (which is not good), hence the introduction of clocks; goes on to guarded recursion, and the properties needed}
+In contrast to $\mathtt{next}^\kappa$, there is no term of type $\laterp^\kappa A \to A$, matching our intuition about a series of stages happening in order: in the current stage we should not be able to obtain a value that is only available in the next stage.
+Also there is no term of type $\laterp^\kappa \laterp^\kappa A \to \laterp^\kappa A$---it might be tempting to write $\lambda x.\, \lambda\alpha.\, x[\alpha][\alpha]$, but the two consecutive applications to~$\alpha$ are prohibited in CCTT.
 
-An inhabitant of $\laterp (\alpha : \kappa).\, A$ can tick on a different clock by a constant tick~$\diamond$ stated by 
-\begin{prooftree}
-  \AxiomC{$\Gamma, \kappa : \clock \vdash t : \laterp (\alpha : \kappa).\, A$}
-  \AxiomC{$\Gamma \vdash \kappa' : \clock$}
-  \BinaryInfC{$\Gamma \vdash (t[\kappa'/\kappa])[\diamond] : A[\kappa'/\kappa][\diamond/\alpha]$}
-\end{prooftree}
-allowing $\laterp^\kappa$ to be eliminated in a clock~$\kappa'$ different from~$\kappa$.
-This tick~$\diamond$ is needed to type Atkey and McBride's~\cite{Atkey2013b} operator
-  $\mathsf{force} \defeq \lambda x.\, \Lambda \kappa.\, x[\kappa][\diamond]
-  : (\forall \kappa.\, \laterp^\kappa A) \to \forall \kappa.\, A$.
+An important primitive is \emph{guarded recursion}, also known as \emph{Löb induction}: every function $f : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,f : \laterp^\kappa A$ which satisfies the fixed point equation $(\mathsf{dfix}^\kappa\,f)[\alpha] =_A f\,(\mathsf{dfix}^\kappa\,f)$, where the right-hand side can be seen as a fixed point of~$f$ without delay.
 
-  Finally, every function $t : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics); this is guarded recursion, also known as Löb induction:
-\[
-  \begin{minipage}{0.47\linewidth}
-    \begin{prooftree}
-      \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
-      \UnaryInfC{$\Gamma \vdash \mathsf{dfix}^\kappa\,t : \laterp^\kappa A$}
-    \end{prooftree}
-  \end{minipage}
-  \begin{minipage}{0.47\linewidth}
-    \begin{prooftree}
-      \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
-      \UnaryInfC{$\Gamma \vdash \mathsf{pfix}^\kappa\,t : (\mathsf{dfix}^\kappa\,t)[\alpha] =_A t(\mathsf{dfix}^\kappa\,t)$}
-    \end{prooftree}
-  \end{minipage}
-\]
-We can further derive the fixed point $t(\mathsf{dfix}^\kappa\,t) : A$ without any delay.
+%\[
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
+%      \UnaryInfC{$\Gamma \vdash \mathsf{dfix}^\kappa\,t : \laterp^\kappa A$}
+%    \end{prooftree}
+%  \end{minipage}
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
+%      \UnaryInfC{$\Gamma \vdash \mathsf{pfix}^\kappa\,t : (\mathsf{dfix}^\kappa\,t)[\alpha] =_A t(\mathsf{dfix}^\kappa\,t)$}
+%    \end{prooftree}
+%  \end{minipage}
+%\]
 
-We now list properties needed for~\Cref{sec:GL}.
-Being a proposition is irrelevant to ticks and clocks, and so is being a set.
-The proof is based on the fact that tick variables cannot be exchanged in a context with ordinary variables but variables of the interval~$\mathbb{I}$.
+%Formally, the rules for ticks are as follows:
+%\[
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma, \alpha : \kappa \vdash t : A$}
+%      \UnaryInfC{$\Gamma \vdash \lambda (\alpha : \kappa).\, t : \laterp (\alpha : \kappa).\, A$}
+%    \end{prooftree}
+%  \end{minipage}
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma \vdash t : \laterp (\alpha : \kappa).\, A$}
+%      \AxiomC{$\Gamma, \beta : \kappa, \Gamma' \vdash$}
+%      \BinaryInfC{$\Gamma, \beta : \kappa , \Gamma' \vdash t[\beta] : A[\beta/\alpha]$}
+%    \end{prooftree}
+%  \end{minipage}
+%\]
+%where the elimination rule separates variables occurring before and after $\alpha$ in a context.
+%The elimination rule reflects the intuition that a tick is a kind of resource.
+%For example, $\lambda (x : \laterp^\kappa\,\laterp^\kappa\,A).\, \lambda (\alpha : \kappa).\, x [\alpha][\alpha]$
+%is not typable (because $\alpha$~is wrongly used twice) but the following term is:
+%\[
+%  \Lambda \kappa.\, \lambda f.\,\lambda x.\,\lambda \alpha.\, f[\alpha]\,(x[\alpha]) : \forall \kappa.\, \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
+%\]
+%An inhabitant of $A$ is available in a time step given by $\mathtt{next} \defeq \Lambda \kappa.\, \lambda x.\,\lambda \alpha.\, x \colon \forall \kappa.\, A \to \laterp^\kappa A$.%
+%\hsnote{later type, abstraction, and application, using $\mathtt{ap}$ and $\mathtt{next}$ as examples; then stage distinction (which is good) but no injectivity of $\mathtt{next}$ (which is not good), hence the introduction of clocks; goes on to guarded recursion, and the properties needed}
+
+%An inhabitant of $\laterp (\alpha : \kappa).\, A$ can tick on a different clock by a constant tick~$\diamond$ stated by 
+%\begin{prooftree}
+%  \AxiomC{$\Gamma, \kappa : \clock \vdash t : \laterp (\alpha : \kappa).\, A$}
+%  \AxiomC{$\Gamma \vdash \kappa' : \clock$}
+%  \BinaryInfC{$\Gamma \vdash (t[\kappa'/\kappa])[\diamond] : A[\kappa'/\kappa][\diamond/\alpha]$}
+%\end{prooftree}
+%allowing $\laterp^\kappa$ to be eliminated in a clock~$\kappa'$ different from~$\kappa$.
+%This tick~$\diamond$ is needed to type Atkey and McBride's~\cite{Atkey2013b} operator
+%  $\mathsf{force} \defeq \lambda x.\, \Lambda \kappa.\, x[\kappa][\diamond]
+%  : (\forall \kappa.\, \laterp^\kappa A) \to \forall \kappa.\, A$.
+
+%  Finally, every function $t : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,t : \laterp^\kappa A$ with a path replacing the judgemental fixed point equation (to ensure the termination of reduction semantics); this is guarded recursion, also known as Löb induction:
+%\[
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
+%      \UnaryInfC{$\Gamma \vdash \mathsf{dfix}^\kappa\,t : \laterp^\kappa A$}
+%    \end{prooftree}
+%  \end{minipage}
+%  \begin{minipage}{0.47\linewidth}
+%    \begin{prooftree}
+%      \AxiomC{$\Gamma \vdash t : \laterp^\kappa A \to A$}
+%      \UnaryInfC{$\Gamma \vdash \mathsf{pfix}^\kappa\,t : (\mathsf{dfix}^\kappa\,t)[\alpha] =_A t(\mathsf{dfix}^\kappa\,t)$}
+%    \end{prooftree}
+%  \end{minipage}
+%\]
+%We can further derive the fixed point $t(\mathsf{dfix}^\kappa\,t) : A$ without any delay.
+
+We now list some properties needed for~\Cref{sec:GL}.
+The first one helps to assure that we are still working with propositions and sets even when $\laterp^\kappa$ is involved.%
+\hsnote{acceptable form?}
 \begin{lemma}
-  If $\laterp (\alpha : \kappa).\, \mathsf{isProp}\,(A [\alpha])$ is inhabited, then so is $\mathsf{isProp}\,(\laterp(\alpha: \kappa).\, A [\alpha])$. 
-  Similarly, if $\laterp (\alpha : \kappa).\, \mathsf{isSet}\,(A [\alpha])$ is inhabited, then so is $\mathsf{isSet}\,(\laterp(\alpha: \kappa).\, A [\alpha])$. 
+  If $A[\alpha]$ is a proposition/set for arbitrary $\alpha : \kappa$, then so is $\laterp(\alpha: \kappa).\, A [\alpha]$.
 \end{lemma}
-
+%Being a proposition is irrelevant to ticks, and so is being a set.
+%The proof is based on the fact that tick variables cannot be exchanged in a context with ordinary variables but variables of the interval~$\mathbb{I}$.
+%\begin{lemma}
+%  If $\laterp (\alpha : \kappa).\, \mathsf{isProp}\,(A [\alpha])$ is inhabited, then so is $\mathsf{isProp}\,(\laterp(\alpha: \kappa).\, A [\alpha])$. 
+%  Similarly, if $\laterp (\alpha : \kappa).\, \mathsf{isSet}\,(A [\alpha])$ is inhabited, then so is $\mathsf{isSet}\,(\laterp(\alpha: \kappa).\, A [\alpha])$. 
+%\end{lemma}
 The later modality distributes over a $\Sigma$-type.
-It follows from the fact that the function from $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B\,(x[\alpha])$ to $\laterp^\kappa \left(\sm{x : A} B\,x\right)$ mapping $(x, y)$ to $\lambda (\alpha : \kappa).\, (x[\alpha], y[\alpha])$ has a quasi-inverse, which entails an equivalence between the types.%
-\hsnote{Say in preliminaries?}
+%It follows from the fact that the function from $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B\,(x[\alpha])$ to $\laterp^\kappa \left(\sm{x : A} B\,x\right)$ mapping $(x, y)$ to $\lambda (\alpha : \kappa).\, (x[\alpha], y[\alpha])$ has a quasi-inverse, which entails an equivalence between the types.
 \begin{lemma}\label{lem:later-sum}
-  For $A : \UU$ and $B : A \to \UU$, there is an equivalence
-  \begin{equation}\label{eq:later-sum}
-    \eqv{\laterp^\kappa \sm{x : A} B\,x}{\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B (x [\alpha])}.
-  \end{equation}
+  Let $B(x)$ be a family of types indexed by $x : A$.
+  Then there are functions from $\laterp^\kappa \sm{x : A} B(x)$ to $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B(x [\alpha])$ and vice versa.
 \end{lemma}
-
-Therefore guarded recursion has a particular form for $\Sigma$-types:
+Therefore guarded recursion has a specialised form for $\Sigma$-types.
 \begin{corollary} \label{coro:lob-induction-sum}
-  Suppose that the type $\sm{x : \laterp A} \laterp (\alpha : \kappa).\,B\,(x[\alpha]) \to \sm{x : A} B\,x$ is inhabited.
-  Then $\sm{x : A} B\,x$ is inhabited.
+  Let $B(x)$ be a family of types indexed by $x : A$.
+  Then
+  \[
+    \sm{x : \laterp A} \laterp (\alpha : \kappa).\,B(x[\alpha]) \to \sm{x : A} B(x) \quad\text{implies}\quad \sm{x : A} B(x).
+  \]
 \end{corollary}
-
-The $\mathtt{force}$ operator is an inverse of~$\mathtt{next}$ in the following sense:%
-\hsnote{Purely for proving the proposition below? (No other use of $\mathtt{force}$?)}
-\begin{lemma}
-  Let $x$ be an inhabitant of $\forall \kappa.\, A$. Then, 
-  $\mathtt{force}\,(\lambda \kappa.\,\lambda (\alpha : \kappa).\, x [\kappa])\,\kappa = x\,\kappa$ is inhabited for any clock $\kappa$.
+%The $\mathtt{force}$ operator is an inverse of~$\mathtt{next}$ in the following sense:%
+%\hsnote{Purely for proving the proposition below? (No other use of $\mathtt{force}$?)}
+%\begin{lemma}
+%  Let $x$ be an inhabitant of $\forall \kappa.\, A$. Then, 
+%  $\mathtt{force}\,(\lambda \kappa.\,\lambda (\alpha : \kappa).\, x [\kappa])\,\kappa = x\,\kappa$ is inhabited for any clock $\kappa$.
+%\end{lemma}
+The final property states that if two values delayed to a next stage are equal, then they are equal in the current stage.
+It may be tempting to formulate the property as $(\mathtt{next}^\kappa\, x =_{\laterp^\kappa A} \mathtt{next}^\kappa\, y) \to (x =_A y)$, but this is in fact invalid, since (analogously to function extensionality) the antecedent equality is equivalent to $\laterp^\kappa (x =_A y)$ rather than $x =_A y$.%
+\hsnote{cite?}
+The correct formulation is the following, where the antecedent includes a \emph{clock quantification}~`$\forall\kappa$'.
+\begin{lemma}\label{lem:later-identity}
+  Let $x$ and $y : A$. Then $x =_A y$ if\/ $\forall \kappa.\, \mathtt{next}^\kappa\,x =_{\laterp^\kappa A} \mathtt{next}^\kappa\,y$.
 \end{lemma}
+This lemma holds because, with clock quantification, it is possible to write Atkey and McBride's~\cite{Atkey2013b} operator $\mathtt{force} : (\forall\kappa.\, \laterp^\kappa A) \to (\forall\kappa.\, A)$, which can then be applied to the equality $\forall\kappa.\, \laterp^\kappa (x =_A y)$ equivalent to the antecedent and yield $\forall\kappa.\, x =_A y$, which is equivalent to $x =_A y$.
+One way to think about (fully) clock-quantified types is that they are independent of the choice of clocks and can be viewed as the types of pure, completed descriptions of staged computation (rather than ongoing computations that are taking effect in stages with respect to a particular clock in scope).
+We can manipulate such descriptions at will, irrespective of our current timeline---in particular, it is perfectly fine to take a description of a staged computation that produces results from the second stage onwards and make it produce the results right from the first stage instead, which is what $\mathtt{force}$ does.
 
-It follows that a path between two inhabitants $\mathtt{next}\,x_i$ in a time step gives rise to a path now.
-In other words, paths are timeless.%
-\hsnote{What's the role of this proposition?}
-\begin{proposition}\label{lem:later-identity}
-  Let $x$ and $y$ be inhabitants of $A$. Then, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right)$ implies $x_1 = x_2$.
-\end{proposition}
-Be aware of the scope of clock quantification.
-The above proposition cannot hold within the same clock, that is, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2 \to x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
+%It follows that a path between two inhabitants $\mathtt{next}\,x_i$ in a time step gives rise to a path now.
+%In other words, paths are timeless.
+%\begin{proposition}\label{lem:later-identity}
+%  Let $x$ and $y$ be inhabitants of $A$. Then, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2\right)$ implies $x_1 = x_2$.
+%\end{proposition}
+%Be aware of the scope of clock quantification.
+%The above proposition cannot hold within the same clock, that is, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2 \to x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
 
 \subsubsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
 
-In order to formulate the faithfulness of an exposure, the definition is adapted with a clock variable accordingly.%
-\hsnote{revise}
+First we adapt the definition of exposures to the setting of CCTT.
 \begin{definition}[Clocked exposure]
-  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q$ for each clock $\kappa$ from objects $X$ of $\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ and \emph{(b)} for each clock~$\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
+  Given $\PP$-categories $\mathbf{C}$ and $\mathbf{D}$, a \emph{clocked exposure} $Q\colon \mathbf{C} \looparrowright \mathbf{D}$ consists of \emph{(a)} a mapping $Q^\kappa$ for each clock~$\kappa$ from objects $X$ of~$\mathbf{C}$ to objects~$Q^\kappa X$ of $\mathbf{D}$ and \emph{(b)} for each clock~$\kappa$ from well-defined morphisms $f\colon X \to Y$ to well-defined morphisms $Q^\kappa f\colon Q^\kappa X \to Q^\kappa Y$ satisfying following properties
   \begin{romanenumerate}
     \item $Q^\kappa \iid_X \sim \iid_{QX}$,
     \item $Q^\kappa (g \circ f) \sim Q^\kappa g \circ Q^\kappa f$, and
-    \item $f \sim g$ whenever $Q^\kappa f \sim Q^\kappa g$ for any clock $\kappa$ and for any two well-defined morphisms $f, g\colon X \to Y$. 
+    \item $f \sim g$ whenever $\forall\kappa.\, Q^\kappa f \sim Q^\kappa g$ for any two well-defined morphisms $f, g\colon X \to Y$. 
   \end{romanenumerate}
 \end{definition}
-\Cref{thm:GL-exposure} gives an example of clocked exposure.
+Notably, the faithfulness of a clocked exposure mirrors the form of \Cref{lem:later-identity}, and is the main reason that we need CCTT.
+%\Cref{thm:GL-exposure} gives an example of clocked exposure.
 
-Now we introduce the clocked exposure $\Box^\kappa \colon \Asm(\Lambda) \to \Asm(\Lambda)$ modelling the \GL modality. 
-For an assembly $X$, the carrier $\bproj{\Box^\kappa X}$ and its realisability relation $\Vdash_{\Box^\kappa}$ are defined as
+Now we introduce the clocked exposure $\Box \colon \Asm(\Lambda) \to \Asm(\Lambda)$ modelling \GL.
+For an assembly $X$, the carrier $\bproj{\Box^\kappa X}$ and the realisability relation $\Vdash_{\Box^\kappa X}$ are defined as
 \[
   \bproj{\Box^\kappa X} \defeq \sm{M : \Lambda_0}{x : {\laterp^\kappa \bproj{X}}} \laterp (\alpha : \kappa) .\, M \Vdash_X x [\alpha]
   \quad\text{and}\quad
@@ -828,14 +873,13 @@ where $\laterp^\kappa \bproj{f} : \laterp^\kappa \bproj{X} \to \laterp^\kappa \b
 The very same argument for $\boxtimes f$ shows that $\Box^\kappa f$ is indeed a trackable map from $\bproj{\Box^\kappa X}$ to $\bproj{\Box^\kappa Y}$.
 
 \begin{remark*}
-  By the equivalence~\eqref{eq:later-sum} and univalence, the carrier of $\Box^\kappa X$ is identical to
-  $ \sm{M : \Lambda_0}\laterp^\kappa\, \sm{x : \bproj{X}} M \Vdash_X x$.
-  This equivalent form is more convenient when used to reason with guarded recursion and will be used interchangeably with the original definition.
+  By \Cref{lem:later-sum}, the carrier of $\Box^\kappa X$ and the type $\sm{M : \Lambda_0}\laterp^\kappa\, \sm{x : \bproj{X}} M \Vdash_X x$ are interchangeable.
+  The latter form is more convenient when using guarded recursion.
 \end{remark*}
 
-It is straightforward to show that $\Box^\kappa$ is a clocked exposure by \Cref{lem:later-identity}.
+It is straightforward to show that $\Box$~is a clocked exposure by \Cref{lem:later-identity}.
 \begin{theorem}\label{thm:GL-exposure}
-  $\Box^\kappa \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is a clocked exposure.
+  $\Box \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is a clocked exposure.
 \end{theorem}
 
 \begin{proposition}
@@ -922,7 +966,7 @@ b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b,
 \]
 without the use of Gödel encoding.
 The mapping on morphisms is similar to~$\boxtimes$.
-Besides the use of set theory as the metalanguage for the development, the exposure $\boxtimes_K$ differs from~$\boxtimes$ in a many ways.
+Besides the use of set theory as the metalanguage for the development, the exposure $\boxtimes_K$ differs from~$\boxtimes$ in many ways.
 First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
 Some $\beta$-equivalent intensions have to be identified to satisfy equations of PCA.
 For example
@@ -930,7 +974,7 @@ $\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$, so $\bproj{\boxtimes_
 Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
 Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
 Finally, it is not clear how to refute the internal quoting for $\boxtimes_K$.
-Using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$, the exposure~$\boxtimes$ is able to distinguish $\beta$-equivalent intensions, so $\boxtimes$ being more intensional than~$\boxtimes_K$ lacks well-behaved extensional properties.
+Using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$, the exposure~$\boxtimes$ is able to distinguish $\beta$-equivalent intensions, so $\boxtimes$---being more intensional than~$\boxtimes_K$---lacks well-behaved extensional properties.
 
 Artemov and Beklemishev~\cite{Artemov2005} pointed out that
 Gödel attempted to use classical \SFour modal logic to capture provability for Peano Arithmetic ($\mathbf{PA}$) but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
@@ -947,7 +991,7 @@ We have studied the $\PP$-category of assemblies on $\lambda$-calculus developed
 Notably, our denotational semantics of the \SFour modality~$\boxtimes$ is more intensional than that of Kavvos' $\boxtimes_K$.
 For the \GL modality~$\Box$, we have given the \emph{first} denotational semantics, which is shown~(\Cref{thm:GL-recursion} and \Cref{thm:internal-gl}) to satisfy the Gödel-Löb axiom and its deductive form---the intensional recursion---using guarded type theory.
 
-As future work, an important issue we have not discussed yet is the connection between $\boxtimes$~and~$\Box$---for example, it is easy to construct a family of trackable maps from $\boxtimes X$ to $\Box X$ natural in $X$ by deferring the extension part of $(M, x)$ to a later stage, and Goris' bi-modal logic~\cite{Goris2009} suggests that there are more rules to discover.
+As future work, an important issue we have not discussed yet is the connection between $\boxtimes$~and~$\Box$---for example, it is easy to construct a family of trackable maps from $\boxtimes X$ to $\Box^\kappa X$ natural in $X$ by deferring the extension part of $(M, x)$ to a later stage, and Goris' bi-modal logic~\cite{Goris2009} suggests that there are more rules to discover.
 In the long term, based on the $\PP$-category of assemblies and the denotational semantics of modalities, we intend to design a type theory with two modes of $\mathtt{Code}$ and prove its meta-properties such as consistency, confluence, and decidability of type checking by interpreting judgements into~$\Asm(\Lambda)$.
 
 %\paragraph*{Future work}
