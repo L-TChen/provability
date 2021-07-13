@@ -66,7 +66,7 @@
 
 \acknowledgements{%
   We are grateful to Alex Kavvos and Tsung-Ju Chiang for insightful discussions.
-  Also we would like to thank Rasmus Ejlers Møgelberg, Churn-Jung Liau, Tom de Jong, Chad Nester, and Andrea Vezzosi for useful exchanges.}
+  Also we would like to thank Rasmus Ejlers Møgelberg, Churn-Jung Liau, Ren-June Wang, Tom de Jong, Chad Nester, and Andrea Vezzosi for useful exchanges.}
 
 
 %\nolinenumbers 
@@ -99,7 +99,7 @@ Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
 Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
 For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `next' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
-Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the generic internal quoting $A \to \Box A$ as well as $A \to \boxtimes A$.
+Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the internal generic quoting $A \to \Box A$ as well as $A \to \boxtimes A$.
 Our results are developed in (guarded) homotopy type theory and formalised in Agda.
 \end{abstract}
 
@@ -157,7 +157,7 @@ Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also suppor
 After recalling preliminaries on homotopy type theory, untyped $\lambda$-calculus, and $\PP$-categories in \Cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\Cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\Cref{sec:provability}, and discuss related work in \Cref{sec:related-work} and future work in~\Cref{sec:conclusion}.
 
 \section{Preliminaries}\label{sec:preliminaries}
-Most, if not all, of the materials in this section are standard, so we do not go into details.
+Most, if not all, of the materials in this section are standard, so we do not go into the details.
 
 \subsection{Homotopy type theory}
 In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $x =_A y$ of proofs that $x$~and~$y$ are equal; given an equality proof $p : x =_A y$, any $z : B(x)$ can be converted to $\mathsf{transport}(p, z) : B(y)$.
