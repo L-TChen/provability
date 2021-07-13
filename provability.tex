@@ -654,16 +654,18 @@ As the choice of $\bigstar$ does not matter for closed elements~$a$, the above t
 It is not clear how to state `parametricity' for~$\boxtimes$ so that any family of morphisms from $A$ to $\boxtimes A$, satisfying a reasonable naturality, can be rejected. 
 
 \subsection{An exposure for the \texorpdfstring{\GL}{GL} modality}
-It is known that the Gödel-Löb axiom $\Box(\Box A \to A) \to \Box A$ is incompatible with the reflection principle $\Box A \to A$.
-Indeed, let $A$ be the falsity $\bot$ for both laws. Then, we have $\Box(\Box \bot \to \bot) \to \Box \bot$ and $\Box \bot \to \bot$.
-By the necessitation rule we can derive $\Box (\Box \bot \to \bot)$ and thus by modus ponens we can derive $\Box \bot$ and finally $\bot$.
-Therefore, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the Gödel-Löb axiom.
-The provability modality $\Box$ and the Gödel-Löb axiom are suggested to be understood as also the type of code of type~$A$ and as intensional recursion respectively from the computational perspective~\cite{Kavvos2017b}.
 
-To untie the knot but to retain consistency and the understanding of $\Box A$ as code of type~$A$, we refine our interpretation with a notion of computation stages.
-In general, staged code is to be evaluated in a next stage while   $\boxtimes A$ is only a special case that next stages include the current one so that $\epsilon_X\colon {\boxtimes} X \to X$ is allowed.
-To express the notion of `next' stages without stage indexing, we work within guarded type theory.
-\hsnote{emphasise code unrolling in stages}
+Kavvos~\cite{Kavvos2017b} advocates that the provability modality~$\Box$ and the Gödel-Löb axiom $\Box(\Box A \to A) \to \Box A$ can also be understood as the type of code of type~$A$ and as intensional recursion respectively from the computational perspective.
+Since we already have an exposure~$\boxtimes$ modelling typed code, a natural approach is to extend~$\boxtimes$ to model the Gödel-Löb axiom in addition to \SFour.
+However, it is known that the Gödel-Löb axiom is incompatible with the reflection principle $\Box A \to A$.
+Indeed, let $A$~be the falsity $\bot$ for both laws.
+Then, we have $\Box(\Box \bot \to \bot) \to \Box \bot$ and $\Box \bot \to \bot$.
+By the necessitation rule we can derive $\Box (\Box \bot \to \bot)$ and thus by modus ponens we can derive $\Box \bot$ and finally~$\bot$.
+Therefore, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the Gödel-Löb axiom if we want the type system to be logically consistent.
+
+To untie the knot but to retain consistency and the understanding of $\Box A$ as code of type~$A$, we observe that in general $\Box A$ and $\boxtimes A$ are types for different kinds of code: code constructed with intensional recursion can only be gradually expanded in stages (or otherwise may result in non-termination), whereas code supporting \SFour is only a special case where next stages include the current one so that $\epsilon_X\colon {\boxtimes} X \to X$ is allowed.
+Therefore, separately from~$\boxtimes$, we give an exposure $\Box \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling \GL in a staged setting (\Cref{sec:GL}).
+To express staged constructions more conveniently (without stage indexing), we work within guarded type theory.
 
 \subsubsection{Digression: Clocked cubical type theory}
 
