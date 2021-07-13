@@ -1,4 +1,4 @@
-\documentclass[draft,a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
+\documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
 \numberwithin{equation}{section}
 
 %\usepackage{mlmodern}
@@ -26,7 +26,6 @@
 
 \usepackage{mathrsfs}
 \usepackage{mathtools}
-\usepackage[all]{xy}
 \usepackage{bussproofs}
 \usepackage{xspace}
 
@@ -52,10 +51,6 @@
   {Institute of Information Science, Academia Sinica, Taiwan~\url{https://josh-hs-ko.github.io}}%
   {joshko@iis.sinica.edu.tw}%
   {https://orcid.org/0000-0002-2439-1048}{}
-%\author{Tsung-Ju Chiang}%
-%  {Institute of Information Science, Academia Sinica, Taiwan}%
-%  {tsungju@pm.me}%
-%  {}{}
 \authorrunning{L.-T.~Chen and H.-S.~Ko}
 
 \Copyright{Liang-Ting Chen and Hsiang-Shang Ko}
@@ -99,12 +94,12 @@
 \begin{abstract}
 
 There have been investigations into type-theoretic foundations for metaprogramming, notably Davies and Pfenning's~(2001) treatment in \SFour modal logic, where code evaluating to values of type~$A$ is given the modal type $\mathtt{Code}\,A$ ($\Box A$ in the original paper).
-Recently, in his modally typed calculus iPCF, Kavvos~(2017) extended PCF with $\mathtt{Code}\,A$ and intensional recursion, understood as the deductive form of the Gödel-Löb (\GL) axiom in provability logic, but the resulting type system is logically inconsistent.
-Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be evaluated in a next stage, whereas \SFour modal type theory is a special case that code can be evaluated in the current stage, and the two types of code should be discriminated.
+Recently Kavvos~(2017) extended PCF with $\mathtt{Code}\,A$ and intensional recursion, understood as the deductive form of the \GL (Gödel-Löb) axiom in provability logic, but the resulting type system is logically inconsistent.
+Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A$ is, in general, code to be evaluated in a next stage, whereas \SFour modal type theory is a special case where code can be evaluated in the current stage, and the two types of code should be discriminated.
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
 Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
 For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `next' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
-Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the internal quoting $A \to \Box A$ as well as $A \to \boxtimes A$.
+Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the generic internal quoting $A \to \Box A$ as well as $A \to \boxtimes A$.
 Our results are developed in (guarded) homotopy type theory and formalised in Agda.
 \end{abstract}
 
@@ -118,27 +113,27 @@ Therefore, there have been investigations into type-theoretic foundations for st
 
 Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~$A$ in a next stage.
 In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the \SFour modality~$\boxtimes$.
-More specifically, the (\textbf{4}) axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages;
-the (\textbf{T}) axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
+More specifically, the \textbf{4} axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages;
+the \textbf{T} axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
 For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
 
 Recently, Kavvos proposed \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
-Logically, intensional recursion amounts to the Gödel-Löb $(\mathbf{GL})$ axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability', and computationally its behaviour mirrors Kleene's second recursion theorem.
+Logically, intensional recursion amounts to the \GL (Gödel-Löb) axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability', and computationally its behaviour mirrors Kleene's second recursion theorem.
 In contrast to general recursion $(A \to A) \to A$, which constructs a value recursively from its value (extension), intensional recursion alone does not lead to logical inconsistency.
 Kavvos explored the computational capabilities of a variant of PCF extended with $\mathtt{Code}$ viewed as both \SFour~and~\GL modalities.
 Unfortunately, when $\mathtt{Code}$ is designed in this way, the type system is inconsistent so that it cannot be treated as a logical foundation.
 
 To make \SFour and \GL coexist in a single system while maintaining logical consistency, our approach is to keep the two modalities $\boxtimes$~and~$\Box$ separate.
 Intuitively, while both modalities model code and appear similar, there are crucial differences:
-In general, programs are to be evaluated in a \emph{next} stage, but \SFour is a special case where next stages include the current one, so the result of evaluating a program can be immediately used in the current stage, as witnessed by $(\mathbf{T})$.
+In general, programs are to be evaluated in a \emph{next} stage, but \SFour is a special case where next stages include the current one, so the result of evaluating a program can be immediately used in the current stage, as witnessed by $\mathbf{T}$.
 On the other hand, a program constructed with \GL can recursively refer to its own code, which must not be evaluated within the same stage or risk non-termination computationally and inconsistency logically, so stage distinction has to be kept for \GL.
 
 To illuminate the difference, we present in this paper a denotational semantics of two types of code---a type $\boxtimes A$ of code that can be evaluated in the current stage and a type $\Box A$ of code to be evaluated in a next stage.
 To distinguish between intensions and extensions, we build upon the previous work using $\PP$-categories~\cite{Cubric1998a,Kavvos2017b}, which have an additional partial equivalence relation on morphisms that models extensional equality, while the underlying equality on morphisms models intensional equality.
 We revisit elements of realisability and construct a $\PP$-category of assemblies on $\lambda$-calculus.
-Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term (the existence of such an intension is merely a property that the extension hold), while trackable maps are pairs of a function and one of its intensions, and can be equipped with both extensional and intensional equalities (taking only the function part or both parts into account).
-The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated intension~$M$ whose associated intensions are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$.
-The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from having a generic internal quoting.
+Roughly speaking, an assembly~$X$ on $\lambda$-calculus is a set $\bproj{X}$ of extensions associated with at least an intension in the form of a $\lambda$-term (the existence of such an intension is merely a property that holds for the extension), while trackable maps are pairs of a function and one of its intensions, and can be equipped with both extensional and intensional equalities (taking only the function part or both parts into account).
+The denotations $\boxtimes X$ and $\Box X$ of the two types of code both consist of pairs~$(M, x)$ of an extension~$x$ and an associated $\lambda$-term~$M$ whose associated intensions are $\lambda$-terms that are reducible to the Gödel code~$\qquote{M}$.
+The choice of using~$\qquote{M}$ (rather than~$M$ as chosen by Kavvos~\cite{Kavvos2017b}) as the intensions of $(M, x)$ prevents $X \to \boxtimes X$ from having the meaning of generic quoting.
 The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
 \begin{itemize}
     \item For $\boxtimes X$, the extension part~$x$ in $(M, x)$ coincides with the values of the set~$\bproj{X}$.
@@ -149,7 +144,7 @@ The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
     By working in guarded type theory, $\Box X \to X$ can no longer be validated by projection (because~$x$ from $(M, x)$ is available later rather than now) and is actually not possible; also intensional recursion can be modelled by guarded recursion.
 \end{itemize}
 The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually false.
-Hence, by refuting both congruence and internal quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} did not achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
+Hence, by refuting both congruence and generic quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} did not achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
 
 We use homotopy type theory (HoTT)~\cite{hottbook} as our metalanguage, although this is mainly for convenience.
 More specifically, our work is built upon the reformulated set theory and logic within HoTT, which enable us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence (for example, within HoTT we can easily distinguish between `pairs of an extension and an intension' and `extensions associated with at least an intension').
@@ -207,7 +202,7 @@ The type~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of re
 The types $\Lambda$ and $M \reduce N$ have decidable equality, so they are sets by Hedberg's theorem.
 
 There is a function between $\lambda$-terms $\qquote{\cdot} : \Lambda \to \Lambda_0$ such that $\qquote{M}$ is normal and
-$M \equiv_\alpha N$ whenever $\qquote{M} \equiv_\alpha \qquote{N}$.
+$M =_\alpha N$ whenever $\qquote{M} =_\alpha \qquote{N}$.
 Moreover, there are $\mathtt{ap}$, $\mathtt{subst} \in \Lambda_2$ and $\mathtt{quote}$, $\mathtt{eval} \in \Lambda_1$ satisfying
 \begin{align*}
   \mathtt{ap}[\,\qquote{M}\,][\,\qquote{N}\,] & \reduce \qquote{M\,N}
@@ -480,11 +475,10 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious and, 
 \end{corollary}
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
-In this section, we introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling the \SFour modality and show that a generic quoting $X \to \boxtimes X$ cannot exist.%
-\hsnote{revise}
-Then, we move to guarded type theory as our metalanguage and introduce an exposure-like construction $\Box$ to model the \GL modality.
+In this section, we introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling the \SFour modality and show that a generic quoting $X \to \boxtimes X$ cannot exist.
+Then, we move to guarded type theory as our metalanguage and introduce an exposure $\Box$ (in a staged setting) to model the \GL modality.
 The construction refutes $X \to \Box X$ by the same argument for $\boxtimes$ and the reflection principle $\Box X \to X$.
-Finally, we derive the (\GL) axiom as well as its deductive form.
+Finally, we derive the \GL axiom as well as its deductive form.
 
 \subsection{An exposure for the \texorpdfstring{\SFour}{S4} modality}
 Given an assembly~$X$, which describes a set of extensions merely realised by some intensions (i.e.\ terms), we can expose the intensions at the level of extensions by constructing an assembly $\boxtimes X$ where an inhabitant $(M, x, r) : \bproj{\boxtimes X}$ is an extension $x : \bproj{X}$ and a term $M : \Lambda_0$ that realises~$x$, witnessed by $r : M \Vdash_X x$.
@@ -516,13 +510,16 @@ In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\box
 \begin{definition} \label{ex:global-element-of-unit}
   By $\bigstar$ we denote a closed element of~$\boxtimes \top$ given by \Cref{lem:global-element} with $(\mathtt{I}, \star, \refl_\twoheadrightarrow) : \bproj{\boxtimes \top}$ and its realiser $\qquote{\mathtt{I}}$.
 \end{definition}
+\begin{remark}
+  Given elements $a, b$ of $X$ with $a \sim b$ but with different trackers, it follows that by definition $\boxtimes a \circ \bigstar \not\sim \boxtimes b \circ \bigstar$ are two extensionally different elements.
+  That is, $\boxtimes$~does not preserve extensional equality.
+\end{remark}
 
 The assembly $\boxtimes \top$ cannot be $\PP$-isomorphic to $\top$, since there are countably many inhabitants of $\bproj{\boxtimes \top}$ while there is exactly one inhabitant of $\bproj{\top} \equiv \Unit$. 
 Similarly, there are trackable maps from $\boxtimes (X \times Y)$ to $\boxtimes X \times \boxtimes Y$ and vice versa, but they are not $\PP$-isomorphic.
-It follows that the exposure $\boxtimes$ does not preserve finite $\PP$-products.%
-\hsnote{So more intensional and better?}
+It follows that the exposure $\boxtimes$ does not preserve finite $\PP$-products.
 
-\begin{theorem}[{\emph{cf}.~\cite[Theorem~11]{Kavvos2017b}}]\label{thm:S4-exposure}
+\begin{theorem}\label{thm:S4-exposure}
   $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ is an exposure of assemblies.
   Moreover, there is an evaluator $\epsilon$ for $\boxtimes$, i.e.\ a natural transformation~$\epsilon$ from $\boxtimes$ to $\mathcal{I}$.
 \end{theorem}
@@ -549,9 +546,6 @@ It follows that the exposure $\boxtimes$ does not preserve finite $\PP$-products
   That is, $\bproj{\epsilon_X}$ is tracked by~$\mathtt{eval}$.
   The naturality of $\epsilon$ follows by definition.
 \end{proof}
-
-
-\hsnote{Why mention the elements?}
 
 Given an element~$a$ of~$X$, define its \emph{quotation} as the element $\boxtimes a \circ \bigstar$ of~$\boxtimes X$.
 The choice of $\bigstar$ does not matter if $a$ is closed, since $\boxtimes a \circ \bigstar' \sim \boxtimes a \circ \bigstar$ for any element~$\bigstar'$ of $\boxtimes \top$.  
@@ -655,16 +649,16 @@ It is not clear how to state `parametricity' for~$\boxtimes$ so that any family 
 
 \subsection{An exposure for the \texorpdfstring{\GL}{GL} modality}
 
-Kavvos~\cite{Kavvos2017b} advocates that the provability modality~$\Box$ and the Gödel-Löb axiom $\Box(\Box A \to A) \to \Box A$ can also be understood as the type of code of type~$A$ and as intensional recursion respectively from the computational perspective.
-Since we already have an exposure~$\boxtimes$ modelling typed code, a natural approach is to extend~$\boxtimes$ to model the Gödel-Löb axiom in addition to \SFour.
-However, it is known that the Gödel-Löb axiom is incompatible with the reflection principle $\Box A \to A$.
+Kavvos~\cite{Kavvos2017b} advocated that the provability modality~$\Box$ and the \GL axiom $\Box(\Box A \to A) \to \Box A$ can also be understood as the type of code of type~$A$ and as intensional recursion respectively from the computational perspective.
+Since we already have an exposure~$\boxtimes$ modelling typed code, a natural approach is to extend~$\boxtimes$ to model the \GL axiom in addition to \SFour.
+However, it is known that the \GL axiom is incompatible with the reflection principle $\Box A \to A$.
 Indeed, let $A$~be the falsity $\bot$ for both laws.
 Then, we have $\Box(\Box \bot \to \bot) \to \Box \bot$ and $\Box \bot \to \bot$.
 By the necessitation rule we can derive $\Box (\Box \bot \to \bot)$ and thus by modus ponens we can derive $\Box \bot$ and finally~$\bot$.
-Therefore, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the Gödel-Löb axiom if we want the type system to be logically consistent.
+Therefore, by \Cref{prop:strict-initial,thm:S4-exposure}, we cannot expect the exposure $\boxtimes$ to model the \GL axiom if we want the type system to be logically consistent.
 
-To untie the knot but to retain consistency and the understanding of $\Box A$ as code of type~$A$, we observe that in general $\Box A$ and $\boxtimes A$ are types for different kinds of code: code constructed with intensional recursion can only be gradually expanded in stages (or otherwise may result in non-termination), whereas code supporting \SFour is only a special case where next stages include the current one so that $\epsilon_X\colon {\boxtimes} X \to X$ is allowed.
-Therefore, separately from~$\boxtimes$, we give an exposure $\Box \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling \GL in a staged setting (\Cref{sec:GL}).
+To untie the knot and retain consistency and the understanding of $\Box A$ as code of type~$A$, we observe that in general $\Box A$ and $\boxtimes A$ are types for different kinds of code and should be kept separate: code constructed with intensional recursion can only be expanded in stages (or otherwise may result in non-termination), whereas code supporting \SFour is only a special case where next stages include the current one so that $\epsilon_X\colon {\boxtimes} X \to X$ is allowed.
+Therefore, separately from~$\boxtimes$, we give an exposure $\Box \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling the \GL modality in a staged setting (\Cref{sec:GL}).
 To express staged constructions more conveniently (without stage indexing), we work within guarded type theory.
 
 \subsubsection{Digression: Clocked cubical type theory}
@@ -704,17 +698,17 @@ An inhabitant of $\laterp (\alpha : \kappa).\, A$ therefore resembles a function
 For brevity, $\laterp (\alpha : \kappa).\,A$ is written as $\laterp^\kappa\, A$ if $\alpha$~is not referred to in~$A$.
 For example, the following term implements the normality axiom for $\laterp^\kappa$:
 \[
-  \mathtt{ap}^\kappa \defeq \lambda f.\,\lambda x.\,\lambda \alpha.\, f[\alpha]\,(x[\alpha]) : \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
+  \mathsf{ap}^\kappa \defeq \lambda f.\,\lambda x.\,\lambda \alpha.\, f[\alpha]\,(x[\alpha]) : \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
 \]
-Viewed as a function, $\mathtt{ap}^\kappa$ takes $f : \laterp^\kappa(A \to B)$ and $x : \laterp^\kappa A$ as arguments, both of which are values that can be used in a next stage, and should produce a result of type~$\laterp^\kappa B$, that is, a value of type~$B$ in a next stage; this result is constructed by first taking in a tick~$\alpha$---after which the rest of the term describes a construction in the next stage---and then applying both $f$~and~$x$ to~$\alpha$ to produce $f[\alpha] : A \to B$, $x[\alpha] : A$, and eventually $f[\alpha]\,(x[\alpha]) : B$ in the next stage.
+Viewed as a function, $\mathsf{ap}^\kappa$ takes $f : \laterp^\kappa(A \to B)$ and $x : \laterp^\kappa A$ as arguments, both of which are values that can be used in a next stage, and should produce a result of type~$\laterp^\kappa B$, that is, a value of type~$B$ in a next stage; this result is constructed by first taking in a tick~$\alpha$---after which the rest of the term describes a construction in the next stage---and then applying both $f$~and~$x$ to~$\alpha$ to produce $f[\alpha] : A \to B$, $x[\alpha] : A$, and eventually $f[\alpha]\,(x[\alpha]) : B$ in the next stage.
 Another important example is delaying a value to a next stage:
 \[
-  \mathtt{next}^\kappa \defeq \lambda x.\,\lambda \alpha.\, x : A \to \laterp^\kappa A.
+  \mathsf{next}^\kappa \defeq \lambda x.\,\lambda \alpha.\, x : A \to \laterp^\kappa A.
 \]
-In contrast to $\mathtt{next}^\kappa$, there is no term of type $\laterp^\kappa A \to A$, matching our intuition about a series of stages happening in order: in the current stage we should not be able to obtain a value that is only available in the next stage.
+In contrast to $\mathsf{next}^\kappa$, there is no term of type $\laterp^\kappa A \to A$, matching our intuition about a series of stages happening in order: in the current stage we should not be able to obtain a value that is only available in the next stage.
 Also there is no term of type $\laterp^\kappa \laterp^\kappa A \to \laterp^\kappa A$---it might be tempting to write $\lambda x.\, \lambda\alpha.\, x[\alpha][\alpha]$, but the two consecutive applications to~$\alpha$ are prohibited in CCTT.
 
-An important primitive is \emph{guarded recursion}, also known as \emph{Löb induction}: every function $f : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,f : \laterp^\kappa A$ which satisfies the fixed point equation $(\mathsf{dfix}^\kappa\,f)[\alpha] =_A f\,(\mathsf{dfix}^\kappa\,f)$, where the right-hand side can be seen as a fixed point of~$f$ without delay.
+An important primitive is \emph{guarded recursion}, also known as \emph{Löb induction}: every function $f : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,f : \laterp^\kappa A$ with the fixed point equation $(\mathsf{dfix}^\kappa\,f)[\alpha] =_A f\,(\mathsf{dfix}^\kappa\,f)$ where the right-hand side can be seen as a fixed point of~$f$ without delay.
 
 %\[
 %  \begin{minipage}{0.47\linewidth}
@@ -786,8 +780,7 @@ An important primitive is \emph{guarded recursion}, also known as \emph{Löb ind
 %We can further derive the fixed point $t(\mathsf{dfix}^\kappa\,t) : A$ without any delay.
 
 We now list some properties needed for~\Cref{sec:GL}.
-The first one helps to assure that we are still working with propositions and sets even when $\laterp^\kappa$ is involved.%
-\hsnote{acceptable form?}
+The first one helps to assure that we are still working with propositions and sets even when $\laterp^\kappa$ is involved.
 \begin{lemma}
   If $A[\alpha]$ is a proposition/set for arbitrary $\alpha : \kappa$, then so is $\laterp(\alpha: \kappa).\, A [\alpha]$.
 \end{lemma}
@@ -802,6 +795,7 @@ The later modality distributes over a $\Sigma$-type.
 \begin{lemma}\label{lem:later-sum}
   Let $B(x)$ be a family of types indexed by $x : A$.
   Then there are functions from $\laterp^\kappa \sm{x : A} B(x)$ to $\sm{x : \laterp^\kappa A} \laterp (\alpha : \kappa).\, B(x [\alpha])$ and vice versa.
+  In fact, the two types are equivalent.
 \end{lemma}
 Therefore guarded recursion has a specialised form for $\Sigma$-types.
 \begin{corollary} \label{coro:lob-induction-sum}
@@ -818,15 +812,14 @@ Therefore guarded recursion has a specialised form for $\Sigma$-types.
 %  $\mathtt{force}\,(\lambda \kappa.\,\lambda (\alpha : \kappa).\, x [\kappa])\,\kappa = x\,\kappa$ is inhabited for any clock $\kappa$.
 %\end{lemma}
 The final property states that if two values delayed to a next stage are equal, then they are equal in the current stage.
-It may be tempting to formulate the property as $(\mathtt{next}^\kappa\, x =_{\laterp^\kappa A} \mathtt{next}^\kappa\, y) \to (x =_A y)$, but this is in fact invalid, since (analogously to function extensionality) the antecedent equality is equivalent to $\laterp^\kappa (x =_A y)$ rather than $x =_A y$.%
-\hsnote{cite?}
+It may be tempting to formulate the property as $\mathsf{next}^\kappa\, x =_{\laterp^\kappa A} \mathsf{next}^\kappa\, y \to x =_A y$, but this is in fact invalid, since (analogously to function extensionality) the antecedent equality is equivalent to $\laterp^\kappa (x =_A y)$ rather than $x =_A y$~\cite{Mogelberg2019a}.
 The correct formulation is the following, where the antecedent includes a \emph{clock quantification}~`$\forall\kappa$'.
 \begin{lemma}\label{lem:later-identity}
-  Let $x$ and $y : A$. Then $x =_A y$ if\/ $\forall \kappa.\, \mathtt{next}^\kappa\,x =_{\laterp^\kappa A} \mathtt{next}^\kappa\,y$.
+  Let $x$ and $y : A$. Then $x =_A y$ if\/ $\forall \kappa.\, \mathsf{next}^\kappa\,x =_{\laterp^\kappa A} \mathsf{next}^\kappa\,y$.
 \end{lemma}
-This lemma holds because, with clock quantification, it is possible to write Atkey and McBride's~\cite{Atkey2013b} operator $\mathtt{force} : (\forall\kappa.\, \laterp^\kappa A) \to (\forall\kappa.\, A)$, which can then be applied to the equality $\forall\kappa.\, \laterp^\kappa (x =_A y)$ equivalent to the antecedent and yield $\forall\kappa.\, x =_A y$, which is equivalent to $x =_A y$.
-One way to think about (fully) clock-quantified types is that they are independent of the choice of clocks and can be viewed as the types of pure, completed descriptions of staged computation (rather than ongoing computations that are taking effect in stages with respect to a particular clock in scope).
-We can manipulate such descriptions at will, irrespective of our current timeline---in particular, it is perfectly fine to take a description of a staged computation that produces results from the second stage onwards and make it produce the results right from the first stage instead, which is what $\mathtt{force}$ does.
+This lemma holds because, with clock quantification, it is possible to write Atkey and McBride's~\cite{Atkey2013b} operator $\mathsf{force} : (\forall\kappa.\, \laterp^\kappa A) \to (\forall\kappa.\, A)$, which can then be applied to the equality $\forall\kappa.\, \laterp^\kappa (x =_A y)$ equivalent to the antecedent and yield $\forall\kappa.\, x =_A y$, which is equivalent to $x =_A y$.
+One way to think about (fully) clock-quantified types is that they are independent of the choice of clocks and can be viewed as the types of pure, completed descriptions of staged computation rather than ongoing computations that are taking effect in stages with respect to a particular clock in scope.
+We can manipulate such descriptions at will, irrespective of our current timeline---in particular, it is perfectly fine to take a description of a staged computation that produces results from the second stage onwards and make it produce the results right from the first stage instead, which is what $\mathsf{force}$ does.
 
 %It follows that a path between two inhabitants $\mathtt{next}\,x_i$ in a time step gives rise to a path now.
 %In other words, paths are timeless.
@@ -886,7 +879,7 @@ It is straightforward to show that $\Box$~is a clocked exposure by \Cref{lem:lat
 
 \begin{proposition}
 There is a family of trackable maps
-from $\boxtimes^\kappa (X \Rightarrow Y)$ to $\boxtimes^\kappa X \Rightarrow \boxtimes^\kappa Y$  tracked by $\lambda \mathtt{x}_0.\, \mathtt{ap}[\mathtt{x}_1] \, \mathtt{x}_0$.
+from $\Box^\kappa (X \Rightarrow Y)$ to $\Box^\kappa X \Rightarrow \Box^\kappa Y$  tracked by $\lambda \mathtt{x}_0.\, \mathtt{ap}[\mathtt{x}_1] \, \mathtt{x}_0$.
 \end{proposition}
 
 Similar to~\Cref{thm:S4-no-quoting}, no morphism $\Lambda_0 \to \Box^\kappa \Lambda_0$ can be quoting.
@@ -895,7 +888,6 @@ Similar to~\Cref{thm:S4-no-quoting}, no morphism $\Lambda_0 \to \Box^\kappa \Lam
 \end{theorem}
 
 It is also not possible to have a family of trackable maps $\epsilon_X$ from $\Box^\kappa X$ to $X$ natural in $X$, since the extension of $(M, x, r)$ can only be projected in a time step away from now.%
-\hsnote{Don't mention naturality?}
 \begin{theorem}\label{thm:GL-no-eval}
   There is no function from $\bproj{\Box^\kappa \bot}$ to $\bproj{\bot}$.
   In particular, there is no natural transformation from $\Box^\kappa$ to $\mathcal{I}$ for any $\kappa$.
@@ -911,7 +903,7 @@ It is also not possible to have a family of trackable maps $\epsilon_X$ from $\B
   Choose an arbitrary closed term~$M$, say $\mathtt{\lambda x.\, x}$, and apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ in a time step to get $r \defeq \lambda \alpha.\, \mathsf{rec}_{\Empty}\,(M \Vdash_\bot x[\alpha])\,x[\alpha]$, which is an inhabitant of $\laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]$, so $(M, x, r)$ is of type $\bproj{\Box^\kappa \bot}$. 
 \end{proof}
 
-The pay-off for disallowing evaluation is to be able to derive intensional recursion, which is logically the deductive form(s) of the Gödel-Löb axiom, as well as the (\GL) axiom.
+The pay-off for disallowing evaluation is to be able to derive intensional recursion, which is logically the deductive form(s) of the Gödel-Löb axiom, as well as the \GL axiom.
 
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
   For every trackable map $f \colon \Box^\kappa X \to X$, there are
@@ -952,7 +944,7 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
   The equation $f^\ddagger \sim f\circ \Box^\kappa(f^\ddagger) \circ \bigstar$ follows from the fixed point equation for guarded recursion. 
 \end{proof}
 
-The (\GL) axiom can be realised by a similar construction, too.
+The \GL axiom can be realised by a similar construction, too.
 \begin{theorem}\label{thm:internal-gl}
   There is a family of trackable maps from 
   $\Box^\kappa (\Box^\kappa X \Rightarrow X)$ to $\Box^\kappa X$.
@@ -975,7 +967,7 @@ For example
 $\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$, so $\bproj{\boxtimes_K \top}$ has only one element $(\star, \mathtt{I})$, too. 
 Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
 Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
-Finally, it is not clear how to refute the internal quoting for $\boxtimes_K$.
+Finally, it is not clear how to refute the generic quoting for $\boxtimes_K$.
 Using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$, the exposure~$\boxtimes$ is able to distinguish $\beta$-equivalent intensions, so $\boxtimes$---being more intensional than~$\boxtimes_K$---lacks well-behaved extensional properties.
 
 Artemov and Beklemishev~\cite{Artemov2005} pointed out that
