@@ -311,8 +311,8 @@ For the sake of formalisation and potential applications in programming language
   \]
   where
   \begin{align}
-    \mathsf{Respects}\left(\mathord{\Vdash_X}, \mathord{\twoheadrightarrow_\beta}\right) & \defeq\prd{M N : \Lambda_0}{x : |X|} \left(M \twoheadrightarrow_ \beta N\right) \to \left(N \Vdash x\right) \to \left(M \Vdash x\right) \label{eq:respect-reduction} \\      
-    \mathsf{RightTotal}(\Vdash_X) & \defeq \fall{x : |X|}\exis{M : \Lambda_0} M \Vdash x
+    \mathsf{Respects}\left(\mathord{\Vdash}, \mathord{\twoheadrightarrow_\beta}\right) & \defeq\prd{M N : \Lambda_0}{x : |X|} \left(M \twoheadrightarrow_ \beta N\right) \to \left(N \Vdash x\right) \to \left(M \Vdash x\right) \label{eq:respect-reduction} \\      
+    \mathsf{RightTotal}(\Vdash) & \defeq \fall{x : |X|}\exis{M : \Lambda_0} M \Vdash x
     \label{eq:right-total}
   \end{align}
 \end{definition}
@@ -848,7 +848,7 @@ For an assembly $X$, the carrier $\bproj{\Box^\kappa X}$ and the realisability r
 \[
   \bproj{\Box^\kappa X} \defeq \sm{M : \Lambda_0}{x : {\laterp^\kappa \bproj{X}}} \laterp (\alpha : \kappa) .\, M \Vdash_X x [\alpha]
   \quad\text{and}\quad
-  \left(N \Vdash_{\Box^\kappa X} (M, x, \star) \right) \defeq N \reduce \qquote{M}
+  \left(N \Vdash_{\Box^\kappa X} (M, x, r) \right) \defeq N \reduce \qquote{M}
 \]
 where $\Vdash_{\Box^\kappa X}$ is defined in the same way as the exposure~$\boxtimes$.
 The main difference between the carriers $\bproj{\boxtimes X}$ and $\bproj{\Box^\kappa X}$ is that the extension part $\bproj{X}$ becomes $\laterp^\kappa \bproj{X}$.
