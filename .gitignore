@@ -3,3 +3,4 @@
 library_fixed.bib
 *.agda#
 _build
+tags
