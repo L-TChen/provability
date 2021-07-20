@@ -160,12 +160,12 @@ After recalling preliminaries on homotopy type theory, untyped $\lambda$-calculu
 Most, if not all, of the materials in this section are standard, so we do not go into the details.
 
 \subsection{Homotopy type theory}
-In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $x =_A y$ of proofs that $x$~and~$y$ are equal; given an equality proof $p : x =_A y$, any $z : B(x)$ can be converted to $\mathsf{transport}(p, z) : B(y)$.
-Between equality proofs $p$, $q : x =_A y$ there is again a higher-dimensional equality type $p =_{x\,{=_A}\,y} q$, and so on.
+In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $\id[A]{x}{y}$ of proofs that $x$~and~$y$ are (propositionally) equal; given an equality proof $p : x =_A y$, any $z : B(x)$ can be converted to $\mathsf{transport}(p, z) : B(y)$.
+Between equality proofs $p$, $q : \id[A]{x}{y}$ there is again a higher-dimensional equality type $\id[{\id[A]{x}{y}}]{p}{q}$, and so on.
 Homotopy type theory (HoTT) identifies this infinite-dimensional structure of equality types as an abstract form of homotopy theory, where types are interpreted as spaces and equality proofs as paths; in particular, equality types are path spaces, and paths between paths are homotopies.
 We do not make use of the full generality of HoTT, however, and work exclusively with \emph{propositions} and \emph{sets}, whose equality structure degenerates at higher dimensions.
 
-A \emph{proposition}~$P$ is a type whose equality types $x =_P y$, for $x$ and $y : P$, are all inhabited---all inhabitants of~$P$ are deemed equal, so all we care about~$P$ is whether it is inhabited, not its specific inhabitants.
+A \emph{proposition}~$P$ is a type whose equality types $\id[P]{x}{y}$, for $x$ and $y : P$, are all inhabited---all inhabitants of~$P$ are deemed equal, so all we care about~$P$ is whether it is inhabited, not its specific inhabitants.
 Hence, we will simply write~$\star$ when referring to an inhabitant of any proposition.
 If $P$~and~$Q$ are propositions, then their product $P \times Q$ is also a proposition.
 Similarly, if a family $R(x)$ of types indexed by $x : A$ (where $A$~is any type) are all propositions, then the product $\prd{x : A} R(x)$ is also a proposition.
@@ -191,14 +191,14 @@ For $\lambda$-calculus we only fix notations.
 The details are left to, for example, the classic textbook by Barendregt~\cite{Barendregt1984a}.
 Terms are defined informally by
 \[
-  M \defeq \mathtt{x} \mid M\,N \mid \lambda \mathtt{x}.\, M
+  M \defeq \mathtt{x} \mid M\,N \mid \lam{\mathtt{x}}M
 \]
 where variables $\mathtt{x}$'s are in the typewriter font.
 $\Lambda$ denotes the type of terms and $\Lambda_n$ the type of terms with at most $n$ free variables.
 In particular, $\Lambda_0$ is the type of \emph{closed terms}.
-Our formalisation uses the de Bruijn representation, so the $\alpha$-equivalence~$=_\alpha$ coincides with the identity type~$=_\Lambda$ by construction.
+Our formalisation uses the de Bruijn representation, so the $\alpha$-equivalence~$=_\alpha$ coincides with the equality type~$=_\Lambda$ by construction.
 For the presentation in this paper, the variable with index~$i$ is written $\mathtt{x}_i$\,, and given $F : \Lambda_{n+1}$ we write $F[M]$ instead of $F[M/\mathtt{x}_0]$ for the substitution for the first free variable~$\mathtt{x}_0$.
-The type~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lambda \mathtt{x}.\,M)\,N \onereduce M [ N / \mathtt{x} ]$; as a special case, the type $M \reduce M$ has exactly one inhabitant $\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$, which can be understood as either the empty sequence or (the proof of) the reflexivity of reduction.
+The type~$M \reduce N$ of reductions from $M$ to $N$ consists of sequences of reduction rules such as $\beta : (\lam{\mathtt{x}}M)\,N \onereduce M [ N / \mathtt{x} ]$; as a special case, the type $M \reduce M$ has exactly one inhabitant $\refl_\twoheadrightarrow M$, or just $\refl_\twoheadrightarrow$, which can be understood as either the empty sequence or (the proof of) the reflexivity of reduction.
 The types $\Lambda$ and $M \reduce N$ have decidable equality, so they are sets by Hedberg's theorem.
 
 There is a function between $\lambda$-terms $\qquote{\cdot} : \Lambda \to \Lambda_0$ such that $\qquote{M}$ is normal and
@@ -256,7 +256,7 @@ It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed categor
   \end{romanenumerate}
 \end{definition}
 
-A $\PP$-category has two kinds of equality for morphisms---the underlying identity $=$ and the partial equivalence relation $\sim$, where the former can be used to model the \emph{intensional equality} and the latter the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
+A $\PP$-category has two kinds of equality for morphisms---the underlying equality $=$ and the partial equivalence relation $\sim$, where the former can be used to model the \emph{intensional equality} and the latter the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
 Having two different equalities $=$~and~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not vice versa.
 For categorical semantics, where terms are interpreted as morphisms, an interpretation into a $\PP$-category is able to discriminate these two kinds of equality, enabling us to model intensionality.
 The usual categorical notions such as functors and initiality are up to the intensional equality~$=$\,; when we want to use the notions up to the extensional equality~$\sim$, we will add the `$\PP$-' prefix and say $\PP$-functors, $\PP$-initiality, etc.
@@ -391,7 +391,7 @@ We now investigate some of its basic properties.
   The unit $\top \defeq (\Unit, \Vdash_\top, r_\top, t_\top)$ is $\PP$-terminal where 
   \begin{romanenumerate}
     \item $\Unit$ is the unit type,  
-    \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{I}$ where $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$, 
+  \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{I}$ where $\mathtt{I} \defeq \lam{\mathtt{x}}\mathtt{x}$, 
     \item $r_\top : (M \reduce N) \to (N \reduce L) \to (M \reduce L)$ given by the transitivity of $\reduce$,
     \item and $t_\top$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{I}$ (by reflexivity).
   \end{romanenumerate}
@@ -406,7 +406,7 @@ In $\Asm(\Lambda)$, as trackers are part of trackable maps, an element has to be
   Let $X$ be an assembly. Then the following statements hold:
   \begin{enumerate}
     \item Every inhabitant $x : \bproj{X}$ corresponds to a merely trackable map from $\top$ to $X$.
-    \item Every pair of $x : \bproj{X}$ and $M : \Lambda_0$ with $r : M \Vdash_X x$ defines a \emph{closed} element of $X$, i.e.\ a trackable map $(\lambda\anonymous.\, x, M, \lambda\anonymous.\,\lambda\anonymous.\, \lambda\anonymous.\, r)$ from $\top$ to $X$.
+    \item Every pair of $x : \bproj{X}$ and $M : \Lambda_0$ with $r : M \Vdash_X x$ defines a \emph{closed} element of $X$, i.e.\ a trackable map $(\lam{\anonymous}x, M, \lam{\anonymous}{\anonymous}{\anonymous}r)$ from $\top$ to $X$.
   \end{enumerate}
 \end{lemma}
 
@@ -450,8 +450,8 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious and, 
   It remains to construct $r_{X\Rightarrow Y}$ and $t_{X \Rightarrow Y}$: 
   We know that $L' \reduce L$ implies $L'\,M \reduce L\,M$, so $L'$ realises $(f, \star)$ whenever $L$ realises $(f, \star)$ and $L' \reduce L$ by $r_Y$.
   For every $(f, \star) : |X \Rightarrow Y|$, there merely exists a tracker of $f$, say $F$.
-  We see that $L \defeq \left(\mathtt{\lambda x}.\,F\right)$ realises $(f, \star)$, since
-  $\left(\mathtt{\lambda x}.\,F\right)\,M \onereduce F[M]$ for any $M$ and $F[M] \Vdash_Y f\,x$ whenever $M \Vdash_X x$.
+  We see that $L \defeq \lam{\mathtt{x}}F$ realises $(f, \star)$, since
+  $\left(\lam{\mathtt{x}}F\right)\,M \onereduce F[M]$ for any $M$ and $F[M] \Vdash_Y f\,x$ whenever $M \Vdash_X x$.
   By applying the recursion principle of the truncated type $\brck{\sm{F : \Lambda_1} \mathsf{Tracks}_{X, Y}(F, f) }$ to the second component of $(f, \star)$, there merely exists a realiser of $(f, \star)$ for the right totality.
 
   The \emph{evaluation map} $(X \Rightarrow Y) \times X \xrightarrow{ev_{X, Y}} Y$ natural in $X$ and $Y$ consists of a function
@@ -459,12 +459,12 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious and, 
 
   The \emph{curried map} $(f^*, F^*, \mathfrak{f}^*)$ of a trackable function $(f, F, \mathfrak{f})$ from $Z \times X$ to $Y$ consists of
     a function
-      $f^* \defeq \lambda z.\, ((\lambda x.\, f\,(z, x)) , \star_z)$, 
-      where by the recursion principle on the mere existence of a realiser $L_z \defeq t_Z z$ there is merely a tracker~$F[\left< L_z , \mathtt{x}_0 \right>]$ of $\lambda x.\, f\,(z, x)$, and
-    a term $F^* \defeq \lambda \mathtt{x}_0.\, F[ \left< \mathtt{x}_1, \mathtt{x}_0 \right> ]$ with 
+    $f^* \defeq \lam{z}((\lam{x}f\,(z, x)) , \star_z)$, 
+    where by the recursion principle on the mere existence of a realiser $L_z \defeq t_Z z$ there is merely a tracker~$F[\left< L_z , \mathtt{x}_0 \right>]$ of $\lam{x}f\,(z, x)$, and
+    a term $F^* \defeq \lam{\mathtt{x}_0}F[ \left< \mathtt{x}_1, \mathtt{x}_0 \right> ]$ with 
     a witness $\mathfrak{f}^*$ of $\prd{L : \Lambda_0}{z : |Z|} \left(L \Vdash_Z z\right) \to \left(F^*[L] \Vdash_{X \Rightarrow Y} f\, z\right)$ because of the reduction
       \[
-        \left(\lambda \mathtt{x}_0, F[\left< L , \mathtt{x}_0 \right>]\right)\,M \onereduce F[\left< L , M \right>]
+        \left(\lam{\mathtt{x}_0} F[\left< L , \mathtt{x}_0 \right>]\right)\,M \onereduce F[\left< L , M \right>]
       \]
       and that $F$ is indeed a tracker of~$f\colon \bproj{Z \times X} \to \bproj{Y}$. 
   It is routine to verify remaining details.
@@ -536,7 +536,7 @@ It follows that the exposure $\boxtimes$ does not preserve finite $\PP$-products
     \boxtimes f(M, x, r) = (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r)
     = (G[M], \bproj{g}\,x, \mathfrak{g}\,M\,x\,r) = \boxtimes g (M, x, r)
   \]
-  since the identity type on $\boxtimes Y$ is a proposition.
+  since the equality type on $\boxtimes Y$ is a proposition.
   Therefore, we have $\prd{x : \bproj{X}} \bproj{f}\,x =_Y \bproj{g}\,x$.
   By function extensionality it then follows that $\left(\bproj{f} =_{\bproj{X} \to \bproj{Y}} \bproj{g}\right) \equiv f \sim g$.
 
@@ -590,7 +590,7 @@ In general, the \emph{lax naturality} appears more appropriate in the presence o
 The normality condition is realised exactly by~$\mathtt{ap}$ without naturality:
 \begin{proposition}
 There is a family of trackable maps
-from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lambda x_0.\, \mathtt{ap}[x_1]\; x_0$.
+from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lam{\mathtt{x_0}}\mathtt{ap}[\mathtt{x_1}]\;\mathtt{x_0}$.
 \end{proposition}
 
 On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute quotations for arbitrary~$A$, since this is already impossible for the particular case of $\Lambda_0 \to {\boxtimes} \Lambda_0$.
@@ -613,7 +613,7 @@ On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute 
 \end{theorem}
 \begin{proof}
   Assume $\eta \colon \Lambda_0 \to {\boxtimes} \Lambda_0$ with $\eta \circ a \sim {\boxtimes} a \circ \bigstar$ for any $a \colon \top \to \Lambda_0$ given by \Cref{lem:global-element}.
-  Every closed term $M$ defines an element $\widehat{M} \defeq (\lambda\anonymous.\, M, M, \lambda\anonymous.\, \lambda\anonymous.\, \lambda\anonymous.\, \refl_\twoheadrightarrow)$ of $\Lambda_0$ and thus $\bproj{\boxtimes\widehat{M}}(N, y, s) = (M, M, \refl_\twoheadrightarrow)$ for any $(N, y, s) : \boxtimes \top$ by definition.
+  Every closed term $M$ defines an element $\widehat{M} \defeq (\lam{\anonymous}M, M, \lam{\anonymous}{\anonymous}{\anonymous}\refl_\twoheadrightarrow)$ of $\Lambda_0$ and thus $\bproj{\boxtimes\widehat{M}}(N, y, s) = (M, M, \refl_\twoheadrightarrow)$ for any $(N, y, s) : \boxtimes \top$ by definition.
   By assumption
   \[
     \bproj{\eta}\,M \equiv \bproj{\eta} \left(\bproj{\widehat{M}}\,\star\right) =  \bproj{\boxtimes\widehat{M}}\,(\bproj{\bigstar}\,\star) = (M, M, \refl_\twoheadrightarrow),
@@ -694,19 +694,19 @@ Here we only intuitively introduce the constructs and properties of CCTT that ar
 
 CCTT features a new type $\laterp (\alpha : \kappa).\, A$ of suspended computations that take in a tick~$\alpha$ on a clock~$\kappa$ to produce an inhabitant of~$A$ in a next stage.
 (Clocks will be discussed towards the end and can be ignored for now.)
-An inhabitant of $\laterp (\alpha : \kappa).\, A$ therefore resembles a function computationally, and can be introduced as a $\lambda$-expression $\lambda(\alpha : \kappa).\,t$ (often abbreviated to $\lambda\alpha.\,t$) where $t : A$, or eliminated by application to a tick, denoted by $f[\alpha] : A$ where $f : \laterp (\alpha : \kappa).\, A$ and $\alpha : \kappa$.
+An inhabitant of $\laterp (\alpha : \kappa).\, A$ therefore resembles a function computationally, and can be introduced as a $\lambda$-expression $\lam{\alpha : \kappa}t$, often abbreviated to $\lam{\alpha}t$, where $t : A$, or eliminated by application to a tick, denoted by $f[\alpha] : A$ where $f : \laterp (\alpha : \kappa).\, A$ and $\alpha : \kappa$.
 For brevity, $\laterp (\alpha : \kappa).\,A$ is written as $\laterp^\kappa\, A$ if $\alpha$~is not referred to in~$A$.
 For example, the following term implements the normality axiom for $\laterp^\kappa$:
 \[
-  \mathsf{ap}^\kappa \defeq \lambda f.\,\lambda x.\,\lambda \alpha.\, f[\alpha]\,(x[\alpha]) : \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
+  \mathsf{ap}^\kappa \defeq \lam{f}{x}{\alpha}f[\alpha]\,(x[\alpha]) : \laterp^\kappa(A \to B) \to \laterp^\kappa A \to \laterp^\kappa B.
 \]
 Viewed as a function, $\mathsf{ap}^\kappa$ takes $f : \laterp^\kappa(A \to B)$ and $x : \laterp^\kappa A$ as arguments, both of which are values that can be used in a next stage, and should produce a result of type~$\laterp^\kappa B$, that is, a value of type~$B$ in a next stage; this result is constructed by first taking in a tick~$\alpha$---after which the rest of the term describes a construction in the next stage---and then applying both $f$~and~$x$ to~$\alpha$ to produce $f[\alpha] : A \to B$, $x[\alpha] : A$, and eventually $f[\alpha]\,(x[\alpha]) : B$ in the next stage.
 Another important example is delaying a value to a next stage:
 \[
-  \mathsf{next}^\kappa \defeq \lambda x.\,\lambda \alpha.\, x : A \to \laterp^\kappa A.
+  \mathsf{next}^\kappa \defeq \lam{x}{\alpha}x : A \to \laterp^\kappa A.
 \]
 In contrast to $\mathsf{next}^\kappa$, there is no term of type $\laterp^\kappa A \to A$, matching our intuition about a series of stages happening in order: in the current stage we should not be able to obtain a value that is only available in the next stage.
-Also there is no term of type $\laterp^\kappa \laterp^\kappa A \to \laterp^\kappa A$---it might be tempting to write $\lambda x.\, \lambda\alpha.\, x[\alpha][\alpha]$, but the two consecutive applications to~$\alpha$ are prohibited in CCTT.
+Also there is no term of type $\laterp^\kappa \laterp^\kappa A \to \laterp^\kappa A$---it might be tempting to write $\lam{x}{\alpha}x[\alpha][\alpha]$, but the two consecutive applications to~$\alpha$ are prohibited in CCTT.
 
 An important primitive is \emph{guarded recursion}, also known as \emph{Löb induction}: every function $f : \laterp^\kappa A \to A$ has a delayed fixed point $\mathsf{dfix}^\kappa\,f : \laterp^\kappa A$ with the fixed point equation $(\mathsf{dfix}^\kappa\,f)[\alpha] =_A f\,(\mathsf{dfix}^\kappa\,f)$ where the right-hand side can be seen as a fixed point of~$f$ without delay.
 
@@ -861,7 +861,7 @@ Similarly, $\Box^\kappa X \defeq (\bproj{\Box^\kappa X}, \Vdash_{\Box^\kappa X},
 
 For any trackable map $f$ from $X$ to $Y$, also define $\Box^\kappa f$ in the same way as $\boxtimes f$ except that a later modality is involved: 
 \[
-  \bproj{\Box^\kappa f}(M, x, r) \defeq (F[M], \laterp^\kappa \bproj{f}\, x, \lambda \alpha.\, \mathfrak{f}\,M\,(x[\alpha])\,(r[\alpha]))
+  \bproj{\Box^\kappa f}(M, x, r) \defeq (F[M], \laterp^\kappa \bproj{f}\, x, \lam{\alpha}\mathfrak{f}\,M\,(x[\alpha])\,(r[\alpha]))
 \]
 where $\laterp^\kappa \bproj{f} : \laterp^\kappa \bproj{X} \to \laterp^\kappa \bproj{Y}$ is given by the functoriality of the later modality~$\mathord{\laterp}^\kappa$.
 %with $(\laterp^\kappa \bproj{f}\, x)[\alpha]$ being judgementally equal to $|f|(x[\alpha])$.
@@ -879,7 +879,7 @@ It is straightforward to show that $\Box$~is a clocked exposure by \Cref{lem:lat
 
 \begin{proposition}
 There is a family of trackable maps
-from $\Box^\kappa (X \Rightarrow Y)$ to $\Box^\kappa X \Rightarrow \Box^\kappa Y$  tracked by $\lambda \mathtt{x}_0.\, \mathtt{ap}[\mathtt{x}_1] \, \mathtt{x}_0$.
+from $\Box^\kappa (X \Rightarrow Y)$ to $\Box^\kappa X \Rightarrow \Box^\kappa Y$  tracked by $\lam{\mathtt{x}_0} \mathtt{ap}[\mathtt{x}_1] \, \mathtt{x}_0$.
 \end{proposition}
 
 Similar to~\Cref{thm:S4-no-quoting}, no morphism $\Lambda_0 \to \Box^\kappa \Lambda_0$ can be quoting.
@@ -900,7 +900,7 @@ It is also not possible to have a family of trackable maps $\epsilon_X$ from $\B
 %    \Box^\kappa \bot \equiv \sm{M : \Lambda_0}{x : {\laterp \Empty}} \laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]
 %  \]
   so that the function $\bproj{\epsilon_\bot}$ from $\bproj{\Box^\kappa \bot}$ to $\bproj{\bot} \equiv \Empty$ can be applied.
-  Choose an arbitrary closed term~$M$, say $\mathtt{\lambda x.\, x}$, and apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ in a time step to get $r \defeq \lambda \alpha.\, \mathsf{rec}_{\Empty}\,(M \Vdash_\bot x[\alpha])\,x[\alpha]$, which is an inhabitant of $\laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]$, so $(M, x, r)$ is of type $\bproj{\Box^\kappa \bot}$. 
+  Choose an arbitrary closed term~$M$, say $\mathtt{\lam{x}x}$, and apply the recursion principle~$\mathsf{rec}_{\Empty}$ of the empty type to~$x$ in a time step to get $r \defeq \lam{\alpha}\rec{\Empty}\,(M \Vdash_\bot x[\alpha])\,x[\alpha]$, which is an inhabitant of $\laterp (\alpha : \kappa) .\, M \Vdash_\bot x [\alpha]$, so $(M, x, r)$ is of type $\bproj{\Box^\kappa \bot}$. 
 \end{proof}
 
 The pay-off for disallowing evaluation is to be able to derive intensional recursion, which is logically the deductive form(s) of the Gödel-Löb axiom, as well as the \GL axiom.
@@ -916,7 +916,7 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
 
 \begin{proof}
   Let $f$~be a trackable map from $\Box^\kappa X$ to $X$ tracked by~$F : \Lambda_1$.
-  Applying \Cref{thm:SRT} to $\lambda\mathtt{x}_0.\,F : \Lambda_0$, we obtain a term $\mathsf{fix}\,F : \Lambda_0$ with $\mathsf{fix}\,F \reduce (\lambda\mathtt{x}_0.\,F)\,\qquote{\mathsf{fix}\,F} \onereduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
+  Applying \Cref{thm:SRT} to $\lam{\mathtt{x}_0}F : \Lambda_0$, we obtain a term $\mathsf{fix}\,F : \Lambda_0$ with $\mathsf{fix}\,F \reduce (\lam{\mathtt{x}_0}F)\,\qquote{\mathsf{fix}\,F} \onereduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
   Now we construct the first element by Löb induction on a $\Sigma$-type (\Cref{coro:lob-induction-sum}):
   assuming%
   \[
