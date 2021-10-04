@@ -400,13 +400,8 @@ We now investigate some of its basic properties.
   The unit $\top \defeq (\Unit, \Vdash_\top, r_\top, t_\top)$ is $\PP$-terminal where 
   \begin{romanenumerate}
     \item $\Unit$ is the unit type,  
-<<<<<<< Updated upstream
-  \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{I}$ where $\mathtt{I} \defeq \lam{\mathtt{x}}\mathtt{x}$, 
-    \item $r_\top : (M \reduce N) \to (N \reduce L) \to (M \reduce L)$ given by the transitivity of $\reduce$,
-=======
     \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{I}$ where $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$, 
     \item $r_\top : (M \reduce N) \to (N \reduce \mathtt{I}) \to (M \reduce \mathtt{I})$ given by the transitivity of $\reduce$,
->>>>>>> Stashed changes
     \item and $t_\top$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{I}$ (by reflexivity).
   \end{romanenumerate}
   The finality follows from function extensionality.
