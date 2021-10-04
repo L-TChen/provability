@@ -1,4 +1,4 @@
-\documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate]{lipics-v2021}
+\documentclass[a4paper,UKenglish,numberwithinsect,cleveref,thm-restate,draft]{lipics-v2021}
 \numberwithin{equation}{section}
 
 %\usepackage{mlmodern}
@@ -99,7 +99,8 @@ Inspired by staged computation, we observe that a term of type $\mathtt{Code}\,A
 Consequently, we use two separate modalities $\boxtimes$~and~$\Box$ to model \SFour and \GL respectively in a unified categorical framework while retaining logical consistency.
 Following Kavvos'~(2017) novel approach to the semantics of intensionality, we interpret the two modalities in the $\PP$-category of assemblies and trackable maps.
 For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `next' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
-Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the internal generic quoting $A \to \Box A$ as well as $A \to \boxtimes A$.
+Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the internal generic quoting $A \to \Box A$ as well as $A \to \boxtimes A$.%
+\hsnote{rewrite}
 Our results are developed in (guarded) homotopy type theory and formalised in Agda.
 \end{abstract}
 
@@ -115,7 +116,8 @@ Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~
 In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the \SFour modality~$\boxtimes$.
 More specifically, the \textbf{4} axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages;
 the \textbf{T} axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
-For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
+For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.%
+\ltnote{definitions of modal logics}
 
 Recently, Kavvos proposed \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
 Logically, intensional recursion amounts to the \GL (Gödel-Löb) axiom $\Box (\Box A \to A) \to \Box A$, where $\Box$ stands for `provability', and computationally its behaviour mirrors Kleene's second recursion theorem.
@@ -146,10 +148,12 @@ The difference between $\boxtimes X$ and $\Box X$ is what extensions are.
 The above constructions do not give rise to $\PP$-functors but `exposures'~\cite{Kavvos2017b} so that congruence (the preservation of extensional equality) is not required by definition and is actually false.
 Hence, by refuting both congruence and generic quoting, which previous work~\cite{Gabbay2013,Kavvos2017b} did not achieve, our denotational semantics is more intensional in the sense that it provides a finer-grained equality which allows us to distinguish computationally equivalent intensions.%
 
-We use homotopy type theory (HoTT)~\cite{hottbook} as our metalanguage, although this is mainly for convenience.
+We use homotopy type theory (HoTT)~\cite{hottbook} as our metalanguage, although this is mainly for convenience.%
+\hsnote{subset, no univalence}
 More specifically, our work is built upon the reformulated set theory and logic within HoTT, which enable us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence (for example, within HoTT we can easily distinguish between `pairs of an extension and an intension' and `extensions associated with at least an intension').
 Moreover, implementations of HoTT are readily available, so we are able to formalise and verify our constructions, for which HoTT provides essential features that some other type theories lack, notably function extensionality: $\left(\fall{x : A} f\,x =_B g\,x\right) \to f = g$.
-Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also supports guarded type theory in the guarded cubical mode.
+Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also supports guarded type theory in the guarded cubical mode.%
+\hsnote{cubical implementation of HoTT, clocked cubical type theory (for forcing), no native cubical arguments}
 
 %\paragraph*{Contributions}
 
@@ -163,7 +167,8 @@ Most, if not all, of the materials in this section are standard, so we do not go
 In type theory, between every two inhabitants $x$~and~$y$ of a type~$A$, there is a type $\id[A]{x}{y}$ of proofs that $x$~and~$y$ are (propositionally) equal; given an equality proof $p : x =_A y$, any $z : B(x)$ can be converted to $\mathsf{transport}(p, z) : B(y)$.
 Between equality proofs $p$, $q : \id[A]{x}{y}$ there is again a higher-dimensional equality type $\id[{\id[A]{x}{y}}]{p}{q}$, and so on.
 Homotopy type theory (HoTT) identifies this infinite-dimensional structure of equality types as an abstract form of homotopy theory, where types are interpreted as spaces and equality proofs as paths; in particular, equality types are path spaces, and paths between paths are homotopies.
-We do not make use of the full generality of HoTT, however, and work exclusively with \emph{propositions} and \emph{sets}, whose equality structure degenerates at higher dimensions.
+We do not make use of the full generality of HoTT, however, and work exclusively with \emph{propositions} and \emph{sets}, whose equality structure degenerates at higher dimensions.%
+\hsnote{rewrite as notation fixing?}
 
 A \emph{proposition}~$P$ is a type whose equality types $\id[P]{x}{y}$, for $x$ and $y : P$, are all inhabited---all inhabitants of~$P$ are deemed equal, so all we care about~$P$ is whether it is inhabited, not its specific inhabitants.
 Hence, we will simply write~$\star$ when referring to an inhabitant of any proposition.
@@ -180,7 +185,8 @@ With truncation, we can obtain a classical version of existential quantification
 Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
 \emph{Sets} are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
-It is easy to check that the types we work with in this paper are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set (which we will write as $A : \set$ for short).
+It is easy to check that the types we work with in this paper are sets: types constructed from sets and the type formers $\times$, $+$, $\to$, $\prod$, and~$\sum$ are all sets, and \emph{Hedberg's theorem} says that if a type~$A$ has decidable equality---that is, $\prd{x, y : A} (x =_A y) + \neg(x =_A y)$---then $A$~is a set (which we will write as $A : \set$ for short).%
+\hsnote{Hedberg's theorem for our own sets}
 
 %We highlight the main difference between set theory and homotopy type theory.
 %\ltnote{(mere) proposition, set, structure vs.\ property, $n$-types are closed under $\sum$, $\prod$-type formers, \setU, \propU, function extensionality, decidable type, $\mathsf{transport}$}
@@ -244,7 +250,8 @@ Kavvos~\cite{Kavvos2017b} recently advocated its use and introduced a construct 
   An element $x \in X$ is \emph{well-defined} (with respect to $\sim$) if $x \sim x$.
 \end{definition}
 The identity function $\idfunc[X]$ is a $\PP$-function, and the composite of two $\PP$-functions is again a $\PP$-function.
-It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed category, so by enriched category theory~\cite{Kelly1982} we have a notion of categories enriched by $\PP$-sets below.
+It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed category, so by enriched category theory~\cite{Kelly1982} we have a notion of categories enriched by $\PP$-sets below.%
+\ltnote{not in the sense of Kelly}
 
 \begin{definition}[{\cite[Definition~2.4]{Cubric1998a}}]
   A $\PP$-category is a category whose hom-sets are $\PP$-sets satisfying the associativity and identity laws up to~$\sim$ in the sense that 
@@ -263,7 +270,8 @@ The usual categorical notions such as functors and initiality are up to the inte
 
 We recall the notion of exposures, which are like $\PP$-functors but are intended to `expose' intensional differences at the extensional level: if an exposure is applied to intensionally different morphisms (which may or may not be identified extensionally), the resulting morphisms may be distinguished extensionally.
 Consequently, exposures are not required to preserve the extensional equality.
-Moreover, exposures are only supposed to refine the extensional equality and do not eliminate existing extensional differences---that is, they are faithful with respect to~$\sim$.
+Moreover, exposures are only supposed to refine the extensional equality and do not eliminate existing extensional differences---that is, they are faithful with respect to~$\sim$.%
+\ltnote{more on faithfulness}
 The precise definition is as follows.
 
 \begin{definition}
@@ -331,7 +339,8 @@ It turns out that formulating the interaction with reduction $\reduce$ as~\eqref
 %With function extensionality valid in HoTT, we believe that the alternative type~\eqref{eq:alternative-right-totality} is in fact empty when $\bproj{X}$ considering Troelstra's argument~\cite{Troelstra1977}.
 
 \begin{example}\label{ex:assembly-lambda}
-  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_{\Lambda_0}, t_{\Lambda_0})$ where $r_{\Lambda_0}$ and $t_{\Lambda_0}$ are given by the transitivity and the reflexivity of~$\reduce$.
+  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_{\Lambda_0}, t_{\Lambda_0})$ where $r_{\Lambda_0}$ and $t_{\Lambda_0}$ are given by the transitivity and the reflexivity of~$\reduce$.%
+  \ltnote{identified up to $\beta$-equality, no induction principle}
 \end{example}
 
 \begin{example} \label{ex:assembly-naturals}
@@ -391,8 +400,13 @@ We now investigate some of its basic properties.
   The unit $\top \defeq (\Unit, \Vdash_\top, r_\top, t_\top)$ is $\PP$-terminal where 
   \begin{romanenumerate}
     \item $\Unit$ is the unit type,  
+<<<<<<< Updated upstream
   \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{I}$ where $\mathtt{I} \defeq \lam{\mathtt{x}}\mathtt{x}$, 
     \item $r_\top : (M \reduce N) \to (N \reduce L) \to (M \reduce L)$ given by the transitivity of $\reduce$,
+=======
+    \item $\Vdash_\top$ a relation defined by $M \Vdash_\top \star \defeq M \reduce \mathtt{I}$ where $\mathtt{I} \defeq \mathtt{\lambda x.\, x}$, 
+    \item $r_\top : (M \reduce N) \to (N \reduce \mathtt{I}) \to (M \reduce \mathtt{I})$ given by the transitivity of $\reduce$,
+>>>>>>> Stashed changes
     \item and $t_\top$ the fact that the only inhabitant $\star : \Unit$ has a realiser $\mathtt{I}$ (by reflexivity).
   \end{romanenumerate}
   The finality follows from function extensionality.
@@ -475,6 +489,9 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious and, 
 \end{corollary}
 
 \section{Realisability semantics for two modalities}\label{sec:provability}
+
+\hsnote{restructure into two sections}
+
 In this section, we introduce an exposure $\boxtimes\colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling the \SFour modality and show that a generic quoting $X \to \boxtimes X$ cannot exist.
 Then, we move to guarded type theory as our metalanguage and introduce an exposure $\Box$ (in a staged setting) to model the \GL modality.
 The construction refutes $X \to \Box X$ by the same argument for $\boxtimes$ and the reflection principle $\Box X \to X$.
@@ -498,17 +515,18 @@ First define a function from $\bproj{\boxtimes X}$ to $\bproj{\boxtimes Y}$ by
 \[
   \bproj{f}^\boxtimes\colon (M, x, r) \mapsto (F[M], \bproj{f}\,x, \mathfrak{f}\,M\,x\,r).
 \]
-To give a tracker of $f^\boxtimes$, recall that there is a term $\mathtt{subst}$ performing term substitution on codes (\Cref{sec:lambda}), and then the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $f^\boxtimes$ because
+To give a tracker of $\boxtimes f$, recall that there is a term $\mathtt{subst}$ performing term substitution on codes (\Cref{sec:lambda}), and then the term $F^\boxtimes \defeq \mathtt{subst}\,\qquote{F}\,\mathtt{x}$ tracks $\bproj{f}^\boxtimes$ because
 \begin{align*}
   \mathtt{subst}\,\qquote{F}\,N 
   \reduce \mathtt{subst}\,\qquote{F}\,\qquote{M}
-  \reduce \qquote{F[M]} ~\Vdash_{\boxtimes Y} f^\boxtimes(M, x, r)
+  \reduce \qquote{F[M]} ~\Vdash_{\boxtimes Y} \bproj{f}^\boxtimes(M, x, r)
 \end{align*}
 completing the definition of $\mathfrak{f}^\boxtimes$.
 In short, $\boxtimes f\defeq(\bproj{f}^\boxtimes, F^\boxtimes, \mathfrak{f}^\boxtimes)$ is a trackable map.
 
 \begin{definition} \label{ex:global-element-of-unit}
-  By $\bigstar$ we denote a closed element of~$\boxtimes \top$ given by \Cref{lem:global-element} with $(\mathtt{I}, \star, \refl_\twoheadrightarrow) : \bproj{\boxtimes \top}$ and its realiser $\qquote{\mathtt{I}}$.
+  By $\bigstar$ we denote a closed element of~$\boxtimes \top$ given by \Cref{lem:global-element} with $(\mathtt{I}, \star, \refl_\twoheadrightarrow) : \bproj{\boxtimes \top}$ and its realiser $\qquote{\mathtt{I}}$.%
+  \ltnote{give a type of $\bigstar$?}
 \end{definition}
 \begin{remark}
   Given elements $a, b$ of $X$ with $a \sim b$ but with different trackers, it follows that by definition $\boxtimes a \circ \bigstar \not\sim \boxtimes b \circ \bigstar$ are two extensionally different elements.
@@ -559,7 +577,8 @@ We say that a trackable map $q\colon X \to \boxtimes X$ \emph{quotes} an element
 %\]
 The (\textbf{4}) axiom can be realised by a family of trackable maps which quote closed elements:
 \begin{proposition} \label{prop:four-rule}
-There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ tracked by~$\mathtt{quote}$ which quote closed elements of~$\boxtimes X$.
+There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ over objects~$X$ tracked by~$\mathtt{quote}$ which quote closed elements of~$\boxtimes X$.%
+\ltnote{revise}
 %  \[
 %    \bproj{\delta_X}(a(\star)) \equiv \bproj{\delta_X}(M, x, r) \equiv (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
 %    = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
@@ -584,7 +603,8 @@ In detail, for each trackable map $f\colon X \to Y$ the inhabitant
 despite that their extensions are the same, where $\mathsf{subst}_{\twoheadrightarrow}$ is the witness of the reduction sequence $\mathsf{subst}\,\qquote{F}\,\qquote{M} \reduce \qquote{F[M]}$.
 Let us define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$ and $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for all~$x$.
 Then we only have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{\delta_Y \circ {\boxtimes} f}$.
-In general, the \emph{lax naturality} appears more appropriate in the presence of intensionality.
+In general, the \emph{lax naturality} appears more appropriate in the presence of intensionality.%
+\ltnote{categorical simulations}
 \end{remark}
 
 The normality condition is realised exactly by~$\mathtt{ap}$ without naturality:
@@ -593,7 +613,7 @@ There is a family of trackable maps
 from $\boxtimes (X \Rightarrow Y)$ to $\boxtimes X \Rightarrow \boxtimes Y$  tracked by $\lam{\mathtt{x_0}}\mathtt{ap}[\mathtt{x_1}]\;\mathtt{x_0}$.
 \end{proposition}
 
-On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute quotations for arbitrary~$A$, since this is already impossible for the particular case of $\Lambda_0 \to {\boxtimes} \Lambda_0$.
+On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute quotations for arbitrary~$A$, since this is already impossible for the particular case of $\Lambda_0 \to {\boxtimes} \Lambda_0$ (where $\Lambda_0$ was given in \Cref{ex:assembly-lambda}).
 %The key is the following lemma which relies on~\Cref{prop:no-quoting}.
 
 %\begin{lemma}\label{lem:no-quoting}
@@ -647,7 +667,7 @@ On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute 
 As the choice of $\bigstar$ does not matter for closed elements~$a$, the above theorem shows that a very limited form of naturality for any two morphisms $\eta_{\Lambda_0}$ and $\eta_\top$ satisfying $\eta_{\Lambda_0} \circ a \sim \boxtimes{a} \circ \eta_{\top}$ for any closed~$a$ remains impossible. 
 It is not clear how to state `parametricity' for~$\boxtimes$ so that any family of morphisms from $A$ to $\boxtimes A$, satisfying a reasonable naturality, can be rejected. 
 
-\subsection{An exposure for the \texorpdfstring{\GL}{GL} modality}
+\section{An exposure for the \texorpdfstring{\GL}{GL} modality}
 
 Kavvos~\cite{Kavvos2017b} advocated that the provability modality~$\Box$ and the \GL axiom $\Box(\Box A \to A) \to \Box A$ can also be understood as the type of code of type~$A$ and as intensional recursion respectively from the computational perspective.
 Since we already have an exposure~$\boxtimes$ modelling typed code, a natural approach is to extend~$\boxtimes$ to model the \GL axiom in addition to \SFour.
@@ -661,7 +681,7 @@ To untie the knot and retain consistency and the understanding of $\Box A$ as co
 Therefore, separately from~$\boxtimes$, we give an exposure $\Box \colon \Asm(\Lambda) \looparrowright \Asm(\Lambda)$ modelling the \GL modality in a staged setting (\Cref{sec:GL}).
 To express staged constructions more conveniently (without stage indexing), we work within guarded type theory.
 
-\subsubsection{Digression: Clocked cubical type theory}
+\subsection{Digression: Clocked cubical type theory}
 
 The particular version of guarded type theory we use is \emph{clocked cubical type theory} (CCTT for short)~\cite{Kristensen2021}, which is a metalanguage extending HoTT with a later modality $\laterp^\kappa$ parametrised by a `clock'~$\kappa$ and guarded recursion.
 Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in Agda.
@@ -829,7 +849,7 @@ We can manipulate such descriptions at will, irrespective of our current timelin
 %Be aware of the scope of clock quantification.
 %The above proposition cannot hold within the same clock, that is, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2 \to x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
 
-\subsubsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
+\subsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
 
 First we adapt the definition of exposures to the setting of CCTT.
 \begin{definition}[Clocked exposure]
@@ -944,14 +964,16 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
   The equation $f^\ddagger \sim f\circ \Box^\kappa(f^\ddagger) \circ \bigstar$ follows from the fixed point equation for guarded recursion. 
 \end{proof}
 
-The \GL axiom can be realised by a similar construction, too.
+The \GL axiom can be realised by a similar construction, too.%
+\ltnote{no strong Löb}
 \begin{theorem}\label{thm:internal-gl}
   There is a family of trackable maps from 
   $\Box^\kappa (\Box^\kappa X \Rightarrow X)$ to $\Box^\kappa X$.
 \end{theorem}
 
 \section{Related work}\label{sec:related-work}
-Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.
+Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.%
+\ltnote{$\eta$-equality?}
 For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defined by%
 \[
 \bproj{\boxtimes_K X} \defeq \{\,(a, x) \mid a \Vdash x \,\}
@@ -960,7 +982,8 @@ b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b,
 \]
 without the use of Gödel encoding.
 The mapping on morphisms is similar to~$\boxtimes$.
-Besides the use of set theory as the metalanguage for the development, the exposure $\boxtimes_K$ differs from~$\boxtimes$ in many ways.
+Besides the use of set theory as the metalanguage for the development, the exposure $\boxtimes_K$ differs from~$\boxtimes$ in many ways.%
+\ltnote{no technical difference due to the choice of metalanguage}
 First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
 Some $\beta$-equivalent intensions have to be identified to satisfy equations of PCA.
 For example
@@ -978,6 +1001,8 @@ On the other hand, Artemov~\cite{Artemov2001} proposed \emph{logic of proofs} ex
 Goris~\cite{Goris2009} discussed two modalities \GL and \SFour over classical logic by presenting a bi-modal logic and provides a Kripke semantics for both.
 We took Goris' notation for the \SFour modality $\boxtimes$.
 Our work is partly inspired by Shamkanov's~\cite{Shamkanov2014, Shamkanov2016a} provability semantics for \GL using circular proofs.
+
+\ltnote{Semantical Analysis of Contextual Types by Brigitte Pientka and Ulrich Schöpp}
 
 \section{Conclusion}\label{sec:conclusion}
 In this paper we follow the principle of modality-as-intension~\cite{Davies2001b} and the $\PP$-categorical semantics~\cite{Kavvos2017b} to manifest the concepts of denotations, extensions, and intensions.
