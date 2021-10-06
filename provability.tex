@@ -290,11 +290,9 @@ Similarly, the notion of natural transformations is introduced for exposures, sh
 \begin{definition}
   Given exposures $P, Q\colon \mathbf{C} \looparrowright \mathbf{D}$, a \emph{natural transformation of exposures} $t\colon P \to Q$ is a family of well-defined morphisms $t_X \colon PX \to QX$ such that $Qf \circ t_X \sim t_Y \circ Pf$ for every well-defined morphism~$f\colon X \to Y$. 
 \end{definition}
-An \emph{evaluator} for an endo-exposure~$Q$ is a natural transformation from $Q$ to $\mathcal{I}$.
-
-To model the \SFour modality, we may further define \emph{comonadic exposures} introduced by Kavvos~\cite{Kavvos2017b} as an endo-exposure equipped with an evaluator and a natural transformation~$\delta$ from $Q$ to $Q^2$ subject to comonad laws.
-In the presence of intensionality, however, we observe that the naturality is not always appropriate.
-We will revisit this issue in~\Cref{sec:provability}.
+An \emph{evaluator} for an endo-exposure~$Q$ is a natural transformation from $Q$ to $\mathcal{I}$, modelling the \textbf{T} axiom $\boxtimes A \to A$.
+To model the \SFour modality, we may define \emph{comonadic exposures} introduced by Kavvos~\cite{Kavvos2017b} as an endo-exposure equipped with an evaluator and a natural transformation~$\delta\colon Q \to Q^2$, modelling the \textbf{4} axiom $\boxtimes A \to \boxtimes{\boxtimes A}$, subject to comonad laws.
+In the presence of intensionality, however, we observe that the naturality is not always appropriate as discussed later in~\cref{re:naturality}.
 
 \section{\texorpdfstring{$\PP$}{P}-Category of assemblies on \texorpdfstring{$\lambda$}{λ}-calculus}\label{sec:assemblies}
 
