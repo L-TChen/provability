@@ -114,8 +114,8 @@ The stratification of computation stages forms possible worlds and can be ideall
 Therefore, there have been investigations into type-theoretic foundations for staged computation with modalities~\cite{Davies2017,Davies2001b,Kavvos2017a,Nanevski2008}, which have influenced the design of practical implementations~\cite{Kiselyov2014,Sheard2002,Taha2000} to varying degrees.
 
 Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~$A$ in a next stage.
-In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the \SFour modality~$\boxtimes$.
-More specifically, the \textbf{4} axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages;
+In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the modality~$\boxtimes$ in the intuitionistic modal logic \SFour.
+More specifically, the \textbf{4} axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages, a.k.a.~\emph{cross-stage persistence};
 the \textbf{T} axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
 For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.%
 \ltnote{definitions of modal logics}
