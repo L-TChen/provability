@@ -159,7 +159,7 @@ Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also suppor
 %\paragraph*{Contributions}
 
 \paragraph*{Plan of the paper}
-After recalling preliminaries on homotopy type theory, untyped $\lambda$-calculus, and $\PP$-categories in \Cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\Cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\Cref{sec:provability}, and discuss related work in \Cref{sec:related-work} and future work in~\Cref{sec:conclusion}.
+After recalling preliminaries on homotopy type theory, untyped $\lambda$-calculus, and $\PP$-categories in \cref{sec:preliminaries}, we present the $\PP$-category of assemblies on $\lambda$-calculus and trackable maps developed in HoTT in~\cref{sec:assemblies} and the denotational semantics of $\boxtimes A$ and $\Box A$ in~\cref{sec:S4-modality,sec:GL-modality} respectively, and discuss related work in \Cref{sec:related-work} and future work in~\cref{sec:conclusion}.
 
 \section{Preliminaries}\label{sec:preliminaries}
 Most, if not all, of the materials in this section are standard, so we do not go into details.
@@ -300,7 +300,7 @@ We will revisit this issue in~\Cref{sec:provability}.
 
 Assemblies are used to accommodate the information of how extensions are \emph{realised by} intensions.
 Accordingly an appropriate notion of morphisms between assemblies is introduced to form a $\PP$-category, laying
-the technical foundation for~\Cref{sec:provability}.
+the technical foundation for~\Cref{sec:S4-modality,sec:GL-modality}.
 
 
 \subsection{Assembly and trackable map}
@@ -484,7 +484,7 @@ The construction of $\PP$-exponential $X \Rightarrow Y$ is a bit laborious and, 
   $\Asm(\Lambda)$ is a cartesian closed $\PP$-category with a strict $\PP$-initial object.
 \end{corollary}
 
-\section{Realisability semantics for two modalities}\label{sec:provability}
+\section{Realisability semantics for the \texorpdfstring{\SFour}{S4} modality}\label{sec:S4-modality}
 
 \hsnote{restructure into two sections}
 
@@ -664,7 +664,7 @@ On the other hand, it is impossible for the rule $A \to \boxtimes A$ to compute 
 As the choice of $\bigstar$ does not matter for closed elements~$a$, the above theorem shows that a very limited form of naturality for any two morphisms $\eta_{\Lambda_0}$ and $\eta_\top$ satisfying $\eta_{\Lambda_0} \circ a \sim \boxtimes{a} \circ \eta_{\top}$ for any closed~$a$ remains impossible. 
 It is not clear how to state `parametricity' for~$\boxtimes$ so that any family of morphisms from $A$ to $\boxtimes A$, satisfying a reasonable naturality, can be rejected. 
 
-\section{An exposure for the \texorpdfstring{\GL}{GL} modality}
+\section{Realisability semantics for the \texorpdfstring{\GL}{GL} modality}\label{sec:GL-modality}
 
 Kavvos~\cite{Kavvos2017b} advocated that the provability modality~$\Box$ and the \GL axiom $\Box(\Box A \to A) \to \Box A$ can also be understood as the type of code of type~$A$ and as intensional recursion respectively from the computational perspective.
 Since we already have an exposure~$\boxtimes$ modelling typed code, a natural approach is to extend~$\boxtimes$ to model the \GL axiom in addition to \SFour.
@@ -846,7 +846,7 @@ We can manipulate such descriptions at will, irrespective of our current timelin
 %Be aware of the scope of clock quantification.
 %The above proposition cannot hold within the same clock, that is, $\forall \kappa.\, \left(\mathtt{next}\,\kappa\,x_1 = \mathtt{next}\,\kappa\,x_2 \to x_1 =x_2\right)$ is not provable, since intuitively it would require us to retrieve inhabitants available later \emph{right now}.
 
-\subsection{Back to \texorpdfstring{\GL}{GL}} \label{sec:GL}
+\subsection{An exposure for the \texorpdfstring{\GL}{GL} modality}\label{sec:GL}
 
 First we adapt the definition of exposures to the setting of CCTT.
 \begin{definition}[Clocked exposure]
