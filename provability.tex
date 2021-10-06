@@ -246,25 +246,24 @@ Kavvos~\cite{Kavvos2017b} recently advocated its use and introduced a construct 
 % We sketch the main idea of the works by \v{C}ubri\'c et al.\ and by Kavvos \emph{op.\ cit.} as follows.
 \begin{definition}
   A \emph{partial equivalence relation} is a symmetric and transitive relation.
-  A \emph{$\PP$-set} $(X, \sim_X)$ is a set $X$ with a partial equivalence relation~$\sim_X$.
+  A \emph{$\PP$-set} $(X, \sim_X)$ is a set $X$ with a PER~$\sim_X$.
   A \emph{$\PP$-function} from $(X, \sim_X)$ to $(Y, \sim_Y)$ is a function $f\colon X \to Y$ which respects the relation~$\sim$ in the sense that $f\,x \sim_Y f\,y$ whenever $x \sim_X y$.
   An element $x \in X$ is \emph{well-defined} (with respect to $\sim$) if $x \sim x$.
 \end{definition}
-The identity function $\idfunc[X]$ is a $\PP$-function, and the composite of two $\PP$-functions is again a $\PP$-function.
-It turns out that $\PP$-sets and $\PP$-functions form a cartesian closed category, so by enriched category theory~\cite{Kelly1982} we have a notion of categories enriched by $\PP$-sets below.%
-\ltnote{not in the sense of Kelly}
+The identity function $\idfunc[X]$ is a $\PP$-function, and the composite of $\PP$-functions is also a $\PP$-function.
+Then we recall the notion of $\PP$-categories as follows.
 
 \begin{definition}[{\cite[Definition~2.4]{Cubric1998a}}]
   A $\PP$-category is a category whose hom-sets are $\PP$-sets satisfying the associativity and identity laws up to~$\sim$ in the sense that 
   \begin{romanenumerate}
   \item every object~$X$ has an identity morphism $\iid_X$, 
   \item $g \circ f \sim g' \circ f'$ whenever $g\sim g'$ and $f \sim f'$,
-  \item $\iid \circ f \sim f'$ and $f \circ \iid \sim f'$ whenever $f \sim f'$,
+  \item $\iid \circ f \sim f'$ and $f \circ \iid \sim f'$ whenever $f \sim f'$,%
   \item $h \circ (g \circ f) \sim (h' \circ g') \circ f'$ whenever $h\sim h'$, $g \sim g'$, and $f \sim f'$.
   \end{romanenumerate}
 \end{definition}
 
-A $\PP$-category has two kinds of equality for morphisms---the underlying equality $=$ and the partial equivalence relation $\sim$, where the former can be used to model the \emph{intensional equality} and the latter the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
+A $\PP$-category has two kinds of equality for morphisms---the underlying equality $=$ and the PER~$\sim$, where the former can be used to model the \emph{intensional equality} and the latter the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
 Having two different equalities $=$~and~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not vice versa.
 For categorical semantics, where terms are interpreted as morphisms, an interpretation into a $\PP$-category is able to discriminate these two kinds of equality, enabling us to model intensionality.
 The usual categorical notions such as functors and initiality are up to the intensional equality~$=$\,; when we want to use the notions up to the extensional equality~$\sim$, we will add the `$\PP$-' prefix and say $\PP$-functors, $\PP$-initiality, etc.
