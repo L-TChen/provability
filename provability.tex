@@ -102,7 +102,7 @@ Following Kavvos'~(2017) novel approach to the semantics of intensionality, we i
 For the \GL modality~$\Box$ in particular, we use guarded type theory to articulate what it means by a `next' stage and to model intensional recursion by guarded recursion together with Kleene's second recursion theorem.
 Besides validating the \SFour and \GL axioms, our model better captures the essence of intensionality by refuting congruence, i.e.\ two extensionally equal terms may not be intensionally equal, and the internal generic quoting $A \to \Box A$ as well as $A \to \boxtimes A$.%
 \hsnote{rewrite}
-Our results are developed in (guarded) homotopy type theory and formalised in Agda.
+Our results are developed in (guarded) homotopy type theory and formalised in \textsc{Agda}.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -153,7 +153,7 @@ We use homotopy type theory (HoTT)~\cite{hottbook} as our metalanguage, although
 \hsnote{subset, no univalence}
 More specifically, our work is built upon the reformulated set theory and logic within HoTT, which enable us to be precise about notions such as sets and propositions, and existence with explicit witnesses versus `mere' existence (for example, within HoTT we can easily distinguish between `pairs of an extension and an intension' and `extensions associated with at least an intension').
 Moreover, implementations of HoTT are readily available, so we are able to formalise and verify our constructions, for which HoTT provides essential features that some other type theories lack, notably function extensionality: $\left(\fall{x : A} f\,x =_B g\,x\right) \to f = g$.
-Indeed, our work has been formalised in Agda 2.6.2~\cite{Agda} which also supports guarded type theory in the guarded cubical mode.%
+Indeed, our work has been formalised in \textsc{Agda}~2.6.2~\cite{Agda} which also supports guarded type theory in the guarded cubical mode~\cite{Veltri2020}.%
 \hsnote{cubical implementation of HoTT, clocked cubical type theory (for forcing), no native cubical arguments}
 
 %\paragraph*{Contributions}
@@ -674,9 +674,11 @@ Therefore, separately from~$\boxtimes$, we give an exposure $\Box \colon \Asm(\L
 To express staged constructions more conveniently (without stage indexing), we work within guarded type theory.
 
 \subsection{Digression: Clocked cubical type theory}
-
-The particular version of guarded type theory we use is \emph{clocked cubical type theory} (CCTT for short)~\cite{Kristensen2021}, which is a metalanguage extending HoTT with a later modality $\laterp^\kappa$ parametrised by a `clock'~$\kappa$ and guarded recursion.
-Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in Agda.
+We use a particular version of guarded type theory---\emph{clocked cubical type theory}~\cite{Kristensen2021}, CCTT for short.
+It extends HoTT with a later modality $\laterp^\kappa$, parametrised by a `clock'~$\kappa$, and guarded recursion. 
+Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in \textsc{Agda} in the guarded cubical mode.
+%The particular version of guarded type theory we use is \emph{clocked cubical type theory} (CCTT for short)~\cite{Kristensen2021}, which is a metalanguage extending HoTT with a later modality $\laterp^\kappa$ parametrised by a `clock'~$\kappa$ and guarded recursion and implemented in Agda~\cite{Veltri2020}.
+%Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in Agda.
 
 %It combines two extensions of dependent type theory.
 %The first extension is the machinery to manipulate $n$-dimensional cubes such as paths, squares, cubes, etc., allowing us to prove Voevodsky’s univalence axiom and function extensionality.
@@ -984,6 +986,8 @@ Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is no
 Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
 Finally, it is not clear how to refute the generic quoting for $\boxtimes_K$.
 Using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$, the exposure~$\boxtimes$ is able to distinguish $\beta$-equivalent intensions, so $\boxtimes$---being more intensional than~$\boxtimes_K$---lacks well-behaved extensional properties.
+
+As a reviewer pointed out, \cref{re:naturality} is reminiscent of \emph{categorical simulation} studied by Cockett and Hofstra~\cite{Cockett2010}.
 
 Artemov and Beklemishev~\cite{Artemov2005} pointed out that
 Gödel attempted to use classical \SFour modal logic to capture provability for Peano Arithmetic ($\mathbf{PA}$) but realised that $\mathsf{Prov}(A) \defeq \exists x.\, \mathsf{Proof}(x, A)$ cannot be \SFour.
