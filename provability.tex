@@ -337,9 +337,12 @@ It turns out that formulating the interaction with reduction $\reduce$ as~\eqref
 %With function extensionality valid in HoTT, we believe that the alternative type~\eqref{eq:alternative-right-totality} is in fact empty when $\bproj{X}$ considering Troelstra's argument~\cite{Troelstra1977}.
 
 \begin{example}\label{ex:assembly-lambda}
-  The type $\Lambda_0$ of closed terms with the reduction relation ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_{\Lambda_0}, t_{\Lambda_0})$ where $r_{\Lambda_0}$ and $t_{\Lambda_0}$ are given by the transitivity and the reflexivity of~$\reduce$.%
-  \ltnote{identified up to $\beta$-equality, no induction principle}
+  The type $\Lambda_0$ of closed terms with ${\reduce}$ as its realisability relation is an assembly $(\Lambda_0, \reduce, r_{\Lambda_0}, t_{\Lambda_0})$ where $r_{\Lambda_0}$ and $t_{\Lambda_0}$ are given by the transitivity and the reflexivity of~$\reduce$.
+  That is, each term $M$ is realised by those reducible to~$M$.
 \end{example}
+Note that the assembly~$\Lambda_0$ does \emph{not} yet model code.
+Indeed, in such case, $M$ should be realised by its \emph{code}~$\qquote{M}$ instead.
+This is exactly the point of forthcoming sections.
 
 \begin{example} \label{ex:assembly-naturals}
   Every natural number $n : \Nat$ is realised by terms reducible to its Church numeral~$\mathtt{c}_n$.
