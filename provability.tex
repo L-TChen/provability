@@ -599,7 +599,7 @@ despite that their extensions are the same, where $\mathsf{subst}_{\twoheadright
 Let us define $(M, x, r) \leq (N, y, s)$ if $M \reduce N$ and $x = y$ and $f \leq g$ if $\bproj{f}\,x \leq \bproj{g}\,x$ for all~$x$.
 Then we only have $\bproj{{\boxtimes} {\boxtimes} f \circ \delta_X} \leq \bproj{\delta_Y \circ {\boxtimes} f}$.
 In general, the \emph{lax naturality} appears more appropriate in the presence of intensionality.%
-\ltnote{categorical simulations}
+\ltnote{categorical simulations: see \cref{sec:related-work}}
 \end{remark}
 
 The normality condition is realised exactly by~$\mathtt{ap}$ without naturality:
@@ -925,10 +925,10 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
 \begin{theorem}[Intensional recursion]\label{thm:GL-recursion}
   For every trackable map $f \colon \Box^\kappa X \to X$, there are
   \begin{enumerate}
-    \item an element~$f^\dagger$ of $\Box^\kappa X$ tracked by $\qquote{\mathsf{fix}\,F}$, and
-    \item an element~$f^\ddagger$ of $X$ tracked by~$\mathsf{fix}\,F$ with $f^\ddagger \sim f \circ \Box^\kappa f^\ddagger \circ \bigstar$
+    \item an element~$f^\dagger$ of $\Box^\kappa X$ realised by $\qquote{\mathsf{fix}\,F}$ and
+    \item an element~$f^\ddagger$ of $X$ realised by~$\mathsf{fix}\,F$ satisfying $f^\ddagger \sim f \circ \Box^\kappa f^\ddagger \circ \bigstar$
   \end{enumerate}
-  where $\mathsf{fix}\,F : \Lambda_0$ satisfies $\mathsf{fix}\,F \reduce F[\,\qquote{\mathsf{fix}\,F}\,]$.
+  where $\mathsf{fix}\,F : \Lambda_0$ is a term that can be reduced to $F[\,\qquote{\mathsf{fix}\,F}\,]$.
 \end{theorem}
 
 \begin{proof}
@@ -960,13 +960,14 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
   To construct the second element~$f^\ddagger$, we follow the same steps except the third: we conclude $(x_0, r_0) : \sm{x : \bproj{X}} F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ without any delay and thus $x_0 : \bproj{X}$ is realised by $r_0' : \mathsf{fix}\,F \Vdash x_0$.
   The equation $f^\ddagger \sim f\circ \Box^\kappa(f^\ddagger) \circ \bigstar$ follows from the fixed point equation for guarded recursion. 
 \end{proof}
-
-The \GL axiom can be realised by a similar construction, too.%
+By inspecting the above proof, we can see that the intension~$F$ of~$\Box^\kappa X \to X$ is essential, since $F$ is used to construct the fixpoint~$\mathsf{fix}\,F$. 
+To internalise the inductive form as the \GL axiom, we will also need the intension:%
 \ltnote{no strong Löb}
 \begin{theorem}\label{thm:internal-gl}
   There is a family of trackable maps from 
   $\Box^\kappa (\Box^\kappa X \Rightarrow X)$ to $\Box^\kappa X$.
 \end{theorem}
+The strong Löb axiom as a map from $\Box^\kappa X \Rightarrow X$ to $X$, without the access to the intension, cannot be tracked by the SRT, justifying the interpretation of \GL as \emph{intensional} recursion.
 
 \section{Related work}\label{sec:related-work}
 Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.%
