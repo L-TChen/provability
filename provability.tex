@@ -979,17 +979,20 @@ For an assembly $X$ on a PCA~$(A, \cdot)$, the assembly $\boxtimes_K X$ is defin
 b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b,
 \]
 without the use of Gödel encoding.
-The mapping on morphisms is similar to~$\boxtimes$.
-Besides the use of set theory as the metalanguage for the development, the exposure $\boxtimes_K$ differs from~$\boxtimes$ in many ways.%
-\ltnote{no technical difference due to the choice of metalanguage}
+The morphism mapping is similar to~$\boxtimes$.
+The difference between $\boxtimes_K$ and $\boxtimes$ mainly comes from the choice of realisability and the use of Gödel encoding.%
+\ltnote{no technical difference due to the choice of metalanguage... Well, not really.}
 First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
 Some $\beta$-equivalent intensions have to be identified to satisfy equations of PCA.
 For example
 $\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$, so $\bproj{\boxtimes_K \top}$ has only one element $(\star, \mathtt{I})$, too. 
 Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
 Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
-Finally, it is not clear how to refute the generic quoting for $\boxtimes_K$.
-Using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$, the exposure~$\boxtimes$ is able to distinguish $\beta$-equivalent intensions, so $\boxtimes$---being more intensional than~$\boxtimes_K$---lacks well-behaved extensional properties.
+Finally, a generic quoting for~$\boxtimes_K$ \emph{can} be defined on the trivial one-element PCA. 
+Assuming the axiom of choice, there (merely) exists a function~$q$ from $ \bproj{X}$ to $\bproj{\boxtimes_K X}$.
+Hence, we conjecture that~$q$ could be realised in the sense of Krivine's classical realisability~\cite{Krivine2021}, which would establish a non-trivial example of generic quoting for~$\boxtimes_K$.
+On the other hand, using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$ allows the exposure~$\boxtimes$ to distinguish $\beta$-equivalent intensions, so $\boxtimes$---being more intensional than~$\boxtimes_K$---lacks well-behaved extensional properties, as expected.
+
 
 As a reviewer pointed out, \cref{re:naturality} is reminiscent of \emph{categorical simulation} studied by Cockett and Hofstra~\cite{Cockett2010}.
 
