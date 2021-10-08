@@ -283,6 +283,7 @@ module _ (Q : Quoting) where
             ∎
           where open ≡-Reasoning
 
+    -- Note that the strong Loeb axiom cannot be realised by the SRT, since the intension ƛF is not available
     |IGL| : ⟨ □′ k (□′ k X ⇒ X) ⟩ → ⟨ □′ k X ⟩
     |IGL| {k} f@(ƛF , |f|) = gfix ƛF , λ α → backward (fix h α)
       where
