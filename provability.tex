@@ -573,7 +573,7 @@ We say that a trackable map $q\colon X \to \boxtimes X$ \emph{quotes} an element
 The (\textbf{4}) axiom can be realised by a family of trackable maps which quote closed elements:
 \begin{proposition} \label{prop:four-rule}
 \ltnote{revise}
-There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ indexed by objects~$X$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ and tracked by~$\mathtt{quote}$ which quote closed elements of~$\boxtimes X$.%
+There is a family of functions $\bproj{\delta_X}(M, x, r) \defeq (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)$ indexed by objects~$X$ from $\bproj{\boxtimes X}$ to $\bproj{{\boxtimes} {\boxtimes} X}$ and tracked by~$\mathtt{quote}$, which quote closed elements of~$\boxtimes X$.%
 %  \[
 %    \bproj{\delta_X}(a(\star)) \equiv \bproj{\delta_X}(M, x, r) \equiv (\qquote{M}, (M, x, r), \refl_\twoheadrightarrow)
 %    = \bproj{\boxtimes a}(\mathtt{I}, \star, \refl_\twoheadrightarrow) \equiv \bproj{\boxtimes a}(\bigstar(\star)).
@@ -679,7 +679,7 @@ To express staged constructions more conveniently (without stage indexing), we w
 \subsection{Digression: Clocked cubical type theory}
 We use a particular version of guarded type theory---\emph{clocked cubical type theory}~\cite{Kristensen2021}, CCTT for short.
 It extends HoTT with a later modality $\laterp^\kappa$, parametrised by a `clock'~$\kappa$, and guarded recursion. 
-Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in \textsc{Agda} in the guarded cubical mode.
+Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in \textsc{Agda} in the guarded cubical mode introduced by Veltri and Vezzosi~\cite{Veltri2020}.
 %The particular version of guarded type theory we use is \emph{clocked cubical type theory} (CCTT for short)~\cite{Kristensen2021}, which is a metalanguage extending HoTT with a later modality $\laterp^\kappa$ parametrised by a `clock'~$\kappa$ and guarded recursion and implemented in Agda~\cite{Veltri2020}.
 %Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in Agda.
 
@@ -960,14 +960,14 @@ The pay-off for disallowing evaluation is to be able to derive intensional recur
   To construct the second element~$f^\ddagger$, we follow the same steps except the third: we conclude $(x_0, r_0) : \sm{x : \bproj{X}} F[\,\qquote{\mathsf{fix}\,F}\,] \Vdash x [\alpha]$ without any delay and thus $x_0 : \bproj{X}$ is realised by $r_0' : \mathsf{fix}\,F \Vdash x_0$.
   The equation $f^\ddagger \sim f\circ \Box^\kappa(f^\ddagger) \circ \bigstar$ follows from the fixed point equation for guarded recursion. 
 \end{proof}
-By inspecting the above proof, we can see that the intension~$F$ of~$\Box^\kappa X \to X$ is essential, since $F$ is used to construct the fixpoint~$\mathsf{fix}\,F$. 
+By inspecting the above proof, we can see that the tracker of~$\Box^\kappa X \to X$ is essential, since it is used to construct the fixpoint~$\mathsf{fix}\,F$. 
 To internalise the inductive form as the \GL axiom, we will also need the intension:%
 \ltnote{no strong Löb}
 \begin{theorem}\label{thm:internal-gl}
   There is a family of trackable maps from 
   $\Box^\kappa (\Box^\kappa X \Rightarrow X)$ to $\Box^\kappa X$.
 \end{theorem}
-The strong Löb axiom as a map from $\Box^\kappa X \Rightarrow X$ to $X$, without the access to the intension, cannot be tracked by the SRT, justifying the interpretation of \GL as \emph{intensional} recursion.
+The strong Löb axiom as a map from $\Box^\kappa X \Rightarrow X$ to $X$, without the access to the intension, is not sufficient to be tracked by the SRT, justifying the interpretation of \GL as \emph{intensional} recursion.
 
 \section{Related work}\label{sec:related-work}
 Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.%
@@ -980,17 +980,20 @@ b \Vdash_{\boxtimes_K X} (a, x) \defeq a = b,
 \]
 without the use of Gödel encoding.
 The morphism mapping is similar to~$\boxtimes$.
-The difference between $\boxtimes_K$ and $\boxtimes$ mainly comes from the choice of realisability and the use of Gödel encoding.%
+The difference between $\boxtimes_K$ and $\boxtimes$ mainly comes from the chosen notion of realisability and the use of Gödel encoding.%
 \ltnote{no technical difference due to the choice of metalanguage... Well, not really.}
 First, the exposure $\boxtimes_K$ preserves finite products, while $\boxtimes$ does not.
 Some $\beta$-equivalent intensions have to be identified to satisfy equations of PCA.
 For example
 $\star : \bproj{\top}$ has only one realiser~$\mathtt{I}$, so $\bproj{\boxtimes_K \top}$ has only one element $(\star, \mathtt{I})$, too. 
 Second, $\boxtimes_K$ is comonadic by a similar reason, while our $\delta$ is not even natural.
-Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
-Finally, a generic quoting for~$\boxtimes_K$ \emph{can} be defined on the trivial one-element PCA. 
-Assuming the axiom of choice, there (merely) exists a function~$q$ from $ \bproj{X}$ to $\bproj{\boxtimes_K X}$.
-Hence, we conjecture that~$q$ could be realised in the sense of Krivine's classical realisability~\cite{Krivine2021}, which would establish a non-trivial example of generic quoting for~$\boxtimes_K$.
+Third, $\boxtimes_K$ is idempotent, i.e.\ $\delta_K$ are isomorphisms, which is impossible for $\boxtimes$ because of Gödel encoding.
+Finally, a generic quoting for~$\boxtimes_K$ \emph{can} be defined:
+\begin{observation}
+  For the one-element PCA, there exists a natural transformation from the identity exposure to~$\boxtimes_K$.
+\end{observation}
+Further, assuming the axiom of choice, there is (merely) a function~$q$ from $ \bproj{X}$ to $\bproj{\boxtimes_K X}$ because of the right totality of~$\Vdash$.
+It is likely that~$q$ could be realised in the sense of Krivine's classical realisability~\cite{Krivine2021}, which would establish a non-trivial example of generic quoting for~$\boxtimes_K$ or alike.
 On the other hand, using $\lambda$-terms subject to $\alpha$-equivalence as realisers and $\qquote{M}$ as realisers for $(M, x, r)$ allows the exposure~$\boxtimes$ to distinguish $\beta$-equivalent intensions, so $\boxtimes$---being more intensional than~$\boxtimes_K$---lacks well-behaved extensional properties, as expected.
 
 
