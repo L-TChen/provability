@@ -158,10 +158,7 @@ module Initial (X : Asm 𝓤) where
   universality = ⊥*-elim , 0 , (λ { {x = ()} })
 
   strict : (f : Trackable X ⊥ₐ) → AsmIso X ⊥ₐ f
-  strict f = ∣ universality , (λ ()) , (λ x → ⊥*-elim (transport ⊥=X x)) ∣
-    where
-      ⊥=X : ⟨ X ⟩ ≡ ⊥*
-      ⊥=X = ua (strict-initial (f .fst))
+  strict f = ∣ universality , (λ ()) , (λ x → ⊥*-elim (strict-initial (f .fst) .fst x)) ∣
     
 ------------------------------------------------------------------------------
 -- Product
