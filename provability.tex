@@ -110,7 +110,7 @@ Metaprogramming is the activity of writing metaprograms that manipulate program 
 Executing a metaprogram can result in another program to be executed, and these successive executions are abstractly referred to as computation \emph{stages}.
 A particular form of metaprogramming is \emph{staged computation}, where fragments of a program are \emph{internally} marked to be evaluated in multiple stages, so that the program can be partially evaluated to produce more efficient code.
 The stratification of computation stages forms possible worlds and can be ideally reasoned about by modal logic.
-Therefore, there have been investigations into type-theoretic foundations for staged computation with modalities~\cite{Davies2017,Davies2001b,Kavvos2017a,Nanevski2008}, which have influenced the design of practical implementations~\cite{Kiselyov2014,Sheard2002,Taha2000} to varying degrees.
+Therefore, there have been investigations into type-theoretic foundations for staged computation with modalities~\cite{Davies2017,Davies2001b,Kavvos2021,Nanevski2008}, which have influenced the design of practical implementations~\cite{Kiselyov2014,Sheard2002,Taha2000} to varying degrees.
 
 Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~$A$ in a next stage.
 In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the modality~$\boxtimes$ in the intuitionistic modal logic \SFour.
@@ -118,7 +118,7 @@ More specifically, the \textbf{4} axiom $\boxtimes A \to {\boxtimes} {\boxtimes}
 the \textbf{T} axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
 For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
 
-Recently, Kavvos proposed \emph{intensional recursion}~\cite{Kavvos2017a} for $\mathtt{Code}$ to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
+Recently, Kavvos proposed \emph{intensional recursion}~\cite{Kavvos2021} for $\mathtt{Code}$ to construct a value recursively from its own code (intension), extending the capabilities of metaprogramming.
 Logically, intensional recursion amounts to the \GL (Gödel-Löb) axiom $\Box (\Box A \to A) \to \Box A$ for the modal logic \GL~\cite{Boolos-provability}, where $\Box A$ stands for `$A$~is provable'.
 Computationally, the behaviour of the \GL axiom mirrors Kleene's second recursion theorem.
 In contrast to general recursion $(A \to A) \to A$, which constructs a value recursively from its value (extension), intensional recursion alone does not lead to logical inconsistency.
@@ -1010,7 +1010,7 @@ In the long term, based on the $\PP$-category of assemblies and the denotational
 %Accordingly, we would like to describe a type theory enriched with modalities $\boxtimes$ and $\Box$ unifying modal type theories considered by Davies and Pfenning~\cite{Davies2001b}, Pfenning~\cite{Pfenning2002a}, and by Kavvos~\cite{Kavvos2017b,Kavvos2020} while maintaining consistency.
 %
 %Second, inhabitants of $\Box^\kappa X$ are not accessible until the next stage. In order to arrive the next stage one needs a way to $\mathtt{force}$ them. 
-%This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2017a}.
+%This suggests a new language construct for $\Box^\kappa X$ apart from its introduction and elimination rules considered by Kavvos~\cite{Kavvos2021}.
 %This construct may correspond to compiler-time code generation---a common form of metaprogramming during compiler-time which, to be the best of our knowledge, does not have a known denotational semantics.
 
 %\ltnote{Third, \Cref{re:boxtimes-is-not} suggests a theory on categories enriched by \emph{partially ordered $\PP$-sets} instead}
