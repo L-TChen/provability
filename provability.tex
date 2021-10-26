@@ -669,7 +669,7 @@ To express staged constructions more conveniently (without stage indexing), we w
 \subsection{Digression: Clocked cubical type theory}
 We use a particular version of guarded type theory---\emph{clocked cubical type theory}~\cite{Kristensen2021}, CCTT for short.
 It extends HoTT with a later modality $\laterp^\kappa$, parametrised by a `clock'~$\kappa$, and guarded recursion. 
-Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in \textsc{Agda} in the guarded cubical mode introduced by Veltri and Vezzosi~\cite{Veltri2020}.
+Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in \textsc{Agda} in the guarded cubical mode.
 %The particular version of guarded type theory we use is \emph{clocked cubical type theory} (CCTT for short)~\cite{Kristensen2021}, which is a metalanguage extending HoTT with a later modality $\laterp^\kappa$ parametrised by a `clock'~$\kappa$ and guarded recursion and implemented in Agda~\cite{Veltri2020}.
 %Here we only intuitively introduce the constructs and properties of CCTT that are necessary for the informal presentation of the constructions in \Cref{sec:GL}, but the formal details are all checked in Agda.
 
@@ -956,7 +956,7 @@ To internalise the inductive form as the \GL axiom, we also need the intension:%
   There is a family of trackable maps from 
   $\Box^\kappa (\Box^\kappa X \Rightarrow X)$ to $\Box^\kappa X$.
 \end{theorem}
-The reader may wonder whether the strong Löb axiom, interpreted as a map from $\Box^\kappa X \Rightarrow X$ to~$X$, can also be realised by the SRT in a similar way, but from $\Box^\kappa X \Rightarrow X$, which amounts to a merely trackable map, we do not get the tracker~$F$ needed by the SRT.
+The reader may wonder whether the strong Löb axiom, interpreted as a map from $\Box^\kappa X \Rightarrow X$ to~$X$, can also be realised by the SRT in a similar way, but from $\Box^\kappa X \Rightarrow X$, which amounts to a merely trackable map, we do not get the tracker~$F$ explicitly needed by the SRT.
 
 \section{Related work}\label{sec:related-work}
 Kavvos introduced a comonadic exposure~\cite[Theorem~11]{Kavvos2017b}, which we denote by~$\boxtimes_K$ here, on $\PP$-category of assemblies on a PCA (instead of $\lambda$-calculus) to model the intensional \SFour modality.
