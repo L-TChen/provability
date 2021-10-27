@@ -67,7 +67,7 @@
 \acknowledgements{%
   We are grateful to Alex Kavvos and Tsung-Ju Chiang for insightful discussions.
   We would also like to thank Tom de Jong, Churn-Jung Liau, Rasmus Ejlers Møgelberg, Chad Nester, Anton Setzer, Andrea Vezzosi, Ren-June Wang, and Zhixuan Yang for useful exchanges.
-  Finally, we thank the anonymous reviewers for their suggestions and thoughtful comments, which are encouraging to us.}
+  Finally, we thank the anonymous reviewers for their suggestions and thoughtful comments.}
 
 
 \nolinenumbers 
@@ -249,9 +249,9 @@ The identity function $\idfunc[X]$ is a $\PP$-function, and the composite of $\P
 Then we recall the notion of $\PP$-categories as follows.
 
 \begin{definition}[{\cite[Definition~2.4]{Cubric1998a}}]
-  A $\PP$-category is a category whose hom-sets are $\PP$-sets satisfying the associativity and identity laws up to~$\sim$ in the sense that 
+  A $\PP$-category~$\mathbf{C}$ consists of a class of objects, a $\PP$-set~$\left(\mathbf{C}(X, Y), \sim\right)$ for each pair of objects $X$ and $Y$, and an identity morphism $\iid_X\colon X \to X$ for each object~$X$ satisfying the associativity and identity laws up to~$\sim$ in the sense that 
   \begin{romanenumerate}
-  \item every object~$X$ has an identity morphism $\iid_X$, 
+  \item $\iid_X \sim \iid_X$ always, 
   \item $g \circ f \sim g' \circ f'$ whenever $g\sim g'$ and $f \sim f'$,
   \item $\iid \circ f \sim f'$ and $f \circ \iid \sim f'$ whenever $f \sim f'$,%
   \item $h \circ (g \circ f) \sim (h' \circ g') \circ f'$ whenever $h\sim h'$, $g \sim g'$, and $f \sim f'$.
@@ -261,7 +261,7 @@ Then we recall the notion of $\PP$-categories as follows.
 A $\PP$-category has two kinds of equality for morphisms---the underlying equality $=$ and the PER~$\sim$, where the former can be used to model the \emph{intensional equality} and the latter the \emph{extensional equality} akin to the structure of multiple judgemental equalities in the modal type theory by Pfenning~\cite{Pfenning2002a}.
 Having two different equalities $=$~and~$\sim$ reflects the fact that, for example, $\alpha$-equivalent terms are $\beta$-equivalent but not vice versa.
 For categorical semantics, where terms are interpreted as morphisms, an interpretation into a $\PP$-category is able to discriminate these two kinds of equality, enabling us to model intensionality.
-The usual categorical notions such as functors and initiality are up to the intensional equality~$=$\,; when we want to use the notions up to the extensional equality~$\sim$, we will add the `$\PP$-' prefix and say $\PP$-functors, $\PP$-initiality, etc.
+To emphasise the categorical notions up to the extensional equality~$\sim$, the `$\PP$-' prefix are added so that we have $\PP$-functors, $\PP$-initiality, etc.
 
 We recall the notion of exposures, which are like $\PP$-functors but are intended to `expose' intensional differences at the extensional level: if an exposure is applied to intensionally different morphisms (which may or may not be identified extensionally), the resulting morphisms may be distinguished extensionally.
 Consequently, exposures are not required to preserve the extensional equality.
