@@ -116,7 +116,7 @@ Let $\mathtt{Code}\,A$ denote the type of code that evaluates to values of type~
 In Davies and Pfenning's analysis of staged computation~\cite{Davies2001b}, $\mathtt{Code}$ corresponds to the modality~$\boxtimes$ in the intuitionistic modal logic \SFour.
 More specifically, the \textbf{4} axiom $\boxtimes A \to {\boxtimes} {\boxtimes} A$ corresponds to the use of code in the stage after the next, so code can be shared across all stages, a.k.a.~\emph{cross-stage persistence};
 the \textbf{T} axiom $\boxtimes A \to A$ corresponds to the \emph{evaluation} of code to its value in the same stage.
-For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding Gödel code of a code and evaluating a code respectively.
+For instance, in $\lambda$-calculus, it is well-known~\cite{Barendregt1984a} that there are terms encoding the Gödel code of a code and evaluating a code respectively.
 
 Recently, Kavvos proposed \emph{intensional recursion}~\cite{Kavvos2021} for $\mathtt{Code}$ to construct a value recursively from its own code (intension).
 Logically, intensional recursion amounts to the \textbf{G}ödel-\textbf{L}öb axiom $\Box (\Box A \to A) \to \Box A$ for the modal logic \GL~\cite{Boolos-provability}, where $\Box A$ stands for `$A$~is provable'.
