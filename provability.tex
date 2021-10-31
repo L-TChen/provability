@@ -178,7 +178,7 @@ This reflects the fact that they are constructive disjunction and existential qu
 In particular, from a proof of $\sm{x : A} R(x)$ we can project a witness $x : A$ and a proof of $R(x)$.
 
 For any type~$A$, the \emph{propositional truncation} of~$A$ is a type~$\brck A$ for which there is an introduction rule that wraps any $a : A$ into $\bproj{a} : \brck A$, and a higher one that introduces an inhabitant of $\bproj{a} =_{\brck A} \bproj{b}$ for any $a$,~$b : A$, equating all inhabitants of~$\brck A$ and making~$\brck A$ a proposition; its recursion principle maps $\brck A$ to a proposition~$P$ provided that $A \to P$.
-With truncation, we can obtain a classical version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sm{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sm{x : A} R(x)\right) \to P$.
+With truncation, we introduce a propositional version of existential quantification by defining $\exis{x : A} R(x) \defeq \brck{\sm{x : A} R(x)}$, from which we can no longer project a witness~$x$ and a proof of $R(x)$, but can only derive another proposition~$P$ provided that $\left(\sm{x : A} R(x)\right) \to P$.
 Following the HoTT convention, if an existential quantification in an informal statement is truncated, we will use the words `mere' or `merely' to make it clear.
 
 \emph{Sets} are types whose equality types are all propositions, so for any two inhabitants of a set, there is at most one way for them to be equal.
