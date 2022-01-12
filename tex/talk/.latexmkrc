@@ -1,0 +1,9 @@
+# $pdf_previewer = 'open -a Skim';
+# $pdf_update_method = 4;
+# $pdf_update_command = 'osascript -e "set theFile to POSIX file \"%S\" as alias" -e "set thePath to POSIX path of theFile" -e "tell application \"Skim\"" -e " set theDocs to get documents whose path is thePath" -e " if (count of theDocs) > 0 then revert theDocs" -e "end tell"';
+$pdf_mode=5;
+$clean_ext .= '%R-??.xyc fls bbl tdo vtc snm nav xdv run.xml vrb xcp upa upb lox spl synctex(busy)';
+$clean_full_ext .= 'synctex.gz';
+$hash_calc_ignore_pattern{'pdf'}='^';
+$emulate_aux = 1;
+$aux_dir = 'output';
